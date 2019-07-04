@@ -1,0 +1,319 @@
+#!/bin/sh
+# Do a little magic to run perl from anywhere in your path.
+
+lines=`cat $0 | wc -l`
+lines=`expr $lines - 16`
+checksys=`uname -s`
+if [ "$checksys" != "SunOS" ]
+then
+  tail -n $lines $0 > /tmp/visitperl$$
+else
+  tail -$lines $0 > /tmp/visitperl$$
+fi
+echo "__END__" >> /tmp/visitperl$$
+echo "$0 $*" >> /tmp/visitperl$$
+exec perl /tmp/visitperl$$ $0 ${1+"$@"}
+
+unlink $0;
+$0 = shift @ARGV;
+
+local (@briefs);
+local (@funcs);
+local (@params);
+local (@args);
+local (@descriptions);
+
+local($iface) = "";
+local($enum_body) = 0;
+local($brace_level) = 0;
+local(%vals) = () ;
+
+### Gather the info...
+local($value) = 0;
+local($infunc) = "";
+local($inpreamble) = 0;
+local($inargs) = 0;
+local($inparams) = 0;
+local($paramname) = "";
+local($paramdesc) = "";
+local($paramsense) = "";
+local($arglist) = "";
+local($paramlist) = "";
+local($descr) = "";
+
+while (<>) {
+    # beginning of a preamble
+    if (/^\s*\/\*\*\s*\\brief\s*(.*)/) {
+        $infunc = "";
+        $inpreamble = 1;
+        print "\n\n\n\n\n";
+        print "*************************************************\n";
+        print "pushing brief...\n";
+        print $1, "\n";
+        push(@briefs, $1);
+
+    # beginning of function
+    } elsif (/^\s*void\s*i(Base|MeshP?|Geom|Rel|Field)_(.*)\(\s*(.*)/) {
+        print "pushing func i$1_$2\n";
+        push (@funcs, "i$1_$2");
+        local ($tmp) = $3;
+
+        # end of func too
+        if (/.*\)\;$/) {
+            chop($tmp);
+            chop($tmp);
+            local(@tmpargs) = split(',',$tmp);
+            local($tmpa);
+            foreach $tmpa (@tmpargs) {
+                local (@tmpb) = split(' ', $tmpa);
+                local ($tmpc) = join(' ', @tmpb[0 .. $#tmpb-1]);
+                print "adding an arg (2)... $tmpc:$tmpb[-1]\n";
+                $arglist = "$arglist\@$tmpc:$tmpb[-1]";
+            }
+            $infunc = "";
+            print "pushing args (a) $arglist\n";
+            push(@args,$arglist);
+            $arglist = "";
+        } else {
+            chop($tmp);
+            local (@tmpb) = split(' ', $tmp);
+            local ($tmpc) = join(' ', @tmpb[0 .. $#tmpb-1]);
+            if ($tmpb[-1] ne "")  {
+                print "adding an arg (3)... $tmpc:$tmpb[-1]\n";
+                $arglist = "$arglist\@$tmpc:$tmpb[-1]";
+            }
+            $infunc = "i$1_$2";
+        }
+        $inpreamble = 0;
+        $inparams = 0;
+
+    # end of preamble
+    } elsif (/^\s*\*\/$/) {
+        if ($paramname ne "") {
+            $paramlist = "$paramlist\@$paramname:$paramdesc:$paramsense";
+        }
+        print "pushing params $paramlist\n";
+        push(@params, $paramlist);
+        print "pushing description...\n";
+        print $descr, "\n";
+        push(@descriptions, $descr);
+        $inpreamble = 0;
+        $inparams = 0;
+        $paramname = "";
+        $paramsense = "";
+        $paramdesc = "";
+        $paramlist = "";
+        $descr = "";
+
+    # end of func
+    } elsif (/^\s*([a-zA-Z0-9_* ]*) ([a-zA-Z0-9_*]*)\s*\)\;\s*$/) {
+        print "adding an arg (4)... $1:$2\n";
+        $arglist = "$arglist\@$1:$2";
+        print "pushing args (b) $arglist\n"; 
+        push(@args,$arglist);
+        $arglist = "";
+
+        if ($#funcs != $#args) {
+            print "problem with main array sizes at \"$infunc\"\n";
+            print "#briefs = $#briefs\n";
+            print "#funcs = $#funcs\n";
+            print "#descriptions = $#descriptions\n";
+            print "#args = $#args\n";
+            print "#params = $#params\n";
+            exit 0;
+        }
+
+        if ($#briefs == $#funcs - 1) {
+            push(@briefs, "Brief unavailable");
+        } elsif ($#briefs != $#funcs) {
+            print "problem with main array sizes at \"$infunc\"\n";
+            print "#briefs = $#briefs\n";
+            print "#funcs = $#funcs\n";
+            print "#descriptions = $#descriptions\n";
+            print "#args = $#args\n";
+            print "#params = $#params\n";
+            exit 0;
+        }
+
+        if ($#descriptions == $#funcs - 1) {
+            push(@descriptions, " * Description unavailable\n");
+        } elsif ($#descriptions != $#funcs) {
+            print "problem with main array sizes at \"$infunc\"\n";
+            print "#briefs = $#briefs\n";
+            print "#funcs = $#funcs\n";
+            print "#descriptions = $#descriptions\n";
+            print "#args = $#args\n";
+            print "#params = $#params\n";
+            exit 0;
+        }
+
+        if ($#params == $#funcs - 1) {
+            push(@params,"@:::::::::::::::::::::::::");
+        } elsif ($#params != $#funcs) {
+            print "problem with main array sizes at \"$infunc\"\n";
+            print "#briefs = $#briefs\n";
+            print "#funcs = $#funcs\n";
+            print "#descriptions = $#descriptions\n";
+            print "#args = $#args\n";
+            print "#params = $#params\n";
+            exit 0;
+        }
+        $infunc = "";
+
+    # more description or params
+    } elsif ($inpreamble == 1) {
+
+        # params
+        if (/^\s*\*\s*\\param\s*\[(in|In|out|Out|InOut|inout|Inout)\]\s*([a-zA-Z0-9_\.\(\)*]*) (.*)$/) {
+            if ($paramname ne "") {
+                $paramlist = "$paramlist\@$paramname:$paramdesc:$paramsense";
+            }
+            $paramsense = $1;
+            $paramname = $2;
+            $paramdesc = $3;
+            $inparams = 1;
+        } elsif ($inparams == 1) {
+            if ($paramdesc ne "") {
+                local($tmp) = $_;
+                $tmp =~ s/^\s*\*\s*(.*)/$1/;
+                $paramdesc = "$paramdesc $tmp";
+            } else {
+                $paramdesc = $2;
+            }
+
+        # description
+        } else {
+            local($tmp) = $_;
+            $tmp =~ s/^\s*\* (.*)$/$1/;
+            local($tmpc) = $tmp;
+            $tmpc =~ tr/\* //d;
+            chomp($tmpc);
+            if ($tmpc ne "") {
+                $descr = "$descr \* $tmp";
+            }
+        }
+
+    # more args
+    } elsif ($infunc ne "") {
+        tr/,);//d;
+        local (@tmpb) = split(' ', $_);
+        local ($tmpc) = join(' ', @tmpb[0 .. $#tmpb-1]);
+        print "adding an arg (1)... $tmpc:$tmpb[-1]\n";
+        $arglist = "$arglist\@$tmpc:$tmpb[-1]";
+
+    # we don't know what this is
+    } else {
+    }
+
+}
+
+$i = 0;
+foreach $funcname (@funcs) {
+    print "/***************************************************************************//**\n";
+    print " * \\brief $briefs[$i]\n";
+    print " *\n";
+    print "$descriptions[$i]";
+    print " ******************************************************************************/\n";
+    print "void $funcname(\n";
+    local(@arglist) = split('@',$args[$i]);
+    local(@paramlist) = split('@',$params[$i]);
+#print "arglist is...\n";
+#foreach $arg (@arglist) {
+#    print "\"$arg\"\n";
+#}
+#print "paramlist is...\n";
+#foreach $param (@paramlist) {
+#    print "\"$param\"\n";
+#}
+    $j = 1;
+    foreach $arg (@arglist) {
+        local($comma) = ",";
+        if ($arg eq $arglist[$#arglist]) {
+            $comma = "";
+        }
+        local($argsense) = "";
+        local($param) = $paramlist[$j];
+        local($paramname,$paramdesc,$paramsense) = split(':',$param);
+        local($argtype,$argname,$argsense) = split(':',$arg);
+        local($tmpa) = $argname;
+        $tmpa =~ tr/\*//d;
+        local($tmpp) = $paramname;
+        $tmpp =~ tr/\*//d;
+        if ($tmpp ne "instance" and $tmpa ne "err" and $tmpa ne $tmpp) {
+#             print "Error: argname \"$tmpa\" doesn't match paramname \"$tmpp\"\n";
+             $paramdesc = "description unknown";
+        }
+        if ($paramsense eq "In") {
+            $argsense = "[in]";
+        } elsif ($paramsense eq "in") {
+            $argsense = "[in]";
+        } elsif ($paramsense eq "Out") {
+            $argsense = "[out]";
+        } elsif ($paramsense eq "out") {
+            $argsense = "[out]";
+        } elsif ($paramsense eq "inout") {
+            $argsense = "[in,out]";
+        } elsif ($paramsense eq "Inout") {
+            $argsense = "[in,out]";
+        } elsif ($paramsense eq "InOut") {
+            $argsense = "[in,out]";
+#        } else {
+#            $argsense = "[???]";
+        }
+        if ($argsense eq "in") {
+            $argsense = "[in]";
+        } elsif ($argsense eq "out") {
+            $argsense = "[out]";
+        } elsif ($argsense eq "inout") {
+            $argsense = "[inout]";
+        }
+        if ($tmpa eq "instance") {
+            $paramdesc = "iField instance handle";
+            $argsense = "[in]";
+        }
+        if ($tmpa eq "err") {
+            $paramdesc = "Returned Error status (see iBase_ErrorType)";
+            $argsense = "[out]";
+        }
+        local($stars) = $argname;
+        $stars =~ s/(\**)(.*)$/$1/;
+        local($argnametmp) = $argname;
+        $argnametmp =~ s/(\**)(.*)$/$2/;
+        next if ($argtype eq "");
+#        print "    $argtype$stars $argnametmp$comma/* $argsense $paramdesc */\n";
+        print "    $argtype$stars $argnametmp$comma\n";
+#        print "        /**< $argsense $paramdesc */\n";
+        $line="         \/\*\*< $argsense $paramdesc \*\/";
+        $line =~ tr/ //s;
+        if (length($line)>79) {
+            @words = split(' ',$line);
+            local $off=0;
+            print "       ";
+            foreach $word (@words) {
+                if (($off+length($word))>71) {
+                    print "\n";
+                    print "       ";
+                    $off = 0;
+                }
+                print " $word";
+                $off = $off + length($word) + 1;
+            }
+            print "\n";
+        } else {
+            printf "       $line\n";
+        }
+        if ($tmpa eq "instance") {
+            if ($tmpp eq "instance") {
+#print "incrimenting j\n";
+                $j = $j + 1;
+            }
+        } else {
+#print "incrimenting j\n";
+            $j = $j + 1;
+        }
+    }
+    print ");\n\n";
+    $i = $i + 1;
+}
+
+exit 0;

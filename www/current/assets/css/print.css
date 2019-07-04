@@ -1,0 +1,142 @@
+body {
+	font-family: Calibri, Arial, sans-serif;
+	margin: 0 0 30px 0;
+	padding: 0px;
+	color: #000;
+	background-color: #FFF;
+	font-size: 100%;
+	min-width: 940px;
+}
+#masthead {
+	font-family: Candara, Arial, sans-serif;
+}
+#masthead h1 {
+	font-size: 1.5em;
+	text-transform: uppercase;
+	letter-spacing: normal;
+	margin: 0px;
+	font-weight: normal;
+	color: #CCC;
+	padding: 16px 0px 42px 20px;
+	background-image: url(../../img/abs_Masthead.jpg);
+	background-repeat: repeat-x;
+	background-color: #4F4F4F;
+	background-position: left bottom;
+}
+.subhead {
+	font-size: 0.7em;
+	margin: 0 0 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.15em;
+	margin: 3px 0 12px 22px;
+	position: relative;
+	top: -28px;
+}
+
+#layoutwrapper {
+	margin: 0px auto;
+	width: 924px;
+	padding: 8px;
+	border: 1px solid #000;
+}
+#banner {
+	background-image: url(../../img/abs04_topper.jpg);
+	background-repeat: no-repeat;
+	background-position: left bottom;
+	padding-bottom: 12px;
+}
+#banner img {vertical-align: bottom; border: 0;}
+#columnwrapper {
+	background-image: url(../../img/abs04_columns_wrapper.jpg);
+	zoom: 1;
+}
+.maincolumn, .sidebar1 {
+	float: left;
+}
+.maincolumn {
+	width: 716px;
+	font-size: 0.85em;
+	margin-right: 8px;
+}
+.sidebar1 {
+	width: 200px;
+	color: #000;
+	font-size: 0.75em;
+	margin-right: 0px;
+}
+.content {
+	padding: 32px;
+	line-height: 1.5em;
+}
+.sidebar1 .content {
+	padding: 32px 24px;
+}
+.maincolumn h1 {
+	font-size: 1.5em;
+	text-transform: uppercase;
+	letter-spacing: normal;
+	font-weight: normal;
+	line-height: normal;
+}
+h2 {
+	font-family: Candara, Arial, sans-serif;
+	letter-spacing: 0.2em;
+	font-size: 1.2em;
+	text-transform: uppercase;
+	margin: 24px 0 0 0;
+}
+h3 {
+	font-family: Candara, Arial, sans-serif;
+	font-size: 1.2em;
+	margin: 24px 0 0 0;
+}
+.noMarginTop {
+	margin-top: 0;
+}
+h3.epmTopper {
+	text-transform: uppercase;
+	letter-spacing: 0.35em;
+	font-size: 0.9em;
+	margin: 16px 0 0;
+	color: #000;
+	background-color: #FFF;
+	padding: 6px 6px 6px 12px;
+	border: 1px solid #000;
+}
+#footer_wrapper {
+	background-image: url(../../img/abs04_footer_top.jpg);
+	background-repeat: no-repeat;
+	padding: 12px 0 0 0;
+	clear: both;
+	zoom: 1;
+	background-position: left bottom;
+}
+.footer {
+	color: #000;
+	font-size: 0.7em;
+	overflow: hidden;
+	zoom: 1;
+	padding: 16px 32px;
+	text-align: center;
+}
+.footer p {
+	margin: 0px 0 4px 0;
+}
+.uppercase {
+	text-transform: uppercase;
+	letter-spacing: .15em;
+}
+.footer ul {
+	margin: 16px 0 0 0;
+	padding: 0;
+}
+.footer li {
+	list-style-type: none;
+	margin: 4px 0;
+}
+.footer a {
+	color: #000;
+}
+.footer a:hover {
+	color: #4882D9;
+}

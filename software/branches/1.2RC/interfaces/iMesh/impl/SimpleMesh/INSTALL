@@ -1,0 +1,21 @@
+To build the GRUMMP TSTTM code, do the following:
+
+1.  Run configure.  If your copy of Babel isn't in a standard place,
+like /usr or /usr/local, you'll need to specify the option:
+
+     --with-BABEL-dir=PATH
+
+    PATH should point to where your babel implementation lives.  The Babel
+    executable is assumed to be PATH/bin/babel, with the Babel run-time
+    libraries in PATH/lib and include files in PATH/include.  If Babel
+    is installed for system-wide use on your machine, PATH probably is
+    /usr/local; in this case, you shouldn't need to specify this option. 
+
+2.  Type make.  Note that make will download the GRUMMP distribution
+    from its FTP server, if you haven't already done so.  This implies
+    that you need a network connection and the patience to wait for
+    about 2 megabytes of data to come through this connection.
+
+    Once make is done, you can choose to 'make clean' to get rid of
+    object files.
+

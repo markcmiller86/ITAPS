@@ -1,0 +1,53 @@
+\subsection{Fields Interface}
+
+PDE's are written in terms of tensor quantities. Fields are the
+discretized representations of tensor quantities over the mesh and
+represent the key quantities operated on in the numerical analysis of
+PDEÕs. A single field can be used by a number of different analysis
+routines that interact and the field may be associated with multiple
+meshes having alternative relationships between them. The definition
+and quantification of a field includes:
+
+\begin{itemize}
+\item Specification of the tensor order and dimension which indicate the number of components of the tensor as well as any symmetries of the tensor [3]. 
+
+\item Indication of the portion of the domain, and associated mesh entities, the field acts over.
+
+\item Specification of the distribution functions defined over those mesh entities that indicate 
+how the field can vary over the mesh.
+
+\item Specification of the values of the degrees of freedom (dof) that will fix the values of the distribution of the field. 
+\end{itemize}
+
+The field interface is being designed to support the qualification and
+manipulation of fields over meshes that can arise in simulations in
+which the fields must interact with multiple meshes as used in
+adaptive and/or multiphysics analysis. Central to this design is
+defining the a field in terms of a qualification of the tensor it is
+defining and a set of field instances where there is a field instance
+defined for each mesh the field is defined over for that portion of
+the domain. The information qualifying the tensor includes it order,
+dimension, symmetries and coordinate system. This information is
+required to define the storage of the tensor, support its
+transformation to other systems and to define how various operations
+must interact with it. The field instance includes qualification of
+the mesh the fields acts over, the distribution functions defined over
+the mesh, the dof and how the three components interact.
+
+Efforts are currently underway to define effective mechanism to define
+and relate the information defining fields that will effectively
+support the needs of mesh-based applications. This will be followed
+by the definition of interoperable functions to:
+\begin{itemize}
+\item Construct a field over a mesh.
+
+\item Load and save fields.
+
+\item Interrogate fields.
+
+\item Manipulate fields on a given mesh.
+
+\item Transfer fields between different meshes including the use of different distributions. 
+\end{itemize}
+
+

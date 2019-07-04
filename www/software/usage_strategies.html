@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>Integration Strategies</title>
+  <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+<center><h1>Strategies
+for Integrating<br>
+ITAPS Software with your Application</h1></center>
+
+ITAPS software is a continually
+growing suite of interoperable software products divided, conceptually,
+into three distinct categories; <span style="font-style: italic;">Integrated-Services,
+Component-Services </span>and<span style="font-style: italic;">
+Interfaces</span>. The diagram below illustrates two
+different methodologies for integration your application with software
+in the ITAPS Software Suite. One method facilitates rapid prototyping
+but, because it involves creating copies of the application's data
+within an <span style="font-style: italic;">ITAPS-Interface
+Implementation</span> is not the highest performance approach. The
+other method essentially amounts to componentizing your application
+with the ITAPS-Interface so that other Component Services within the
+ITAPS Software Suite can interact with it.
+
+<br>
+<img alt="" src="../graphics/itaps_diagram5.gif"
+ style="width: 873px"><br>
+
+This integration
+effort is represented by the blue-green boxes (labeled ITAPS-Interface)
+on the application. In addition, each Integrated- and Component-Service
+with the ITAPS Software Suite may also require a handful of function
+calls to be added to your application. This integration effort is
+represented by the gray and/or magenta boxes (labeled ISx-Interface and
+CS-Interface) on the application.
+
+<br>
+<br>
+In integrating an
+application with the ITAPS Interfaces, there are basically two
+approaches. The first approach is suitable for rapid prototyping of
+capability but not necessarily very high performance. It requires the
+least amount of integration effort and utilizes a <span
+ style="font-style: italic;">Storage-Proxy</span> to serve as the
+intermediary for Components that need to interact with the
+Application's data. This approach essentially involves "building up" a
+copy of the application data inside an existing Implementation of the
+ITAPS Interfaces by making appropriate calls to the handful of methods
+in the ITAPS interfaces that enable an application to construct (as
+opposed to query) a mesh. Once this handful of calls is made, a copy of
+the Application's data is constructed inside the Storage Proxy from
+which it can then be interacted with by all other ITAPS software
+components.<br>
+<br>
+The higher performance approach essentially componentizes the
+application by implementating the ITAPS interface to interact directly
+with the Application's data. Depending on the Components the
+Application wishes to use, a subset or a complete implementation of the
+ITAPS interface(s) may be necessary. The specific portions of the ITAPS
+Interfaces necessary to interact with different Component-Services are
+defined for each Component-Service. In this way, the Application
+becomse another component in the ITAPS Software Suite just like any
+other component.
+</div>
+
+</div>
+</div>
+</body>
+</html>

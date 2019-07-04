@@ -1,0 +1,2 @@
+House autoconf (or maybe in the future, CMake) specific code to facilitate
+software configuration. Examples include i<Whatever>-Defs.in files.

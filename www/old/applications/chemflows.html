@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Basic Energy Sciences</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+<h1>Basic Energy Sciences</h1>
+
+<p><b>Diesel Jet Spray Formation</b></p>
+
+<p><i>ITAPS Personnel</i>: Zhiliang Xu (BNL), James Glimm (BNL/SUNY SB), Roman Samulyak (BNL), Xiaolin Li (SUNY SB)</p>
+
+<p><i>Combustion Personnel</i>: Constantine Tzanos (ANL)</p>
+
+<p><i>Project Status</i>: Active </p>
+
+<p> ITAPS members at BNL and SUNY SB have been working with scientists at
+Argonne to create a simulation code that models spray formation in
+diesel jet break up.  This is an important aspect of the problem as it
+provides input to spray combustion models and is critical for
+predictive modeling of bio-diesel engine combustion.  The overall goal of
+such an effort is the design of a nonpolluting, fuel-efficient engine.  
+The flow geometry is shown in Figure 1.</p>
+
+<p><img src="../graphics/Fig1_initial_jet.gif"></p>
+<p>Figure 1. The flow geometry for the diesel jet spray formation simulation.</p>
+
+<p>Spray formation is a difficult problem for simulation due to</p>
+
+<ul>
+	<li> the geometric complexity and multiscale nature of the spray, </li>
+	<li> the stiff equation of state (EOS) for diesel fuel, and the need to model cavitations, phase transitions, shock waves and other strong hydrodynamic transients, </li>
+	<li> the limited resolution of experimental diagnostics, and </li>
+	<li> the sensitive dependence of spray formation on nozzle geometry and other problem parameters. </li>
+</ul>
+
+<p> To model this process, we are using a 2D compressible fluid code,
+FronTier which has a high quality interface capability that enables
+multiscale resolution of complex geometries. Through our study, we
+have found that the formation of cavitation vapor bubbles is the key
+phenomena contributing to the breakup. We have developed a three scale
+hetrogeneous EOS model consisting of explicitly tracked cavitation
+vapor bubbles within the liquid diesel fuel for the mixed phase
+(diesel vapor/liquid) regime for cavitations in the nozzle and
+atomization, in the regime of a high speed jet. This appears to be the
+first calculation of this nature, and in this high speed atomization
+parameter regime.</p>
+
+<p>The three scales we study are a thermal diffusion boundary layer (nm)
+at the edge of the cavitation bubbles, and regulating the rate of phase
+transition on the bubble wall, the bubble diameter, on the scale of
+microns, and the device (nozzle and combustion chamber) on the scale of cm. </p>
+
+<p>New developments supported by ITAPS required to make this simulation
+a success include: AMR (from code merger with Overture), a phase
+transition module and Riemann solver, and a numerical model for the
+initiation of a tracked bubble, inserted when the pressure is less than
+a critical (tension) value. </p>
+
+<p>The major conclusion is that a multiscale model has been able to
+achieve agreement with quantitative macroscale flow parameters such as
+spray opening angle and spray volume fraction or density, and as a
+qualitative measure of agreement with experiment, the occurrence of
+spray formation. See Figure 2.</p>
+
+<p>The current work is mainly focused on the simulation of the two-phase
+mixture resulting from cavitation. The influence of other parameters
+on spray formation is a subject of further research.</p>
+
+<p><img src="../graphics/Fig2_dens_vorticity.gif"></p>
+
+<p>Figure 2.  Breakup of the diesel jet. Left frame is the vorticity plot. The right frame is the density plot. Blue denotes diesel vapor, red is liquid. </p>
+	</div>
+</div>
+
+</body>
+</html>

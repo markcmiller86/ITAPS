@@ -1,0 +1,22 @@
+#
+#    This cronfile runs the ITAPS testing script each Wednesday at 8am
+#
+#    The first 5 entries correspond to:
+#       minute (0-59)
+#       hour (-23)
+#       day of month (1-31)
+#       month  (1-12)
+#       day of week (0=Sunday; 6=Saturday)
+#
+#       * is 'every' and */m is 'every mth'
+#
+#    The first line sets the return email for cron errors
+#    The following line sets:
+#        time/day to run the script
+#        cd's to the test execution directory
+#        updates the test script 
+#        runs the test script; the log file is iMesh.cron.log and 
+#                              the error file is iMesh.cron.err
+#
+MAILTO=hill66@llnl.gov
+0 8 * * 3 cd /usr/local/itaps/testing/test_runs; svn --username hill66 update; ./run_iMesh_test.sh > iMesh.cron.log 2> iMesh.cron.err

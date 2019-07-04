@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>VisIt Plugins</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>VisIt Plugins</h1>
+
+<p>A key service required by ITAPS users is the ability to visualize
+data from iMesh implementations.  To provide this functionality, we
+are collaborating with the VACET SciDAC center to create an ITAPS
+database plugin for VisIt; their primary delivery vehicle.  The plugin
+currently provides access to basic iMesh data (vertices, regions,
+etc), the ability to write data to an iMesh implementation, some
+support for iMesh sets and tags, and support for zone- and
+node-centered fields as dense tags.  In the initial implementation of
+the iMesh plugin and the integration of iMesh with VisIt, a user was
+required to select a particular implementation of the iMesh interface
+at the time VisIt was configured. That implementation and only that
+implementation would then be supported by the resulting installation
+of VisIt. We added logic to VisIt's configuration tools to allow this
+constraint was relaxed and a single installation of VisIt can support
+multiple implementations of iMesh. 
+
+<p>We have demonstrated that a single
+VisIt executable can display data from the MOAB, FMDB, and GRUMMP
+implementations of iMesh simultaneously. This demonstration also
+served as an important ITAPS milestone in that it was the first time
+multiple implementations of iMesh were linked together into a common
+executable further proving the interoperability of the iMesh
+interface.  Finally, to support parallel visualization for ITAPS,
+VisIt's iMesh plugin was used as a starting point to develop one based
+on iMeshP.  A prototype iMeshP-based plugin was demonstrated on a 4
+processor parallel run with FMDB.
+
+
+
+</div>
+</div>
+
+</body>
+</html>

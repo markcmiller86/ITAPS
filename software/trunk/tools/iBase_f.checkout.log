@@ -1,0 +1,11 @@
+     1	--2013-01-21 17:25:19--  https://redmine.scorec.rpi.edu/anonsvn/itaps/software/trunk/interfaces/iBase/spec/iBase_f.h
+     2	Resolving redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)... 128.113.131.53, 2620:0:2820:4108:80::53
+     3	Connecting to redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)|128.113.131.53|:443... connected.
+     4	HTTP request sent, awaiting response... 200 OK
+     5	Length: 6795 (6.6K) [text/plain]
+     6	Saving to: `iBase_f.h'
+       
+     7	     0K ......                                                100% 59.8M=0s
+       
+     8	2013-01-21 17:25:20 (59.8 MB/s) - `iBase_f.h' saved [6795/6795]
+       

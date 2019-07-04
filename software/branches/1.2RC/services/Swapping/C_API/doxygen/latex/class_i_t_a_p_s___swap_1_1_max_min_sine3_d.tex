@@ -1,0 +1,50 @@
+\hypertarget{class_i_t_a_p_s___swap_1_1_max_min_sine3_d}{
+\section{ITAPS\_\-Swap::MaxMinSine3D Class Reference}
+\label{class_i_t_a_p_s___swap_1_1_max_min_sine3_d}\index{ITAPS\_\-Swap::MaxMinSine3D@{ITAPS\_\-Swap::MaxMinSine3D}}
+}
+Inheritance diagram for ITAPS\_\-Swap::MaxMinSine3D:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2cm]{class_i_t_a_p_s___swap_1_1_max_min_sine3_d}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_max_min_sine3_d_a327f610a8d16c81434b6e0af19640cd1}{
+virtual bool \hyperlink{class_i_t_a_p_s___swap_1_1_max_min_sine3_d_a327f610a8d16c81434b6e0af19640cd1}{shouldMinimize} () const   throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_max_min_sine3_d_a327f610a8d16c81434b6e0af19640cd1}
+
+\begin{DoxyCompactList}\small\item\em Returns true iff the quality measure should be minimized by swapping. \item\end{DoxyCompactList}\item 
+virtual double \hyperlink{class_i_t_a_p_s___swap_1_1_max_min_sine3_d_a4856dd6b9712f90d6327f1c651b90471}{calcQuality} (const double coords\mbox{[}$\,$\mbox{]}, const int coords\_\-size) const   throw (iBase\_\-ErrorType)
+\begin{DoxyCompactList}\small\item\em Evaluates the quality of a single (actual or possible) cell. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_max_min_sine3_d_a4856dd6b9712f90d6327f1c651b90471}{
+\index{ITAPS\_\-Swap::MaxMinSine3D@{ITAPS\_\-Swap::MaxMinSine3D}!calcQuality@{calcQuality}}
+\index{calcQuality@{calcQuality}!ITAPS_Swap::MaxMinSine3D@{ITAPS\_\-Swap::MaxMinSine3D}}
+\subsubsection[{calcQuality}]{\setlength{\rightskip}{0pt plus 5cm}double ITAPS\_\-Swap::MaxMinSine3D::calcQuality (const double {\em coords}\mbox{[}$\,$\mbox{]}, \/  const int {\em coords\_\-size}) const  throw (iBase\_\-ErrorType)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_max_min_sine3_d_a4856dd6b9712f90d6327f1c651b90471}
+
+
+Evaluates the quality of a single (actual or possible) cell. 
+
+Because the vertices are specified only by their coordinates, both current cells and post-\/swapping candidates can easily be accomodated.
+
+
+\begin{DoxyParams}{Parameters}
+\item[\mbox{$\leftarrow$} {\em coords}]Coordinates of vertices (stored as x1,y1,z1, x2,y2,z2, etc; in 2D no z-\/coordinates are passed).\item[\mbox{$\leftarrow$} {\em coords\_\-size}]Number of coordinates passed in.\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Quality measure for these vertices. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_t_a_p_s___swap_1_1_q_m___base_aea047b3afc06b75a1115bbaddd8286ee}{ITAPS\_\-Swap::QM\_\-Base}.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+ITAPS\_\-QualMeasure.hh\item 
+ITAPS\_\-MaxMinSine3D.cc\end{DoxyCompactItemize}

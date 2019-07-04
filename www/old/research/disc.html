@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>High Order Discretization</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>High Order Discretization</h1>
+
+<p>The complexities of discretizing new applications on unstructured and
+adaptively evolving grids have hampered widespread usage of many
+powerful tools, leading to suboptimal strategies or to lengthy
+implementation periods. To overcome these limitations and to
+complement the proposed mesh generation effort, we will develop
+mechanisms that will greatly simplify the discretization of PDEs on
+TSTT center meshes.  The solution methodology typically involves
+(possibly discrete versions of) mathematical operations (+, -, *, /,
+differentiation, div, grad, curl, interpolation, etc.) acting on
+discrete approximations of the field variables relative to the mesh.
+Such operations are:</p>
+<ul>
+	<li><p>complicated by a tedious low-level dependence upon the mesh geometry (e.g. Jacobians),</p></li>
+	<li><p>repeated throughout an application,</p></li>
+	<li><p>a source of subtle bugs during development,</p></li>
+	<li><p>a bottleneck to the interoperability of applications with different mesh structures,</p></li>
+	<li><p>difficult to implement in a general way while maintaining optimal performance, and</p></li>
+	<li><p>often linked with the mesh representation of the domain.</p></li>
+</ul>
+
+<p>We have an excellent opportunity to simplify the development of
+application codes by creating a <i>Discretization Library</i> of
+numerous mathematical operators that are common to PDEs arising in
+many applications.  The operators will be applicable to several
+discretization technologies (as defined below) and the mesh structures
+addressed within this project. Thus we will dramatically lower the
+time, cost, and effort to effectively deploy modern discretization
+tools.  As with mesh generation tools, we will develop common
+interfaces to a wide variety of discretization technologies.  User
+interaction will occur at various levels for use by practitioners
+wishing to rapidly implement a new application, software developers
+wishing to add new operators to the library, and applications
+specialists seeking to incorporate a particular technology into their
+software.  The library will be extensible to allow for user
+implementation of additional generic and application-specific
+operations.  These might, e.g., include numerical flux functions for
+use with conservation laws.  Problem-dependent functions, such as
+equations of state, can be evaluated through a library interface.
+Efficiency is a must and this can be ensured by using an optimization
+approach such as that offered by ROSE or through the concepts of
+generic programming.</p>
+
+<h2>Development of the Discretization Library</h2>
+
+<p>The Discretizatoin Library will provide a representation of
+discrete operations independent of the underlying mesh and its
+geometric factors.  Such techniques have been developed for structured
+mesh topology as part of the LLNL Overture project and for variational
+discretization (finite element, spectral element, partition of unity,
+etc.) as part of RPI's Trellis project.  Thus, collectively we
+understand the advantages and limitations of this approach through
+experience with many application domains. Initially we will provide
+for the inclusion of arithmetic and differentiation operators as well
+as interpolation and projection operators to support multilevel
+solution strategies and preserve local conservation. Other common
+vector (div, grad, curl) and tensor operations will be added to this
+initial set.  The design of the library will:</p>
+
+<ul>
+	<li><p>permit extensibility so that users can add operators,</p></li>
+	<li><p>allow access at mid levels (the traditional approach) or at high levels (the simplified approach), and</p></li>
+	<li><p>permit composition where users build complex expressions by combining operators using, e.g., common array operations.</p></li>
+</ul>
+
+<p>This structure will allow development of application-specific discrete
+operators that depend on the PDEs being solved and the algorithms
+being used to address them.  These, could include, e.g., projection
+operators to handle incompressibility constraints and stabilization
+operators for convection-dominated viscous flow problems.  Boundary
+operators to handle the myriad of boundary conditions typical of the
+SciDAC applications would also be included.</p>
+
+<p>At lower levels of interaction the multiple level interface will be of
+immediate use for existing applications.  This interface is simpler to
+construct, although it is more tedious to use since it exposes many
+details that will be hidden at higher levels.  The higher-level
+interfaces greatly simplify the construction of new applications but
+require a much higher degree of infrastructure and optimization.  The
+Discretization Library will define operators for finite difference
+(FD), finite volume (FV), finite element (FE), spectral element (SE),
+discontinuous Galerkin (DG), and partition of unity (PUM) methods.
+Operators of all orders will be considered, but our emphasis will be
+on the creation of high-order and variable order methods for use with
+adaptive methods focusing on varying both the mesh and order (hp- or
+hpr-refinement).  High-order methods provide rapid convergence
+(p-refinement) and high efficiency in regions where the solution is
+regular; however, convergence stalls near singularities and
+h-refinement offers a more optimal strategy.  The optimal combination
+of the two (hp-refinement) converges at exponential rates and, hence,
+is remarkably efficient.  As part of this project, we will determine
+optimal adaptive enrichment strategies for different situations and
+applications.  Such optimality is currently available only for simple
+academic problems. </p>
+
+<p> High-order FE, FV, and SE methods typically
+associate most of their unknown solution parameters (at nodes) within
+an element.  As such, they simplify communication on parallel
+computers to produce additional efficiencies.  This, however,
+introduces some complications.  Curved boundaries of the regions must
+be approximated to an order of accuracy that is commensurate with that
+of the solution.  The large number of solution parameters within an
+element can lead to ill-conditioned algebraic systems.  Thus, mesh
+quality will be a very important consideration.  </p>
+
+<p> Support for temporal discretization strategies will range from the commonly used
+method-of-lines (MOL) formulation, where time steps and temporal
+methods are spatially independent, to local refinement methods, where
+time steps and methods vary in space, to space-time techniques where
+unstructured meshes are used in space and time.  The library would
+include traditional (strong) and variational (weak) forms of operators
+where applicable. This would permit the combining of methods and
+operations on mixed grids, to create very powerful new discretization
+technologies.  The plug-and-play versatility of the high-level
+discretizations within the library would give users the opportunity to
+experiment with various combinations of discretization technologies
+and optimize performance for their application.  Perhaps of greatest
+importance, the simplification afforded by hiding the complex
+grid-dependent details from users would shorten development times,
+reduce costs, enhance software reuse, and improve reliability of
+applications implemented and maintained in this manner.</p>
+
+<p> Interfaces will be created that allow software developed
+partially or totally from operators in the Discretization Library to
+use the linear and nonlinear algebraic component capabilities
+developed by the Terascale Optimal PDE Simulation (<a href="/isics/tops.html">TOPS</a>) ISIC.  Adaptive approaches using
+automatic mesh refinement/coarsening (h-refinement), variation of
+method order (p-refinement), and mesh motion (r-refinement) are best
+guided by a posteriori estimates of discretization errors.  While this
+is an ongoing and active area of research with several unanswered
+questions and unresolved issues, some error estimates can be provided
+within the Discretization Library with relatively little difficulty.
+Error estimates based on h-refinement (Richardson's extrapolation) use
+the difference between solutions computed on different meshes to
+furnish an estimate.  Since the same differential operator is used for
+each solution and this discrete operator can be composed from tools in
+the library, it is a simple matter to add this error estimate to the
+library.  Error estimates that make use of solutions computed on the
+same mesh with methods of different orders (p-refinement) are also
+relatively straightforward to implement.  The complexity of the
+procedure can be reduced by using a hierarchical basis where the
+solution of order p + 1 may be computed as a correction to that of
+order p.  Simpler ad hoc error indicators, such as solution gradients
+and various vorticity metrics, can also be composed from tools within
+the Discretization Library.  The work on mesh quality metrics
+described in the <a href="mesquite.html"> mesh quality section</a> can be
+combined in a natural way with that on error estimators to provide a
+comprehensive framework for mesh adaptivity.  This framework could
+enable rigorous control over the geometric properties of a mesh to
+reduce errors for h-, p-, and r-refinement.</p>
+
+<p> In many classes of simulation it is necessary to transfer the
+solution fields as the mesh is adapted. In adaptive overlapping grid
+procedures [BrHe00], this includes the transfer between mesh
+patches. In other cases, the mesh adaptations are local refinement,
+coarsening or modifications. In each case, generalized procedures must
+be developed to determine the interacting mesh entities and to perform
+interpolations meeting such requirements as local conservation
+properties. The effective support of solution transfer processes when
+both local modification and independent meshes are combined requires
+specific consideration. Searching structures and parametric inversion
+procedures for curved domain problems using both low and high order
+element geometries must be considered. Particular emphasis must be
+given to local conservation issues when mapping between meshes.</p>
+
+<p><b>Progress to date</b></p>
+
+<p>Efforts in FY02 have been primarily focused on creating the
+infrastructure necessary for the discretization library development.
+The TSTT center has a great deal of expertise in high order and
+adaptive discretization strategies, but most of the implementations
+are tightly coupled to existing TSTT frameworks and are not suitable
+for direct insertion into a stand-alone library.  Thus a great deal of
+effort at LLNL, RPI, and ANL has gone into separating and
+re-implementing low level operators from their respective frameworks.</p>
+
+<p>In particular, the LLNL team has focused on creating new, optimized
+versions of the Overture operators as Fortran-callable functions for
+structured grids which include both conservative and non-conservative
+difference approximations. The non-conservative operators are
+available to 2nd and 4th order.  The addition of 4th order
+conservative approximations is under consideration.  There are
+functions to evaluate the derivatives and also functions to form the
+sparse matrix corresponding to the operator. Most of the derivative
+operators are now completed and work has begun on some of the
+interpolation functions, such as those needed for AMR interpolation.</p>
+
+<p>Simultaneously, efforts at RPI have focused on redesigning Trellis to
+increase its componentization. Trellis is now divided into four
+modules.</p>
+
+<ul>
+<li>A parallel mesh database, PAOMD, that provides critical capabilities
+for accessing the mesh, doing mesh adaptation and handling parallel
+mesh representations. The mesh database is independent of the other
+modules and can be distributed separately. PAOMD provides a TSTT mesh
+interface. Some extensions have been added to the mesh database:
+integration, curved elements and mapping, geometrical queries and
+searches in large meshes, parallel toolbox.</li>
+
+<li>A function space library that provides generic approximation schemes
+capabilities for finite-dimensional field families and contains the
+interpolation schemes (Lagrange, Szabo, Aiffa, Dubiner).</li>
+
+<li>A discretization library that provides basic differential and integral
+operators that act on the function spaces. Differential operators
+include standard operators such as Grad, Div and Curl and those
+commonly used by applications such as various strain definitions. In
+the application of weak forms (e.g., finite element, finite volume,
+partition of unity) local contribution to the global system of
+discrete equations are constructed through the appropriate integration
+of discrete entities (elements, element faces, etc.) of appropriate
+differential operators acting on weighting and trial spaces that are
+in terms of the selected members of the function space library. To
+support the definition of these contributions Trellis supports the
+effective construction of linear, bilinear, trilinear and a general
+operator.  The discretization library also provides the important
+capability of managing degrees of freedom. Degrees of freedom (DOFs)
+are the coefficients of the function space members employed in the
+construction of the contributors. The DOF Manager is a purely
+algebraic tool that is able to store, retrieve, and delete DOFs.</li>
+
+<li>A Solver Driver that provides capabilities to solve multiphysics
+problems. The Solver Driver can interface to solvers such as PETSc,
+Sparskit or DASPK.</li>
+
+</ul>
+
+<p>In addition, at ANL, Fischer has worked to separate the high-order
+spectral elements used in the Nek5000 framework.  He has created a
+self-contained set of routines to general spectral discretrization
+components on an element-by-element basis.  He currently supports a
+number of different operators commonly found in PDE simulations and is
+working to provide both Fortran and Matlab implementations.</p>
+
+<p>Finally, preliminary efforts are underway to define the common
+interfaces needed for discretization operators and fields.  An initial
+draft based on a prototype implementation has been proposed by the LLNL
+team.</p>
+
+<h2>Performance Optimization of Discretization Operators</h2>
+
+<p>There are two aspects that must be addressed in the performance
+optimization of discretization operators for terascale computing.  The
+first is obtaining good single processor performance.  To accomplish
+this goal, mechanisms for compile-time optimization of user defined
+high-level abstractions will be investigated as part of a
+collaboration with the High-End Computer System Performance: Science
+and Engineering ISIC; specifically we will investigate the ROSE
+preprocessing mechanisms. This work will address the hierarchical
+memory performance and particularly the cache usage of statements that
+use the operators defined within the Discretization Library and
+user-defined operators.  The concepts of generic programming where
+algorithms are separated from particular data structures could
+certainly be an important factor in implementing distinct
+discretization strategies on the diverse mesh structures.  This
+concept has produced substantial performance gains when used with the
+RPM parallel data management system.  Second, the algorithms for
+creating and composing the discrete operators and (for implicit
+operators) assembling them into a global algebraic system must scale
+well on distributed memory architectures.  In most cases, because the
+discrete operators are local in nature, we will be able to easily
+accomplish this goal. For example, variational operators are created
+by traversing geometric entities (e.g., elements) of the mesh.
+Interprocessor communication is only required for entities on the
+boundaries of distributed-memory processor partition boundaries.
+Finite difference operators proceed in much the same way with,
+perhaps, a more complicated communication due to "ghost cells" at
+partition boundaries.</p>
+	</div>
+</div>
+
+</body>
+</html>

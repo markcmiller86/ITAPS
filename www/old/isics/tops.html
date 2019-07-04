@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>TOPS</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+	<link type="text/css" rel="stylesheet" href="/templates/isics.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><!--#include virtual="../templates/banner.html"--></div>
+
+<div id="nav"><!--#include virtual="../templates/nav.html"--></div>
+
+<div id="content">
+
+<h1>TOPS</h1>
+
+<p><i><a href="http://tops-scidac.org">
+Toward Optimal Petascale Simulations (TOPS) ISIC</a><br />
+PI: David Keyes (ODU), ITAPS Point of Contact: M. Shephard (RPI)</i></p>
+
+<p>The solution of large-scale PDE problems typically leads to a large,
+sparse linear or nonlinear algebraic system.  Dimensions easily range
+into the hundreds of millions.  With the emergence of hierarchical
+computing systems and inexpensive clusters this number will
+dramatically rise in the next few years. Suboptimal algebraic solution
+strategies can easily dominate the computational time and often mean
+the difference between being able or not being able to solve a
+problem.  Efficiency in a terascale environment is a must.
+Fortunately, the TOPS ISIC is addressing these issues and developing
+the optimal multiscale solution software and strategies needed for the
+applications cited in this proposal and others intending to use our
+mesh and discretization libraries.  This is an excellent opportunity
+for cooperation and collaboration.  Reversing the perspective, the
+meshing software, adaptive procedures, and discretization library to
+be developed by this effort provide the TOPS ISIC with a source of
+algebraic systems that will be obtained by the most advanced
+technologies.</p>
+
+<p>Initial interactions with TOPS have focused on a careful examination
+of the latest version of PETSc (a key TOPS solver technology) and its
+integration into Trellis. The integration into the new version of
+Trellis has been carried out for fixed mesh analysis using the Trellis
+DOF manager to coordinate the linkage with the overall global systems
+and to provide the assembler with the mesh entity level
+contributors. The contributors have been assembled into appropriate
+PETSc structures for solution. Initial parallel analyses are underway
+and efforts to ensure efficiency are beginning.</p>
+
+<p>An examination of the issues surrounding the support of adaptive
+calculations has been started by determining which PETSc structures
+will best support such simulations. One natural selection is the
+matrix free GMRES method. We plan to investigate the application of
+the matrix free GMRES for an adaptive calculations. Efforts will then
+begin on the long-term effort with TOPS developers to determine the
+most effective methods to combine ITAPS adaptive mesh structures with
+TOPS solvers.</p>
+
+<p>
+In addition, we are carefully following the definition of the TOPS
+vector, matrix, and solver interfaces to ensure that the compatibility
+of our discretization library.  These interfaces are still under
+development (primarily at ANL) and we have attended several
+meetings with TOPS scientists to discuss their development as it
+relates to ITAPS functionality.</p>
+	</div>
+	<div id="footer">
+<!--#include virtual="/templates/footer.html"-->
+	</div>
+</div>
+
+</body>
+</html>

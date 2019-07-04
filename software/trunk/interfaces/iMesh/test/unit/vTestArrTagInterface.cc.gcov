@@ -1,0 +1,385 @@
+        -:    0:Source:vTestArrTagInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestArrTagInterface(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  // Not testing save/load in this function; if entity tags are handled
+        -:    6:  // properly with save/load (as tested in the entity tag test), they'll
+        -:    7:  // be fine here, just a lot harder to test.
+        -:    8:
+        -:    9:  //     getArrData, getIntArrData, getDblArrData, getEHArrData,
+        -:   10:  //     setArrData, setIntArrData, setDblArrData, setEHArrData,
+        -:   11:  //     rmvArrTag
+        1:   12:  cout << "Testing basic array tagging functionality...\n";
+        -:   13:  iBase_TagHandle aTags[7];
+        1:   14:  int iOutputAlloc = 9*sizeof(double);
+        1:   15:  void *aOutput = calloc(iOutputAlloc, 1);
+        -:   16:  iBase_EntityHandle aEnts[3];
+        -:   17:  int aints[9];
+        -:   18:  double aDoubles[9];
+        -:   19:  iBase_EntityHandle aHandles[9];
+        -:   20:
+        -:   21:  int iNumChars, iNumVals, err;
+        -:   22:
+        -:   23:  // Begin the "normal" operation testing.
+        -:   24:
+        -:   25:  {
+        -:   26:    iBase_EntityIterator pvIter;
+        -:   27:    // Get at least 3 entities to work with
+        -:   28:    iMesh_initEntIter(instance, pvRootSet, iBase_ALL_TYPES, 
+        1:   29:		      iMesh_ALL_TOPOLOGIES, 0, &pvIter, &err);
+        1:   30:    CHECK_ERR(err);
+        1:   31:    if (err != iBase_SUCCESS) {
+    #####:   32:      cout << "\nCould not get mesh data to work with... exiting...\n";
+    #####:   33:      TEST ( data_preparation );
+        -:   34:      return;
+        -:   35:    }
+        -:   36:    
+        1:   37:    int qGotData, i = 0;  
+        1:   38:    iMesh_getNextEntIter(instance, pvIter, &aEnts[i], &qGotData, &err);
+        1:   39:    CHECK_ERR(err);
+        1:   40:    i++;
+        4:   41:    while (qGotData && i < 3) {
+        2:   42:      iMesh_getNextEntIter(instance, pvIter, &aEnts[i], &qGotData, &err);
+        2:   43:      CHECK_ERR(err);
+        2:   44:      i++;
+        -:   45:    }
+        1:   46:    if (!qGotData) {
+    #####:   47:      cout << "\nCould not get enough mesh data to work with... exiting...\n";
+    #####:   48:      TEST ( data_preparation );
+        -:   49:      return;
+        -:   50:    }
+        1:   51:    iMesh_endEntIter(instance, pvIter, &err);
+        1:   52:    CHECK_ERR(err);
+        -:   53:  }
+        -:   54:
+        -:   55:  // Create tags of each type that store a single value
+        4:   56:  for ( int i=0; i<3; i++ ) {
+        3:   57:    iMesh_createTag(instance, astrTagNames[i], 3, aTagTypes[i], &aTags[i], &err, aiTagNameLen[i]);
+        3:   58:    CHECK_ERR(err);
+        -:   59:  }
+        -:   60:  // ... and a generic tag for completeness
+        1:   61:  iMesh_createTag(instance, astrTagNames[3], 6, aTagTypes[3], &aTags[3], &err, aiTagNameLen[3]);
+        1:   62:  CHECK_ERR(err);
+        -:   63:
+        1:   64:  cout << "Testing get and set methods with integers...              ";
+        -:   65:  bool qGotData;
+        -:   66:  {
+        -:   67:    // Try setting the data using the generic function...
+        1:   68:    iNumChars = 3*3*sizeof(int);
+        1:   69:    int aiData[] = {4,8,12,16,20,24,28,32,36};
+        1:   70:    char *aChars = (char*)(aiData);
+        -:   71:
+        1:   72:    iMesh_setArrData(instance, aEnts, 3, aTags[0], aChars, iNumChars, &err);
+        1:   73:    CHECK_ERR(err);
+        -:   74:    // ... then seeing if it comes back intact
+        -:   75:    iMesh_getArrData(instance, aEnts, 3, aTags[0],
+        1:   76:		     &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:   77:    CHECK_ERR(err);
+        1:   78:    qGotData = ( iNumChars == 3*3*(int)sizeof(int) );
+        1:   79:    if ( qGotData ) {
+        1:   80:      int *piOutput = (int*)aOutput;
+       10:   81:      for ( int i=0; i<9; i++ )
+        9:   82:	qGotData = qGotData && ( piOutput[i] == 4*(i+1) );
+        -:   83:    }
+        1:   84:    TEST ( qGotData );
+        -:   85:
+        -:   86:    // Now try to change the data using the specific function
+        -:   87:    // and ensure it comes back intact
+       10:   88:    for ( int i=0; i<9; i++ )
+        9:   89:      aints[ i] =  5*(i+1) ;
+        1:   90:    iMesh_setIntArrData(instance, aEnts, 3, aTags[0], aints, 9, &err);
+        1:   91:    CHECK_ERR(err);
+        1:   92:    int *aintsBack = NULL, iintsAlloc = 0;
+        -:   93:    iMesh_getIntArrData(instance, aEnts, 3, aTags[0],
+        1:   94:			&aintsBack, &iintsAlloc, &iNumVals, &err);
+        1:   95:    CHECK_ERR(err);
+        1:   96:    qGotData = ( iNumVals == 9 );
+        1:   97:    if ( qGotData ) {
+       10:   98:      for ( int i=0; i<9; i++ )
+        9:   99:	qGotData = qGotData && ( aintsBack[i] == 5*(i+1) );
+        -:  100:    }
+        1:  101:    TEST ( qGotData );
+        1:  102:    UT_FREE(aintsBack);
+        -:  103:  } 
+        1:  104:  cout << "DONE\n"; // Testing array int tags.
+        -:  105:
+        1:  106:  cout << "Testing get and set methods with doubles...               ";
+        -:  107:  {
+        -:  108:    // Try setting the data using the generic function...
+        1:  109:    iNumChars = 9*sizeof(double);
+        1:  110:    double adData[] = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 };
+        1:  111:    char *aChars = (char*)(adData);
+        1:  112:    iMesh_setArrData(instance, aEnts, 3, aTags[1], aChars, iNumChars, &err);
+        1:  113:    CHECK_ERR(err);
+        -:  114:    // ... then seeing if it comes back intact
+        1:  115:    iNumChars = 0;
+        1:  116:    iMesh_getArrData(instance, aEnts, 3, aTags[1], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  117:    CHECK_ERR(err);
+        1:  118:    qGotData = ( iNumChars == 9*(int)sizeof(double) );
+        1:  119:    if ( qGotData ) {
+        1:  120:      double *pdOutput = (double*)aOutput;
+       10:  121:      for ( int i=0; i<9; i++ )
+        9:  122:	qGotData = qGotData && APPROX_EQUAL(pdOutput[i], ((double)(i+1))/10);
+        -:  123:    }
+        1:  124:    TEST ( qGotData );
+        -:  125:    // Now try to change the data using the specific function
+        -:  126:    // and ensure it comes back intact
+       10:  127:    for ( int i=0; i<9; i++ )
+        9:  128:      aDoubles[i] =  ((double)(i+1))/5;
+        1:  129:    iMesh_setDblArrData(instance, aEnts, 3, aTags[1], aDoubles, 9, &err);
+        1:  130:    CHECK_ERR(err);
+        1:  131:    double *aDoublesBack = NULL;
+        1:  132:    int iDoublesBackAlloc = 0;
+        -:  133:    iMesh_getDblArrData(instance, aEnts, 3, aTags[1],
+        1:  134:			&aDoublesBack, &iDoublesBackAlloc, &iNumVals, &err);
+        1:  135:    CHECK_ERR(err);
+        1:  136:    qGotData = ( iNumVals == 9 );
+        1:  137:    if ( qGotData ) {
+       10:  138:      for ( int i=0; i<9; i++ )
+        9:  139:	qGotData = qGotData && APPROX_EQUAL(aDoublesBack[i],((double)(i+1))/5);
+        -:  140:    }
+        1:  141:    TEST ( qGotData );
+        1:  142:    UT_FREE(aDoublesBack);
+        -:  143:  }
+        1:  144:  cout << "DONE\n";
+        -:  145:
+        1:  146:  cout << "Testing get and set methods with entity handles...        ";
+        -:  147:  {
+        -:  148:    // Try setting the data using the generic function...
+        1:  149:    iNumChars = 9*sizeof(iBase_EntityHandle);
+        -:  150:
+        -:  151:    iBase_EntityHandle aEntTemp[9];
+       10:  152:    for ( int i=0; i<9; i++ )
+        9:  153:      aEntTemp[i] = aEnts[i%3];
+        1:  154:    char *aChars = (char*)aEntTemp;
+        -:  155:
+        1:  156:    iMesh_setArrData(instance, aEnts, 3, aTags[2], aChars, iNumChars, &err);
+        1:  157:    CHECK_ERR(err);
+        -:  158:
+        -:  159:    // ... then seeing if it comes back intact
+        -:  160:    iMesh_getArrData(instance, aEnts, 3, aTags[2],
+        1:  161:		     &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  162:    CHECK_ERR(err);
+        1:  163:    qGotData = ( iNumChars == 9*(int)sizeof(iBase_EntityHandle) );
+        1:  164:    if ( qGotData ) {
+        1:  165:      iBase_EntityHandle *aEntOut = (iBase_EntityHandle*)aOutput;
+       10:  166:      for ( int i=0; i<9; i++ )
+        9:  167:	qGotData = qGotData && ( aEntOut[i] == aEntTemp[i] );
+        -:  168:    }
+        1:  169:    TEST ( qGotData );
+        -:  170:
+        -:  171:    // Now try to change the data using the specific function
+        -:  172:    // and ensure it comes back intact
+       10:  173:    for ( int i=0; i<9; i++ )
+        9:  174:      aHandles[i] =  aEnts[(i+1)%3];
+        -:  175:
+        1:  176:    iMesh_setEHArrData(instance, aEnts, 3, aTags[2], aHandles, 9, &err);
+        1:  177:    CHECK_ERR(err);
+        1:  178:    iBase_EntityHandle *aEntOut = NULL;
+        1:  179:    int iEntOutAlloc = 0;
+        -:  180:    iMesh_getEHArrData(instance, aEnts, 3, aTags[2],
+        1:  181:		       &aEntOut, &iEntOutAlloc, &iNumVals, &err);
+        1:  182:    CHECK_ERR(err);
+        -:  183:
+        1:  184:    qGotData = ( iNumVals == 9 );
+        1:  185:    if ( qGotData ) {
+       10:  186:      for ( int i=0; i<9; i++ )
+        9:  187:	qGotData = qGotData && ( aEntOut[i] == aEnts[(i+1)%3] );
+        -:  188:    }
+        1:  189:    TEST ( qGotData );
+        1:  190:    UT_FREE(aEntOut);
+        -:  191:  } 
+        1:  192:  cout << "DONE\n"; // with handle tag testing
+        -:  193:
+        1:  194:  cout << "Testing get and set methods with generic data (bytes)...  ";
+        -:  195:  {
+        -:  196:    // Try setting the data using the generic function...
+        1:  197:    iNumChars = 18;
+        1:  198:    char aChars[] = "abcdefghijklmnopqr";
+        -:  199:
+        1:  200:    iMesh_setArrData(instance, aEnts, 3, aTags[3], aChars, iNumChars, &err);
+        1:  201:    CHECK_ERR(err);
+        -:  202:    // ... then seeing if it comes back intact
+        -:  203:
+        1:  204:    iMesh_getArrData(instance, aEnts, 3, aTags[3], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  205:    CHECK_ERR(err);
+        -:  206:    qGotData = ( iNumChars == 18 ) && 
+        1:  207:      !strncmp(aChars, reinterpret_cast<char*>(aOutput), iNumChars);
+        1:  208:    TEST ( qGotData );
+        -:  209:  } 
+        1:  210:  cout << "DONE\n"; // with generic tag testing
+        -:  211:
+        -:  212:  // Testing error throwing
+        1:  213:  if ( qErrTests ) {
+        -:  214:    iMesh_Instance new_instance;
+        1:  215:    iMesh_newMesh("", &new_instance, &err, 0);
+        -:  216:
+        1:  217:    cout << "Testing error throwing for array tag methods...              ";
+        -:  218:    // Error throwing tests simply try to create a situation where the intefrace
+        -:  219:    // should, according to the spec, throw an error, and verify that:
+        -:  220:    // (a) an error is thrown, and (b) the error is the one expected.
+        -:  221:    // If an error is not thrown, the reveral of the action is attempted, if
+        -:  222:    // it would interfere with further tests.
+        -:  223:
+        -:  224:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -:  225:    // entity as an entity set or vice vera, etc., but sometimes try more
+        -:  226:    // difficult tests such as passing in a pointer to character data as an
+        -:  227:    // entity handle.
+        -:  228:    
+        4:  229:    for ( int i=0; i<3; i++ ) {
+        6:  230:      iMesh_createTag(new_instance, astrTagNames[i], 3, aTagTypes[i], &aTags[i+4],
+        9:  231:		      &err, aiTagNameLen[i]);
+        3:  232:      CHECK_ERR(err);
+        -:  233:    }
+        -:  234:
+        -:  235:    // Setting tag data for a mesh with no data
+        1:  236:    iMesh_setArrData(new_instance, aEnts, 3, aTags[4], aOutput, iNumChars, &err);
+        1:  237:    CHECK_ERR2(err, iBase_INVALID_ENTITY_HANDLE );
+        -:  238:
+        -:  239:    // setting tag data for a mesh with no data
+        1:  240:    iMesh_setIntArrData(new_instance, aEnts, 3, aTags[4], aints, 9, &err);
+        1:  241:    CHECK_ERR2(err, iBase_INVALID_ENTITY_HANDLE );
+        -:  242:
+        -:  243:    // setting tag data for a mesh with no data
+        1:  244:    iMesh_setDblArrData(new_instance, aEnts, 3, aTags[5], aDoubles, 9, &err);
+        1:  245:    CHECK_ERR2(err, iBase_INVALID_ENTITY_HANDLE );
+        -:  246:
+        -:  247:    // setting tag data for a mesh with no data
+        1:  248:    iMesh_setEHArrData(new_instance, aEnts, 3, aTags[6], aHandles, 9, &err);
+        1:  249:    CHECK_ERR2(err, iBase_INVALID_ENTITY_HANDLE );
+        -:  250:
+        -:  251:    //  getting tag data for a mesh with no data
+        1:  252:    iMesh_getArrData(new_instance, aEnts, 3, aTags[4], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  253:    CHECK_ERR2(err,iBase_INVALID_ENTITY_HANDLE );
+        -:  254:
+        -:  255:    int *aIntsOut;
+        1:  256:    int iIntsAlloc = 0;
+        -:  257:    // getting tag data for a mesh with no data
+        1:  258:    iMesh_getIntArrData(new_instance, aEnts, 3, aTags[4], &aIntsOut, &iIntsAlloc, &iNumVals, &err);
+        1:  259:    CHECK_ERR2(err,iBase_INVALID_ENTITY_HANDLE );
+        -:  260:
+        -:  261:    // getting tag data for a  mesh with no data
+        -:  262:    double *aDoublesOut;
+        1:  263:    int iDoublesAlloc = 0;
+        1:  264:    iMesh_getDblArrData(new_instance, aEnts, 3, aTags[5], &aDoublesOut, &iDoublesAlloc, &iNumVals, &err);
+        1:  265:    CHECK_ERR2(err,iBase_INVALID_ENTITY_HANDLE );
+        -:  266:
+        -:  267:    // getting tag data for a mesh with no data
+        1:  268:    iBase_EntityHandle *aHandlesOut = NULL;
+        1:  269:    int iHandlesAlloc = 0;
+        1:  270:    iMesh_getEHArrData(new_instance, aEnts, 3, aTags[6], &aHandlesOut, &iHandlesAlloc, &iNumVals, &err);
+        1:  271:    CHECK_ERR2(err,iBase_INVALID_ENTITY_HANDLE );
+        -:  272:
+        -:  273:    // setting integer tag data for a double tag handle
+        1:  274:    iMesh_setIntArrData(instance, aEnts, 3, aTags[1], aints, 9, &err);
+        1:  275:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  276:
+        -:  277:    // setting double tag data for an integer tag handle
+        1:  278:    iMesh_setDblArrData(instance, aEnts, 3, aTags[0], aDoubles, 9, &err);
+        1:  279:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  280:
+        -:  281:    // setting entity handle tag data for integer tag handle
+        1:  282:    iMesh_setEHArrData(instance, aEnts, 3, aTags[0], aHandles, 9, &err);
+        1:  283:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  284:
+        -:  285:    // setting tag data for an invalid input array size
+        1:  286:    iMesh_setIntArrData(instance, aEnts, 3, aTags[0], aints, 12, &err);
+        1:  287:    CHECK_ERR2(err, iBase_BAD_ARRAY_SIZE );
+        -:  288:    
+        -:  289:    // Excercise error getting functions...
+        -:  290:    int err2, err3;
+        -:  291:#ifdef IMESH_VERSION_GE
+        -:  292:#if IMESH_VERSION_GE(1,3,0)
+        1:  293:    iMesh_getErrorType(instance, &err2);
+        -:  294:#else
+        -:  295:    iMesh_getErrorType(instance, &err2, &err3);
+        -:  296:#endif
+        -:  297:#else
+        -:  298:    iMesh_getErrorType(instance, &err2, &err3);
+        -:  299:#endif
+        1:  300:    CHECK_ERR2(err2, iBase_BAD_ARRAY_SIZE );
+        -:  301:
+        -:  302:    char descr[256];
+        1:  303:    descr[0] = '\0';
+        -:  304:#ifdef IMESH_VERSION_GE
+        -:  305:#if IMESH_VERSION_GE(1,3,0)
+        1:  306:    iMesh_getDescription(instance, descr, (int) sizeof(descr));
+        -:  307:#else
+        -:  308:    iMesh_getDescription(instance, descr, &err3, (int) sizeof(descr));
+        -:  309:#endif
+        -:  310:#else
+        -:  311:    iMesh_getDescription(instance, descr, &err3, (int) sizeof(descr));
+        -:  312:#endif
+        1:  313:    TEST(descr != "");
+        -:  314:    
+        -:  315:    //  setting double tag data for an invalid input array size
+        1:  316:    iMesh_setDblArrData(instance, aEnts, 3, aTags[1], aDoubles, 12, &err);
+        1:  317:    CHECK_ERR2(err, iBase_BAD_ARRAY_SIZE );
+        -:  318:
+        -:  319:    //  setting entity handle tag data for an invalid input array size
+        1:  320:    iMesh_setEHArrData(instance, aEnts, 2, aTags[2], aHandles, 9, &err);
+        1:  321:    CHECK_ERR2(err, iBase_BAD_ARRAY_SIZE);
+        -:  322:
+        -:  323:    // getting integer tag data for a double tag handle
+        -:  324:    iMesh_getIntArrData(instance, aEnts, 3, aTags[1],
+        1:  325:			&aIntsOut, &iIntsAlloc, &iNumVals, &err);
+        1:  326:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  327:
+        -:  328:    // getting double tag data for an integer tag handle
+        -:  329:    iMesh_getDblArrData(instance, aEnts, 3, aTags[0],
+        1:  330:			&aDoublesOut, &iDoublesAlloc, &iNumVals, &err);
+        1:  331:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  332:
+        -:  333:    // getting entity handle tag data for an integer tag handle
+        -:  334:    iMesh_getEHArrData(instance, aEnts, 3, aTags[0],
+        1:  335:		       &aHandlesOut, &iHandlesAlloc, &iNumVals, &err);
+        1:  336:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  337:
+        1:  338:    iMesh_dtor(new_instance, &err);
+        1:  339:    cout << "DONE\n";
+        -:  340:  } // Done with error checking
+        1:  341:  cout << "Testing tag removal and forced/unforced destruction...    ";
+        -:  342:  {
+        1:  343:    bool qOK = true;
+        1:  344:    iMesh_rmvArrTag(instance, aEnts, 3, aTags[0], &err);
+        1:  345:    qOK = qOK && (err == iBase_SUCCESS);
+        1:  346:    CHECK_ERR(err);
+        -:  347:
+        1:  348:    iMesh_rmvArrTag(instance, aEnts, 3, aTags[1], &err);
+        1:  349:    qOK = qOK && (err == iBase_SUCCESS);
+        1:  350:    CHECK_ERR(err);
+        -:  351:
+        1:  352:    iMesh_destroyTag(instance, aTags[0], false, &err);
+        1:  353:    qOK = qOK && (err == iBase_SUCCESS);
+        1:  354:    CHECK_ERR(err);
+        -:  355:
+        1:  356:    iMesh_destroyTag(instance, aTags[1], false, &err);
+        1:  357:    qOK = qOK && (err == iBase_SUCCESS);
+        1:  358:    CHECK_ERR(err);
+        -:  359:    
+        1:  360:    if (qOK) iNPassed++;
+        -:  361:  } 
+        -:  362:  // trying to destroy tag with data without using forced
+        1:  363:  iMesh_destroyTag(instance, aTags[2], false, &err);
+        1:  364:  CHECK_ERR2(err, iBase_TAG_IN_USE );
+        -:  365:
+        1:  366:  iMesh_destroyTag(instance, aTags[3], false, &err);
+        1:  367:  CHECK_ERR2(err, iBase_TAG_IN_USE );
+        -:  368:
+        -:  369:  {
+        1:  370:    bool qOK = true;
+        1:  371:    iMesh_destroyTag(instance, aTags[2], true, &err);
+        1:  372:    qOK = qOK && (err == iBase_SUCCESS);
+        1:  373:    CHECK_ERR(err);
+        -:  374:
+        1:  375:    iMesh_destroyTag(instance, aTags[3], true, &err);
+        1:  376:    qOK = qOK && (err == iBase_SUCCESS);
+        1:  377:    CHECK_ERR(err);
+        -:  378:
+        1:  379:    iNPassed++;
+        -:  380:  } 
+        1:  381:  cout << "DONE\n";
+        1:  382:  free(aOutput);
+        2:  383:}

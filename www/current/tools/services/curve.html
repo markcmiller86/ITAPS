@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageCurve" -->
+</head>
+
+<body class="pageTools pageToolsServices pageCurve">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+<h1>Mesh Curving Service</h1>
+<p>Applying high-order finite element methods to general 3D curved domains requires carefully constructed meshes with properly curved elements [1]. A common approach to construct such curved meshes is to generate straight-sided meshes and curve the mesh entities on domain boundaries to the required order by inserting high-order edge (or face) nodes. A major problem with this procedure is that a number of elements typically become invalid (resulting in negative determinant of the Jacobian over a portion of the element) or poorly shaped after being curved [2]. In order to tackle this problem and support the needs of SciDAC applications (e.g. linear accelerator design at SLAC), a mesh curving service has been developed to construct valid and well-shaped curved elements. The mesh curving service is able to work in parallel to support large scale applications that require sufficiently refined partitioned curved meshes.</p>
+<p>The mesh curving service is being developed as part of the ITAPS component software - MeshAdapt, and now has two major functionalities: 1) curved mesh creation for straight sided mesh over general 3D domains both in serial and in parallel, and 2) shape quality optimization of 3D curved meshes including element invalidity check and correction.</p>
+<p>In curved mesh creation, the mesh curving service takes as inputs a CAD model of the domain of interest (such as Parasolid and Acis models), a valid straight-sided mesh of that domain and the classification information (the association of the mesh entities with the corresponding model entities) [3], then inserts high-order nodes to mesh entities classified on model boundaries (mesh edges and/or faces) and properly moves these nodes to appropriate positions on the model boundary by parametric queries to the CAD engines. The shape quality optimization functionality evaluates the shape quality of the curved mesh elements, including those that are invalid and performs local mesh modification and explicit nodal smoothing procedures to eliminate invalid elements and improve the overall shape quality of the rest valid elements. In the meantime it maintains the geometric approximation by keeping the nodes properly placed on the curved geometric boundary. The mesh curving service is currently able to work with unstructured meshes both in serial and parallel. When integrated with parallel straight sided element mesh generation tools, the service is able to effectively generate valid partitioned curved meshes with hundreds of millions of elements in parallel.</p>
+<p>The mesh curving service performs a set of local mesh modification and explicit nodal smoothing operations to eliminate the invalid elements. They are applied in an incremental manner as well as a specific order [4]. The modification procedures are built upon a set of unit topological modifications including collapse, split, swap, etc. Internally it uses Bezier polynomials to represent the mesh geometry. The mesh region validity check and correction takes advantage of the bounding property of the Bezier polynomials which ensures that the determinant of Jacobian of the element in its closure is always positive and is independent of the chosen integration scheme in the high order finite element method [4]. In the situation where the given mesh uses different shape representation methods such as Lagrange polynomials, the conversion between the original representation and the Bezier method is processed before and after applying the tool. </p>
+<p>In parallel, inter-processor communications are taken into consideration when constructing mesh cavities across partition boundaries. With the support of other ITAPS software (IPComMan and iMeshP), the curved mesh entities needed by modification operations can be efficiently migrated from one partition to another to construct the cavities. Inter-processor communication is also used for unifying data attached to the mesh entities shared among multiple partitions.
+</p>
+
+<div class="imgContainer fLeft" style="width: 380px;">
+    <a href="../../assets/images/partition_curved_full.png" rel="lightbox">
+	<img src="../../assets/images/partition_curved_mini.png" width="380" height="150" alt="Accelerator Application" />
+    </a>
+	<p>Figure 1. Overview and close-ups of a partitioned curved mesh of linear accelerator cavities</p>
+</div>
+
+<p>The mesh curving service has been successfully applied to curvilinear meshes being simulated by the <a href="http://www.slac.stanford.edu/" target="_blank">SLAC National Accelerator Laboratory</a> (SLAC) in the large-scale electromagnetic modeling. Large parallel curved meshes are needed to ensure resolution and accuracy of the simulation results. So far the largest mesh curved by the mesh curving service is a partitioned mesh with more than 180 million curved tetrahedral elements on a model of two linear accelerator cavities. It was generated in parallel with 64 cores. Figure 1 is an example of a partitioned curved mesh generated in parallel for the accelerator cavity model. The valid curvilinear meshes not only make the time-domain simulations stable but also make the execution time up to 30% faster due to better condition matrices. </p>
+
+<h3 class="clear">Point of Contacts</h3>
+
+<p>Qiukai Lu (RPI, <a href="mailto:qlu@scorec.rpi.edu">qlu@scorec.rpi.edu</a>)<br />
+Mark S. Shephard (RPI, <a href="mailto:shephard@scorec.rpi.edu">shephard@scorec.rpi.edu</a>)</p>
+
+<h3>Download information</h3>
+
+<p>The mesh curving service is implemented as part of MeshAdapt which is an ITAPS component software. For more information and download, see MeshAdapt webpage at (<a href="http://www.scorec.rpi.edu/MeshAdapt">www.scorec.rpi.edu/MeshAdapt</a>)</p>
+
+<h3>References</h3>
+<p>[1] X. Luo, M.S. Shephard, J.-F. Remacle, R.M. OBara, M.W. Beall, B. Szabo and R. Actis, p-Version Mesh Generation Issues, 11th International Meshing Roundtable, 2002.</p>
+<p>[2] X. Luo, M.S. Shephard, R.M. OBara, R. Nastasia, and M.W. Beall, Automatic p-version mesh generation for curved domains, Engineering with Computers, 20(3):273-285, 2004.</p>
+<p>[3] M.W. Beall and M.S. Shephard, A General Topology-Based Mesh Data Structure, International Journal for Numerical Methods in Engineering, 40:1573-1596, 1996.</p>
+<p>[4] L-Q Lee, L. Ge X. Luo, M.S. Shephard and C. Ng. Moving Curved Mesh Adaptation for Higher Order Finite Element Simulations, Engineering with Computers, 2008.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+          <p>&nbsp;</p>
+        </blockquote>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,218 @@
+Rough Outline:
+
+1. General Introduction/Goals of TSTT and the tutorial (30 min)
+Introduction/goals of TSTT
+
+- Motivation
+  . Applications need advanced mesh services like ...
+  . Lots of packages & frameworks for mesh-related technology, but
+  most of it is bound to a framework or not packaged as component
+
+- Solution/Goals
+  . Bring them together through common interfaces & data semantics
+  . Enable interoperability:
+    * Horizontal: allow applications to choose implementation of a
+      given service which works best for them
+    * Vertical: choose collection of services which interoperate
+      through common interfaces to build higher-level application
+  . Mode 1: Application: implements its own interface, gets service
+    which operates on data through that interface
+  . Mode 2: Service: access data through common interface, use
+    available implementation(s) to test on "real" data
+  . Mode 3: Assembled application: integrate services, data (through
+    implementations), custom code to assemble higher-level application
+
+- Scope of TSTT Interfaces
+  . Mesh
+  . Geometry
+  . Associations
+  . Fields?
+
+- Basic data model
+  . Entities, EntitySets, Tags, Interface
+  . Examples of embedding simulation data into this model
+
+- Implementations survey
+  . TSTTM: MOAB, FMDB, GRUMMP
+  . TSTTG: CGM, Eleven
+  . TSTTR: LASSO, GRUMMP?
+
+- Services survey
+  . Adaptive refinement (RPI)
+  . Front tracking (Frontier-Lite)
+  . Mesh transformations (GRUMMP)
+  . Mesh smoothing (Mesquite)
+  . Mesh/geometry access (MOAB, CGM)
+
+- TSTTM, TSTTG, TSTTR overviews
+  . (brief description of interfaces)
+
+- Implementation notes
+  . Language interoperability through SIDL/Babel
+   (Tammy's outline - part here? part below?) Babel/SIDL
+       - What is Babel?
+       - What is SIDL?
+       - Interoperability generation process
+       - [TSTT] Example walkthrough
+  . Application: use Babel runtime, arrays, Factory; otherwise works
+    similar to 3rd party library
+  . Implementation: use Babel to process interface, then implement
+    stubs for TSTTX functions 
+
+- Future plans
+  . Distribution/repository of implementations, services
+  . PR, Tutorials, etc. to gain mindshare
+  . Follow-on to build on 1st round success
+    * Fields interface, implementations
+    * Solution transfer
+    * General AMR service
+    * Parallel mesh/data migration
+    * Shape optimization
+    * Discrete/continuum 
+    * Hybrid mesh representation, tools
+    * Lots of application-specific efforts
+
+2. TSTT services (1 hour)
+
+     - Focus on Mesquite, front tracking, swapping, h-refinement, access?
+     - Highlight capabilities, provide examples of use
+     - How do you access these services through TSTT functions
+         - for example, what TSTT calls are made.  Perhaps provide a handout
+
+Mesquite
+  Capabilities:
+    - mesh quality improvement via optimization-based smoothing methods
+    - flexible - 2D,3D; many different element types
+    - Rigorous mathematical framework 
+        - target matrix paradigm for reference-element based quality definition
+        - objective function templates
+    - State of the art solvers - feasible newton, etc
+    - User Interface and using Mesquite
+   Using TSTT interface
+      EntArrIter:
+      - iterate over vertices or elements in a meshset for
+        populating local patches
+      - used in Mesquite's TSTTM glue code to avoid large arrays
+        for operations like setting a tag on all vertices,
+        constructing temporary entity sets, etc.
+      Tags:
+      - App sets an integer tag to indicate which vertices are 'fixed'
+      - Mesquite uses an integer tag to store per-vertex state information
+        when using local patches
+      - Used to store target matrices (3x3 doubles), target matrix weights (1 double)
+      Sets:
+      - The application provides Mesquite with an entity set to specify
+        the mesh elements Mesquite is to improve the quality of.  Mesquite
+        needs to a) iterate over all the vertices in the elements in that
+        set and b) iterate over all 2D and 3D elements in the set.  An
+        iterator cannot be declared to do b) unless the set contains only
+        2D and 3D elements, so mesquite constructs two temporary sets from
+        the input set: one containing only the 2D and 3D elements from
+        the input set and the other containing the vertices in the closure
+        of those elements.
+      Adjacency Information:
+      - Used in Mesquite's TSTT glue code to build set of vertices
+        from input set of elements
+      - Used to get elements using a vertex
+      - Used to get element connectivity
+      Get Entities
+
+   Examples of Use -
+      Show examples of mesquite usage - shape improvement, deforming meshes, 
+          untangling
+
+Swapping service
+    Capabilities:
+      In 2D (triangular meshes): edge-based swapping.
+      In 3D (tetrahedral meshes): face- and edge-based swapping.
+      Swapping criteria: Delaunay, minmax angle, maxmin sine of
+        dihedral, user-defined
+      Standard interface for user-defined quality criteria; in 3D,
+        included criteria are encoded this way, so examples are
+	available.
+      Can swap a single edge/face (with or without recursion to check
+        neighbors after) or entire entity set / mesh.
+      In 3D, can choose whether bdry modification is permitted.
+      Future plan: add ability to tag entities to check for swapping;
+        this will be implemented in such a way that non-tagging
+	implementations will still be able to use the service.
+    Examples:
+      I'll pull some examples from the swapping conference paper (Jan
+        06) to show effectiveness, relative efficiency, and (hopefully)
+	interoperability.
+
+ MeshAdapt:
+    Capabilities:
+	- perform a set of local mesh modification operations on the
+          input mesh utill the specified size field is satisfied.
+        - flexible - support mesh with/without classified solid model
+
+    Minimal input requirements:
+        - a mesh loaded through TSTTM interface
+        - a specified size field
+
+    Outline of the procedure:
+        - load the mesh through TSTTM interface
+        - specify the size field against the TSTTM mesh by attaching the
+          desired edge length or size tensor to the appropriate TSTTM mesh
+          entities
+        - apply the mesh adaptation procedure to modify the mesh
+        - output the adapted mesh through TSTTM interface
+     In case that a solid model is involved, the model and the associatio
+     beteween the mesh and model are loaded before the aapplication of the
+     mesh adaptation procedure.
+
+    Using TSTT interface:
+        - load/save the mesh/model through TSTTM, TSTTG, TSTTR.
+        - traverse the mesh to attach the size field that need to traverse
+          the mesh entities, retrieve vertex location and attach the
+          computed new mesh size to the mesh entities,
+          - initEntIter
+          - getNextEntIter
+          - resetEntIter
+          - endEntIter
+          - getAdjEnt
+          - getVtxCoords
+          - setIntData, setDblData, setEHData,
+          - getIntData, getDblData, getEHData,
+          - rmvTag
+
+     Examples:
+         Two examples, that one only has a mesh and the other has both the
+         mesh and the solid model, will be shown to demonstrate the mesh
+         adaptation procedure.
+
+3. Getting your application ready to use TSTT services (1.5 hour)
+  The Interface in more detail 
+    - how it's laid out by interfaces, functionality described
+    - Naming conventions
+    - SIDL as an interface defn language - in, inout, out 
+      - how to generate SIDL impl files
+  Show detailed examples of how to implement TSTT interface
+        - Providing access to entities - arrays (how to set up a SIDL array)
+        - Providing access to entity adjacency information (semantics of call)
+        - Providing Iterator access (arrays and worksets - reuse arrays)
+        - Implementing Tags
+        - others as highlighted by the services?
+  Best practices:  In each case, provide a description and good & bad
+    examples (ideally with some timing data).
+      - Use direct array access.
+      - Retrieve data in chunks.
+      - Re-use SIDL arrays.
+
+
+4. Mechanics (30 min)
+ Compliance testing
+    Before building: preparing an implementation to work with
+      TSTTM_unitTest
+    Building: how to configure and build to test an implementation
+    Testing: running with and without checks for error handling
+    Post-testing: how to interpret results, what to do when things go
+      wrong
+
+    - How to download/build services
+    - Dependencies
+        - SIDL/Babel
+        - others?
+    - Getting help
+

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Astrophysics</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+<h1>Astrophysics</h1>
+
+<p><i>"Terascale Simulation Initiative" </i>
+PI: Tony Messacappa</p>
+<p><i> Project Status:</i> Inactive</p>
+
+<p>During SciDAC-1, ITAPS researchers at ORNL had collaborations with the
+astrophysics SciDAC-1 center: the Terascale Supernova Initiative (TSI)
+led by Mezzacappa.  The primary focus was the exploration of
+alternative discretization strategies for various aspects of the
+solution process.  In addition, they explored a 3D
+spatial caching strategy to reduce costly evaluations of the
+scattering kernels for Boltzman transport.</p>
+
+<p><b>Discontinuous Galerkin Discretizations for Radiative Transfer</b></p>
+
+<p><i>ITAPS Personnel</i>:  Valmor de Almeida (ORNL), Ed D'Azevedo (ORNL)</p>
+
+<p><i>TSI Personnel</i>: Tony Mezzacappa (ONRL), Bronson Messer (ORNL), Matthias Liebendoerfer (ORNL)</p>
+
+<p>With the TSI team, ITAPS researchers at ORNL explored new schemes
+for solving models of radiative transfer in stellar atmospheres
+representative of supernova type 2 core collapse/explosions. The
+current solution method, namely, discrete ordinates, in conjunction
+with finite differences, may require petascale computing power when
+extended to three dimensions. The ITAPS/TSI interaction was aimed at
+exploring novel schemes that are able to keep computational
+requirements at the terascale level.</p>
+
+<p>A series of radiative transfer prototype problems have been chosen by
+the TSI group. These problems are simplified forms of Boltzmann's
+integro-differential equation for radiative transfer and thus have
+features significant to supernova collapse/explosion modeling.</p>
+
+<p>The first problem, Milne's axis-symmetric pure scattering of photons
+in extended stellar atmospheres, has been studied successfully. In
+this problem the dependent variable is the radiative intensity field
+(photon distribution function), and the independent variables are the
+radius of the spherical stellar atmosphere and the polar angle made by
+the radius and the photon velocity vector. The new method of analysis
+consists of a discontinuous Galerkin (DG) approach for the
+approximation of the radiative intensity field in phase space (the
+Cartesian product of the one-dimensional radius domain and the polar
+angle domain). The integro-differential equation is treated as a
+linear hyperbolic PDE at each step of an iterative scheme that
+corrects the value of the integral scattering kernel. Each iteration
+is accelerated by evaluating the kernel from the first and zeroth
+moments of the original problem. The DG method applied to the linear
+hyperbolic problem at each iteration was implemented explicitly in
+phase space since the characteristic curves are known a priori. This
+allows the resulting linear algebraic set of equations to be solved
+locally and progressively along wave fronts normal to the
+characteristics. The DG method developed for the Milne's problem was
+found to be memory efficient (requiring one order of magnitude less
+storage than the discrete ordinate method) and fast (one order of
+magnitude faster than DOM). In addition, in view of the adaptive mesh
+used, the results were significantly more accurate when capturing
+important features of the solution. For instance, the region of
+transition from diffusive radiation to streaming was correctly
+captured, and the outward peaking (a delta function like sharp
+increase) of the radiation field at the outer boundary of the extended
+atmosphere was correctly reproduced. The results were obtained for a
+range of atmosphere sizes including the range of interest to supernova
+applications.  Although the results are exciting, supernova models are
+significantly more complex, involving the extended set of equations
+that couple neutrino radiation transfer to relativistic flow, that is
+radiative hydrodynamics.</p>
+
+<p><b>Caching Strategies for Boltzman Transport</b></p>
+
+<p><i>ITAPS Personnel</i>: Ed D'Azevedo (ORNL)</p>
+
+<p><i>TSI Personnel</i>: Bronson Messer (ORNL)</p>
+
+<p>Another interaction between ITAPS and TSI is the use of a 3D spatial
+cache for avoiding redundant and costly evaluations of scattering
+kernels for Boltzmann transport. The scattering kernel is a function
+of density, temperature and species fraction. We have generated trace
+data over a realistic TSI computation and visualized the trajectories
+of evaluation in 3D phase space (density, temperature, species
+fraction). Initial analysis shows 3D interpolation with a small global
+cache has good hit ratio of over 90%, or about 9 of 10 evaluations of
+scattering kernels can be computed by 3D interpolation instead of the
+actual costly computations.</p>
+
+	</div>
+</div>
+
+</body>
+</html>

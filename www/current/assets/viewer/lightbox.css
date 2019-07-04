@@ -1,0 +1,30 @@
+#lightbox{
+	background-color:#eee;
+	padding: 10px;
+	border-bottom: 2px solid #666;
+	border-right: 2px solid #666;
+}
+#lightboxDetails{
+	font-size: 0.8em;
+	padding-top: 0.4em;
+}	
+#keyboardMsg{ float: right; }
+#closeButton{ top: 5px; right: 5px; }
+
+#lightbox img{ border: solid 1px #CCC; border-bottom-color:#BBB; border-right-color:#BBB; background-color: #FFF; clear: both;} 
+#overlay img{ border: none; }
+
+#overlay{ background-image: url(overlay50.png); }
+
+* html #overlay{
+	background-color: #333;
+	back\ground-color: transparent;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");
+}
+#lightboxCaption {
+	font-style: italic;
+	font-size: 1.4em;
+	line-height:1.6em;
+	float: left;
+	margin: 0 auto;
+}

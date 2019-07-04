@@ -1,0 +1,34 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.59)
+AC_INIT(TSTT swapping service, 0.7, cfog@mech.ubc.ca)
+AC_CONFIG_SRCDIR([Swap.sidl])
+
+AC_CONFIG_AUX_DIR(conf)
+
+TSTT_CLIENT_C=yes
+TSTT_CLIENT_CXX=yes
+TSTT_CLIENT_F77=yes
+TSTT_CLIENT_F90=yes
+TSTT_CLIENT_JAVA=no
+TSTT_CLIENT_PYTHON=no
+
+TSTT_SERVER_LANG(CXX)
+
+TSTT_PROG_CHECKS
+TSTT_PROG_BUILD_LIB
+
+TSTT_CLIENT_INIT
+TSTT_PATH_TSTTB
+TSTT_PATH_TSTTG
+TSTT_PATH_TSTTM
+TSTT_PATH_TSTTR
+
+dnl Miscellaneous checks.
+dnl These should really be in TSTT_PROG_CHECKS...
+AC_HEADER_STDC
+AC_C_CONST
+AC_C_INLINE
+
+AC_CONFIG_FILES(Makefile Makefile-client server/Makefile)
+
+AC_OUTPUT

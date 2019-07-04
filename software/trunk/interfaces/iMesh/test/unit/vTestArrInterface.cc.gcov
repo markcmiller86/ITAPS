@@ -1,0 +1,420 @@
+        -:    0:Source:vTestArrInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestArrInterface(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  bool qOK;
+        -:    6:  int eEType, eETopo, err;
+        -:    7:
+        -:    8:
+        -:    9:  //@@@ Test loop
+        -:   10:  cout << " Verifying retrieved entity type and topology (array version)"
+        -:   11:       << endl << "    and global entity adjacency"
+        2:   12:       << endl;
+        6:   13:  for (eEType = iBase_VERTEX;
+        -:   14:       eEType <= iBase_ALL_TYPES;
+        -:   15:       eEType++) {
+       65:   16:    for (eETopo = iMesh_POINT;
+        -:   17:	 eETopo <= iMesh_ALL_TOPOLOGIES;
+        -:   18:	 eETopo++) {
+       60:   19:      if (a2qLegalTypeAndTopo[eEType][eETopo]) {
+       27:   20:	cout << "  Type: ";
+        -:   21:	cout.width(9);
+       27:   22:	cout << astrTypes[eEType] << " Topology: ";
+        -:   23:	cout.width(14);
+       27:   24:	cout << astrTopologies[eETopo] << endl;
+        -:   25:	//@@@@ Get entities, type, topo
+       27:   26:	iBase_EntityHandle * aEntHandles = NULL;
+       27:   27:	int iNumEnt, iEntHandlesAlloc = 0;
+        -:   28:	iMesh_getEntities(instance, pvRootSet, static_cast<iBase_EntityType>(eEType),
+        -:   29:			 static_cast<iMesh_EntityTopology>(eETopo),
+       27:   30:			  &aEntHandles, &iEntHandlesAlloc, &iNumEnt, &err);
+       27:   31:	CHECK_ERR(err);
+        -:   32:
+       27:   33:	if (err == iBase_SUCCESS) {
+       27:   34:	  int * aiEType = NULL;
+       27:   35:	  int * aiETopo = NULL;
+        -:   36:	  
+       27:   37:	  int topo_size, type_size, topo_alloc = 0 , type_alloc = 0;
+        -:   38:	  iMesh_getEntArrTopo(instance, aEntHandles, iNumEnt,
+       27:   39:			      &aiETopo, &topo_alloc, &topo_size, &err);
+       27:   40:	  CHECK_ERR(err);
+        -:   41:	  iMesh_getEntArrType(instance, aEntHandles, iNumEnt,
+       27:   42:			      &aiEType, &type_alloc, &type_size, &err);
+       27:   43:	  CHECK_ERR(err);
+        -:   44:	  
+       27:   45:	  qOK = (topo_size == iNumEnt) && (type_size == iNumEnt);
+        -:   46:	  
+        -:   47:	  int iTopo, iType;
+    23119:   48:	  for (iTopo = 0, iType = 0; iTopo < topo_size; iTopo++, iType++) {
+    23092:   49:	    int eTo = aiETopo[(iType)];
+    23092:   50:	    int eTy = aiEType[(iType)];
+        -:   51:	    qOK = qOK && ((eTo == eETopo ||
+        -:   52:			   eETopo == iMesh_ALL_TOPOLOGIES) &&
+        -:   53:			  (eTy == eEType ||
+    23092:   54:			   eEType == iBase_ALL_TYPES));
+        -:   55:	  }
+       27:   56:	  UT_FREE(aiEType);
+       27:   57:	  UT_FREE(aiETopo);
+       27:   58:	  assert(iTopo <= topo_size);
+       27:   59:	  assert(iType <= type_size);
+        -:   60:	}
+       27:   61:	UT_FREE(aEntHandles);
+       27:   62:	if (!qOK) {
+    #####:   63:	  cout << endl << "Inconsistency in entity type or topology.\n\n";
+    #####:   64:	  qAllPassed = false;
+    #####:   65:	  iNFailed++;
+        -:   66:	}
+        -:   67:
+       27:   68:	TEST(qOK);
+       27:   69:	if (eEType == iBase_ALL_TYPES)
+       12:   70:	  continue;
+        -:   71:
+       15:   72:	qOK = true;
+        -:   73:	//@@@@ Equivalence tests for entityGetAdj and entitysetGetAdj
+        -:   74:	// Now test for equivalence in adjacency operations.
+       15:   75:	int eAdjType, eLastType = iBase_REGION;
+       75:   76:	for (eAdjType = iBase_VERTEX;
+        -:   77:	     eAdjType <= eLastType;
+        -:   78:	     eAdjType++) {
+        -:   79:	  // Skip any that are identities or unsupported.
+       60:   80:	  if (eAdjType == eEType || a2iAdjTable[eEType][eAdjType] == 0)
+       34:   81:	    continue;
+       26:   82:	  cout << "   Adjacent type: ";
+        -:   83:	  cout.width(9);
+       26:   84:	  cout << astrTypes[eAdjType] << endl;
+        -:   85:
+        -:   86:	  // Get adjacencies using the entityset call.
+       26:   87:	  iBase_EntityHandle *aEnts2 = NULL, *aAdjEnt2 = NULL;
+       26:   88:	  int *aiIndex = NULL, *aiOffset2 = NULL;
+        -:   89:	  int iNumAdj2, iOffset2Size, iIndexSize, iEnts2Size;
+       26:   90:	  int iAdjEnt2Alloc = 0, iOffset2Alloc = 0, iIndexAlloc = 0,
+       26:   91:	    iEnts2Alloc = 0;
+        -:   92:	  iMesh_getAdjEntIndices
+        -:   93:	    (instance, pvRootSet, static_cast<iBase_EntityType>(eEType),
+        -:   94:	     static_cast<iMesh_EntityTopology>(eETopo),
+        -:   95:	     static_cast<iBase_EntityType>(eAdjType),
+        -:   96:	     &aEnts2, &iEnts2Alloc, &iEnts2Size,
+        -:   97:	     &aAdjEnt2, &iAdjEnt2Alloc, &iNumAdj2,
+        -:   98:	     &aiIndex, &iIndexAlloc, &iIndexSize,
+       26:   99:	     &aiOffset2, &iOffset2Alloc, &iOffset2Size, &err);
+       26:  100:	  CHECK_ERR(err);
+        -:  101:
+       26:  102:	  if (err == iBase_SUCCESS) {
+        -:  103:	    int *aiOffset1;
+       26:  104:	    iBase_EntityHandle *aAdjEnt1 = NULL;
+        -:  105:	    // Get adjacencies using entityGetAdjacencies.
+        -:  106:	    int iNumAdj1, iOffset1Size;
+       26:  107:	    int iAdjEnt1Alloc = 0, iOffset1Alloc = 0;
+        -:  108:	    iMesh_getEntArrAdj(instance, aEnts2, iEnts2Size,
+        -:  109:			       static_cast<iBase_EntityType>(eAdjType),
+        -:  110:			       &aAdjEnt1, &iAdjEnt1Alloc, &iNumAdj1,
+        -:  111:			       &aiOffset1, &iOffset1Alloc, &iOffset1Size,
+       26:  112:			       &err);
+       26:  113:	    CHECK_ERR(err);
+        -:  114:
+        -:  115:	    // Verify that the size of the output arrays are correct.
+        -:  116:	    qOK = (iNumAdj1 >= iNumAdj2) && (iNumAdj1 == iIndexSize)
+        -:  117:	      && (iNumEnt == iEnts2Size)
+       26:  118:	      && (iNumEnt == iOffset1Size - 1) && (iNumEnt == iOffset2Size - 1);
+        -:  119:	    
+        -:  120:	    // Verify that the contents are the same.
+        -:  121:	    // Loop first over entities
+       26:  122:	    int iAdj = 0;
+    23118:  123:	    for (int iEnt = 0; iEnt < iNumEnt; iEnt++) {
+    23092:  124:	      qOK = (aiOffset1[iEnt+1] == aiOffset2[iEnt+1]);
+   137572:  125:	      for ( ; iAdj < aiOffset1[iEnt+1] ; iAdj++) {
+   114480:  126:		iBase_EntityHandle entA = aAdjEnt1[iAdj];
+   114480:  127:		iBase_EntityHandle entB = aAdjEnt2[aiIndex[iAdj]];
+   114480:  128:		qOK = (entA == entB);
+        -:  129:	      }
+        -:  130:	    }
+       26:  131:	    assert(!qOK || iAdj == iNumAdj1);
+       26:  132:	    assert(!qOK || iAdj == iIndexSize);
+       26:  133:	    UT_FREE(aAdjEnt1);
+       26:  134:	    UT_FREE(aiOffset1);
+        -:  135:	  }
+       26:  136:	  UT_FREE(aEnts2);
+       26:  137:	  UT_FREE(aAdjEnt2);
+       26:  138:	  UT_FREE(aiIndex);
+       26:  139:	  UT_FREE(aiOffset2);
+        -:  140:	}
+       15:  141:	TEST(qOK);
+        -:  142:      }
+        -:  143:    }
+        -:  144:  } // Done with double loop to verify consistency of bulk adjacency calls.
+        -:  145:
+        -:  146:  // Test the scalar second adjacency call.
+        1:  147:  vSecondAdjacencyArrayTest(instance);
+        -:  148:
+        -:  149:  // Iterators should be tested by iterating over every legal type and
+        -:  150:  // topology combination to be sure that all the entities retrieved by
+        -:  151:  // the global call are traversed by the iterator.  To make sure reset
+        -:  152:  // works properly, run through each collection twice.
+        1:  153:  cout << " Testing array iterators" << endl;
+        6:  154:  for (eEType = iBase_VERTEX;
+        -:  155:       eEType <= iBase_ALL_TYPES;
+        -:  156:       eEType++) {
+       65:  157:    for (eETopo = iMesh_POINT;
+        -:  158:	 eETopo <= iMesh_ALL_TOPOLOGIES;
+        -:  159:	 eETopo++) {
+       60:  160:      cout << "  Type: ";
+        -:  161:      cout.width(9);
+       60:  162:      cout << astrTypes[eEType] << " Topology: ";
+        -:  163:      cout.width(14);
+       60:  164:      cout << astrTopologies[eETopo] << endl;
+        -:  165:      // First, grab everything and put it in a set.
+       60:  166:      int iMaxCount = a2iEntCount[eEType][eETopo];
+        -:  167:      iBase_EntityHandle *aEnt =
+       60:  168:	(iBase_EntityHandle*) calloc(iMaxCount, sizeof(iBase_EntityHandle));
+       60:  169:      int iEntAlloc = iMaxCount;
+        -:  170:      int iActualCount;
+        -:  171:
+        -:  172:      std::set<iBase_EntityHandle> sEnt;
+        -:  173:      iMesh_getEntities(instance, pvRootSet,
+        -:  174:			static_cast<iBase_EntityType>(eEType),
+        -:  175:			static_cast<iMesh_EntityTopology>(eETopo),
+       60:  176:			&aEnt, &iEntAlloc, &iActualCount, &err);
+       60:  177:      if (a2qLegalTypeAndTopo[eEType][eETopo]) {
+       27:  178:	CHECK_ERR(err);
+        -:  179:      
+        -:  180:        // Put all these entities into a big set.  This will need to be a
+        -:  181:        // multiset when testing entity set queries, because the entity
+        -:  182:        // set could have the same entity in it twice.
+       27:  183:        sEnt.insert(aEnt, aEnt+iActualCount);
+       27:  184:        qOK = ((int)(sEnt.size()) == iActualCount);
+        -:  185:      }
+        -:  186:      else
+       33:  187:        qOK = true;
+        -:  188:      std::set<iBase_EntityHandle> sEntCopy(sEnt);
+        -:  189:      
+        -:  190:      // Now iterate over these entities, and remove them one by one
+        -:  191:      // from the set, hopefully succeeding every time.
+        -:  192:      iBase_EntityArrIterator arrIter;
+        -:  193:      iBase_EntityHandle *aEntHandles = (iBase_EntityHandle*)
+       60:  194:	calloc(100, sizeof(iBase_EntityHandle*));
+       60:  195:      int iEntHandlesAlloc = 100;
+       60:  196:      int qHasData = true;
+        -:  197:      
+        -:  198:      do {
+        -:  199:	iMesh_initEntArrIter(instance, pvRootSet,
+        -:  200:			     static_cast<iBase_EntityType>(eEType),
+        -:  201:			     static_cast<iMesh_EntityTopology>(eETopo),
+       60:  202:			     100, 0, &arrIter, &err);
+       60:  203:	if (a2qLegalTypeAndTopo[eEType][eETopo]) {
+       27:  204:	  BREAK_ON_ERR(err);
+        -:  205:	}
+        -:  206:	else {
+        -:  207:	  break;
+        -:  208:	}
+       27:  209:	int iMissedCount = 0;
+       27:  210:	int iExtraCount = 0;
+        -:  211:	int iNumHandles;
+        -:  212:	iMesh_getNextEntArrIter(instance, arrIter, &aEntHandles,
+        -:  213:				&iEntHandlesAlloc, &iNumHandles,
+       27:  214:				&qHasData, &err);
+       27:  215:	BREAK_ON_ERR(err);
+      263:  216:	while (qHasData) {
+    23328:  217:	  for (int ii = 0; ii < iNumHandles; ii++) {
+    46184:  218:	    int iRes = sEnt.erase(aEntHandles[ii]);
+    23092:  219:	    if (iRes > 1) iExtraCount++;
+    23092:  220:	    else if (iRes == 0) iMissedCount++;
+        -:  221:	  }
+        -:  222:	  iMesh_getNextEntArrIter(instance, arrIter, &aEntHandles,
+        -:  223:				  &iEntHandlesAlloc, &iNumHandles,
+      236:  224:				  &qHasData, &err);
+      236:  225:	  BREAK_ON_ERR(err);
+        -:  226:	}
+        -:  227:	qOK = qOK && (iMissedCount == 0) && (iExtraCount == 0)
+       54:  228:	  && (sEnt.size() == 0);
+        -:  229:	
+       27:  230:	iMesh_resetEntArrIter(instance, arrIter, &err);
+       27:  231:	BREAK_ON_ERR(err);
+        -:  232:	
+        -:  233:	// Now repeat to be sure the reset worked.
+       27:  234:	iMissedCount = 0;
+       27:  235:	iExtraCount = 0;
+        -:  236:	iMesh_getNextEntArrIter(instance, arrIter, &aEntHandles,
+        -:  237:				&iEntHandlesAlloc, &iNumHandles,
+       27:  238:				&qHasData, &err);
+       27:  239:	BREAK_ON_ERR(err);
+      263:  240:	while (qHasData) {
+    23328:  241:	  for (int ii = 0; ii < iNumHandles; ii++) {
+    46184:  242:	    int iRes = sEntCopy.erase(aEntHandles[ii]);
+    23092:  243:	    if (iRes > 1) iExtraCount++;
+    23092:  244:	    else if (iRes == 0) iMissedCount++;
+        -:  245:	  }
+        -:  246:	  iMesh_getNextEntArrIter(instance, arrIter, &aEntHandles,
+        -:  247:				  &iEntHandlesAlloc, &iNumHandles,
+      236:  248:				  &qHasData, &err);
+      236:  249:	  BREAK_ON_ERR(err);
+        -:  250:	}
+        -:  251:	qOK = qOK && (iMissedCount == 0) && (iExtraCount == 0)
+       54:  252:	  && (sEntCopy.size() == 0);
+        -:  253:	
+       27:  254:	iMesh_endEntArrIter(instance, arrIter, &err);
+       27:  255:	BREAK_ON_ERR(err);
+        -:  256:      } while (0);
+       60:  257:      switch (err) {
+        -:  258:      case iBase_FAILURE:
+        -:  259:	// Could mean there aren't any of these; check for this.
+    #####:  260:	if (iMaxCount == 0)
+    #####:  261:	  iNPassed++;
+        -:  262:	else {
+    #####:  263:	  cout << "Max count should be zero; is " << iMaxCount << endl;
+    #####:  264:	  qAllPassed = false;
+    #####:  265:	  iNFailed++;
+        -:  266:	}
+        -:  267:	break;
+        -:  268:      case iBase_BAD_TYPE_AND_TOPO:
+        -:  269:	{
+       33:  270:	  if (a2qLegalTypeAndTopo[eEType][eETopo]) {
+    #####:  271:	    cout << "Didn't produce iterator for valid combinations." << endl;
+    #####:  272:	    qAllPassed = false;
+    #####:  273:	    iNFailed++;
+        -:  274:	  }
+        -:  275:	  else {
+       33:  276:	    iNPassed++;
+        -:  277:	  }
+        -:  278:	}
+        -:  279:	break;
+        -:  280:      case iBase_INVALID_ARGUMENT:
+        -:  281:	// Can happen for 2D meshes requested to iterate over
+        -:  282:	// regions.
+        -:  283:	{
+        -:  284:	  int iGeomDim;
+    #####:  285:	  iMesh_getGeometricDimension(instance, &iGeomDim, &err);
+    #####:  286:	  CHECK_ERR(err);
+    #####:  287:	  if (iGeomDim == 2 &&
+        -:  288:	      ((eEType == iBase_REGION) ||
+        -:  289:	       ((eEType == iBase_ALL_TYPES) &&
+        -:  290:		((eETopo == iMesh_POLYHEDRON) ||
+        -:  291:		 (eETopo == iMesh_TETRAHEDRON) ||
+        -:  292:		 (eETopo == iMesh_PYRAMID) ||
+        -:  293:		 (eETopo == iMesh_PRISM) ||
+        -:  294:		 (eETopo == iMesh_HEXAHEDRON) ||
+        -:  295:		 (eETopo == iMesh_SEPTAHEDRON)))))
+    #####:  296:	    iNPassed++;
+        -:  297:	  else {
+    #####:  298:	    cout << "Valid arguments incorrectly diagnosed." << endl;
+    #####:  299:	    qAllPassed = false;
+    #####:  300:	    iNFailed++;
+        -:  301:	  }
+        -:  302:	}
+        -:  303:	break;
+        -:  304:      case iBase_SUCCESS:
+        -:  305:	break;
+        -:  306:      default:
+    #####:  307:	cout << "Unexpected error type!" << endl;
+    #####:  308:	TEST(false);
+        -:  309:	break;
+        -:  310:      } // Done with catching exceptions
+       60:  311:      UT_FREE(aEntHandles);
+       60:  312:      UT_FREE(aEnt);
+        -:  313:    }
+        -:  314:  } // Done with double loop to test entity iterators.
+        -:  315:
+        -:  316:  // Test reciprocity of array adjacency calls.
+        -:  317:  // Edge->vertex
+        1:  318:  cout << " Testing entity array adjacency reciprocity" << endl;
+        1:  319:  if (a2iAdjTable[1][0] != iBase_UNAVAILABLE &&
+    #####:  320:      a2iAdjTable[0][1] != iBase_UNAVAILABLE) {
+    #####:  321:    cout << "  Edges and verts:";
+        -:  322:    vArrayReciprocityTest(instance, iBase_EDGE,
+    #####:  323:			   iBase_VERTEX);
+        -:  324:    vArrayReciprocityTest(instance, iBase_VERTEX,
+    #####:  325:			   iBase_EDGE);
+        -:  326:    cout << endl;
+        -:  327:  }
+        -:  328:
+        -:  329:  // Face->vertex
+        2:  330:  if (a2iAdjTable[2][0] != iBase_UNAVAILABLE &&
+        1:  331:      a2iAdjTable[0][2] != iBase_UNAVAILABLE) {
+        1:  332:    cout << "  Faces and verts:";
+        -:  333:    vArrayReciprocityTest(instance, iBase_FACE,
+        1:  334:			   iBase_VERTEX);
+        -:  335:    vArrayReciprocityTest(instance, iBase_VERTEX,
+        1:  336:			   iBase_FACE);
+        -:  337:    cout << endl;
+        -:  338:  }
+        -:  339:
+        -:  340:  // Region->vertex
+        2:  341:  if (a2iAdjTable[3][0] != iBase_UNAVAILABLE &&
+        1:  342:      a2iAdjTable[0][3] != iBase_UNAVAILABLE) {
+        1:  343:    cout << "  Regions and verts:";
+        -:  344:    vArrayReciprocityTest(instance, iBase_REGION,
+        1:  345:			   iBase_VERTEX);
+        -:  346:    vArrayReciprocityTest(instance, iBase_VERTEX,
+        1:  347:			   iBase_REGION);
+        -:  348:    cout << endl;
+        -:  349:  }
+        -:  350:
+        -:  351:  // Face->edge
+        1:  352:  if (a2iAdjTable[2][1] != iBase_UNAVAILABLE &&
+    #####:  353:      a2iAdjTable[1][2] != iBase_UNAVAILABLE) {
+    #####:  354:    cout << "  Faces and edges:";
+        -:  355:    vArrayReciprocityTest(instance, iBase_FACE,
+    #####:  356:			   iBase_EDGE);
+        -:  357:    vArrayReciprocityTest(instance, iBase_EDGE,
+    #####:  358:			   iBase_FACE);
+        -:  359:    cout << endl;
+        -:  360:  }
+        -:  361:
+        -:  362:  // Region->edge
+        1:  363:  if (a2iAdjTable[3][1] != iBase_UNAVAILABLE &&
+    #####:  364:      a2iAdjTable[1][3] != iBase_UNAVAILABLE) {
+    #####:  365:    cout << "  Regions and edges:";
+        -:  366:    vArrayReciprocityTest(instance, iBase_REGION,
+    #####:  367:			   iBase_EDGE);
+        -:  368:    vArrayReciprocityTest(instance, iBase_EDGE,
+    #####:  369:			   iBase_REGION);
+        -:  370:    cout << endl;
+        -:  371:  }
+        -:  372:
+        -:  373:  // Region->face
+        2:  374:  if (a2iAdjTable[3][2] != iBase_UNAVAILABLE &&
+        1:  375:      a2iAdjTable[2][3] != iBase_UNAVAILABLE) {
+        1:  376:    cout << "  Regions and faces:";
+        -:  377:    vArrayReciprocityTest(instance, iBase_REGION,
+        1:  378:			   iBase_FACE);
+        -:  379:    vArrayReciprocityTest(instance, iBase_FACE,
+        1:  380:			   iBase_REGION);
+        -:  381:    cout << endl;
+        -:  382:  }
+        -:  383:
+        1:  384:  cout << " Array adjacency identity test..." << endl;
+        -:  385:  //@@ Ensure that identity adjacency calls return nothing.
+        -:  386:  // Test to be sure that no VERTEX has an adjacent VERTEX, etc.  The
+        -:  387:  // iMesh data model specifies that entities of the same type are never
+        -:  388:  // adjacent, but are connected instead through entities of different
+        -:  389:  // type incident on both.
+        5:  390:  for (int iType = 0; iType <= 3; iType++) {
+        4:  391:    if (a2iAdjTable[iType][iType] != iBase_UNAVAILABLE) {
+        3:  392:      cout << "  Type: ";
+        -:  393:      cout.width(9);
+        3:  394:      cout << astrTypes[iType] << endl;
+        3:  395:      iBase_EntityType eType = static_cast<iBase_EntityType>(iType);
+        -:  396:
+        3:  397:      iBase_EntityHandle * aEntHand = NULL;
+        3:  398:      int iNumEnt, iEntHandAlloc = 0;
+        -:  399:      iMesh_getEntities(instance, pvRootSet, eType, iMesh_ALL_TOPOLOGIES,
+        3:  400:			&aEntHand, &iEntHandAlloc, &iNumEnt, &err);
+        3:  401:      CHECK_ERR(err);
+        -:  402:
+        3:  403:      iBase_EntityHandle * aAdjHand = NULL;
+        3:  404:      int * aiOffset = NULL;
+        -:  405:      int iNAdj, iNOff;
+        3:  406:      int iAdjHandAlloc = 0;
+        3:  407:      int iOffsetAlloc = 0;
+        -:  408:      iMesh_getEntArrAdj(instance, aEntHand, iNumEnt, eType,
+        -:  409:			 &aAdjHand, &iAdjHandAlloc, &iNAdj,
+        3:  410:			 &aiOffset, &iOffsetAlloc, &iNOff, &err);
+        3:  411:      CHECK_ERR(err);
+        3:  412:      UT_FREE(aAdjHand);
+        3:  413:      UT_FREE(aiOffset);
+        3:  414:      UT_FREE(aEntHand);
+        3:  415:      TEST(iNAdj == 0 && iNOff == iNumEnt+1);
+        -:  416:    }
+        -:  417:  }
+        3:  418:}

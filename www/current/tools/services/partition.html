@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pagePartition" -->
+</head>
+
+<body class="pageTools pageToolsServices pagePartition">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+    <h1>Partition Improvement</h1>
+  <p>Parallel simulations at extreme scale require that the mesh is distributed across a large number of processors with equal work load and minimum inter-part communications. A number of algorithms have been developed to meet these goals and graph/hypergraph-based methods are by far the most powerful ones. However, the global implementation of current approaches can fail on very large core counts and the vertex imbalance is not optimal where individual cores are lightly loaded. Those issues are resolved by combination of global and local partitioning and the iterative improvement algorithms developed in [1, 2]. This combined partition strategy is applied to the simulations at extreme scale with up to O(1010) elements and up to O(300K) cores.</p>
+
+<h3>Global partition and local partition</h3>
+<p>Two partitioning categories are defined based on data provided to graph/hypergraph-based partitioner: global partitioning, which considers both intra-processor and inter-processor graph edges, and local partitioning which considers only intra-processor graph edges. Global partitioning considers the complete set of graph edges and provides a balanced partition with well-controlled inter-part communication. Local partitioning considers only the on-processor (intra-processor) graph edges and nodes, without knowing the existence of graph nodes and edges on other processors. In this case, partitioning is carried out independently on each processor, as a serial process, which can be executed in an embarrassingly parallel fashion on all processors.</p>
+<p>At large core counts local partitioning requires much smaller compute time where a global partitioning implementation may fail. However, as local partitioning is repeated, the quality of the partition will decrease due to the compounding of imbalance in each step. Local partitioning is not optimal, but provides good starting partitions that can easily be improved by iterative algorithm [1, 2].</p>
+
+<h3>Iterative improvement algorithm</h3>
+<p>When very large core counts are considered, the problems observed in the partition obtained from the graph/hypergraph-based procedures are limited to a number of heavily loaded parts (based on mesh vertices), referred to as spikes. Thus scalability of the equation solution phase, is limited by these spikes.  The diffusive approach, Local Iterative Inter-Part Boundary Modification (LIIPBMod) developed in [1], reduces spikes by migrating selected mesh entities from relatively heavily loaded parts to less loaded neighboring parts.  On heavily loaded parts, the mesh vertices on the inter-part boundary are traversed and the ones bounding a small number of elements are identified. Then the elements adjacent selected vertices are migrated to the lightly loaded neighboring part. Figure 1 explains the algorithm using three, 2D examples for clarity. The procedure has been implemented for 3D meshes.</p>
+<img src="../../assets/images/Partition_figure1.jpg" width="300" height="179" alt="patition LlIPBMod" />
+<p>Figure 1: partition before (top) and after (bottom) LIIPBMod</p>
+<p>By this local inter-part boundary adjustment, the vertex imbalance is improved while only modestly perturbing the element balance. The procedure is repeated for several iterations to achieve the desired improvement to the vertex balance.  
+In the extreme scale simulations, the global and local partitioning are used in a combined manner. i.e., in the first step, the mesh is balanced globally into an intermediate number of parts, m, and in the second step, each of these m parts split independently to n parts, which gives mxn parts in total. In the final step, the balance of the partition is improved by an iterative mesh entity migration procedure. This combination is much faster and more efficient compared to global partitioning.</p>
+
+<h3>Applications</h3>
+<p>An abdominal aorta aneurysm (AAA) model (see Figure 2) is used to study the partition improvement algorithm by using it in conjunction with graph/hypergraph-based procedures, namely ParMETIS PartKWay [3] and Zoltan Parallel HyperGraph partitioner PHG [4]. </p>
+<img src="../../assets/images/aorta.jpg" width="220" height="156" alt="Aorta" />
+<p>Figure 2: The geometry and the mesh of an abdominal aorta aneurysm (AAA) model</p>
+<p>First consider a 1.07 billion anisotropic, tetrahedral element mesh created by applying mesh adaptation [5] on an AAA model. The global (ParMETIS PartKWay) and local (PHG) partitioning are combined to obtain different partitions with number of parts ranging from 4,096 to 294,912 [2]. The element imbalance is within 6% for all the partitions with up to 294,912 parts. However, the vertex imbalance is getting worse when the mesh is distributed to more and more parts. Each part of a globally balanced (1.025% element imbalance) partition with 4,096 parts splitting to 72 parts gives a partition with 294,912 parts in total. The element imbalance is 5.6%, but the vertex imbalance is 43.7%, which indicates 43.7% more work to do on the part with the highest number of vertices during the equation solution phase of the FEA. The LIIPBMod algorithm reduces the vertex imbalance dramatically to 17% while increasing the element imbalance to 15%. Table 1 presents the time usage of the FEA along with the scaling factors. </p>
+<img src="../../assets/images/Partition-Table1.gif" width="300" height="53" alt="strong scaling results of FEA on an AAA model" />
+<p>Table 1. Strong scaling results of FEA on an AAA model with 1.07B elements up to 294,912 cores on JUGENE with and without LIIPBMod algoithm. <em>LMod</em> denotes LIIPBMod.</p>
+<p>It also compares the cases with and without using LIIPBMod algorithm. The equation solution phase is accelerated by 12% (from 10.38 to 9.14 seconds) due to better vertex balance, while the equation formation is slowed down a little from 5.54 to 5.82 seconds. The total time usage of the FEA is reduced from 15.92 to 14.96 seconds and the scaling factor is increased from 0.74 to 0.79. The time spent on the FEA is reduced by 0.96 second per 20 time steps, which means 78.6 cpu hours. In the real application, we usually run thousands of time steps per cardiac cycle, e.g, 5000. By using LIIPBMod algorithm, we save 78.6x5000=393 thousand cpu hours per cardiac cycle in analysis. The time spent on LIIPBMod algorithm is much smaller than the classical graph/hypergraph-based partitioner, which is negligible compared to solver [1]. An 8.56 billion element mesh was also run and yielded similar results.</p>
+<p> [1]. M. Zhou, O. Sahni, K.D. Devine, M.S. Shephard, K.E. Jansen, Controlling Unstructured Mesh Partitions for Massively Parallel Simulations, SIAM Scientific Computing, 2010, accepted.</p>
+<p>[2]. M. Zhou, O. Sahni, T. Xie, M.S. Shephard, K.E. Jansen, Unstructured Mesh Partition Improvement for Implicit Finite Element at Extreme Scale, Journal of Supercomputing, 2010, under review.</p>
+<p>[3]. G. Karypis and V. Kumar, A parallel algorithm for multilevel graph partitioning and sparse matrix ordering, 10th Intl. Parallel Processing Symposium, 314-319, 1996.</p>
+<p>[4]. K. Devine and E. Boman and R. Heaphy and B. Hendrickson and C. Vaughan, Zoltan Data Management Services for Parallel Dynamic Applications, Computing in Science and Engineering, 4(2):90-97, 2002.</p>
+<p>[5]. O. Sahni and Y. M&uuml;ller and K.E. Jansen and M.S. Shephard and C.A. Taylor, Efficient Anisotropic Adaptive Discretization of the Cardiovascular System, Comp. Meth. Appl. Mech. Engng. 195: 5634-5655, 2006. </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

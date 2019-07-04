@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+<!-- TemplateParam name="bodyID" type="text" value="default" -->
+<!-- TemplateParam name="bodyClass" type="text" value="" -->
+</head>
+
+<body class="@@(_document['bodyClass'])@@">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="../technologies/research/index.html" id="linkIndex">Research</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/research/partition.html" id="linkPartition">Partition Improvement</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/research/predictiveLoad.html" id="linkPredictiveLoad">Predictive Load Balance</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/research/commLib.html" id="linkCommLib">Communication Libraries</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/research/mapReduce.html" id="linkMapReduce">MapReduce Experiments</a><span class="hide"> | </span>
+<a class="nav" href="../technologies/results/index.html">Scaling Results</a>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- TemplateBeginEditable name="Content" -->
+  <h1>Title Goes Here...</h1>
+  <img src="../img/thumb1.jpg" height="130" width="130" alt="Thumbnail example" />
+  <p class="intro"><strong>Lorem Ipsum</strong> is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry's standard dummy  text ever since the 1500s, when an unknown printer took a galley of  type and scrambled it to make a type specimen book. It has survived not  only five centuries, but also the leap into electronic typesetting,  remaining essentially unchanged. It was popularised in the 1960s with  the release of Letraset sheets containingt:</p>
+  <p>It is a long established fact that a reader will be distracted by the  readable content of a page when looking at its layout. The point of  using Lorem Ipsum is that it has a more-or-less normal distribution of  letters, as opposed to using 'Content here, content here', making it  look like readable English. Many desktop publishing packages and web  page editors now use Lorem Ipsum as their default model text, and a  search for 'lorem ipsum' will uncover many web sites still in their  infancy. Various versions have evolved over the years, sometimes by  accident, sometimes on purpose (injected humour and the like).</p>
+<!-- TemplateEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+</html>

@@ -1,0 +1,616 @@
+
+\section{Interface Description\label{sec:Interface}}
+
+The TSTT mesh interface is built on a client-server model, with the
+explicit assumption that the client and server may be written in
+different programming languages.  To address cross-language issues,
+especially with arrays and strings, the TSTT interface is defined using
+the Scientific Interface Description Language
+(SIDL)~\cite{babel:site04,usersguide04}.  This language neutral
+description is then processed by an existing interpreter, Babel to
+produce a language-specific client API and server skeleton, as well as
+glue code that mediates language translation issues.
+
+We have defined interfaces that support a variety of commonly needed,
+and supported, functionalities for mesh and entity query, mesh
+modification, entity set operations, and tags.  Implementations must
+support a core set of functions to be considered TSTT-compliant.
+Support of more advanced functionality, such as mesh modification, is
+optional; in some cases, such functionality can be supported by
+reference implementations built on the core interface.  In this section
+we describe several aspects of the interface and illustrate its use with
+simple code fragment examples.  All code fragments are written using the
+SIDL calls to TSTT to avoid the confusion inherent in presenting
+examples in specific languages.  All code fragments can be rendered by
+application programs written in Fortran, C/C++, Java, and Python. In all
+cases, line numbers are included for the purposes of the exposition.
+
+\subsection{Global Queries\label{sub:Mesh-Interface}}
+
+\begin{algorithm*}
+
+\caption{Global Query Example\label{alg:Global-Mesh-Query}}
+\begin{lyxcode}
+1~~opaque~rootSet~=~getRootSet()
+
+2~~int~numElements
+
+3~~array<opaque>~handles
+
+4~~getEntities(rootSet,~TSTTM.EntityType\_REGION,
+
+5~~~~~~~~~~~~~~TSTTM.EntityTopology\_ALL\_TOPOLOGIES,
+
+6~~~~~~~~~~~~~~handles,~numElements)
+
+~
+
+7~~array<double>~coords
+
+8~~array<int>~inSet
+
+9~~int~coordsSize,~inSetSize
+
+10~TSTTM.StorageOrder~storageOrder~=~TSTTM.StorageOrder\_UNDETERMINED
+
+11~getAllVtxCoords(rootSet,~coords,~coordsSize,~inSet,~inSetSize,~
+
+12~~~~~~~~~~~~~~~~~storageOrder)
+
+~
+
+13~int~offsetSize,~indexSize,~topoSize
+
+14~array<int>~offset,~index
+
+15~array<TSTTM.EntityTopology>~topologies
+
+16~getVtxCoordIndex(rootSet,~TSTTM.EntityType\_REGION,
+
+17~~~~~~~~~~~~~~~~~~TSTTM.EntityTopology\_ALL\_TOPOLOGIES,
+
+18~~~~~~~~~~~~~~~~~~TSTTM.EntityType\_REGION,
+
+19~~~~~~~~~~~~~~~~~~offset,~offsetSize,~index,~indexSize,
+
+20~~~~~~~~~~~~~~~~~~topologies,~topoSize)
+\end{lyxcode}
+
+\end{algorithm*}
+
+
+Global query functions can be categorized into two groups: 1)
+\emph{database functions}, that manipulate the properties of the
+database as a whole and 2) \emph{set query functions}, that query the
+contents of entity sets as a whole.  
+
+Database functions include functions to load and save information to a
+file; file format is implementation dependent. In addition, an
+application can request the geometric dimension of the mesh data stored
+in the database, as well as the implementation's preferred storage order
+for coordinate data: blocked (xxx...yyy...zzz...) or interleaved
+(xyzxyzxyz...).  Also, implementations must provide information about
+the availability and relative cost of computing adjacencies between
+entities of different types. Finally, each instance of the interface
+must provide a handle for the root set.
+
+Set query functions allow an application to retrieve information about
+entities in a set.  The entity set may be the root set, which
+will return selected contents of the entire database, or may be any
+subsidiary entity set.  For example, functions exist to
+request the number of mesh entities of a given type or topology; the
+types and topologies are defined as enumerations.  Applications can
+request handles for all entities of a given type or topology or handles
+for entities of a given type adjacent to all entities of a given type or
+topology.  Also, vertex coordinates are available in either blocked or
+interleaved order. Coordinate requests can be made for all vertices or
+for the vertex handles returned by an adjacency call. Finally, indices
+into the global vertex coordinate array can be obtained for both entity
+and adjacent entity requests.
+
+To illustrate the use of several of these global functions,
+Algorithm~\ref{alg:Global-Mesh-Query} shows how the TSTT interface
+could be used to obtain the information necessary for assembling the
+global stiffness matrix for a three-dimensional mixed-element
+problem.  During stiffness matrix assembly, a finite element
+application needs to retrieve information about each element,
+including materials properties, as well as information about
+connectivity and vertex coordinates.
+
+Line 1 retrieves the handle for the root set, which is a required
+argument for global mesh queries; a mesh subset can be selected by
+using the handle for an entity set instead. In line 4, all three-dimensional
+mesh entities are retrieved, regardless of whether they are tetrahedra,
+hexahedra, etc. In addition to returning an array containing the data
+(\texttt{handles}), the number of elements actually contained in the
+array is returned; this is essential, because SIDL arrays can be larger
+than the amount of data stored in them, especially if the array is
+re-used. 
+
+Line 11 retrieves coordinates of all vertices. The coordinates are
+returned in the \texttt{coords} array. Because an entity set may contain
+(for example) a tetrahedron while not containing all of its vertices,
+the \texttt{inSet} array contains a 1 for vertices in the set and
+a 0 for vertices not in the set. For the current example, which uses
+the root set, all vertices are in the set, and \texttt{inSet} would
+contain all 1's. Finally, because the storage order for vertex coordinate
+data was not specified, the implementation will return coordinate
+data in its preferred order, and return this order in \texttt{storageOrder};
+if this variable is set before making the call, the implementation
+must return data in the requested order.
+
+Finally, in Line 16, a request is made for the indices within the
+global vertex coordinate array where data for each vertex of each
+element is stored.%
+\footnote{Note that the usage in this example is the simple case of identifying
+vertex indices for the REGION entities; by changing the \texttt{requestedEntityType}
+(the second entity type argument), we could retrieve (for instance)
+the vertex indices for all faces adjacent to all regions in an entity
+set.%
+} These indices can be used not only to retrieve vertex coordinates
+from the \texttt{coords} array, but also as global degree of freedom
+indices for the finite element problem. Because the entity types supported
+by TSTTM have different numbers of vertices, this information is returned
+in \texttt{index} in a compressed format, with \texttt{offset} indicating
+where data for each element begins. In addition, entity topology information
+for each entity is returned.
+
+
+\subsection{Entity- and Array-Based Query\label{sub:Ent-Interface}}
+
+%
+\begin{algorithm*}
+
+\caption{Single Face Traversal and Query Example\label{alg:entity-example}}
+
+\begin{lyxcode}
+~1~opaque~iter
+
+~2~bool~moreData
+
+~3~moreData~=~initEntIter(rootSet,~TSTTM.EntityType\_FACE,
+
+~4~~~~~~~~~~~~~~~~~~~~~~~~TSTTM.EntityTopology\_ALL\_TOPOLOGIES,~iter)
+
+~5~
+
+~6~while~(moreData)~\{
+
+~7~~~opaque~entity
+
+~8~~~moreData~=~getNextEntIter(iter,~entity)
+
+~9~~~TSTTM.EntityTopology~ET~=~getTopo(entity)
+
+10~~~
+
+11~~~array<opaque>~vertHandles
+
+12~~~getEntAdj(entity,~TSTTM.EntityType\_VERTEX,
+
+13~~~~~~~~~~~~~vertHandles,~numVerts)
+
+14~~~/{*}~Use~face~data~for~mesh~refinement,~etc.~{*}/
+
+15~\}~/{*}~Go~on~to~the~next~triangle~{*}/
+
+16~endEntIter(iter)
+\end{lyxcode}
+
+\end{algorithm*}
+
+
+The example of the previous section illustrated how to retrieve information
+about all entities in a mesh. While this is certainly a practical
+alternative for some types of problems and for small problem size,
+larger problems or situations involving mesh modification require
+access to single entities or to blocks of entities. The TSTT mesh
+interface supports traversal and query functions for single entities
+and for blocks of entities; the query functions supported are entity
+type and topology, vertex coordinates, and entity adjacencies. Algorithm~\ref{alg:entity-example}
+illustrates some of this functionality for single entity access; block
+access is similar. Lines 3, 8, and 16 show how single-entity iterators
+are created, accessed, and destroyed; this iterator will traverse
+all two-dimensional entities in the mesh --- triangles, quadrilaterals,
+and polygons. Because the actual topology of the entity is unknown,
+\texttt{getTopo} (line 9) must be used to retrieve this information.
+Line 12 shows the use of the single-entity adjacency call to identify
+vertices adjacent to the face. This vertex information can then be
+used for any operation requiring face geometric information, including
+mesh refinement.
+
+\subsection{Mesh Modification\label{sub:Mesh-Modification}}
+
+%
+\begin{algorithm*}
+
+\caption{Mesh Modification Example\label{alg:Mesh-Modification-Example}}
+
+\begin{lyxcode}
+~1~deleteEnt(oldTri1)
+
+~2~deleteEnt(oldTri2)
+
+~3~deleteEnt(oldDiagEdge)
+
+~4
+
+~5~TSTTM.CreationStatus~CStat
+
+~6~array<opaque>~verts,~edges
+
+~7~opaque~newDiagEdge,~newTri1,~newTri2
+
+~8~
+
+~9~/{*}~Set~verts~to~contain~endpoints~for~new~diagonal~edge~{*}/
+
+10~createEnt(TSTTM.EntityTopology\_LINE\_SEGMENT,~verts,~2,~newDiagEdge,~CStat)
+
+11~
+
+12~/{*}~Set~edges~to~contain~edges~for~new~triangle~1~{*}/
+
+13~createEnt(TSTTM.EntityTopology\_TRIANGLE,~edges,~3,~newTri1,~CStat)
+
+14
+
+15~/{*}~Set~newEdges~to~contain~edges~for~new~triangle~2~{*}/
+
+16~createEnt(TSTTM.EntityTopology\_TRIANGLE,~edges,~3,~newTri2,~CStat)
+\end{lyxcode}
+
+\end{algorithm*}
+
+
+The TSTT mesh interface supports mesh modification by providing a
+minimal set of operators for low-level modification; both single entity
+and block versions of all of these operators are provided.  These
+functions are intended as low-level primitives.  High-level
+functionality, including mesh generation, quality assessment, and
+validity checking, can in principle be built from these operators,
+although extensions to the current modification interface are planned to
+support such functionality
+
+Geometry modification is achieved through functions that change vertex
+locations.  Vertex locations are set at creation, and can be changed as
+required, for instance, by mesh smoothing or other node movement
+algorithms.
+
+Topology modification is achieved through the creation and deletion of
+mesh entities.  Creation of higher-dimensional entities requires
+specification, in canonical order, of an appropriate collection of
+lower-dimensional entities. For instance, a tetrahedron can be created
+using four vertices, six edges or four faces, but not from
+combinations of these. Upon creation, adjacency information properly
+connecting the new entity to its components is set up by the
+implementation. Some implementations may allow the creation of
+duplicate entities (for example, two edges connecting the same two
+vertices), while others will respond to such a creation request by
+returning a copy of the already-existing entity.
+
+Deletion of existing entities must always be done from highest to
+lowest dimension, because the TSTT interface forbids the deletion
+of an entity with existing upward adjacencies (for instance, an edge
+that is still in use by one or more faces or regions).
+
+Algorithm~\ref{alg:Mesh-Modification-Example} shows a simple example
+from a two-dimensional edge-swapping kernel. In this example, the
+triangles \texttt{oldTri1} and \texttt{oldTri2}, along with their common
+edge \texttt{oldDiagEdge} are removed (lines 1--3); note that the
+triangles are deleted before the edge, as discussed above. A new
+diagonal edge is created (line 10) and two new triangles are created
+adjacent to it (lines 12--16). After each creation, the outcome of the
+attempted creation can be verified by checking the value of
+\texttt{CStat}; in this example, the entity created ought not to have
+existed before (for a non-overlapping mesh, at any rate), and so the
+status value should be \texttt{CreationStatus\_NEW}.
+
+
+\subsection{Entity Sets\label{sub:Entity-Set-Interface}}
+
+The TSTT entity set interface is divided into three parts: basic set
+functionality, hierarchical set relations, and set boolean operations.
+
+Basic set functionality includes creating and destroying
+entity sets; adding and removing entities and sets; and several entity
+set specific query functions.%
+\footnote{In addition, all of the functions described above that take an entity
+set argument can be used to query entity sets as well. This includes
+all global mesh query functions of Section~\ref{sub:Mesh-Interface}
+as well as the single-entity and block traversal functionality of
+Section~\ref{sub:Ent-Interface}.%
+} Entity sets can be either ordered and non-unique, or unordered and
+unique; an ordered set guarantees that query results (including traversal)
+will always be given in the order in which entities were added to
+the set. The ordered/unordered status of an entity set must be specified
+when the set is created and can be queried. 
+
+Entity sets are created empty. Entities can be added to or removed
+from
+the set individually or in blocks; for ordered sets, the last of a
+number of duplicate entries will be the first to be deleted.  Also,
+entity sets can be added to or removed from each other; note that,
+because all sets are automatically contained in the root set from
+creation, calls that would add or remove a set from the root set are not
+permitted.  An entity set can also be queried to determine the number
+and handles of sets that it contains, and to determine whether a
+given entity or set belongs to that set.
+
+Hierarchical relationships between entity sets are intended to describe,
+for example, multilevel meshes and mesh refinement hierarchies. The
+directional relationships implied here are labeled as parent-child
+relationships in the TSTT interface. Functions are provided to add,
+remove, count, and identify parents and children and to determine
+if one set is a child of another.
+
+Set boolean operations --- intersection, union, and subtraction ---
+are also defined by the TSTT interface. The definitions are intended
+to be compatible with their C++ standard template library (STL) counterparts,
+both for semantic clarity and so that STL algorithms can be used by
+implementations where appropriate. All set boolean operations apply
+not only to \emph{entity} members of the set, but also to \emph{set}
+members. Note that set hierarchical relationships are not included:
+the set resulting from a set boolean operation on sets with hierarchical
+relationships will \emph{not} have any hierarchical relationships
+defined for it, regardless of the input data. For instance, if one
+were to take the intersection of two directionally-coarsened meshes
+(stored as sets) with the same parent mesh (also a set) in a multigrid
+hierarchy, there is no reason to expect that the resulting set will
+necessarily be placed in the multigrid hierarchy at all. On the other
+hand, if both of those directionally-coarsened meshes contain a set
+of boundary faces, then their intersection will contain that set as
+well.
+
+While set boolean operations are completely unambiguous for unordered
+entity sets, ordered sets make things more complicated. For operations
+in which one set is ordered and one unordered, the result set is unordered;
+its contents are the same as if an unordered set were created with
+the (uniquified) contents of the ordered set and the operation were
+then performed. In the case of two ordered sets, the TSTT specification
+follows the spirit of the STL definition, with complications related
+to the possibility of multiple copies of a given entity handle in
+each set. In the following discussion, assume that a given entity
+handle appears $m$ times in the first set and $n$ times in the second
+set. 
+
+\begin{itemize}
+\item For intersection of two ordered sets, the output set will contain
+the $\min\left(m,n\right)$ copies of the entity handle. These will
+appear in the same order as in the first input set, with the first
+copies of the handle surviving. For example, intersection of the two
+sets $A=\textrm{\{$abacdbca$\}}$ and $B=\{ dadbac\}$ will result
+in $A\bigcap B=\{ abacd\}$.
+\item Union of two ordered sets is easy: the output set is a concatenation
+of the input sets: $A\bigcup B=\{ abacdbcadadbac\}$.
+\item Subtraction of two ordered sets results in a set containing $\min\left(m-n,0\right)$
+copies of an entity handle. These will appear in the same order as
+in the first input set, with the first copies of the handle surviving.
+For example, $A-B=\{ abc\}$.
+\end{itemize}
+Regardless of whether the entity set is ordered or unordered, the
+sets it contains are always treated as unordered, with correspondingly
+simple semantics for boolean operations.
+
+%
+\begin{algorithm}
+
+\caption{Entity Set Example\label{alg:Entity-Set-Example}}
+
+\begin{lyxcode}
+~1~opaque~setA,~setB,~setC
+
+~2~createEntSet(false,~setA)
+
+~3~createEntSet(false,~setB)
+
+~4~createEntSet(true,~setC)
+
+~
+
+~5~array<opaque>~entityHandles
+
+~6~int~numEntities
+
+~7~/{*}~Populate~entityHandles~{*}/
+
+~8~addEntArrToSet(entityHandles,~numEntities,~setA)
+
+~9~/{*}~Populate~other~sets~{*}/
+
+~
+
+10~getEntities(setA,~TSTT.EntityType\_FACE,~
+
+11~~~~~~~~~~~~~TSTT.EntityTopology\_ALL\_TOPOLOGIES,~entityHandles,~
+
+12~~~~~~~~~~~~~numEntities)
+
+~
+
+13~array<opaque>~containedSets
+
+14~int~numSets
+
+15~addEntSet(setB,~setA)
+
+16~getEntSets(setA,~-1,~containedSets,~numSets)
+
+
+
+17~opaque~setD
+
+18~intersect(setA,~setC,~setD)
+
+19~destroyEntSet(setC)
+\end{lyxcode}
+
+\end{algorithm}
+
+Algorithm~\ref{alg:Entity-Set-Example} demonstrates usage of entity
+sets. Three sets are created in lines 2--4; one of these (set C) is
+an ordered set. Set A is then populated (line 8) with all the entities
+in one partition of a parallel simultion; Set B is populated (line
+9) with all entities incident on the partition boundary; and Set C
+is populated (line 9) with all boundary vertices, stored in a particular
+order. In line 10, we retrieve all faces in this partition, regardless
+of face topology. Set B is obviously a subset of Set A, and adding
+Set B to Set A (line 15) records this fact; we can retrieve all subsets
+of Set A (including all subsets of B) using line 16. Finally, lines
+17--19 create a set of boundary vertices belonging to the partition,
+and destroys the global list of boundary vertices.
+
+
+\subsection{Tags\label{sub:Tag-Interface}}
+
+Tags are used to associate application-dependent data with a mesh,
+entity, or entity set. When creating a tag, the application must provide
+its data type and size, as well as a unique name. For generic tag
+data, the tag size specifies how many bytes of data to store; for
+other cases, the tag size and data type size must be consistent. The
+implementation is expected to manage the memory as needed to store
+tag data. The name string and data size can be retrieved based on
+the tag's handle, and the tag handle can be found from its name. Also,
+all tags associated with a particular entity can be retrieved; this
+can be particularly useful in saving or copying a mesh.
+
+Initially, a tag is not associated with any entity or entity set,
+and no tag values exist; association is made explicitly by setting
+data for a tag-entity pair. Tag data can be set for single entities,
+arrays of entities (each with its own value), or for entity sets.
+In each of these cases, separate functions exist for setting generic
+tag data and type-specific data. Analogous data retrieval functions
+exist for each of these cases. 
+
+When an entity or set no longer needs to be associated with a tag
+--- for instance, a vertex was tagged for smoothing and the smoothing
+operation is complete --- the tag can be removed from that entity
+without affecting other entities associated with the tag. When a tag
+is no longer needed at all --- for instance, when all vertices have
+been smoothed --- the tag can be destroyed through one of two variant
+mechanisms. First, an implementation can remove this tag from all
+tagged entities, and then request destruction of the tag. Simpler
+for the application is forced destruction, in which the tag is destroyed
+even though the tag is still associated with mesh entities, and all
+tag values and associations are deleted. Some implementations may
+not support forced destruction.
+
+%
+\begin{algorithm}
+
+\caption{Tag Example\label{alg:Tag-Example}}
+
+\begin{lyxcode}
+~1~opaque~tagHandle
+
+~2~createTag({}``Boundary~condition'',~sizeof(int),~~
+
+~3~~~~~~~~~~~TSTT.TagValueType\_INTEGER,~tagHandle)
+
+
+
+~4~array<int>~tagValues
+
+~5~array<opaque>~entityHandles
+
+~6~int~numEntities,~numValues
+
+~7~/{*}~Populate~entityHandles~and~tagValues~{*}/
+
+~8~setIntArrData(entityHandles,~numEntities,~tagHandle,
+
+~9~~~~~~~~~~~~~~~tagValues,~numValues)
+
+~
+
+10~/{*}~Much~later...~{*}/
+
+11~opaque~entity
+
+12~int~bdryCond
+
+13~bdryCond~=~getIntData(entity,~tagHandle)
+
+14~rmvTag(entity,~tagHandle)
+
+~~~...
+
+15~destroyTag(tagHandle,~true)
+
+
+\end{lyxcode}
+
+\end{algorithm}
+
+Algorithm~\ref{alg:Tag-Example} illustrates basic tag usage. In
+line 2, a tag is created to store boundary condition information,
+encoded as integers. In line 7, an array of boundary entities are
+tagged with their boundary conditions. This tag data can be retrieved
+in unrelated parts of the code, as shown for a single entity on line
+13. This entity has its boundary condition tag removed in line 14
+--- the entity is no longer tagged as having a boundary condition
+at all. Finally, line 15 shows the eventual deletion of the tag and
+all its values.
+
+
+\subsection{Error Handling\label{sub:Error-Handling}}
+
+Like any API, the TSTT interface is vulnerable to errors, either through
+incorrect input or through internal failure within an implementation.
+For instance, it is an error for an application to request entities
+with conflicting types and topologies. Also, an error in the implementation
+occurs when memory for a new object cannot be allocated. The TSTT
+error interface supports error handling by defining standard behavior
+when an error occurs. Severity of error actions range from ignoring
+errors through ``throwing'' errors to aborting on errors; this
+behavior can be customized by changing the default action. Also, the
+error interface defines a number of standard error conditions which
+could occur in TSTT mesh functions, either because of illegal input
+or internal implementation errors. 
+
+%
+\begin{algorithm}
+
+\caption{Error Handling Example}\label{alg:Error-Example}
+
+\begin{lyxcode}
+~1~/{*}~In~callee~{*}/
+
+~2~if~(/{*}~Some~error~condition~{*}/)
+
+~3~~~TSTT.Error~TErr
+
+~4~~~TErr.set(TSTT.ErrorType\_FAILURE,~{}``Unknown~error'')
+
+~5~~~/{*}~return~or~throw~error~{*}/
+
+~6~end~if
+
+~
+
+~7~/{*}~Caller~{}``catches''~error,~then...~{*}/
+
+~8~TSTT.ErrorType~EType
+
+~9~string~description
+
+10~TErr.get(EType,~description)
+
+11~/{*}~Handle~error~based~on~type~and/or~description~{*}/
+\end{lyxcode}
+
+\end{algorithm}
+
+A simple usage example for the error interface is given in 
+Algorithm~\ref{alg:Error-Example}.  The first half of the example (lines
+1--6) show how a function in a TSTT implementation might handle an
+internal error.  When an error condition is noted (line 2), TSTT Error
+object is created (line 3) and information about the type of error is
+stored in it (line 4).  The TSTT interface defines numerous standard
+error conditions to cover the vast majority of possible errors.  The
+Error object is then ``thrown'' out the function (line 5); the mechanism
+for this is obviously language dependent, with most languages returning
+errors as function arguments hidden to the interface user.  The caller
+can then access error information (lines 8--10) to
+recover from the error.
+

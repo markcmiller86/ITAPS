@@ -1,0 +1,23 @@
+FACE = Mesh
+IMPL_SIDL = $(srcdir)/iMeshSIDL.sidl
+IBASE_REPO = -R../iBase/xml
+EXTRA_DIST = testcxx.cpp
+IMPL_TESTS = testcxx
+
+include @top_srcdir@/subdir.make
+
+SERVER_LIBS = server/libiMeshserver.la  ../iBase/server/libiBaseserver.la
+CXX_LIBS = cxxclient/libiMeshcxxclient.la \
+	   ../iBase/cxxclient/libiBasecxxclient.la \
+	   $(SERVER_LIBS) 
+           
+
+testcxx: testcxx.cpp $(CXX_LIBS)
+	$(CXXLINK) -no-install $< -o $@ \
+		$(SIDL_INCLUDES) \
+                $(SIDL_INCLUDES)/cxx \
+                -I../iBase/cxxclient \
+                -Icxxclient \
+		$(CXX_LIBS) \
+		-R $(SIDL_LIBDIR) \
+		$(TEST_IMESH_LIBS)

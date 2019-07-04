@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Swapping</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><!--#include virtual="../templates/banner.html"--></div>
+
+<div id="menu"><!--#include virtual="../templates/menu.html"--></div>
+
+<div id="content">
+	
+<h1>Swapping</h1>
+
+<p>Mesh swapping improves the quality of unstructured meshes by
+changing the local topology of the mesh.&nbsp; This technique is
+especially helpful in three dimensions, where the combination of
+swapping and shape improvement has been shown to dramatically improve
+mesh quality and simulation efficiency.&nbsp; As part of SciDAC-1, a
+state-of-the-art swapping algorithm (part of the <a
+ href="http://tetra.mech.ubc.ca/GRUMMP/index.html">GRUMMP</a> meshing
+suite) was re-implemented using the mesh and geometry interfaces. This
+swapping software is already in use in one widely-distributed SciDAC
+meshing code (GRUMMP) with over 500 downloads per year for applications
+in fluid and solid mechanics, medicine, and astrophysics.<br>
+</p>
+<p>In two dimensions, face swapping chooses the best diagonal for the
+quadrilateral formed by two neighboring triangles. Pre-defined
+quality&nbsp; criteria include the Delaunay criterion and the maximum
+angle criterion.
+</p>
+<p>In three dimensions, the swapping service performs both face swapping
+and edge swapping.&nbsp; The former reconfigures tetrahedra that share
+a common face, while the latter reconfigures all tetrahedra incident on
+a single edge.&nbsp; The canonical
+face swapping case is exchanging two tetrahedra that share a face with
+three
+tetrahedra,
+as shown in the top left part of Figure 1.
+The inverse swap, from three to two tetrahedra, is also possible.
+In addition, we allow reconfiguration of two tets to two (T22
+case in the figure); in this case, the two shaded faces must be
+co-planar,
+and swapping decisions reduce to choosing the best diagonal for the
+coplanar quadrilateral. If two pairs of tetrahedra in the interior
+of the mesh share a pair of coplanar faces, this swap is also
+permitted;
+in this case, two T22 configurations are back-to-back in the mesh.
+In addition to these swappable configurations, there are a number
+of unswappable cases, some of which are illustrated in the bottom
+of Figure 1.
+</>
+<div align="center"><a name="fig:face-swap-configs"></a><a name="3246"></a>
+<table>
+  <caption align="bottom"><strong>Figure 1:</strong>
+Face swapping in three dimensions</caption> <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="../graphics/swap-3Dface.jpg"
+ alt="3D face swapping configurations"
+ style="border: 0px solid ; width: 282px; height: 277px;"> </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>
+Edge swapping is a more complicated procedure, replacing N tetrahedra
+incident a single edge by a new set of 2N-4 tetrahedra. In the
+example of Figure 2, the edge TB
+is
+perpendicular to the screen. The five tetrahedra originally incident
+on it (01TB, 12TB, 23TB, 34TB, 40TB) are replaced
+by six new tetrahedra, two for each of the triangles of the
+(non-planar)
+triangulation of polygon 01234: 012T, 024T, 234T, 021B, 042B, and 324B.
+</p>
+<div align="center"><a name="fig:edge-swap-example"></a><a name="3247"></a>
+<table>
+  <caption align="bottom"><strong>Figure 2:</strong>
+Edge swapping example</caption> <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="../graphics/swap-edge-schematic.jpg"
+ alt="Edge swapping schematic"
+ style="border: 0px solid ; width: 361px; height: 116px;"> </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>
+The challenge with edge swapping is that the number of possible
+configurations
+grows rapidly with the number of tetrahedra incident on the edge to
+be removed, as seen in the table below. In practice, the number of
+successful 7-for-10 swaps is very small, so the swapping service does
+not explore
+possible swaps for more complex initial configurations.<br>
+</p>
+<div align="center">
+<table border="1" cellpadding="3">
+  <tbody>
+    <tr>
+      <td align="center">Tets before</td>
+      <td align="center">3</td>
+      <td align="center">4</td>
+      <td align="center">5</td>
+      <td align="center">6</td>
+      <td align="center">7</td>
+    </tr>
+    <tr>
+      <td align="center">Tets after</td>
+      <td align="center">2</td>
+      <td align="center">4</td>
+      <td align="center">6</td>
+      <td align="center">8</td>
+      <td align="center">10</td>
+    </tr>
+    <tr>
+      <td align="center">Possible configurations<br>
+      </td>
+      <td align="center">1<br>
+      </td>
+      <td align="center">2<br>
+      </td>
+      <td align="center">5<br>
+      </td>
+      <td align="center">14<br>
+      </td>
+      <td align="center">42<br>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">Tets times configs<br>
+      </td>
+      <td align="center">2</td>
+      <td align="center">8<br>
+      </td>
+      <td align="center">30<br>
+      </td>
+      <td align="center">112<br>
+      </td>
+      <td align="center">420<br>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">Unique tets<br>
+      </td>
+      <td align="center">2</td>
+      <td align="center">8<br>
+      </td>
+      <td align="center">20<br>
+      </td>
+      <td align="center">40<br>
+      </td>
+      <td align="center">70</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>
+Clearly, checking the quality of each tetrahedron in each possible
+configuration is a costly undertaking; instead, the
+quality for each unique tetrahedron is computed only once, and the
+quality of a given configuration is the minimum quality among
+its tetrahedra. To simplify bookkeeping, we also take advantage of the
+symmetries
+of the post-edge-swapping configurations and store only a small set
+of canonical post-swap configurations, as shown in Figure 3.
+</>
+<div align="center"><a name="fig:canon-configs"></a><a name="3248"></a>
+<table>
+  <caption align="bottom"><strong>Figure 3:</strong>
+Canonical configurations for edge swapping, including repeat count.</caption>
+  <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="../graphics/swap-canonical.jpg"
+ alt="Canonical edge swapping configurations"
+ style="border: 0px solid ; width: 388px; height: 181px;"> </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Both face and edge swapping support pre-defined quality measures
+that enforce the Delaunay criterion, maximize the minimum sine of
+dihedral angles (recommended) or minimize
+the maximum dihedral angle. User-defined quality measures are also
+supported.<br>
+</p>
+</body>
+</html>

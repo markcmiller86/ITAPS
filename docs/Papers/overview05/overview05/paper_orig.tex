@@ -1,0 +1,111 @@
+\documentclass[11pt]{article}
+%\usepackage{imr}
+%\usepackage{amssymb}
+\usepackage{epsfig}
+
+\def\thepage {}
+%\bibliographystyle{imr}
+%\newtheorem{Pseudo}{Pseudo-Code}[section]
+\begin{document}
+
+\title{\uppercase{Toward Interoperable Mesh, Geometry and Field Components for PDE Simulation Development}}
+%\author{Lori Diachin$^1$ \and Mark Shephard$^2$}
+%\thanks{
+%$^1$ Center for Applied Scientific Computing, Lawrence Livermore National Laboratory, Livemore, CA 94551 \and
+%$^2$ Scientific Computing Research Center, Rensellear Polytechnic Institute, Troy NY
+%}
+\date{Received: date / Revised version: date}
+
+\maketitle
+\begin{abstract}
+abstract
+\end{abstract}
+
+\section{Introduction}
+\input{intro_orig}
+
+%\begin{verbatim}
+%1. Introduction
+% - Motivation: there is a significant effort devoted to the development
+%   of PDE solvers
+%    - often this effort is somewhat peripheral to the main goals at
+%      hand; that is the development of a new physics solver
+%    - could be more effective if tools for the peripheral parts were
+%      available for incorporation
+%    - such tools would include automated meshing from general problem 
+%      definitions, adaptive methods, multi-physics techniques
+%
+% - Even when they exist, simulation codes find it difficult to take 
+%   advantage of these tools because of the current status of tool availability:
+%    - libraries:
+%        - typically focused; limited API options for accessing library
+%          functionality
+%        - difficult to experiment with different libraries that provide
+%          similar capabilities (API is library specific)
+%        - often don't interoperate with other libraries that provide 
+%          related capabilities
+%        - language interoperability often sketchy
+%        - examples include F,G
+%    - frameworks:
+%        - typically impose structure on application code; reasonable
+%          for new application development, but often difficult to rewrite
+%          existing codes to conform
+%        - simulation codes need to buy into the entire framework to use
+%          the parts of most interest to them
+%        - examples include X,Y
+%
+% - New work in scientific community focuses on the development of components 
+%   which addresses some of the short comings of library or framework approaches
+%    - Define a component (a software object meant to interact with other
+%       components, encapsulating a certain functionality, clearly defined
+%       interface and comforms to a prescribed behavior common to all components
+%       in an architecture)
+%    - Key: define a common API, multiple implementations/services that conform
+%    - Useful in the following cases
+%        - where there is a specialized analysis engine that cannot be easily 
+%          reworked into a framework code and that requires multiple, related 
+%          functionalities (perhaps provided by incompatible libraries)
+%        - where experimentation with different techniques is of interest
+%          (plug and play)
+%        - where dynamic access to different, related services is required
+%    - Other examples of work in this area
+%        - CCA, solvers, etc
+%    - TSTT work focuses on mesh/geometry/field tools - the focus of this paper
+%\end{verbatim}
+
+\section{Information Flow in Mesh-based simulation}
+\input{simulation_orig}
+
+%\begin{verbatim}
+%  - Gives the overview of PDE simulation steps - based on the general 
+%    discretization docuement from last summer (Mark, can you send that out again?)
+%  - Assumptions and definitions
+%      - Mesh:  high level view of data model, functionality expected
+%      - Geom:  high level view of data model, functionality expected
+%      - Field: high level view of data model, functionality expected
+%      - Others?
+%  - How they are related to each other
+%\end{verbatim}
+
+\section{The TSTT Interface Definition efforts}
+
+\input{interface_orig}
+
+\section{TSTT interface use cases}
+
+\input{adapt_loop}
+\input{improve}
+
+\begin{verbatim}
+  - SLAC design optimization 
+  - Front tracking
+\end{verbatim}
+
+\section{Conclusions/Future work}
+
+\section*{Acknowledgments} 
+
+\bibliographystyle{plain}
+\bibliography{tstt}
+
+\end{document} 

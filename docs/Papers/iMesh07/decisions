@@ -1,0 +1,9 @@
+Form of C interface: Fortran compatibility
+
+SIDL as add-on rather than core: Useful for full language portability,
+but the performance and programming costs are high.
+
+-------------------------------
+
+Performance issues:  blocks are fast, but higher overhead; need both.
+

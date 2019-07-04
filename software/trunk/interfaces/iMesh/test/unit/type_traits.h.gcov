@@ -1,0 +1,206 @@
+        -:    0:Source:/usr/include/c++/4.4/ext/type_traits.h
+        -:    0:Programs:15
+        -:    1:// -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the terms
+        -:    7:// of the GNU General Public License as published by the Free Software
+        -:    8:// Foundation; either version 3, or (at your option) any later
+        -:    9:// version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful, but
+        -:   12:// WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   14:// General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/** @file ext/type_traits.h
+        -:   26: *  This file is a GNU extension to the Standard C++ Library.
+        -:   27: */
+        -:   28:
+        -:   29:#ifndef _EXT_TYPE_TRAITS
+        -:   30:#define _EXT_TYPE_TRAITS 1
+        -:   31:
+        -:   32:#pragma GCC system_header
+        -:   33:
+        -:   34:#include <bits/c++config.h>
+        -:   35:#include <bits/cpp_type_traits.h>
+        -:   36:
+        -:   37:_GLIBCXX_BEGIN_NAMESPACE(__gnu_cxx)
+        -:   38:
+        -:   39:  // Define a nested type if some predicate holds.
+        -:   40:  template<bool, typename>
+        -:   41:    struct __enable_if 
+        -:   42:    { };
+        -:   43:
+        -:   44:  template<typename _Tp>
+        -:   45:    struct __enable_if<true, _Tp>
+        -:   46:    { typedef _Tp __type; };
+        -:   47:
+        -:   48:
+        -:   49:  // Conditional expression for types. If true, first, if false, second.
+        -:   50:  template<bool _Cond, typename _Iftrue, typename _Iffalse>
+        -:   51:    struct __conditional_type
+        -:   52:    { typedef _Iftrue __type; };
+        -:   53:
+        -:   54:  template<typename _Iftrue, typename _Iffalse>
+        -:   55:    struct __conditional_type<false, _Iftrue, _Iffalse>
+        -:   56:    { typedef _Iffalse __type; };
+        -:   57:
+        -:   58:
+        -:   59:  // Given an integral builtin type, return the corresponding unsigned type.
+        -:   60:  template<typename _Tp>
+        -:   61:    struct __add_unsigned
+        -:   62:    { 
+        -:   63:    private:
+        -:   64:      typedef __enable_if<std::__is_integer<_Tp>::__value, _Tp> __if_type;
+        -:   65:      
+        -:   66:    public:
+        -:   67:      typedef typename __if_type::__type __type; 
+        -:   68:    };
+        -:   69:
+        -:   70:  template<>
+        -:   71:    struct __add_unsigned<char>
+        -:   72:    { typedef unsigned char __type; };
+        -:   73:
+        -:   74:  template<>
+        -:   75:    struct __add_unsigned<signed char>
+        -:   76:    { typedef unsigned char __type; };
+        -:   77:
+        -:   78:  template<>
+        -:   79:    struct __add_unsigned<short>
+        -:   80:    { typedef unsigned short __type; };
+        -:   81:
+        -:   82:  template<>
+        -:   83:    struct __add_unsigned<int>
+        -:   84:    { typedef unsigned int __type; };
+        -:   85:
+        -:   86:  template<>
+        -:   87:    struct __add_unsigned<long>
+        -:   88:    { typedef unsigned long __type; };
+        -:   89:
+        -:   90:  template<>
+        -:   91:    struct __add_unsigned<long long>
+        -:   92:    { typedef unsigned long long __type; };
+        -:   93:
+        -:   94:  // Declare but don't define.
+        -:   95:  template<>
+        -:   96:    struct __add_unsigned<bool>;
+        -:   97:
+        -:   98:  template<>
+        -:   99:    struct __add_unsigned<wchar_t>;
+        -:  100:
+        -:  101:
+        -:  102:  // Given an integral builtin type, return the corresponding signed type.
+        -:  103:  template<typename _Tp>
+        -:  104:    struct __remove_unsigned
+        -:  105:    { 
+        -:  106:    private:
+        -:  107:      typedef __enable_if<std::__is_integer<_Tp>::__value, _Tp> __if_type;
+        -:  108:      
+        -:  109:    public:
+        -:  110:      typedef typename __if_type::__type __type; 
+        -:  111:    };
+        -:  112:
+        -:  113:  template<>
+        -:  114:    struct __remove_unsigned<char>
+        -:  115:    { typedef signed char __type; };
+        -:  116:
+        -:  117:  template<>
+        -:  118:    struct __remove_unsigned<unsigned char>
+        -:  119:    { typedef signed char __type; };
+        -:  120:
+        -:  121:  template<>
+        -:  122:    struct __remove_unsigned<unsigned short>
+        -:  123:    { typedef short __type; };
+        -:  124:
+        -:  125:  template<>
+        -:  126:    struct __remove_unsigned<unsigned int>
+        -:  127:    { typedef int __type; };
+        -:  128:
+        -:  129:  template<>
+        -:  130:    struct __remove_unsigned<unsigned long>
+        -:  131:    { typedef long __type; };
+        -:  132:
+        -:  133:  template<>
+        -:  134:    struct __remove_unsigned<unsigned long long>
+        -:  135:    { typedef long long __type; };
+        -:  136:
+        -:  137:  // Declare but don't define.
+        -:  138:  template<>
+        -:  139:    struct __remove_unsigned<bool>;
+        -:  140:
+        -:  141:  template<>
+        -:  142:    struct __remove_unsigned<wchar_t>;
+        -:  143:
+        -:  144:
+        -:  145:  // For use in string and vstring.
+        -:  146:  template<typename _Type>
+        -:  147:    inline bool
+        -:  148:    __is_null_pointer(_Type* __ptr)
+        1:  149:    { return __ptr == 0; }
+        -:  150:
+        -:  151:  template<typename _Type>
+        -:  152:    inline bool
+        -:  153:    __is_null_pointer(_Type)
+        -:  154:    { return false; }
+        -:  155:
+        -:  156:
+        -:  157:  // For complex and cmath
+        -:  158:  template<typename _Tp, bool = std::__is_integer<_Tp>::__value>
+        -:  159:    struct __promote
+        -:  160:    { typedef double __type; };
+        -:  161:
+        -:  162:  template<typename _Tp>
+        -:  163:    struct __promote<_Tp, false>
+        -:  164:    { typedef _Tp __type; };
+        -:  165:
+        -:  166:  template<typename _Tp, typename _Up>
+        -:  167:    struct __promote_2
+        -:  168:    {
+        -:  169:    private:
+        -:  170:      typedef typename __promote<_Tp>::__type __type1;
+        -:  171:      typedef typename __promote<_Up>::__type __type2;
+        -:  172:
+        -:  173:    public:
+        -:  174:      typedef __typeof__(__type1() + __type2()) __type;
+        -:  175:    };
+        -:  176:
+        -:  177:  template<typename _Tp, typename _Up, typename _Vp>
+        -:  178:    struct __promote_3
+        -:  179:    {
+        -:  180:    private:
+        -:  181:      typedef typename __promote<_Tp>::__type __type1;
+        -:  182:      typedef typename __promote<_Up>::__type __type2;
+        -:  183:      typedef typename __promote<_Vp>::__type __type3;
+        -:  184:
+        -:  185:    public:
+        -:  186:      typedef __typeof__(__type1() + __type2() + __type3()) __type;
+        -:  187:    };
+        -:  188:
+        -:  189:  template<typename _Tp, typename _Up, typename _Vp, typename _Wp>
+        -:  190:    struct __promote_4
+        -:  191:    {
+        -:  192:    private:
+        -:  193:      typedef typename __promote<_Tp>::__type __type1;
+        -:  194:      typedef typename __promote<_Up>::__type __type2;
+        -:  195:      typedef typename __promote<_Vp>::__type __type3;
+        -:  196:      typedef typename __promote<_Wp>::__type __type4;
+        -:  197:
+        -:  198:    public:
+        -:  199:      typedef __typeof__(__type1() + __type2() + __type3() + __type4()) __type;
+        -:  200:    };
+        -:  201:
+        -:  202:_GLIBCXX_END_NAMESPACE
+        -:  203:
+        -:  204:#endif 

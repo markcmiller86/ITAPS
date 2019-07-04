@@ -1,0 +1,59 @@
+
+% \section{Introduction}
+
+Requirements for modeling and simulation capabilities are increasing
+in breadth of physics, fidelity of 
+models, complexity of the systems to be simulated, problem size
+(e.g. degrees of freedom) \cite{TACC}. These 
+problems of interest are multi-physics and multi-scale in nature,
+including electronic structures, seismic 
+modeling, fusion, system biology, and climate modeling \cite{LLNL}.
+The availability of supercomputers 
+capable of sustained petaflops performance within the next several
+years will create numerous opportunities 
+to advance all these scientific applications by computer modeling of
+previously intractable problems. The 
+availability also challenges the current computer technologies and
+algorithms, such as massively parallel 
+computing and automatically adaptive simulations. 
+
+In order to support scientific applications in SCOREC software framework at the petascale level, the system is 
+required to satisfy the following items. 
+\begin{itemize}
+
+\item Balanced work loads on all processors. Even small imbalances
+  result in many wasted processors. For 
+example, 50,000 processors with one processor 5\% over average workload
+				 is equivalent to 2380 idle
+				processors 
+and 47,620 perfectly balanced processors\cite{devine}.
+
+\item Low interprocessor communication costs, including message
+  passing volume and data redistribution costs. 
+Processor speeds are increasing faster then network speeds.   
+
+\item Scalable performance on computing algorithms, including scalable
+  program execution time and memory 
+usage on each processor. 
+\end{itemize}
+
+SCOREC has developed an entire software framework, including FMDB and ScorecMeshAdapt,  to 
+support massively parallel adaptive, multiphysics and mutliscale
+application codes, especially finite element 
+method based applications. In the software framework, FMDB is
+responsible for combining complex application-
+independent capabilities into a single software infrastructure that is
+shared by the application codes. 
+ScorecMeshAdapt is responsible for parallel adaptivity for distributed,
+unstructured meshes for the application codes. 
+
+An overview of SCOREC software framework's capabilities and design abstractions of its
+distributed dynamic object-oriented mesh 
+data structure and parallel algorithms is presented in the following sections. These
+capabilities include management of 
+distributed mesh and field data structures, parallel mesh
+input/output, interface to data 
+partitioning and load balancing, and
+transfer of data and fields between 
+distributed meshes, and predictive load balancing for parallel
+adaptive computations. 

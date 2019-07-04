@@ -1,0 +1,24 @@
+A    SwapDir/configure
+A    SwapDir/ITAPS_QualMeasure.hh
+A    SwapDir/Makefile.in
+A    SwapDir/Doxyfile
+A    SwapDir/ITAPS_MaxMinSine3D.cc
+A    SwapDir/swap3d_test.cc
+A    SwapDir/ITAPS_Swap2D.cc
+A    SwapDir/ITAPS_Swap3D.cc
+A    SwapDir/conf
+A    SwapDir/conf/acinclude.m4
+A    SwapDir/conf/config.guess
+A    SwapDir/conf/aclocal.m4
+A    SwapDir/conf/config.sub
+A    SwapDir/conf/install-sh
+A    SwapDir/configure.in
+A    SwapDir/README
+A    SwapDir/ITAPS_Swap_config.hh.in
+A    SwapDir/Makefile.admin
+A    SwapDir/ITAPS_InitCanon.cc
+A    SwapDir/rand1.vtk
+A    SwapDir/ITAPS_Swap.hh
+A    SwapDir/ITAPS_MinMaxAngle3D.cc
+A    SwapDir/ITAPS_Delaunay3D.cc
+Checked out revision 3241.

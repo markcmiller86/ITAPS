@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageMeshgeom" -->
+</head>
+
+<body class="pageTools pageToolsServices pageMeshgeom">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Mesh and Geometry Services</h1>
+  <p>During SciDAC-1, several mesh and geometry component services were developed that are useful to applications in their own right and also used as building blocks by integrated services.  In this section, we describe the component services that will continue to see development in SciDAC-2. </p>
+
+<h3>Support for Distributed Meshes.</h3>
+<p>Many of the SciDAC applications require ITAPS services operate on meshes that are distributed over the processors of a parallel computer. To meet these needs, the ITAPS team has developed two tools that support distributed mesh operations. The first is a parallel mesh generation process that distributes a CAD model over multiple processors allowing each processor to mesh surfaces and volumes in parallel yielding a valid conforming mesh of the entire domain. The second tool is the addition of a partition model and parallel mesh migration procedures to our flexible mesh database (FMDB) to support dynamic load balancing in the parallel adaptive loops service.  Both of the distributed mesh support tools have been used on the SLAC accelerator modeling project. The parallel partitioning and migration are part of FMDB which is available for download.</p>
+
+<h3>Geometry Services</h3>
+<p>The geometry interface, developed in the first phase of this project, provides functions for reading, querying, and modifying geometric models.  This interface is used by various ITAPS mesh services discussed in this proposal, including mesh improvement and r-adaptivity,   parallel mesh  generation, and shape optimization.  Several newly proposed SciDAC efforts have also indicated a need for geometry services, including embedded boundary mesh generation for fusion and accelerator applications and adaptive mesh refinement in fusion device modeling.  Fully capable but heavy-weight implementations of the geometry  interface were initiated in SciDAC-1.  In addition, we propose to develop focused, light-weight tools to meet specific application needs.  These include: (i) inside-outside queries on geometric models (this functionality is used to perform fast ray-tracing to support fusion applications, and to support generation of embedded boundary grids for accelerator modeling) (ii) discrete (facet-based) geometric evaluation, including queries of the distance to a surface, and determination of the normal and curvature (efficiency of the lightweight tools will be achieved by using fast ADT searches for first evaluations, local stencil walks for evolving queries, and fast Newton solves, and (iii) efficient methods for tracking many particles through a geometry, to support particle-in-cell applications.  This work will extend the current capabilities in the Rapsodi, Eleven, and CGM libraries.</p>
+
+<h3> Mesh, geometry sorting and searching </h3>
+<p>Many applications require sorting and searching algorithms  that operate on mesh and geometry data. For example, these algorithms are used to (i) locate the element or vertex closest to, or containing, a given spatial position (e.g. for PIC codes, the interpolation of a field on one mesh onto another mesh, or interface tracking), (ii) compute the overlap between mesh and geometry ( e.g. for embedded boundary grid generation), and (iii) sort and search field data (e.g. for locating the solution maximum over a mesh or to smooth a mesh based on the minimum value of a given quality metric). </p>
+
+<p> There is a trade off between the storage and execution time for algorithms supporting these services.  Sorting the data makes subsequent searches on these data faster, at the expense of the required storage space to cache the sorted data.  The choice of sorting container and searching algorithm depends on storage constraints, and the potential for future reuse of cached data, both of which are controlled by or known by applications and which potentially evolve over the course of a simulation. </p>
+
+<p>We will develop data sorting and searching services functionality based on the geometry, mesh and tag data.  Sorting structures such as octrees, K-d trees,  range trees, and alternating digital trees will be provided by this service.  Point locations between meshes on curved domains will handle the case where the point in one mesh is exterior to the other mesh.  These services will be provided in both  high-level (implemented on top of the ITAPS interfaces), for  flexibility, and low-level (implemented inside the interface implementations themselves) implementations, for efficiency.  These services will build on existing software developed at various institutions participating in ITAPS. </p>
+<p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

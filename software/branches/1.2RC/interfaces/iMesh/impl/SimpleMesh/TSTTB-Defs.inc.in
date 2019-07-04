@@ -1,0 +1,50 @@
+# This file contains variables that are essential for building
+# applications on TSTTB implementations without having to hack
+# application Makefiles horribly each time.  Instead, one can simply
+# re-run configure in the application tree with a new -with-TSTT-dir
+# argument, and the implementation-specific version of this file gets
+# included automatically.  The application programmer/user can also just
+# edit the pathname in their Makefile if they prefer.
+
+INSTALLED_MAKE_DEFS_PATH=@prefix@/share/TSTT
+INSTALLED_INCLUDES=-I@prefix@/include/TSTT
+INSTALLED_LIB_DIR=-L@prefix@/lib
+
+TSTTB_LIB_DIR=-L@IMPL_ROOT@/TSTTB -L@IMPL_ROOT@/TSTTB_@IMPL_NAME@
+
+TSTTB_SERVER_LIBS =-lTSTTB
+TSTTB_ALL_CXX_LIBS=-lTSTTB_C++ $(TSTTB_SERVER_LIBS)
+TSTTB_ALL_C_LIBS  =-lTSTTB_C   $(TSTTB_SERVER_LIBS)
+TSTTB_ALL_F77_LIBS=-lTSTTB_F77 $(TSTTB_SERVER_LIBS)
+TSTTB_ALL_F90_LIBS=-lTSTTB_F90 $(TSTTB_SERVER_LIBS)
+
+TSTTB_SERVER_INCLUDES=-I@IMPL_ROOT@/TSTTB/server
+TSTTB_SERVER_LIBFILE=@IMPL_ROOT@/TSTTB/libTSTTB.so
+
+# C++ client stuff
+TSTTB_CLIENT_CXX_INCLUDES=-I@IMPL_ROOT@/TSTTB/client_C++/
+TSTTB_CLIENT_CXX_LIBFILE=@IMPL_ROOT@/TSTTB/libTSTTB_C++.so
+
+# C client stuff
+TSTTB_CLIENT_C_INCLUDES=-I@IMPL_ROOT@/TSTTB/client_C/
+TSTTB_CLIENT_C_LIBFILE=@IMPL_ROOT@/TSTTB/libTSTTB_C.so
+
+# F77 client stuff
+TSTTB_CLIENT_F77_INCLUDES=-I@IMPL_ROOT@/TSTTB/client_F77/
+TSTTB_CLIENT_F77_LIBFILE=@IMPL_ROOT@/TSTTB/libTSTTB_F77.so
+
+# F90 client stuff
+TSTTB_CLIENT_F90_INCLUDES=-I@IMPL_ROOT@/TSTTB/client_F90/
+TSTTB_CLIENT_F90_LIBFILE=@IMPL_ROOT@/TSTTB/libTSTTB_F90.so
+
+# Java client stuff; who knows?
+
+# python client stuff; who knows?
+
+TSTTB_BACKEND_INCLUDES=
+TSTTB_BACKEND_LIBS=
+TSTTB_BACKEND_LIBFILE=
+
+SIDL_LIBS=-L@BABEL_ROOT@/lib -lsidlstub_cxx -lsidl @SIDL_STATIC_LIBS@
+SIDL_INCLUDES=-I@BABEL_ROOT@/include -I@BABEL_ROOT@/include/cxx
+

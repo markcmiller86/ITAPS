@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageSubsurface" -->
+</head>
+
+<body class="pageApplications pageSubsurface">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+ <h1>Subsurface Flow</h1>
+        <h2>Next Generation Subsurface Flow Codes <br/>
+        Using Unstructured Grids and Front-tracking</h2>
+        <p class="research">ITAPS Personnel:  Xiaolin Li (SUNY SB), Harold Trease (PNNL) <br />
+          Subsurface Personnel: Tim Schiebe (PNNL)<br />
+        Project Status: Active </p>
+        <p>Subsurface transport codes, such as the STOMP code developed at PNNL, are used for simulating the flow and transport of multi-scale, multi-phase components (fluids, gases, and reactive species) through complex underground structures. DOE applications of these codes include modeling remediation strategies for the cleanup of heavy metal radioactive waste and the design and study of carbon sequestration strategies in subsurface repositories. In collaboration with the ``Hybrid Numerical Methods for Multiscale Simulations of Subsurface Biogeochemical Processes'' SciDAC project, the ITAPS team is developing new techniques for the next generation of subsurface transport codes in two ways. First, we are developing a new code that combines the STOMP subsurface transport code formulations with ITAPS unstructured mesh capabilities to capture complex subsurface topology such as intersecting layers and faulted structures. We have been working closely with the STOMP team to define the best way to map a library of unstructured STOMP mesh primitives onto the ITAPS mesh interface which has been implemented in NWGrid/NWPhys.</p>
+        
+        <p>In our second activity with PNNL scientists, we are using the the FronTier front-tracking library to simulate reactive transport and mineral precipitation in fractured and porous media. Our research suggests that these techniques will be more cost effective than the standard Smooth Particle Hydrodynamics (SPH) approach, and we will compare the two methods for accuracy and computational cost. We have made good progress on modeling the reactive deposition of minerals on the rock surface using FronTier. The Figure below shows the solute concentration in  2D  simulations of crystal growth. The comparison has shown that the front tracking method gives good agreement with the SPH method but is much faster and more efficient.</p>     
+      
+   <div class="imgContainer fLeft" style="width: 450px;margin-left: 20px">
+    <a href="../assets/images/crystal_full.png" rel="lightbox">
+    	<img src="../assets/images/crystal_mini.png" alt="Crystal surface" width="450" height="145" />
+    </a>
+    <p>Solute concentration in  2D  simulations of crystal growth.</p>
+  </div>     
+      
+<p class="clear">The movies below show a 3D crystal growth case. The left if the shaded crystal surface, the right shows the meshed crystal surface.</p>
+
+   <div class="imgContainer fLeft" style="width: 319px;margin-left: 20px">
+    <a href="../assets/images/gifs/3d120light.gif" rel="lightbox">
+    	<img src="../assets/images/gifs/3d120light_poster.gif" alt="Crystal surface" width="319" height="266" />
+    </a>
+    <p><strong><em>3D crystel</em></strong>:&nbsp;&nbsp;<a href="http://www.ams.sunysb.edu/~yhu/crystal/3d120light.html" title="3D Crystel" target="_blank">Original Link</a><br />
+    <em>Acknowledge: simulations done by Yijing Hu.</em></p>
+  </div>
+  
+   <div class="imgContainer fLeft" style="width: 319px;margin-left: 20px">
+    <a href="../assets/images/gifs/subsurf.gif" rel="lightbox">
+    	<img src="../assets/images/gifs/subsurf_poster.gif" alt="Crystal surface" width="319" height="266" />
+    </a>
+    <p><em><strong>Precipitation under subsurface flow</strong> (phase code coupled with Navier Stokes solver)</em>:&nbsp;&nbsp;<a href="http://www.ams.sunysb.edu/~linli/subsurf.gif" title="precipitation with subsurface flow" target="_blank">Original Link</a><br />
+    <em>Acknowledge: simulations done by Yijing Hu.</em></p>
+  </div>     
+
+<p class="clear">Currently, the FronTier code has coupled the crystal code with the incompressible Navier-Stokes solver to simulate the precipitation with subsurface flow. We are currently developing multi-component reaction/diffusion code to study more realistic subsurface precipitation processes. The bottom movie shows the asymmetric precipitation when subsurface flow is considered.</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

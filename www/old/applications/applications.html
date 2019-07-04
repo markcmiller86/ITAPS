@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+  <title>Applications Impact</title>
+  <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+
+
+<body>
+<div id="container">
+
+<div id="banner"> <img alt="ITAPS" src="../graphics/banner.gif" > <br> </div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+<h1>Applications Impact</h1>
+
+<p>The goal of the ITAPS Center is to develop and deploy a set of
+computational tools that will significantly and positively impact the
+ability of scientific applications researchers to employ advanced
+mesh and geometry-based simulation technology in their research.
+Because of the sophistication of most existing advanced tools in this
+area, their availability has until now been limited to only the most
+ambitious application developers.  We are addressing this deficiency by
+offering significant capability for generating different kinds of
+meshes for complex geometry and employing these meshes in scientific
+simulations through easy-to-use application-appropriate interfaces.
+Since many important Office of Science applications are characterized
+by strongly non-uniform solution features, these tools will include
+capabilities for solution-adaptive mesh and solution improvement
+capabilities, including mesh refinement and front tracking.
+</p>
+
+<p>We have invested a significant portion of our resources in meeting with
+scientists from many of the SciDAC application areas, analyzing their
+needs for advanced meshing and discretization technologies, and
+working with them to demonstrate the promise of such techniques in
+their application domains.  We highlight the positive impact we have
+had on applications researchers here.  More information on these interactions
+can be found by following the links.</p>
+
+<h2> Impact on SciDAC Applications </h2>
+
+<ul>
+<li>
+<i><a href="https://compass.fnal.gov">Community Petascale Project for Accelerator Science and Simulation (COMPASS)</a>.</i> 
+The ITAPS team supported significant accelerator
+modeling achievements in several areas. 
+[<a href="./accelerator.html">More Information</a>]
+<ul>
+<p>
+</p><li>ITAPS enabled the first-ever Tau3P transit beam simulation of the
+Stanford Linear Accelerator Center (SLAC) PEP-II device, supporting a
+15% increase in beam current in the upgraded device by providing
+high-quality hexahedral meshes.  Similar mesh generation
+efforts for the advanced Damped Detuned Structure (DDS) resulted in
+the first wakefield analysis of an actual DDS prototype and the direct
+verification of DDS wakefield suppression by end-to-end simulation.
+</li>
+
+<p>
+</p><li> ITAPS researchers teamed with SLAC scientists to improve by
+an order of magnitude the accuracy of predicted field quantities that
+influence wall losses in the Rare Isotope Accelerator device. To accomplish this ITAPS researchers provided
+an adaptive simulation capability with error indicators, field
+function libraries, and mesh modification procedures.
+These
+procedures are being extended to effectively operate in parallel to
+support full-scale accelerator systems.
+</li>
+
+<p>
+</p><li> A collaboration between ``Toward Optimal Petascale Simulations'' (TOPS),
+ITAPS, and SLAC researchers is providing automatic tuning of
+accelerator geometries to significantly increase the speed and
+decrease the cost by which new accelerators can be designed.  ITAPS researchers provide services for varying
+design geometry, smoothing the mesh onto new models, and automatically
+computing sensitivities of the mesh with respect to design parameters.
+</li>
+</ul>
+
+<p>
+</p></li><li>
+<i><a href="http://w3.pppl.gov/cemm">Center for Extended Magnetohydrodynamic Modeling (CEMM)</a>.</i>
+ITAPS researchers are contributing to a new effort at Princeton Plasma
+Physics Lab (PPPL) to develop
+an adaptive, high-order finite element discretization for their new
+M3D-C1 code.  Solutions of the CEMM challenge problems
+developed by ITAPS researchers using high-order spectral element
+technologies
+elements that focused on the case of anisotropic diffusion led to the
+conclusion that a small number of higher-order elements significantly
+decreased the total solution time needed to obtain a given
+accuracy.  Ongoing work focuses on insertion of
+adaptive mesh refinement technologies and error estimators directly
+into the new code. 
+[<a href="./fusion.html">More Information</a>]
+</li>
+
+<p>
+</p><li>
+<i>Virtual Microbial Cell Simulator (VMCS)</i>.  ITAPS mesh
+generation and discretization technologies were used in simulations
+that provided new scientific insight into the flocculation behavior of
+Shewanella microbes in oxygen rich environments by confirming that
+there is an oxygen gradient from the edges of the floc into the center.  This collaboration with PNNL computational biologists
+has resulted in the development of the VMCS&nbsp; which is targeting DOE bioremediation problems in heavy metal
+waste.
+[<a href="./biology.html">More Information</a>] </li>
+
+<p>
+</p><li>
+<a href="http://www.scidac.gov/CCSM"><i>Collaborative Design and Development of the Community Climate
+Model.</i></a>  ITAPS researchers, in collaboration with climate scientists
+at ORNL, improved the prediction of rainfall, snowfall and cloud
+cover in regional weather models in prototype simulations for an
+atmospheric pulse rotating around the Earth.  ITAPS provided the enhanced mesh
+generation and discretization capabilities for anisotropic planar and
+geodesic surface meshes that helped enable this result.  The initial
+mesh is adapted and optimized to capture land surface orographic or
+topographic height fields for these simulations. 
+[<a href="./climate.html">More Information</a>]</li></ul><ul><li><p>For two of the astrophysics SciDAC-1 centers, we demonstrated
+the potential impact of high-order discretization methods for both the
+hydrodynamics and neutrino transport aspects of their simulations.  In
+both cases, adaptive Discontinuous Galerkin discretizations were
+implemented for the appropriate test problems and comparison to the
+currently used techniques shows that a significant benefit in terms of
+accuracy and time to solution can be obtained by using these
+techniques.  
+[<a href="./astrophysics.html">More Information]</a></p></li>
+
+</ul><h2>Other Applications</h2><ul><li><span style="font-style: italic;">Reactor Modeling.<span style="font-style: italic;">&nbsp;</span></span></li></ul><ul><li>
+<i> Combustion.</i>  ITAPS researchers developed simulation tools
+that provide a new predictive capability for diesel engine design that
+emphasizes the modeling of the instability and break up of a diesel
+jet into spray.  This simulation highlighted the
+advantages of front tracking algorithms combined with two-dimensional
+structured adaptive mesh refinement.
+[<a href="chemflows.html">More Information</a>]
+</li></ul>
+</div>
+</div>
+
+</body></html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_interfaces.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsInterfaces" -->
+</head>
+
+<body class="pageTools pageToolsInterfaces">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" --> 
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Interfaces</a><span class="hide"> | </span>
+<a class="nav" href="../services/index.html">Services</a>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+    <h1>Common Interface Definition</h1>
+  <p>PDE-based numerical simulation applications commonly use basic software infrastructure to manage mesh, geometry, and discretization data. The commonality of this infrastructure implies the software is theoretically amenable to re-use. However, the traditional reliance on library-based implementations of these functionalities hampers experimentation with different software instances that provide similar functionality.  This is especially true for meshing and geometry libraries where applications often directly access the underlying data structures, which can be quite different from implementation to implementation.  Thus, using different libraries interchangeably or interoperably for this functionality has proven difficult at best and has hampered the wide spread use of advanced meshing and geometry tools developed by the research community. To address these issues, the ITAPS  center is working to develop standard interfaces to enable the creation of interoperable and interchangeable simulation tools. </p>
+      <p>One of the primary development efforts that showcases ITAPS  teamwork is our creation of common interfaces for mesh geometry and topology access.  Our philosophy has been to focus primarily on the definition of accessor interfaces that provide the functionality needed by application programmers.  A key aspect of this approach is that we do not enforce any particular data structure or implementation with our interfaces, only that certain questions about the mesh (such as geometry or first-order adjacency information) can be answered through calls to the interface.  The challenges inherent in this type of effort include balancing performance of the interface with the flexibility needed to support a wide variety of mesh types and the desire to keep the interface minimal so that it is easy to implement and adopt.</p>
+      
+      <h2>Information Flow in PDE Simulations</h2>
+<p>We use the information flow through a mesh-based simulation as the framework for developing interoperable geometry, mesh and solution field components.  A simulation's information flow begins with a problem definition which consists of a description of the geometric and temporal domain annotated by <em> attributes </em> designating mathematical model details and parameters.  The geometric domain is then often decomposed into a set of piecewise components, <em> the mesh</em>, and the continuous PDEs are then approximated on that mesh using, for example, finite difference or finite  element techniques.  Simulation automation and reliability often imply feedback of the PDE discretization information back to the domain discretization (i.e. in adaptive methods) or even modification of the physical domain or attributes (e.g., for design optimization). </p>
+
+<h2>ITAPS Abstract Data Model </h2>
+<p>Based on this model of information flow, ITAPS researchers have defined an abstract data model that supports a wide array of supporting technologies and encompasses a broad spectrum of usage scenarios.  The data model divides the data required by a simulation into three <em>core data types</em>: the geometric data, the mesh data, and the field data.  These core data types are associated with each other through <em>data relation managers</em>. The data relation managers control the relationships among two or more of the core data types, resolve cross references between entities in different groups, and can provide additional functionality that depends on multiple core data types.  The building blocks within these data models are the concepts of <em>entities</em>, <em>entity sets</em>, and <em>tags</em>. </p>
+
+<ul>
+  <li><em>Entities</em> are used to represent atomic pieces of information such as a vertices in a mesh or edges in a geometric model. Entity adjacency relationships define how the entities connect to each other and both first-order and second-order adjacencies are supported. </li>
+  <li><em> Entity sets</em> are arbitrary collections of entities that may be an ordered list or unordered.  The two primary supported relationships among entity sets are contained in and  parent/child to allow for subsetting and hierarchical applications. In addition, entity sets also have ''set operation&quot; capabilities such as set subtraction, intersection, or union. </li>
+  <li><em> Tags</em> are used as containers to attach user-defined data to ITAPS entities and entity sets.  Tags can be multi-valued which implies that a given tag handle can be associated with many different entities.  We support specialized tag types for improved performance as well as the more general opaque case that allows any type of data to be attached. </li>
+</ul>
+
+<p>As a particular example, consider the discrete representation of the computational domain, or the mesh.  ITAPS <em> mesh entities</em> correspond to the individual pieces of the mesh, namely, vertices, edges, faces, and regions.  Specific examples include a hexahedron, edge, triangle or vertex.  Mesh entities are classified by their entity type (topological dimension) and entity topology (shape). Higher-dimensional entities are defined by lower-dimensional entities using canonical ordering relationships.  To determine which adjacencies are supported by an underlying implementation, an adjacency table is defined which can be returned by a query through the interface.  The implementation can report that adjacency information is always, sometimes, or never available; and to be available at a cost that is constant, logarithmic (i.e., tree search), or linear (i.e., search over all entities) in the size of the mesh. ITAPS <em> mesh entity sets</em> are extensively used to collect mesh entities together in meaningful ways, for example, to represent the set of all faces classified on a geometric face or the set of regions in a domain decomposition for parallel computing.  To support many of the services that applications desire, such as adaptive mesh refinement, it is important that the data model include the concept of modification to allow changes to geometry, topology, or set structure.  In the case of the mesh, capabilities include changing vertex coordinates and adding or deleting entities. Modification often requires interactions between the mesh, geometry and field data models and is one of the primary uses for the data relations manager. For example, when refining a mesh, it is often critical to associate or classify the mesh entity with one or more specific entities in the underlying geometric model to ensure accuracy, particularly on curved or complex geometries.
+</p>
+<h2>The ITAPS Interfaces</h2>
+<p>The next step to creating interoperable technologies is to define  common interfaces that support the abstract data model.  A key aspect of our approach is that we do not enforce any particular data structure or implementation with our interfaces, requiring only that certain questions about the geometry, mesh, or field data can be answered through calls to the interface. One of the most challenging aspects of this effort remains balancing performance of the interface with the flexibility needed to support a wide variety of data types. Performance is critical for kernel computations involving mesh and geometry access, and to address this need, we provide a number of different access patterns including individual iterator-based and agglomerated array-based requests. Further challenges arise when considering the support of many different scientific programming languages which we address using a two-pronged approach. First, we provide a C-language binding for our interfaces that is compatible with most needs in scientific computing.  Additional flexibility, albeit at a somewhat higher cost, is supported through the use of the SIDL/Babel technology provided by the Common Component Architecture Forum (CCA).  The ITAPS mesh interface has been under development for several years, and we provide a simple example of using the C-binding version of the interface in code below. Lines 11-12 show the creation of a new mesh instance which creates the opaque handle <em>mesh</em> that is used in later calls to refer to this instance of the interface.  Line 13 shows a the use of the <em>iMesh_load</em> function to populate the mesh interface using a string name identifier.  How the data is created is not specified; for example,it may be loaded from a file or generated on-the-fly.  Line 16 shows a simple query for the geometric dimension of the mesh.  Lines 18-22 show another query to retrieve all of the three-dimensional entities in the mesh, regardless of their particular topology.
+</p>
+<pre>1  #include "iMesh.h"
+3
+4  int main( int argc, char *argv[] )
+5  {
+6      // create and populate the Mesh instance
+7    iMesh_Instance mesh;
+8    iBase_EntitySetHandle root;
+9    int geom_dim, ierr;
+10
+11   iMesh_newMesh("", &amp;mesh, &amp;ierr, 0);
+12   iMesh_getRootSet(mesh, &amp;root, &amp;ierr);
+13   iMesh_load(mesh, root, "125hex.vtk", "", &amp;ierr, 10, 0);
+14
+15    // get the geometric dimension of the mesh
+16   iMesh_getGeometricDimension(mesh, &amp;geom_dim, &amp;ierr);
+17
+18    // get all 3d elements
+19   iMesh_EntityHandle *ents;
+20   int ents_alloc = 0, ents_size;
+21   iMesh_getEntities(mesh, 0, iBase_REGION, iMesh_ALL_TOPOLOGIES,
+22                     &amp;ents, &amp;ents_alloc, ents_size, &amp;ierr);
+23  }
+</pre>
+<p>Additional <a href="../../software/download_interfaces.html">documentation  and  the reference implementations </a> of the ITAPS interfaces are available.  These include mesh management toolkits such as FMDB (RPI), MOAB (ANL), GRUMMP (University of British Columbia), and NWGrid (PNL).  In addition to the development of underlying implementations, the ITAPS mesh interface has also been used in a variety of ITAPS <a href="../../software/download_components.html">services</a> including the <em>Frontier-Lite</em> front tracking library, the <em> Mesquite</em> mesh quality improvement toolkit, the <em> Zoltan</em> partitioning toolkit, along with unstructured mesh refinement and swapping tools. </p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

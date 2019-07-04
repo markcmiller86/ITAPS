@@ -1,0 +1,37 @@
+#
+# This makefile can be used without using autoconf,
+# as long as you have IMESH_DIR set to the location
+# of the IMESH implementation you're using and 
+# F77, FC, CC, and CXX point to the appropriate compilers
+#
+
+include ${IMESH_DEFS}
+IMESH_INSTALL_DIR=`echo $(IMESH_DEFS) | rev | cut -d'/' -f3- | rev`
+IMESH_RPATH_FLAGS=`echo $(IMESH_LIBS) | tr ' ' '\n' | grep -e -L | sed -e 's|-L|-Wl,-rpath,|'`
+
+EXECS = rocket
+EXECSOBJ = ${EXECS:=.o}
+EXECSOUT = ${EXECS:=.out}
+EXECSERR = ${EXECS:=.err}
+
+##  temporary fix until all codes use IMESH_CPPFLAGS
+IMESH_INCS=${IMESH_INCLUDES} ${IMESH_CPPFLAGS}
+
+default: ${EXECS}
+
+rocket: rocket.o
+	${CXX} -o $@ $< ${IMESH_LIBS} ${EXTRA_CXX_LIBS} ${IMESH_RPATH_FLAGS}
+
+.SUFFIXES: .cpp
+
+.cpp.o:
+	${CXX} -c ${IMESH_CXXFLAGS} ${IMESH_INCS} ${CXXFLAGS} $<
+
+clean:
+	rm -f ${EXECS} ${EXECSOBJ} ${EXECSOUT} ${EXECSERR}
+
+check: default
+	./rocket 1>rocket.out 2>rocket.err
+
+install:
+	-install ${EXECS} ${IMESH_INSTALL_DIR}/bin

@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageClimate" -->
+</head>
+
+<body class="pageApplications pageClimate">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+     <h1>Climate</h1>
+        <h2>Smooth Grid Refocusing and Adaptive Mesh Refinement</h2>
+        <p class="research">Comprehensive Design and Development of the Community Climate  System Model for Tera-scale Computers<br />
+        ITAPS Personnel:  Ahmed Khamayseh (ORNL), Valmor de Almeida  (ORNL)<br />
+        Climate Personnel: John Drake (ORNL)<br />
+        Project Status: Active </p>
+<p>The accuracy and convergence of computational solutions using mesh-based numerical methods are strongly dependent on the quality of the mesh being used. Our efforts at ORNL  include the development of several algebraic and PDE-based elliptic methods for optimizing meshes that are comprised of elements of arbitrary hybrid polygonal and polyhedral type.  These methods provide the ability to generate and focus mesh resolution over areas of particular interest yet strive to equidistribute the node densities of the mesh while improving the aspect ratios and quality of mesh cells. The numerical methods that solve the partial differential equations perform node redistribution on the mesh to maximize the equidistribution of a weighted function of geometric and solution parameters.</p>
+<p>In collaboration the SciDAC-funded ``A Scalable and Extensible Earth System Model for Climate Change Science'' project, the ITAPS team at ORNL has developed a fully coupled mesh generation, mesh adaptation, and data transfer capability geared toward generating high-quality meshes for climate modeling. In particular, we are investigating a solution-adaptive method for the shallow atmosphere model using a local least-squares approximation with spherical harmonics basis functions. The key enabling components include a hybrid mesh generator coupled with <em>r-h-p</em>-adaptivity. We employ conformal mapping to derive an elliptic PDE-model for the optimization and $r$-adaptation of hybrid meshes. In addition, an algebraic method is used for a combined <em>h-p</em>-adaptive method wherein the maximum degree of the spherical harmonics basis is variable (polynomial degree <em>p</em>-adaptivity) for any basis set, and the number of collocation mesh points spanned by the corresponding basis set is also variable (mesh spacing <em>h</em>-adaptivity). This approach is particularly attractive when used in conjunction with a Cartesian representation of the time-dependnent solution of the shallow atmosphere model for the velocity and atmosphere height fields, and semi-Lagrangian transport algorithms.</p>
+
+
+<div class="imgContainer fLeft" style="width: 300px;">
+	<a href="../assets/images/climate_figure.jpg" rel="lightbox">
+    <img src="../assets/images/thumbs/climate_figure.jpg" width="300" height="152" alt="Climate Figure" />
+    </a>
+	<p>Figure: The final hybrid adapted meshes are much coarser at  sea level (50-km)  and finer at the high altitude regions (1-km) with only a fraction  of the original field data size allowing the orogrhapy field  to be globally preserved to very small accuracy. </p>
+</div>
+
+
+
+
+
+
+<p>We have implemented a locally adaptive least-squares method with spherical harmonic basis functions for representing functions on the sphere. The approximation uses clusters of spatial mesh points on the sphere with variable sizes wherein a basis set is defined. Given test function values on the points, we use the least-squares method to find a linear combination of the trial basis set to approximate the data. By dynamically refining and/or coarsening points from the cluster sets, and increasing or decreasing the dimension of the basis set, we can obtain a smooth approximation of rough data. The adaptive mesh point insertion and removal is accomplished by defining an underlying unstructured triangular mesh connecting all points on the surface. Since the approximation is smooth, it provides approximations for field differentiation by simple differentiation of the basis set. We are currently employing this approach in conjunction with a Cartesian representation of the velocity field to obtain surface gradient approximations that are not adversely affected by the pole problem existing in spherical coordinates. </p>
+
+
+<p>We have tested this concept successfully on a realistic orography field and on various initial boundary conditions, see the figure below. Orography plays an important role in determining the strength and location of atmospheric jet streams and its impact is most pronounced in regional climate studies. Orography is also crucial for predicting many key climatic dynamics, such as rainfall, snowfall, and cloud cover. The use of <em>h-p</em>-adaptivity has proven to produce more accurate simulations at a less cost (much smaller meshes) than striving for the same results at the level of uniform meshes. </p>
+      <p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

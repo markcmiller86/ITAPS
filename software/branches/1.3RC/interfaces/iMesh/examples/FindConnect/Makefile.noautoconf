@@ -1,0 +1,47 @@
+#
+# This makefile can be used without using autoconf,
+# as long as you have IMESH_DIR set to the location
+# of the IMESH implementation you're using and 
+# F77, FC, CC, and CXX point to the appropriate compilers
+#
+# Note that gfortran < 4.3 has a bug that prevents passing integer*8
+# variables by value.  The practical upshot is that the Fortran 77 and
+# 90 programs fail on 64-bit machines with earlier gfortran versions.
+#
+#  Ellen Hill Tue Apr 5 2001 09:21:48 2011 PDT
+#     Added cray-pointer option
+
+include ${IMESH_DIR}/lib/iMesh-Defs.inc
+
+EXECS = FindConnectF77 FindConnectF90
+
+FCFLAGS=-fcray-pointer
+FFLAGS=-fcray-pointer
+
+default: $(EXECS)
+
+F77LINK=${F77}
+FCLINK=${FC}
+
+FindConnectF77: FindConnectF77.o
+	${F77LINK} -o $@ $< ${IMESH_LIBS} ${F77FLAGS}
+
+FindConnectF90: FindConnectF90.o
+	${FCLINK} -o $@ $< ${IMESH_LIBS} ${FCFLAGS}
+
+.SUFFIXES: .F90 .F
+
+
+.F90.o:
+	${FC} -c ${IMESH_FCFLAGS} ${IMESH_INCLUDES} ${FCFLAGS} $<
+
+.F.o:
+	${F77} -c ${IMESH_FFLAGS} ${IMESH_INCLUDES} ${F77FLAGS} $<
+
+clean:
+	rm -f $$(echo ${EXECS} | sed -e 's/ \|$$/.o /g')
+	rm -f $(EXECS)
+
+install:
+	-install ${EXECS} ${IMESH_DIR}/bin
+

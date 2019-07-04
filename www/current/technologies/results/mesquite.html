@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-results_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS - Mesquite Mesh Quality Improvement Scaling</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResults pageMesquite" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResults pageMesquite">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="../research/index.html">Research</a><span class="hide"> | </span>
+<a class="nav" href="index.html" id="linkIndex">Scaling Results</a><span class="hide"> | </span>
+<a class="nav sub" href="phastaScaling-LAD.html" id="linkPhastaScaling-LAD">PHASTA Scaling</a><span class="hide"> | </span>
+<a class="nav sub" href="FMDB_imesh.html" id="linkFMDB_imesh">FMDB iMesh Implementation</a><span class="hide"> | </span>
+<a class="nav sub" href="meshAdapt.html" id="linkMeshAdapt">Mesh Adapt </a><span class="hide"> | </span>
+<a class="nav sub" href="zoltan.html" id="linkZoltan">Zoltan Partitioning </a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesquite Mesh Quality </a><span class="hide"> | </span>
+
+<a class="nav sub" href="parallelScaling.html" id="linkParallelScaling">FronTier parallel scaling</a><span class="hide"> | </span>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Mesquite Mesh Quality Improvement Scaling</h1>
+  
+  
+<div class="imgContainer fRight" style="width: 400px;">
+    <a href="../../assets/images/mesquite_full.jpg" rel="lightbox">
+	<img src="../../assets/images/mesquite_mini.jpg" width="400" height="209" alt="mesquite on up to 128 processors" /></a>
+    <p>Weak scaling of Mesquite on up to 128 processors</p>
+</div>
+
+  <p>The parallel implementation of Mesquite has been achieved as part of SciDAC-2 and preliminary scaling studies are underway.  In general, parallel smoothing is done using the partitioning of vertices determined by the application program.  At each smoothing step, communication must be done to ensure that vertices that are adjacent in the graph are updated correctly and the mesh does not become inverted.  For most applications, this can be achieved with nearest neighbor, point-to-point communication with a limited number of processors.  It is also necessary to determine when all of the work is complete which has traditionally be done using an MPI all-reduce each iteration to check for remaining vertices to be smoothed.  As the number of processors grows, this MPI all-reduce is expected to become increasingly expensive, and so a new algorithm was created that allows us to pre-compute the expected work for each iteration using only nearest neighbor communication.  </p> 
+
+<p>Preliminary weak scaling results on up to 128 processors show that nearly 90&#37; efficiency can be obtained.  Results on larger numbers of processors are being collected and will be posted soon.</p>
+
+
+
+<p>Strong scaling studies of Mesquite on up to 128 processors show how the increasing surface to volume ratio of vertices that require smoothing impacts the communication overhead.&nbsp; As the number of partition boundary (PB) vertices increases from 0 to 10% of the total number of vertices, the time it takes to smooth the PB increases from 0 to 30&#37;.&nbsp; </p>
+<p class="clear">&nbsp;</p>
+
+
+<div class="imgContainer center" style="width: 500px;">
+  <table border="0" cellspacing="2" cellpadding="2" width="500">
+    <tr>
+      <td valign="top"><p>Proc count</p></td>
+      <td valign="top"><p>time<br />
+        [sec]</p></td>
+      <td valign="top"><p>speed-up</p></td>
+      <td colspan="2" valign="top"><p>&nbsp; PB smoothing<br />
+        &nbsp;&nbsp; time of total</p></td>
+      <td valign="top"><p>Vtx per<br />
+        proc</p></td>
+      <td colspan="2" valign="top"><p>PB vtx per<br />
+        processor</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>1</p></td>
+      <td valign="top"><p>11.28</p></td>
+      <td valign="top"><p>1.00</p></td>
+      <td valign="top"><p>0.00</p></td>
+      <td valign="top"><p>0 &#37;</p></td>
+      <td valign="top"><p>186K</p></td>
+      <td valign="top"><p>0</p></td>
+      <td valign="top"><p>0 &#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>2</p></td>
+      <td valign="top"><p>5.78</p></td>
+      <td valign="top"><p>1.95</p></td>
+      <td valign="top"><p>0.13</p></td>
+      <td valign="top"><p>2 &#37;</p></td>
+      <td valign="top"><p>93.3K</p></td>
+      <td valign="top"><p>465</p></td>
+      <td valign="top"><p>&frac12;&#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>4</p></td>
+      <td valign="top"><p>2.90</p></td>
+      <td valign="top"><p>3.89</p></td>
+      <td valign="top"><p>0.05</p></td>
+      <td valign="top"><p>2 &#37;</p></td>
+      <td valign="top"><p>46.7K</p></td>
+      <td valign="top"><p>434</p></td>
+      <td valign="top"><p>1 &#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>8</p></td>
+      <td valign="top"><p>1.47</p></td>
+      <td valign="top"><p>7.68</p></td>
+      <td valign="top"><p>0.07</p></td>
+      <td valign="top"><p>4 &#37;</p></td>
+      <td valign="top"><p>23.3K</p></td>
+      <td valign="top"><p>438</p></td>
+      <td valign="top"><p>2 &#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>16</p></td>
+      <td valign="top"><p>0.75</p></td>
+      <td valign="top"><p>15.14</p></td>
+      <td valign="top"><p>0.05</p></td>
+      <td valign="top"><p>6 &#37;</p></td>
+      <td valign="top"><p>11.7K</p></td>
+      <td valign="top"><p>331</p></td>
+      <td valign="top"><p>3 &#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>32</p></td>
+      <td valign="top"><p>0.38</p></td>
+      <td valign="top"><p>29.58</p></td>
+      <td valign="top"><p>0.04</p></td>
+      <td valign="top"><p>10 &#37;</p></td>
+      <td valign="top"><p>5.8K</p></td>
+      <td valign="top"><p>227</p></td>
+      <td valign="top"><p>5 &#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>64</p></td>
+      <td valign="top"><p>0.21</p></td>
+      <td valign="top"><p>53.01</p></td>
+      <td valign="top"><p>0.04</p></td>
+      <td valign="top"><p>19 &#37;</p></td>
+      <td valign="top"><p>2.9K</p></td>
+      <td valign="top"><p>192</p></td>
+      <td valign="top"><p>7 &#37;</p></td>
+    </tr>
+    <tr>
+      <td valign="top"><p>128</p></td>
+      <td valign="top"><p>0.12</p></td>
+      <td valign="top"><p>90.96</p></td>
+      <td valign="top"><p>0.04</p></td>
+      <td valign="top"><p>30 &#37;</p></td>
+      <td valign="top"><p>1.4K</p></td>
+      <td valign="top"><p>150</p></td>
+      <td valign="top"><p>10 &#37;</p></td>
+    </tr>
+  </table>
+  <p>Table 1. Strong scaling of mesquite on up to 128 processors.</p>
+</div>
+
+<p class="clear">&nbsp;</p>
+
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

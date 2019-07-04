@@ -1,0 +1,16 @@
+
+iMesh wrappers for the Zoltan toolkit.
+
+To use these wrappers, download an iMesh implementation (which is used in the
+example), siMPI (which comes with Zoltan), ParMETIS3_1 (optional), Zoltan
+(from www.cs.sandia.gov/Zoltan), and these wrappers to subdirectories in your
+home directory and build them in that order.  ParMETIS3_1 and Zoltan should
+both be configured and built with siMPI.  If the option for ParMETIS3_1 is not
+going to be exercised, Zoltan should be configured and built without
+ParMETIS3_1 as well.  To build these wrappers, run the configure file with the
+relevant path to iMesh-Defs.inc and directories to mpi.h, libsimpi.a,
+libparmetis.a (optional), zoltan_cpp.h, and libzoltan.a to generate the
+Makefile; run make; and run the resulting executable, iMeshZoltanTest, on test
+data for iMesh.  ITAPSZoltanTest.cpp contains a C++ example of Zoltan library
+use with iMesh.  If the option for ParMETIS3_1 is not exercised, the options
+for ParMETIS3_1 cannot be used.

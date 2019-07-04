@@ -1,0 +1,12 @@
+     1	--2013-01-21 17:16:03--  https://redmine.scorec.rpi.edu/anonsvn/itaps/software/trunk/interfaces/iMesh/data/brick.vtk
+     2	Resolving redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)... 128.113.131.53, 2620:0:2820:4108:80::53
+     3	Connecting to redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)|128.113.131.53|:443... connected.
+     4	HTTP request sent, awaiting response... 200 OK
+     5	Length: 74776 (73K) [text/plain]
+     6	Saving to: `brick.vtk'
+       
+     7	     0K .......... .......... .......... .......... .......... 68%  273K 0s
+     8	    50K .......... .......... ...                             100% 58.1M=0.2s
+       
+     9	2013-01-21 17:16:05 (398 KB/s) - `brick.vtk' saved [74776/74776]
+       

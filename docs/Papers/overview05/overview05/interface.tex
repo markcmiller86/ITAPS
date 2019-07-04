@@ -1,0 +1,284 @@
+To support the flow of information in mesh-based simulations, a number
+of tools and technologies have been developed by different research
+groups in academia, industry, and the government labs.  For these tools
+to have maximum impact, it is important that they be interoperable,
+interchangeable, and easily inserted into existing application
+simulation codes.  Accomplishing this goal will allow easier
+experimentation with different, but functionally similar, technologies
+to determine which is best suited for a given application.  In
+addition, it will provide mechanisms for combining technologies
+together to create hybrid solution techniques that use multiple
+advanced tools.  To accomplish this goal, we have defined an abstract
+data model that encompasses a broad spectrum of mesh types and usage
+scenarios {\it and} a set of common interfaces that are implementation
+and data structure neutral.  Our goal has been to keep the interfaces
+small enough to encourage adoption but also flexible enough to support
+a broad range of mesh types.
+
+The ITAPS data model partitions the data required by a simulation
+into three {\it core data types}: the geometric data, the mesh
+data, and the field data.  Interfaces to the data represented by these
+abstractions channel the flow of information throughout the
+simulation.  For example, ITAPS adaptive mesh refinement services
+access solution information for error estimation via the field
+interface; modify the mesh using the mesh interface; and query the
+geometry interface when creating mesh entites on domain boundaries.
+These core data types are associated with each other through {\it data
+relation managers}. The data relation managers control the
+relationships among two or more of the core data types, resolve cross
+references between entities in different groups, and can provide
+additional functionality that depends on multiple core data types.
+In addition, there are a number of basic functionalities and concepts
+that are common to all three of the core data types, for example,
+entities, creating sets of entities, and attaching user-defined data
+to entities.  We discuss these concepts in Section \ref{sec:utilities}.
+Work on the mesh data model and application programming interface
+(API) has progressed the farthest, and we describe it in some detail
+in Section \ref{sec:mesh}.  Preliminary work on the geometry and field
+data model and interfaces are discussed as well in Sections \ref{sec:geom} and
+\ref{sec:fields}.
+
+A key aspect of the ITAPS approach is that we do not enforce any
+particular data structure or implementation with our interfaces,
+requiring only that certain questions about the geometry, mesh, or
+field data can be answered through calls to the interface.  To
+encourage adoption of the interface, we aim to create a small set of
+interfaces that existing mesh and geometry packages can support.  The
+latter point is critical.  The DOE, NSF, DoD and other federal
+agencies have invested hundreds of person-years in the development of
+a wide variety of geometry, mesh generation and mesh management
+toolkits.  These software packages will not be rewritten from scratch
+to conform to a common API, rather the API must be data structure
+neutral and allow for a broad range of underlying mesh, geometry, and
+field representations. However, only a small set of functionalities
+can be covered by a 'core' set of interface functions.  To increase
+the functionality of the ITAPS interface, we define additional,
+optional, interfaces for which we will provide reference
+implementations based on the core interface methods.  Developers can
+incrementally adopt the interface by implementing the optional
+functions on their own mesh database as needed.
+
+One of the most challenging aspects of this effort remains balancing
+performance of the interface with the flexibility needed to support a
+wide variety of mesh types.  Performance is critical for kernel
+computations involving mesh and geometry access.  To address this
+need, we provide a number of different access patterns including array
+and iterator-based.  The user may choose the access pattern that is
+best suited for their application; the underlying implementation must
+provide both styles of access even though only one is likely to be
+native.  Further challenges arise when considering the support of many
+different scientific programming languages.  This aspect is addressed
+through our joint work with the Common Component Architecture Forum
+\cite{cca-forum} to provide
+language independent interfaces by using their SIDL/Babel technology
+\cite{babel}.  
+
+%%{\tt Insert example here}
+
+\subsection{The ITAPS Basic Interface}
+\label{sec:utilities}
+
+The ITAPS data models for mesh, geometry and fields all make use of the
+concepts of {\it entities}, {\it entity sets}, and {\it tags}, and we
+describe these now in some detail.
+
+ITAPS {\it entities} are used to represent atomic pieces of information
+such as vertices in a mesh or edges in a geometric model.  To allow
+the interface to remain data structure neutral, entities (as well as
+entity sets and tags) are uniquely represented by opaque handles.
+Unless entities are added or removed, these handles must be
+invariant through different calls to the interface in the lifetime of
+the ITAPS interface, in the sense that a given entity will always have
+the same handle.  This is required to ensure consistency among the
+several different calls that use and return entity handles and to
+allow for easy entity handle comparison.  Entities do not have
+interface functionality that is separate from mesh, geometry or field
+interfaces, and we describe these functionalities in more detail in
+the sections that follow.
+
+Entity adjacency relationships define how the entities connect to
+each other and both first-order and second-order adjacencies are
+supported for the mesh and geometry interfaces.
+\begin{itemize}
+\item {\it First-order adjacencies}: For an entity of dimension $d$,
+first-order adjacencies return all of the entities of dimension
+$q$, which are either on the closure of the entity ($d > q$, downward
+adjacency), or which it is on the closure of ($d < q$, upward
+adjacency).  
+
+\item {\it Second-order adjacencies}:  Many applications require not
+only information about first-order adjacencies, but also about the next
+level of neighbors. Although such information can always be determined
+from the appropriate first-order adjacencies, their application is
+common enough that supporting a second-order adjacency function is
+useful. A second-order adjacency determines the set of topological
+entities of a given type adjacent to entities that share common
+boundary entities of the specified type. An example would be
+the set of regions that share a bounding edge with the given region.
+\end{itemize}
+
+An ITAPS {\it entity set} is an arbitrary collection of ITAPS entities
+that have uniquely defined entity handles.  Each entity set may be an
+unordered set or it may be a (possibly non-unique) ordered list of
+entities.  When an ITAPS interface is first created in a simulation, a
+{\it Root Set} is created.  The root set can be populated by string
+name using the {\tt load} function call.  The action taken by {\tt
+load} is implementation specific and can range from reading mesh data
+from a file to generating a mesh on the fly from a named CAD file.
+
+Two primary relationships among entity sets are supported:
+
+\begin{itemize}
+\item Entity sets may {\it contain} one or more entity sets.  An
+entity set contained in another may be either a subset or an element
+of that entity set.  The choice between these two interpretations is
+left to the application; ITAPS supports both interpretations. If entity
+set A is contained in entity set B, a request for the contents of B
+will include the entities in A and the entities in sets contained in A
+if the application requests the contents recursively.  We note that
+the {\it Root Set} cannot be contained in another entity set.
+
+\item {\it Parent/child relationships} between entity sets are used to
+represent relations between sets, much like directed edges connecting nodes in
+a graph.  This relationship can be used to indicate that two meshes
+have a logical relationship to each other, including multigrid and
+adaptive mesh sequences. Because we distinguish between parent and
+child links, this is a directed graph. Also, the meaning of cyclic
+parent/child relationships is dubious, at best, so graphs must be
+acyclic. No other assumptions are made about the graph.
+\end{itemize}
+
+Users are able to query entity sets for their entities and entity
+adjacency relationships.  Both array- and iterator-based access
+patterns are supported.  In addition, entity sets also have "set
+operation" capabilities; in particular, existing ITAPS entities may be
+added to or removed from the entity set, and sets may be subtracted,
+intersected, or united.  
+
+ITAPS {\it tags} are used as containers for user-defined opaque data that
+can be attached to ITAPS entities and entity sets.  Tags can be
+multi-valued which implies that a given tag handle can be associated
+with many different entities.  In the general case, ITAPS tags do not
+have a predefined type and allow the user to attach any opaque data to
+ITAPS entities.  To improve ease of use and performance, we support
+three specialized tag types: integers, doubles, and entity handles.  Tags
+have and can return their string name, size, handle and data.  Tag
+data can be retrieved from ITAPS entities by handle in an agglomerated
+or individual manner.  The ITAPS implementation is expected to allocate
+the memory as needed to store the tag data.
+
+\subsection{The ITAPS Mesh Interface}
+\label{sec:mesh}
+
+ITAPS {\it mesh entities} are the fundamental building blocks of the
+ITAPS mesh interface and correspond to the individual pieces of the
+domain decomposition (mesh).  Under the assumption that each
+topological mesh entity of dimension $d$, $M^d_i$, is bounded by a set
+of topological mesh entities of dimension $d-1$, $\left\{ M^d_i
+\left\{ M^{d-1}
+\right\} \right\}$, the full set of mesh topological entities are:
+\begin{equation}
+T_M = \left\{ \left\{ M \left\{ M^0 \right\} \right\},~
+\left\{ M \left\{ M^1 \right\} \right\},~
+\left\{ M \left\{ M^2 \right\} \right\},~
+\left\{ M \left\{ M^3 \right\} \right\} \right\}
+\end{equation}
+where $\left\{ M \left\{ M^{d} \right\} \right\}$, $d=0,1,2,3$, are
+respectively the set of vertices, edges, faces and regions which
+define the topological entities of the mesh domain. It is
+possible to limit the mesh representation to just these entities under
+the following restrictions \cite{BeSh97}.
+\begin{enumerate}
+\item Regions and faces have no interior holes.
+\item Each entity of order $d_i$ in a mesh, $M^{d_i}$, may use a particular entity of
+lower order, $M^{d_j}$, $d_j<d_i$, at most once.
+\item	For any entity $M^{d_i}_i$ there is a unique set of entities of order $d_i-1$,
+$\left \{ M^{d_i}_i \left\{M^{d_{i-1}} \right\} \right\}$  that 
+are on the boundary of $M^{d_i}_i$.
+\end{enumerate}
+
+The first restriction means that regions may be directly represented
+by the faces that bound them, faces may be represented by the edges
+that bound them, and edges may be represented by the vertices that
+bound them. The second restriction allows the orientation of an entity
+to be defined in terms of its boundary entities.  For example, the
+orientation of an edge, $M^1_i$ bounded by vertices $M^0_j$ and
+$M^0_k$ is uniquely defined as going from $M^0_j$ to $M^0_k$ only if
+$j \neq k$. The third restriction means that a mesh entity is uniquely
+specified by its bounding entities. Most representations including
+that used in this paper employ that requirement. There are
+representational schemes where this condition only applies to interior
+entities; entities on the boundary of the model may have a non-unique
+set of boundary entities \cite{BeSh97}.
+
+Specific examples of mesh entities include, for example, a hexahedron,
+tetrahedron, edge, triangle and vertex.  Mesh entities are classified
+by their entity type (topological dimension) and entity topology
+(shape).  Just as for geometric entities, allowable mesh entity types
+are vertex (0D), edge (1D), face (2D), and region (3D).  Allowable
+entity topologies are point (0D); line segment (1D); triangle,
+quadrilateral, and polygon (2D); and tetrahedron, pyramid, prism,
+hexahedron, septahedron, and polyhedron (3D); each of these topologies
+has a unique entity type associated with it.  Mesh entity geometry and
+shape information is associated with the individual mesh entities. For
+example, the vertices will have coordinates associated with them.
+Higher-dimensional mesh entities can also have shape information
+associated with them. For example the coordinates of higher-order
+finite-element nodes can be associated with mesh edges, faces, and
+regions.
+ 
+Higher-dimensional entities are defined by lower-dimensional entities
+with shape and orientation defined using canonical ordering
+relationships.  To determine which adjacencies are supported by an
+underlying implementation, an adjacency table is defined which can be
+returned by a query through the interface.  The implementation can
+report that adjacency information is always, sometimes, or never
+available; and to be available at a cost that is constant, logarithmic
+(i.e., tree search), or linear (i.e., search over all entities) in the
+size of the mesh.  The use of a table allows the implementation to
+provide separate information for each upward and downward adjacency
+request.  If adjacency information exists, entities must be able to
+return information in the canonical ordering using both individual and
+agglomerated request mechanisms.
+
+ITAPS {\it mesh entity sets} are extensively used to collect mesh
+entities together in meaningful ways, for example, to represent the
+set of all faces classified on a geometric face, or the set of regions
+in a domain decomposition for parallel computing.  For some
+computational applications, it is useful for entity sets to comprise a
+valid computational mesh.  The simplest example of this is a
+nonoverlapping, connected set of ITAPS region entities, for example,
+the structured and unstructured meshes commonly used in finite element
+simulations.  Collections of entity sets can compose, for example,
+overlapping and multiblock meshes. In both of these examples,
+supplemental information on the interactions of the mesh sets will be
+defined and maintained by the application.  We note that in other
+cases, for example, smooth particle hydrodynamic (SPH) applications,
+molecular dynamics, or mesh-free methods, one can use meshes that
+consist of a collection of ITAPS vertices with no connectivity or
+adjacency information.
+
+The mesh interface, including the use of mesh entity sets, is extendable to
+include ``modification operators'' that change the geometry and topology.
+Capabilities include changing vertex coordinates and adding or deleting
+entities. No validity checks are provided with this basic interface so that
+care must be taken when using these interfaces.  These interfaces are intended
+to support higher-level functionality such as mesh quality improvement,
+adaptive schemes, front tracking proceedures, and basic mesh generation
+capabilities, all of which would provide validity checking.  Modifiable meshes
+require interactions with the underlying geometric model including classifying
+entities.  
+
+Several implementations of the ITAPS mesh interface are well underway and are
+supported by mesh management toolkits such as FMDB (RPI)~\cite{ReSh03},
+MOAB (SNL)~\cite{moab:http}, NWGrid
+(PNNL)~\cite{nwgrid:http}, and GRUMMP (University of British
+Columbia)~\cite{GRUMMP:http}.  In addition to the development of underlying
+implementations, the ITAPS mesh interface has also been used in a variety of
+contexts as well.  In particular, it serves as the interface to the Mesquite
+mesh quality improvement and Frontier front tracking tools (see Section 4).
+
+
+\input{geometry.tex}
+
+\input{fields.tex}

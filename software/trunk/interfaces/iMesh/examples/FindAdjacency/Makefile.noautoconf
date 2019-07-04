@@ -1,0 +1,82 @@
+#
+# This makefile can be used without using autoconf,
+# as long as you have IMESH_DIR set to the location
+# of the IMESH implementation you're using and 
+# F77, FC, CC, and CXX point to the appropriate compilers
+#
+# Note that gfortran < 4.3 has a bug that prevents passing integer*8
+# variables by value.  The practical upshot is that the Fortran 77 and
+# 90 programs fail on 64-bit machines with earlier gfortran versions.
+#
+#  Ellen Hill Tue Apr 5 2001 09:21:48 2011 PDT
+#     Added cray-pointer option; comment out F2003 references in order to
+#     test other fortran codes
+#
+#  Ellen Hill Wed June 29 2011 09:51:48 2011 PDT
+
+include ${IMESH_DEFS}
+IMESH_INSTALL_DIR=`echo $(IMESH_DEFS) | rev | cut -d'/' -f3- | rev`
+IMESH_RPATH_FLAGS=`echo $(IMESH_LIBS) | tr ' ' '\n' | grep -e -L | sed -e 's|-L|-Wl,-rpath,|'`
+
+###EXECS = FindAdjacencyF77 FindAdjacencyF90 FindAdjacencyC FindAdjacencyCXX FindAdjacencyF2003
+EXECS = FindAdjacencyF77 FindAdjacencyF90 FindAdjacencyC FindAdjacencyCXX
+EXECSOBJ = ${EXECS:=.o}
+EXECSOUT = ${EXECS:=.out}
+EXECSERR = ${EXECS:=.err}
+
+###  temporary fix until all codes use IMESH_CPPFLAGS
+IMESH_INCS=${IMESH_INCLUDES} ${IMESH_CPPFLAGS}
+
+default: $(EXECS)
+
+FindAdjacencyF77: FindAdjacencyF77.o
+	${F77} -o $@ $< ${IMESH_LIBS} ${EXTRA_F77_LIBS} ${IMESH_RPATH_FLAGS}
+
+FindAdjacencyF90: FindAdjacencyF90.o
+	${FC} -o $@ $< ${IMESH_LIBS} ${EXTRA_FC_LIBS} ${IMESH_RPATH_FLAGS}
+
+FindAdjacencyC: FindAdjacencyC.o
+	${CC} -o $@ $< ${IMESH_LIBS} ${EXTRA_CC_LIBS} ${IMESH_RPATH_FLAGS}
+
+FindAdjacencyCXX: FindAdjacencyCXX.o
+	${CXX} -o $@ $< ${IMESH_LIBS} ${EXTRA_CXX_LIBS} ${IMESH_RPATH_FLAGS}
+
+##FindAdjacencyF2003: FindAdjacencyF2003.o
+##	${FC} -o $@ $< ${IMESH_LIBS} -lstdc++
+
+##.SUFFIXES: .F90 .F .c .cpp .F03
+.SUFFIXES: .F90 .F .c .cpp
+
+##.F03.o:
+##	${FC} -c ${IMESH_FCFLAGS} ${IMESH_INCS} ${FCFLAGS} $<
+
+.F90.o:
+	${FC} -c -fcray-pointer ${IMESH_FCFLAGS} ${IMESH_INCS} ${FCFLAGS} $<
+
+.F.o:
+	${F77} -c -fcray-pointer ${IMESH_FFLAGS} ${IMESH_INCS} ${FFLAGS} $<
+
+.c.o:
+	${CC} -c ${IMESH_CFLAGS} ${IMESH_INCS} ${CFLAGS} $<
+
+.cpp.o:
+	${CXX} -c ${IMESH_CXXFLAGS} ${IMESH_INCS} ${CXXFLAGS} $<
+
+check: default
+	./FindAdjacencyF77 1>FindAdjacencyF77.out 2>FindAdjacencyF77.err
+	!(test -s FindAdjacencyF77.err && cat FindAdjacencyF77.err)
+	./FindAdjacencyF90 1>FindAdjacencyF90.out 2>FindAdjacencyF90.err
+	!(test -s FindAdjacencyF90.err && cat FindAdjacencyF90.err)
+	./FindAdjacencyC 1>FindAdjacencyC.out 2>FindAdjacencyC.err
+	!(test -s FindAdjacencyC.err && cat FindAdjacencyC.err)
+	./FindAdjacencyCXX 1>FindAdjacencyCXX.out 2>FindAdjacencyCXX.err
+	!(test -s FindAdjacencyCXX.err && cat FindAdjacencyCXX.err)
+	diff -w FindAdjacencyF90.out FindAdjacencyF77.out
+	diff -w FindAdjacencyC.out FindAdjacencyF77.out
+	diff -w FindAdjacencyCXX.out FindAdjacencyF77.out
+
+install:
+	-install ${EXECS} ${IMESH_INSTALL_DIR}/bin
+
+clean:
+	rm -f ${EXECS} ${EXECSOBJ} ${EXECSOUT} ${EXECSERR}

@@ -1,0 +1,770 @@
+        -:    0:Source:vTestEntityWithSets.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestEntityWithSets(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  //    initEntIter, getNextEntIter, resetEntIter, endEntIter
+        1:    6:  const int iNumType = iBase_ALL_TYPES - iBase_VERTEX;
+        1:    7:  const int iNumTopo = iMesh_ALL_TOPOLOGIES - iMesh_POINT;
+        -:    8:  iBase_EntitySetHandle apvSets[10];
+        -:    9:  iBase_EntityHandle a2pvTypeEnts[iNumType][iNumType*5];
+        -:   10:  iBase_EntityIterator pvIter;
+        -:   11:  iBase_EntityHandle a2pvTopoEnts[iNumTopo][iNumTopo*5];
+        1:   12:  int aiNumTypeEnts[iNumType] = {0};
+        1:   13:  int aiNumTopoEnts[iNumTopo] = {0};
+        -:   14:  int i, iGeoDim, iNumTypeVerts, iNumTopoVerts;
+        1:   15:  int qGotData = false;
+        -:   16:  int err;
+        -:   17:
+        1:   18:  iMesh_getGeometricDimension(instance, &iGeoDim, &err);
+        1:   19:  CHECK_ERR(err);
+        -:   20:
+        -:   21:  // Get a different number of entities for each type and record how
+        -:   22:  // many were retrieved --a2pvTypeEnts stores the entities,
+        -:   23:  // aiNumTypeEnts stores how many for each type
+        1:   24:  qGotData = false;
+        -:   25:
+        5:   26:  for ( i = 0; i < iNumType; i++ ) {
+        4:   27:    if ( (iGeoDim == 2) && (i > iBase_FACE) )
+        -:   28:      break;
+        -:   29:    iMesh_initEntIter(instance, pvRootSet,
+        -:   30:		      static_cast<iBase_EntityType>(i+iBase_VERTEX),
+        4:   31:		      iMesh_ALL_TOPOLOGIES, 0, &pvIter, &err);
+        4:   32:    CHECK_ERR(err);
+        -:   33:
+        -:   34:    iBase_EntityHandle entity;
+        4:   35:    iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+        4:   36:    CHECK_ERR(err);
+        -:   37:
+        4:   38:    int j = 0;
+       43:   39:    while (qGotData && aiNumTypeEnts[i] < 5*(iNumType-i)) {
+       35:   40:      a2pvTypeEnts[i][j] = entity;
+       35:   41:      j++;
+       35:   42:      aiNumTypeEnts[i] = j;
+       35:   43:      iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+       35:   44:      CHECK_ERR(err);
+        -:   45:    };
+        4:   46:    iMesh_endEntIter(instance, pvIter, &err);
+        4:   47:    CHECK_ERR(err);
+        -:   48:  }
+        -:   49:
+        -:   50:  // If there aren't the required number of vertices (20 to be exact) or
+        -:   51:  // there aren't any of any of the other types of entities, bail out
+        -:   52:  // because the subsequent tests would be useless and might not even
+        -:   53:  // work.
+        1:   54:  if ( (aiNumTypeEnts[0] < 20) ) {
+    #####:   55:    cout << "\nCould not get mesh data to work with... exiting...\n";
+    #####:   56:    TEST ( data_preparation );
+        -:   57:    return;
+        -:   58:  }
+        -:   59:
+        -:   60:  // Get a different number of entities for each topology and record how
+        -:   61:  // many were retrieved -- a2pvTopoEnts stores the entities,
+        -:   62:  // aiNumTopoEnts stores how many for each topology.
+        1:   63:  qGotData = false;
+       12:   64:  for ( i = 0; i < iNumTopo; i++ ) {
+       11:   65:    if ( (iGeoDim == 2) && (i > iMesh_QUADRILATERAL) )
+        -:   66:      break;
+        -:   67:    iMesh_initEntIter(instance, pvRootSet, iBase_ALL_TYPES,
+       11:   68:		      static_cast<iMesh_EntityTopology>(i), 0, &pvIter, &err);
+       11:   69:    CHECK_ERR(err);
+        -:   70:
+        -:   71:    iBase_EntityHandle entity;
+       11:   72:    iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+       11:   73:    CHECK_ERR(err);
+       11:   74:    int j = 0;
+      222:   75:    while (qGotData && aiNumTopoEnts[i] < 5*(iNumTopo-i)) {
+      200:   76:      a2pvTopoEnts[i][j] = entity;
+      200:   77:      j++;
+      200:   78:      aiNumTopoEnts[i] = j;
+      200:   79:      iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+      200:   80:      CHECK_ERR(err);
+        -:   81:    }
+       11:   82:    iMesh_endEntIter(instance,  pvIter, &err);
+       11:   83:    CHECK_ERR(err);
+        -:   84:  }
+        -:   85:
+        -:   86:  // If there aren't the required number of points (55 to be exact) or
+        -:   87:  // there aren't any of any of the other topologies of entities, bail
+        -:   88:  // out because the subsequent tests would be useless and might not
+        -:   89:  // even work
+        1:   90:  if ( aiNumTopoEnts[0] < 55 ) {
+    #####:   91:    cout << "\nCould not get mesh data to work with... exiting...\n";
+    #####:   92:    TEST ( data_preparation );
+        -:   93:    return;
+        -:   94:  }
+        -:   95:
+        -:   96:  // Create two lists and two sets, one for types and one for topologies each,
+        -:   97:  // as well as an empty list
+        6:   98:  for ( i=0; i<5; i++ ) {
+        5:   99:    iMesh_createEntSet(instance,  i<3, &apvSets[i], &err);
+        5:  100:    CHECK_ERR(err);
+        -:  101:  }
+        -:  102:
+        -:  103:  // Add the entities of each type to list #1 and set #3, interspersing
+        -:  104:  // them with vertices, like this:
+        -:  105:  //        V0,V0,V1,V1,V2,V2,...,E0,V0,E1,V1,E2,V2,....R0,V0,R1,V1,R2,V2
+        -:  106:  // for the set the order makes no difference, but it does make the
+        -:  107:  // list traversal slightly more interesting
+       21:  108:  for ( int j = 0; j < aiNumTypeEnts[0]; j++ ) {
+      100:  109:    for ( i = 0; i < iNumType; i++ ) {
+       80:  110:      if ( j < aiNumTypeEnts[i] ) {
+       35:  111:	iMesh_addEntToSet(instance,  a2pvTypeEnts[i][j], apvSets[1], &err);
+       35:  112:	CHECK_ERR(err);
+       35:  113:	iMesh_addEntToSet(instance,  a2pvTypeEnts[0][j], apvSets[1], &err);
+       35:  114:	CHECK_ERR(err);
+       35:  115:	iMesh_addEntToSet(instance,  a2pvTypeEnts[i][j], apvSets[3], &err);
+       35:  116:	CHECK_ERR(err);
+       35:  117:	iMesh_addEntToSet(instance,  a2pvTypeEnts[0][j], apvSets[3], &err);
+       35:  118:	CHECK_ERR(err);
+        -:  119:      }
+        -:  120:    }
+        -:  121:  }
+        -:  122:
+        -:  123:  // Calculate the number of vertices used in the list above
+        1:  124:  iNumTypeVerts = aiNumTypeEnts[0];
+        5:  125:  for ( i=0; i<iNumType; i++ ) {
+        4:  126:    iNumTypeVerts += aiNumTypeEnts[i];
+        -:  127:  }
+        -:  128:
+        -:  129:  // Do the same thing except for topologies
+       56:  130:  for ( int j = 0; j < aiNumTopoEnts[0]; j++ ) {
+      660:  131:    for ( i = 0; i < iNumTopo; i++ ) {
+      605:  132:      if ( j < aiNumTopoEnts[i] ) {
+      200:  133:	iMesh_addEntToSet(instance,  a2pvTopoEnts[i][j], apvSets[2], &err);
+      200:  134:	CHECK_ERR(err);
+      200:  135:	iMesh_addEntToSet(instance,  a2pvTopoEnts[0][j], apvSets[2], &err);
+      200:  136:	CHECK_ERR(err);
+      200:  137:	iMesh_addEntToSet(instance,  a2pvTopoEnts[i][j], apvSets[4], &err);
+      200:  138:	CHECK_ERR(err);
+      200:  139:	iMesh_addEntToSet(instance,  a2pvTopoEnts[0][j], apvSets[4], &err);
+      200:  140:	CHECK_ERR(err);
+        -:  141:      }
+        -:  142:    }
+        -:  143:  }
+        -:  144:
+        -:  145:  // Calculate the number of points used in the list above
+        1:  146:  iNumTopoVerts = aiNumTopoEnts[0];
+       12:  147:  for ( i=0; i<iNumTopo; i++ )
+       11:  148:    iNumTopoVerts += aiNumTopoEnts[i];
+        -:  149:
+        1:  150:  cout << "Testing set iterator initialization...                    ";
+        -:  151:  iBase_EntityIterator apvTypeIter0[iNumType];
+        -:  152:  iBase_EntityIterator apvTopoIter0[iNumTopo];
+        -:  153:  iBase_EntityIterator apvTypeIter1[iNumType];
+        -:  154:  iBase_EntityIterator apvTypeIter3[iNumType];
+        -:  155:  iBase_EntityIterator apvTopoIter2[iNumTopo];
+        -:  156:  iBase_EntityIterator apvTopoIter4[iNumTopo];
+        1:  157:  bool aqInitType1[iNumType] = {false};
+        1:  158:  bool aqInitType3[iNumType] = {false};
+        1:  159:  bool aqInitTopo2[iNumTopo] = {false};
+        1:  160:  bool aqInitTopo4[iNumTopo] = {false};
+        -:  161:
+        5:  162:  for ( int iType = 0; iType < iNumType; iType++ ) {
+        4:  163:    if ( (iGeoDim == 2) && (iType > iBase_FACE) )
+        -:  164:      break;
+        -:  165:    iMesh_initEntIter(instance, apvSets[0], iType, iMesh_ALL_TOPOLOGIES,
+        4:  166:		      0, &(apvTypeIter0[iType]), &err);
+        4:  167:    CHECK_ERR(err);
+        -:  168:
+        4:  169:    if ( aiNumTypeEnts[iType] > 0 ) {
+        -:  170:      iMesh_initEntIter(instance,  apvSets[1], iType, iMesh_ALL_TOPOLOGIES,
+        3:  171:			0, &(apvTypeIter1[iType]), &err);
+        3:  172:      aqInitType1[iType] = (err == iBase_SUCCESS);
+        3:  173:      CHECK_ERR(err);
+        -:  174:
+        -:  175:      iMesh_initEntIter(instance,  apvSets[3], iType, iMesh_ALL_TOPOLOGIES,
+        3:  176:			0, &(apvTypeIter3[iType]), &err);
+        3:  177:      aqInitType3[iType] = (err == iBase_SUCCESS);
+        3:  178:      CHECK_ERR(err);
+        -:  179:    }
+        -:  180:  }
+        -:  181:
+       12:  182:  for ( int iTopo = 0; iTopo < iNumTopo; iTopo++ ) {
+       11:  183:    if ( (iGeoDim == 2) && (iTopo > iMesh_QUADRILATERAL) )
+        -:  184:      break;
+        -:  185:    iMesh_initEntIter(instance, apvSets[0], iBase_ALL_TYPES,
+       11:  186:		      iTopo, 0, &(apvTopoIter0[iTopo]), &err);
+       11:  187:    CHECK_ERR(err);
+        -:  188:
+       11:  189:    if ( aiNumTopoEnts[iTopo] > 0 ) {
+        -:  190:      iMesh_initEntIter(instance, apvSets[2], iBase_ALL_TYPES,
+        7:  191:			iTopo, 0, &(apvTopoIter2[iTopo]), &err);
+        7:  192:      aqInitTopo2[iTopo] = (err == iBase_SUCCESS);
+        7:  193:      CHECK_ERR(err);
+        -:  194:
+        -:  195:      iMesh_initEntIter(instance, apvSets[4], iBase_ALL_TYPES,
+        7:  196:			iTopo, 0, &(apvTopoIter4[iTopo]), &err);
+        7:  197:      aqInitTopo4[iTopo] = (err == iBase_SUCCESS);
+        7:  198:      CHECK_ERR(err);
+        -:  199:    }
+        -:  200:  }
+        1:  201:  cout << "DONE\n";
+        -:  202:  // No point in testing save-load here; no one expects iterators to be
+        -:  203:  // valid after this anyway.
+        -:  204:
+        1:  205:  cout << "Testing set iterator entity retrieval...                  ";
+        -:  206:  iBase_EntityHandle pvEntTemp;
+        1:  207:  iBase_EntityHandle aGotEnts[iNumTypeVerts+iNumTopoVerts];
+        -:  208:
+        1:  209:  if ( aqInitType1[0] ) {
+        1:  210:    i = 0;
+        -:  211:    iMesh_getNextEntIter(instance, apvTypeIter1[0], &pvEntTemp,
+        1:  212:			 &qGotData, &err);
+        1:  213:    CHECK_ERR(err);
+       56:  214:    while ( i < iNumTypeVerts+1 && qGotData) {
+       55:  215:      aGotEnts[i++] =  pvEntTemp;
+        -:  216:      iMesh_getNextEntIter(instance, apvTypeIter1[0], &pvEntTemp,
+       55:  217:			   &qGotData, &err);
+       55:  218:      CHECK_ERR(err);
+        -:  219:    }
+        -:  220:
+        1:  221:    qGotData = ( i == iNumTypeVerts );
+        1:  222:    if ( qGotData ) {
+        1:  223:      i = 0;
+       21:  224:      for ( int j=0; j < aiNumTypeEnts[0]; j++ ) {
+       20:  225:	qGotData = qGotData && ( a2pvTypeEnts[0][j] == aGotEnts[i++] );
+      100:  226:	for ( int iType = 0; iType < iNumType; iType++ )
+       80:  227:	  if ( j < aiNumTypeEnts[iType] )
+       35:  228:	    qGotData = qGotData && ( a2pvTypeEnts[0][j] == aGotEnts[i++] );
+        -:  229:      }
+        -:  230:    }
+        1:  231:    TEST2 ( qGotData, "Didn't match entity retrieval for list-type set, iterating by type." );
+        -:  232:  }
+        -:  233:
+        -:  234:
+        4:  235:  for ( int iType = 1; iType < iNumType; iType++ ) {
+        3:  236:    if ( aqInitType1[iType] ) {
+        2:  237:      i = 0;
+        -:  238:      iMesh_getNextEntIter(instance, apvTypeIter1[iType], &pvEntTemp,
+        2:  239:			   &qGotData, &err);
+        2:  240:      CHECK_ERR(err);
+       17:  241:      while ( i < iNumTypeVerts+1 && qGotData) {
+       15:  242:	aGotEnts[i++] =  pvEntTemp;
+        -:  243:	iMesh_getNextEntIter(instance, apvTypeIter1[iType], &pvEntTemp,
+       15:  244:			     &qGotData, &err);
+       15:  245:	CHECK_ERR(err);
+        -:  246:      }
+        -:  247:
+        2:  248:      qGotData = ( i == aiNumTypeEnts[iType] );
+        2:  249:      if ( qGotData ) {
+       17:  250:	for ( int j=0; j < aiNumTypeEnts[iType]; j++ )
+       15:  251:	  qGotData = qGotData && ( a2pvTypeEnts[iType][j] == aGotEnts[j] );
+        -:  252:      }
+        2:  253:      TEST ( qGotData );
+        -:  254:    }
+        -:  255:  }
+        -:  256:
+        5:  257:  for ( int iType = 0; iType < iNumType; iType++ ) {
+        4:  258:    if ( (iGeoDim == 2) && (iType > iBase_FACE) )
+        -:  259:      break;
+        -:  260:
+        -:  261:    iMesh_getNextEntIter(instance, apvTypeIter0[iType], &pvEntTemp,
+        4:  262:			 &qGotData, &err);
+        4:  263:    CHECK_ERR(err);
+        4:  264:    TEST( !qGotData );
+        -:  265:
+        4:  266:    if ( aqInitType3[iType] ) {
+        3:  267:      i = 0;
+        -:  268:      iMesh_getNextEntIter(instance, apvTypeIter3[iType], &pvEntTemp,
+        3:  269:			   &qGotData, &err);
+        3:  270:      CHECK_ERR(err);
+       38:  271:      while ( i < aiNumTypeEnts[iType]+1 && qGotData) {
+       35:  272:	aGotEnts[i++] =  pvEntTemp ;
+        -:  273:	iMesh_getNextEntIter(instance, apvTypeIter3[iType], &pvEntTemp,
+       35:  274:			     &qGotData, &err);
+       35:  275:	CHECK_ERR(err);
+        -:  276:      }
+        3:  277:      qGotData = false;
+        3:  278:      if ( i == aiNumTypeEnts[iType] ) {
+        3:  279:	GOT_ALL_ITEMS ( a2pvTypeEnts[iType], aGotEnts, i, qGotData );
+        -:  280:      }
+        3:  281:      TEST ( qGotData );
+        -:  282:    }
+        -:  283:  }
+        -:  284:
+        -:  285:
+        1:  286:  if ( aqInitTopo2[0] ) {
+        1:  287:    i = 0;
+        -:  288:    iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        1:  289:			 &qGotData, &err);
+        1:  290:    CHECK_ERR(err);
+      256:  291:    while ( i < iNumTopoVerts+1 && qGotData) {
+      255:  292:      aGotEnts[i++] =  pvEntTemp ;
+        -:  293:      iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+      255:  294:			   &qGotData, &err);
+      255:  295:      CHECK_ERR(err);
+        -:  296:    }
+        1:  297:    qGotData = ( i == iNumTopoVerts);
+        1:  298:    if ( qGotData ) {
+        1:  299:      i = 0;
+       56:  300:      for ( int j=0; j < aiNumTopoEnts[0]; j++ ) {
+       55:  301:	qGotData = qGotData && ( a2pvTopoEnts[0][j] == aGotEnts[i++] );
+      660:  302:	for ( int iTopo = 0; iTopo < iNumTopo; iTopo++ )
+      605:  303:	  if ( j < aiNumTopoEnts[iTopo] )
+      200:  304:	    qGotData = qGotData && ( a2pvTopoEnts[0][j] == aGotEnts[i++] );
+        -:  305:      }
+        -:  306:    }
+        1:  307:    TEST2 ( qGotData, "Didn't match entity retrieval for list-type set, iterating by topology." );
+        -:  308:  }
+        -:  309:
+       11:  310:  for ( int iTopo = 1; iTopo < iNumTopo; iTopo++ ) {
+       10:  311:    if ( aqInitTopo2[iTopo] ) {
+        6:  312:      i = 0;
+        -:  313:      iMesh_getNextEntIter(instance, apvTopoIter2[iTopo], &pvEntTemp,
+        6:  314:			   &qGotData, &err);
+        6:  315:      CHECK_ERR(err);
+      151:  316:      while ( i < iNumTopoVerts+1 && qGotData) {
+      145:  317:	aGotEnts[i++] =  pvEntTemp ;
+        -:  318:	iMesh_getNextEntIter(instance, apvTopoIter2[iTopo],
+      145:  319:			     &pvEntTemp, &qGotData, &err);
+      145:  320:	CHECK_ERR(err);
+        -:  321:      }
+        6:  322:      qGotData = ( i == aiNumTopoEnts[iTopo] );
+        6:  323:      if ( qGotData ) {
+      151:  324:	for ( int j=0; j < aiNumTopoEnts[iTopo]; j++ )
+      145:  325:	  qGotData = qGotData && ( a2pvTopoEnts[iTopo][j] == aGotEnts[j] );
+        -:  326:      }
+        6:  327:      TEST ( qGotData );
+        -:  328:    }
+        -:  329:  }
+        -:  330:
+       12:  331:  for ( int iTopo = 0; iTopo < iNumTopo; iTopo++ ) {
+       11:  332:    if ( (iGeoDim == 2) && (iTopo > iMesh_QUADRILATERAL) )
+        -:  333:      break;
+        -:  334:    iMesh_getNextEntIter(instance, apvTopoIter0[iTopo], &pvEntTemp,
+       11:  335:			 &qGotData, &err);
+       11:  336:    CHECK_ERR(err);
+       11:  337:    TEST ( !qGotData );
+       11:  338:    if ( aqInitTopo4[iTopo] ) {
+        7:  339:      i = 0;
+        -:  340:      iMesh_getNextEntIter(instance, apvTopoIter4[iTopo], &pvEntTemp,
+        7:  341:			   &qGotData, &err);
+        7:  342:      CHECK_ERR(err);
+      207:  343:      while ( i < iNumTopoVerts+1 && qGotData) {
+      200:  344:	aGotEnts[i++] =  pvEntTemp ;
+        -:  345:	iMesh_getNextEntIter(instance, apvTopoIter4[iTopo],
+      200:  346:			     &pvEntTemp, &qGotData, &err);
+      200:  347:	CHECK_ERR(err);
+        -:  348:      }
+        7:  349:      qGotData = false;
+        7:  350:      if ( i == aiNumTopoEnts[iTopo] )
+        7:  351:	GOT_ALL_ITEMS ( a2pvTopoEnts[iTopo], aGotEnts, i, qGotData );
+        7:  352:      TEST ( qGotData );
+        -:  353:    }
+        -:  354:  }
+        1:  355:  cout << "DONE\n";
+        -:  356:  // No point in testing save-load here; no one expects iterators to be
+        -:  357:  // valid after this anyway.
+        -:  358:
+        1:  359:  cout << "Testing reset, with removal and addition mid-traversal... ";
+        -:  360:  iBase_EntityHandle pvEntOut;
+        -:  361:
+        1:  362:  if ( aqInitType1[0]  ) {
+        1:  363:    iMesh_resetEntIter(instance,  apvTypeIter1[0], &err);
+        1:  364:    CHECK_ERR(err);
+        -:  365:
+        1:  366:    i = 0;
+        -:  367:    iMesh_getNextEntIter(instance, apvTypeIter1[0],
+        1:  368:			 &pvEntTemp, &qGotData, &err);
+        1:  369:    CHECK_ERR(err);
+       19:  370:    while ( i < (iNumTypeVerts/3) && qGotData ) {
+       18:  371:      i++;
+        -:  372:      iMesh_getNextEntIter(instance, apvTypeIter1[0],
+       18:  373:			   &pvEntTemp, &qGotData, &err);
+       18:  374:      CHECK_ERR(err);
+        -:  375:    }
+        -:  376:
+        1:  377:    pvEntOut = pvEntTemp;
+       11:  378:    while ( i < (iNumTypeVerts/2) && qGotData ) {
+        9:  379:      i++;
+        -:  380:      iMesh_getNextEntIter(instance, apvTypeIter1[0],
+        9:  381:			   &pvEntTemp, &qGotData, &err);
+        9:  382:      CHECK_ERR(err);
+        -:  383:    }
+        -:  384:
+        1:  385:    iMesh_rmvEntFromSet(instance,  pvEntOut, apvSets[1], &err);
+        1:  386:    CHECK_ERR(err);
+        1:  387:    iMesh_rmvEntFromSet(instance,  pvEntTemp, apvSets[1], &err);
+        1:  388:    CHECK_ERR(err);
+        1:  389:    iMesh_addEntToSet(instance,  pvEntTemp, apvSets[1], &err);
+        1:  390:    CHECK_ERR(err);
+        -:  391:
+       29:  392:    while ( i < iNumTypeVerts+1 && qGotData ) {
+       28:  393:      i++;
+        -:  394:      iMesh_getNextEntIter(instance, apvTypeIter1[0],
+       28:  395:			   &pvEntTemp, &qGotData, &err);
+       28:  396:      CHECK_ERR(err);
+        -:  397:    }
+        -:  398:
+        -:  399:    // The following commented code requires iterators over list-type
+        -:  400:    // sets to return newly-added entities.  This part of the spec is
+        -:  401:    // currently (May, 2011) in question.
+        -:  402://     iMesh_addEntToSet(instance,  pvEntOut, apvSets[1], &err);
+        -:  403://     CHECK_ERR(err);
+        -:  404:
+        -:  405://     iMesh_getNextEntIter(instance, apvTypeIter1[0],
+        -:  406:// 			 &pvEntTemp, &qGotData, &err);
+        -:  407://     CHECK_ERR(err);
+        -:  408:
+        -:  409://     if ( qGotData ) {
+        -:  410://       TESTEQ(pvEntOut,pvEntTemp);
+        -:  411://     }
+        -:  412://     else {
+        -:  413://       TEST2(false, "Didn't retrieve newly added entity at the end of iteration (list-type set)." );
+        -:  414://     }
+        -:  415:    iMesh_getNextEntIter(instance, apvTypeIter1[0],
+        1:  416:			 &pvEntTemp, &qGotData, &err);
+        1:  417:    CHECK_ERR(err);
+        1:  418:    TEST ( !qGotData );
+        -:  419:  }
+        -:  420:
+        4:  421:  for ( int iType = 1; iType < iNumType; iType++ ) {
+        3:  422:    if ( aqInitType1[iType] ) {
+        2:  423:      iMesh_resetEntIter(instance,  apvTypeIter1[iType], &err);
+        2:  424:      CHECK_ERR(err);
+        -:  425:
+        2:  426:      i = 0;
+        -:  427:      iMesh_getNextEntIter(instance, apvTypeIter1[iType],
+        2:  428:			   &pvEntTemp, &qGotData, &err);
+        2:  429:      CHECK_ERR(err);
+        6:  430:      while ( i < (aiNumTypeEnts[iType]/3) && qGotData ) {
+        4:  431:	i++;
+        -:  432:	iMesh_getNextEntIter(instance, apvTypeIter1[iType],
+        4:  433:			     &pvEntTemp, &qGotData, &err);
+        4:  434:	CHECK_ERR(err);
+        -:  435:      }
+        -:  436:
+        2:  437:      pvEntOut = pvEntTemp;
+        7:  438:      while ( i < (aiNumTypeEnts[iType]/2) && qGotData ) {
+        3:  439:	i++;
+        -:  440:	iMesh_getNextEntIter(instance, apvTypeIter1[iType],
+        3:  441:			     &pvEntTemp, &qGotData, &err);
+        3:  442:	CHECK_ERR(err);
+        -:  443:      }
+        -:  444:
+        2:  445:      iMesh_rmvEntFromSet(instance,  pvEntOut, apvSets[1], &err);
+        2:  446:      CHECK_ERR(err);
+        2:  447:      iMesh_rmvEntFromSet(instance,  pvEntTemp, apvSets[1], &err);
+        2:  448:      CHECK_ERR(err);
+        2:  449:      iMesh_addEntToSet(instance,  pvEntTemp, apvSets[1], &err);
+        2:  450:      CHECK_ERR(err);
+       12:  451:      while ( i < aiNumTypeEnts[iType]+1 && qGotData ) {
+       10:  452:	i++;
+        -:  453:	iMesh_getNextEntIter(instance, apvTypeIter1[iType],
+       10:  454:			     &pvEntTemp, &qGotData, &err);
+       10:  455:	CHECK_ERR(err);
+        -:  456:      }
+        -:  457:
+        -:  458:    // The following commented code requires iterators over list-type
+        -:  459:    // sets to return newly-added entities.  This part of the spec is
+        -:  460:    // currently (May, 2011) in question.
+        -:  461://       iMesh_addEntToSet(instance,  pvEntOut, apvSets[1], &err);
+        -:  462://       CHECK_ERR(err);
+        -:  463://       iMesh_getNextEntIter(instance, apvTypeIter1[iType],
+        -:  464:// 			   &pvEntTemp, &qGotData, &err);
+        -:  465://       CHECK_ERR(err);
+        -:  466:
+        -:  467://       if ( qGotData ) {
+        -:  468:// 	TESTEQ(pvEntOut,pvEntTemp);
+        -:  469://       }
+        -:  470://       else {
+        -:  471:// 	TEST2(false, "Didn't retrieve newly added entity at the end of iteration (list-type set).");
+        -:  472://       }
+        -:  473://       iMesh_getNextEntIter(instance, apvTypeIter1[iType],
+        -:  474:// 			   &pvEntTemp, &qGotData, &err);
+        -:  475://       CHECK_ERR(err);
+        -:  476:      iMesh_getNextEntIter(instance, apvTypeIter1[iType], &pvEntTemp,
+        2:  477:			   &qGotData, &err);
+        2:  478:      CHECK_ERR(err);
+        2:  479:      TEST ( !qGotData );
+        -:  480:    }
+        -:  481:  }
+        -:  482:  // No point in testing save-load here; no one expects iterators to be
+        -:  483:  // valid after this anyway.
+        -:  484:
+        5:  485:  for ( int iType = 0; iType < iNumType; iType++ ) {
+        4:  486:    if ( (iGeoDim == 2) && (iType > iBase_FACE) )
+        -:  487:      break;
+        4:  488:    iMesh_resetEntIter(instance,  apvTypeIter0[iType], &err);
+        4:  489:    CHECK_ERR(err);
+        -:  490:    iMesh_getNextEntIter(instance, apvTypeIter0[iType], &pvEntTemp,
+        4:  491:			 &qGotData, &err);
+        4:  492:    CHECK_ERR(err);
+        4:  493:    TEST ( !qGotData );
+        -:  494:
+        4:  495:    if ( aqInitType3[iType] ) {
+        3:  496:      iMesh_resetEntIter(instance,  apvTypeIter3[iType], &err);
+        3:  497:      CHECK_ERR(err);
+        3:  498:      i = 0;
+        -:  499:      iMesh_getNextEntIter(instance, apvTypeIter3[iType], &pvEntTemp,
+        3:  500:			   &qGotData, &err);
+        3:  501:      CHECK_ERR(err);
+       13:  502:      while ( i < (aiNumTypeEnts[iType]/3) && qGotData ) {
+       10:  503:	i++;
+        -:  504:	iMesh_getNextEntIter(instance, apvTypeIter3[iType], &pvEntTemp,
+       10:  505:			     &qGotData, &err);
+       10:  506:	CHECK_ERR(err);
+        -:  507:      }
+        3:  508:      pvEntOut = pvEntTemp;
+       13:  509:      while ( i < (aiNumTypeEnts[iType]/2) && qGotData ) {
+        7:  510:	i++;
+        -:  511:	iMesh_getNextEntIter(instance, apvTypeIter3[iType], &pvEntTemp,
+        7:  512:			     &qGotData, &err);
+        7:  513:	CHECK_ERR(err);
+        -:  514:      }
+        3:  515:      iMesh_rmvEntFromSet(instance,  pvEntOut, apvSets[3], &err);
+        3:  516:      CHECK_ERR(err);
+        3:  517:      iMesh_rmvEntFromSet(instance,  pvEntTemp, apvSets[3], &err);
+        3:  518:      CHECK_ERR(err);
+        -:  519:
+       21:  520:      while ( qGotData ) {
+       18:  521:	i++;
+        -:  522:	iMesh_getNextEntIter(instance, apvTypeIter3[iType], &pvEntTemp,
+       18:  523:			     &qGotData, &err);
+       18:  524:	CHECK_ERR(err);
+        -:  525:      }
+        3:  526:      TEST ( i >= aiNumTypeEnts[iType]/2 && i <= aiNumTypeEnts[iType]);
+        -:  527:    }
+        -:  528:  } // Loop over types for set 3
+        -:  529:
+        -:  530:    // The following commented code requires iterators over list-type
+        -:  531:    // sets to return newly-added entities.  This part of the spec is
+        -:  532:    // currently (May, 2011) in question.
+        -:  533://   if ( aqInitTopo2[0]  ) {
+        -:  534://     iMesh_resetEntIter(instance,  apvTopoIter2[0], &err);
+        -:  535://     CHECK_ERR(err);
+        -:  536:
+        -:  537://     i = 0;
+        -:  538://     iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        -:  539:// 			 &qGotData, &err);
+        -:  540://     CHECK_ERR(err);
+        -:  541://     while ( i < (iNumTopoVerts/3) && qGotData ) {
+        -:  542://       i++;
+        -:  543://       iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        -:  544:// 			   &qGotData, &err);
+        -:  545://       CHECK_ERR(err);
+        -:  546://     }
+        -:  547://     pvEntOut = pvEntTemp;
+        -:  548://     while ( i < (iNumTopoVerts/2) && qGotData ) {
+        -:  549://       i++;
+        -:  550://       iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        -:  551:// 			   &qGotData, &err);
+        -:  552://       CHECK_ERR(err);
+        -:  553://     }
+        -:  554://     iMesh_rmvEntFromSet(instance,  pvEntOut, apvSets[2], &err);
+        -:  555://     CHECK_ERR(err);
+        -:  556://     iMesh_rmvEntFromSet(instance,  pvEntTemp, apvSets[2], &err);
+        -:  557://     CHECK_ERR(err);
+        -:  558://     iMesh_addEntToSet(instance,  pvEntTemp, apvSets[2], &err);
+        -:  559://     CHECK_ERR(err);
+        -:  560:
+        -:  561://     while ( i < iNumTopoVerts+1 && qGotData ) {
+        -:  562://       i++;
+        -:  563://       iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        -:  564:// 			   &qGotData, &err);
+        -:  565://       CHECK_ERR(err);
+        -:  566://     }
+        -:  567://     iMesh_addEntToSet(instance,  pvEntOut, apvSets[2], &err);
+        -:  568://     CHECK_ERR(err);
+        -:  569:
+        -:  570://     iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        -:  571:// 			 &qGotData, &err);
+        -:  572://     CHECK_ERR(err);
+        -:  573:
+        -:  574://     if ( qGotData ) {
+        -:  575://       TESTEQ(pvEntOut,pvEntTemp);
+        -:  576://     }
+        -:  577://     else {
+        -:  578://       TEST2(false, "Didn't retrieve newly added entity at the end of iteration (list-type set)." );
+        -:  579://     }
+        -:  580://     iMesh_getNextEntIter(instance, apvTopoIter2[0], &pvEntTemp,
+        -:  581:// 			 &qGotData, &err);
+        -:  582://     CHECK_ERR(err);
+        -:  583://     TEST ( !qGotData );
+        -:  584://   }
+        -:  585:
+        -:  586:    // The following commented code requires iterators over list-type
+        -:  587:    // sets to return newly-added entities.  This part of the spec is
+        -:  588:    // currently (May, 2011) in question.
+        -:  589://   for ( int iTopo = 1; iTopo < iNumTopo; iTopo++ ) {
+        -:  590://     if ( aqInitTopo2[iTopo] ) {
+        -:  591://       iMesh_resetEntIter(instance,  apvTopoIter2[iTopo], &err);
+        -:  592://       CHECK_ERR(err);
+        -:  593:
+        -:  594://       i = 0;
+        -:  595://       iMesh_getNextEntIter(instance, apvTopoIter2[iTopo], &pvEntTemp,
+        -:  596:// 			   &qGotData, &err);
+        -:  597://       CHECK_ERR(err);
+        -:  598://       pvEntOut = pvEntTemp;
+        -:  599://       while ( i < (aiNumTopoEnts[iTopo]/2) && qGotData) {
+        -:  600:// 	i++;
+        -:  601:// 	iMesh_getNextEntIter(instance, apvTopoIter2[iTopo], &pvEntTemp,
+        -:  602:// 			     &qGotData, &err);
+        -:  603:// 	CHECK_ERR(err);
+        -:  604://       }
+        -:  605://       iMesh_rmvEntFromSet(instance,  pvEntOut, apvSets[2], &err);
+        -:  606://       CHECK_ERR(err);
+        -:  607://       iMesh_rmvEntFromSet(instance,  pvEntTemp, apvSets[2], &err);
+        -:  608://       CHECK_ERR(err);
+        -:  609://       iMesh_addEntToSet(instance,  pvEntTemp, apvSets[2], &err);
+        -:  610://       CHECK_ERR(err);
+        -:  611:
+        -:  612://       while ( i < aiNumTopoEnts[iTopo]+1 && qGotData ) {
+        -:  613:// 	i++;
+        -:  614:// 	iMesh_getNextEntIter(instance, apvTopoIter2[iTopo], &pvEntTemp,
+        -:  615:// 			     &qGotData, &err);
+        -:  616:// 	CHECK_ERR(err);
+        -:  617://       }
+        -:  618:
+        -:  619://       iMesh_addEntToSet(instance,  pvEntOut, apvSets[2], &err);
+        -:  620://       CHECK_ERR(err);
+        -:  621:
+        -:  622://       iMesh_getNextEntIter(instance, apvTopoIter2[iTopo], &pvEntTemp,
+        -:  623:// 			   &qGotData, &err);
+        -:  624://       CHECK_ERR(err);
+        -:  625:
+        -:  626://       if ( qGotData ) {
+        -:  627:// 	TESTEQ(pvEntOut,pvEntTemp);
+        -:  628://       }
+        -:  629://       else {
+        -:  630:// 	TEST2(false, "Didn't retrieve newly added entity, with removal and addition mid-iteration (list-type set).");
+        -:  631://       }
+        -:  632:
+        -:  633://       iMesh_getNextEntIter(instance, apvTopoIter2[iTopo], &pvEntTemp,
+        -:  634:// 			   &qGotData, &err);
+        -:  635://       CHECK_ERR(err);
+        -:  636://       TEST ( !qGotData );
+        -:  637://     }
+        -:  638://   }
+        -:  639:
+       12:  640:  for ( int iTopo = 0; iTopo < iNumTopo; iTopo++ ) {
+       11:  641:    if ( (iGeoDim == 2) && (iTopo > iMesh_QUADRILATERAL) )
+        -:  642:      break;
+       11:  643:    iMesh_resetEntIter(instance,  apvTopoIter0[iTopo], &err);
+       11:  644:    CHECK_ERR(err);
+        -:  645:    iMesh_getNextEntIter(instance, apvTopoIter0[iTopo], &pvEntTemp,
+       11:  646:			 &qGotData, &err);
+       11:  647:    CHECK_ERR(err);
+       11:  648:    TEST ( !qGotData );
+        -:  649:
+       11:  650:    if ( aqInitTopo4[iTopo] ) {
+        7:  651:      iMesh_resetEntIter(instance,  apvTopoIter4[iTopo], &err);
+        7:  652:      CHECK_ERR(err);
+        -:  653:
+        7:  654:      i = 0;
+        -:  655:      iMesh_getNextEntIter(instance, apvTopoIter4[iTopo], &pvEntTemp,
+        7:  656:			   &qGotData, &err);
+        7:  657:      CHECK_ERR(err);
+       71:  658:      while ( i < (aiNumTopoEnts[iTopo]/3) && qGotData ) {
+       64:  659:	i++;
+        -:  660:	iMesh_getNextEntIter(instance, apvTopoIter4[iTopo], &pvEntTemp,
+       64:  661:			     &qGotData, &err);
+       64:  662:	CHECK_ERR(err);
+        -:  663:      }
+        7:  664:      pvEntOut = pvEntTemp;
+       48:  665:      while ( i < (aiNumTopoEnts[iTopo]/2) && qGotData ) {
+       34:  666:	i++;
+        -:  667:	iMesh_getNextEntIter(instance, apvTopoIter4[iTopo], &pvEntTemp,
+       34:  668:			     &qGotData, &err);
+       34:  669:	CHECK_ERR(err);
+        -:  670:      }
+        7:  671:      iMesh_rmvEntFromSet(instance,  pvEntOut, apvSets[4], &err);
+        7:  672:      CHECK_ERR(err);
+        7:  673:      iMesh_rmvEntFromSet(instance,  pvEntTemp, apvSets[4], &err);
+        7:  674:      CHECK_ERR(err);
+        -:  675:
+      109:  676:      while ( qGotData ) {
+      102:  677:	i++;
+        -:  678:	iMesh_getNextEntIter(instance, apvTopoIter4[iTopo], &pvEntTemp,
+      102:  679:			     &qGotData, &err);
+      102:  680:	CHECK_ERR(err);
+        -:  681:      }
+        7:  682:      TEST ( i >= aiNumTopoEnts[iTopo]/2 && i <= aiNumTopoEnts[iTopo]);
+        -:  683:    }
+        -:  684:  }
+        1:  685:  cout << "DONE\n";
+        -:  686:  // No point in testing save-load here; no one expects iterators to be
+        -:  687:  // valid after this anyway.
+        -:  688:
+        1:  689:  cout << "Testing set iterator termination...                       ";
+        -:  690:
+        5:  691:  for ( int iType = 0; iType < iNumType; iType++ ) {
+        4:  692:    if ( (iGeoDim == 2) && (iType > iBase_FACE) )
+        -:  693:      break;
+        4:  694:    iMesh_endEntIter(instance,  apvTypeIter0[iType], &err);
+        4:  695:    CHECK_ERR(err);
+        -:  696:
+        4:  697:    if ( aiNumTypeEnts[iType] > 0 ) {
+        3:  698:      iMesh_endEntIter(instance,  apvTypeIter1[iType], &err);
+        3:  699:      CHECK_ERR(err);
+        3:  700:      iMesh_endEntIter(instance,  apvTypeIter3[iType], &err);
+        3:  701:      CHECK_ERR(err);
+        -:  702:    }
+        -:  703:  }
+        -:  704:
+       12:  705:  for ( int iTopo = 0; iTopo < iNumTopo; iTopo++ ) {
+       11:  706:    if ( (iGeoDim == 2) && (iTopo > iMesh_QUADRILATERAL) )
+        -:  707:      break;
+       11:  708:    iMesh_endEntIter(instance,  apvTopoIter0[iTopo], &err);
+       11:  709:    CHECK_ERR(err);
+       11:  710:    if ( aiNumTopoEnts[iTopo] > 0 ) {
+        7:  711:      iMesh_endEntIter(instance,  apvTopoIter2[iTopo], &err);
+        7:  712:      CHECK_ERR(err);
+        7:  713:      iMesh_endEntIter(instance,  apvTopoIter4[iTopo], &err);
+        7:  714:      CHECK_ERR(err);
+        -:  715:    }
+        -:  716:  }
+        1:  717:  cout << "DONE\n";
+        -:  718:
+        1:  719:  if ( qErrTests ) {
+        -:  720:    iBase_EntityIterator pvBadIter;
+        1:  721:    cout << "Testing error throwing...                                 ";
+        -:  722:    // Error throwing tests simply try to create a situation where the interface
+        -:  723:    // should, according to the spec, throw an error, and verify that:
+        -:  724:    // (a) an error is thrown, and (b) the error is the one expected.
+        -:  725:    // If an error is not thrown, the reversal of the action is attempted, if
+        -:  726:    // it would interfere with further tests.
+        -:  727:
+        -:  728:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -:  729:    // entity as an entity set or vice versa, etc., but sometimes try more
+        -:  730:    // difficult tests such as passing in a pointer to character data as an
+        -:  731:    // entity handle.
+        -:  732:    //   Initializing an iterator for an invalid entity type.
+        -:  733:    iMesh_initEntIter(instance,  apvSets[0], iBase_ALL_TYPES+1,
+        1:  734:		      iMesh_ALL_TOPOLOGIES, 0, &pvBadIter, &err);
+        1:  735:    CHECK_ERR2(err, iBase_INVALID_ENTITY_TYPE);
+        -:  736:
+        -:  737:    //   Initializing an iterator for an invalid entity topology.
+        -:  738:    iMesh_initEntIter(instance,  apvSets[0], iBase_ALL_TYPES,
+        1:  739:		      iMesh_ALL_TOPOLOGIES+1, 0, &pvBadIter, &err);
+        1:  740:    CHECK_ERR2(err, iBase_INVALID_ENTITY_TOPOLOGY);
+        -:  741:
+        -:  742:    //  Initializing an iterator for an invalid entity type topology
+        -:  743:    //  combination.
+        6:  744:    for ( int iType = iBase_VERTEX; iType <= iBase_ALL_TYPES; iType++ ) {
+       65:  745:      for ( int iTopo = iMesh_POINT;
+        -:  746:	    iTopo <= iMesh_ALL_TOPOLOGIES; iTopo++ ) {
+       60:  747:	if ( !a2qLegalTypeAndTopo[iType][iTopo] ) {
+       33:  748:	  if ( (iGeoDim == 2) && (iType == iBase_REGION ||
+        -:  749:				  (iTopo > iMesh_QUADRILATERAL &&
+        -:  750:				   iTopo != iMesh_ALL_TOPOLOGIES)) )
+    #####:  751:	    continue;
+        -:  752:	  iMesh_initEntIter(instance,  apvSets[0], (iType), (iTopo),
+       33:  753:			    0, &pvBadIter, &err);
+       33:  754:	  CHECK_ERR2(err, iBase_BAD_TYPE_AND_TOPO );
+        -:  755:	} // if ( !a2q.. )
+        -:  756:      } // for ( int iTopo... )
+        -:  757:    }
+        -:  758:
+        1:  759:    cout << "DONE\n";
+        -:  760:    // No point in testing save-load here; no one expects iterators to be
+        -:  761:    // valid after this anyway.
+        -:  762:  }
+        -:  763:
+        6:  764:  for ( i=0; i<5; i++ ) {
+        5:  765:    iMesh_destroyEntSet(instance,  apvSets[i], &err);
+        5:  766:    CHECK_ERR(err);
+        -:  767:  }
+        2:  768:}

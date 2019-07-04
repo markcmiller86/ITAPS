@@ -1,0 +1,13 @@
+General idea:
+
+  o Test harness should be able to read a VTK file, with arbitrary
+  connectivity, and infer faces/edges from cells.  A micro
+  implementation of the GRUMMP database could provide this:  create
+  entities from verts.  This micro implementation would have to be in a
+  namespace or something to prevent name clashes.
+
+  o Implementation to be tested must have the same data available.
+
+  o Ideally, test every function that the implmentation actually has,
+  and provide output on what functionality is available and whether it
+  works.  Alternatively, take as input the list of things to test.

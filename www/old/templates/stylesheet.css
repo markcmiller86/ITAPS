@@ -1,0 +1,285 @@
+body {
+  background:#FFF;
+  font-style: normal;
+  font-family: Arial,Helvetica,sans-serif;
+  
+}
+
+h1 {
+  text-align: left;
+  font-family: Arial,Helvetica,sans-serif;
+  color: #330099;
+}
+
+img {
+  border:  none;
+}
+
+#container {
+  background:#FFF;
+  width:100%;
+}
+
+#banner {
+  background:#FFF;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:1;
+}
+
+#content {
+  position:absolute;
+  top:150px;
+  left:200px;
+  margin-right:9em;
+  padding-right:9px;
+  padding-left:9px;
+  background:#FFF;
+  font-family: Arial,Helvetica,sans-serif;
+  z-index:0;
+}
+
+#content a {
+  display:inline;
+}
+
+#content ul {
+  type:disc;
+}
+
+#content li {
+  type:disc;
+}
+
+#menu {
+  position:fixed;
+  top:130px;
+  font-family:arial,tahoma,verdana,helvetica;
+  font-size:12px;
+  z-index:5;
+}
+	/* the menu */
+
+#menu	ul,li,a {
+		display:block;
+		margin:0;
+		padding:0;
+		border:0;
+	}
+
+#menu	ul {
+		width:150px;
+		border:1px solid #9d9da1;
+		list-style:none;
+                background-color: #666699;
+                color:white;
+
+	}
+
+#menu	li {
+		position:relative;
+		padding:1px;
+		padding-left:1px;
+		z-index:9;
+                background-color: #666699;
+                color:white;
+	}
+#menu   li.folder{  }
+#menu	li.folder ul {
+		position:absolute;
+		left:120px; /* IE */
+		top:5px;
+	}		
+/* #menu		li.folder>ul { left:110px; } /* others */ */
+
+#menu   li.folder2{  }
+
+#menu	li.folder2 ul {
+		position:absolute;
+		left:120px; /* IE */
+		top:5px;
+        }		
+
+#menu		li.folder2>ul { left:110px; } /* others */
+
+#menu	a {
+		padding:2px;
+		border:1px solid white;
+		text-decoration:none;
+                color:white;
+		font-weight:bold;
+		width:100%; /* IE */
+	}
+#menu		li>a { width:auto; } /* others */
+
+#menu	li a.submenu {
+		background:url("./sub.gif") right no-repeat;
+	}
+
+	/* regular hovers */
+
+#menu	a:hover {
+		border-color:gray;
+		background-color:#bbb7c7;
+		color:black;
+	}
+#menu	li.folder a:hover {
+		background-color:#bbb7c7;
+		color:black;
+	}
+
+#menu	li.folder2 a:hover {
+		background-color:#bbb7c7;
+		color:black;
+	}
+	
+	/* hovers with specificity */
+	
+#menu	li.folder:hover { z-index:10; }		
+#menu	li.folder2:hover { z-index:10; }		
+		
+
+#menu   ul ul, li:hover ul ul  { 
+           display:none;
+        }
+
+#menu	li:hover ul, li:hover li:hover ul { 
+	   display:block;
+	}
+
+#menu   li.folder2 ul, li:hover li:hover li:hover ul { 
+           display:none;
+        }
+
+#menu   li:hover li:hover ul, li:hover li:hover li:hover ul { 
+           display:block;
+        }
+
+
+#nav{
+  position:fixed;
+  top:100px;
+  right:auto;
+  left:9px;
+  background:#FFF;
+  width:170px;
+  height:auto;
+  text-align: left ;
+  font-family: sans-serif;
+  font-size: 100%;
+}
+
+#nav ul {
+  margin: 0 ;
+  padding: 0 ;
+  list-style: none ;
+}
+
+#nav li {
+  margin: 0 ;
+  display: block ;
+  list-style: none ;
+  color: #000 ;
+  background-color: #4682b4;
+  width: 150px ;
+  text-decoration: none ;
+  display: block ;
+}
+
+#nav li a {
+  color: #000 ;
+  background-color: #4682b4;
+  width: 150px ;
+  text-decoration: none ;
+  display: block ;
+}
+
+#nav li a:hover {
+  color: #fff ;
+  background-color: #000 ;
+}
+
+#footer {
+  margin: 10px;
+  text-align: right;
+}
+
+#navcont {
+  padding: 5px;
+  float: left;
+  position: fixed;
+  visibility: visible;
+  height: 100%;
+  width: 160px;
+}
+
+#intnav {
+  display: none;
+}
+
+#resnav {
+  display:none;
+  visibility:hidden;
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+
+#resnav li a {
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+
+#appnav {
+  display: none;
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#appnav li a {
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#pubnav {
+  display: none;
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#softnav {
+  display: none;
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#softnav li a {
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#peonav {
+  display: none;
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#peonav li a{
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+
+#contnav {
+  display: none;
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}
+#contnav li a {
+  color: #000 ;
+  background-color: #c0c0c0 ;
+  padding-left: 20px;
+}

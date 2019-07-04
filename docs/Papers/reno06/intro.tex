@@ -1,0 +1,112 @@
+\section*{List of Abbreviations}
+\begin{multicols}{3}
+\begin{lyxlist}{Topo}
+\item[AI]{Adjacency information enum}
+\item[EH]{Entity handle}
+\item[ES]{Entity set handle}
+\item[ET]{Error type enum}
+\item[iter]{Iterator over entities}
+\item[SH]{Set handle}
+\item[SO]{Storage order enum}
+\item[TH]{Tag handle}
+\item[TVT]{Tag value type enum}
+\item[Topo]{Entity topology enum}
+\item[Type]{Entity type enum}
+\item[VH]{Vertex handle}
+\end{lyxlist}
+\end{multicols}
+
+\section{Introduction\label{sec:Introduction}}
+
+Creating simulation software for problems described by partial
+differential equations is a relatively common but very time-consuming
+task. Much of the effort of developing a new simulation code goes into
+writing infrastructure for tasks such as interacting with mesh and
+geometry data, equation discretization, adaptive refinement, design
+optimization, etc. Because these infrastructure components are common to
+most or all simulations, re-usable software for these tasks would
+significantly reduce both the time and expertise required to create a
+new simulation code.
+
+Currently, libraries are the most common mechanism for software re-use
+in scientific computing, especially the highly-successful libraries for
+numerical linear algebra\cite{petsc,BaGr97,eispack,lapack,linpack}.
+The drawback to software re-use through libraries is the difficulty in
+changing from one to another. When a user wishes to add functionality or
+simply experiment with a different implementation of the same
+functionality in another library, all calls within an application must
+be changed to the other API, which likely will not package functionality
+in precisely the same way. Another significant challenge with library
+use, especially in the context of meshing and geometry libraries, is
+that data structures used within the libraries may be radically
+different, making changes from one library to another even more onerous.
+This time-consuming conversion process can be a significant diversion
+from the central scientific investigation, so many application
+researchers are reluctant to undertake it. This can lead to the use of
+sub-optimal strategies.  For example, new advances developed by the
+meshing research community often take years to become incorporated into
+application simulations.
+
+To address these issues, the Terascale Simulation Tools and Technologies
+(TSTT) center is working to develop interoperable software tools for
+meshes, domain geometry, and discretization\cite{tstt:overview}.  The
+present paper will discuss our work in developing a mesh interface.  The
+most prominent example of prior research in defining interfaces for
+meshing is the Unstructured Grid Consortium, a working group of the AIAA
+Meshing, Visualization, and Computing Environments Technical
+Committee\cite{UGC-web}.  The first release of the UGC
+interface\cite{UGC-v1} was aimed at high level mesh operations,
+including mesh generation and quality assessment.  Recognizing a need
+for lower-level functionality, the UGC has developed a low-level query
+and modification interface for mesh databases, as well as an interface
+for defining generic high-level services\cite{UGC-v2:paper}.
+
+The TSTT mesh interface has a broader scope than the UGC interface.  In
+addition to supporting low-level mesh manipulation, the TSTT interface
+is also designed to support the requirements of solver applications,
+including the ability to define mesh subsets and to attach arbitrary
+user data to mesh entities.  In addition, The TSTT interface is intended
+to be both language and data structure independent.  In summary, our
+initial target is to support low-level interaction between applications
+programs --- both meshing and solution applications --- and external
+mesh databases regardless of the data structures and programming
+language used by each.  In the long term, we expect to also support
+high-level operations, including mesh generation, typically as services
+built using the TSTT interface.
+
+The fundamental challenge in developing this interface has been the
+tension between generality and compactness: our goal has been to define
+a set of operations addressing all common uses of mesh data while
+minimizing redundancy and avoiding idioms peculiar to a particular
+underlying mesh representation.
+
+We began by defining a general abstract data model, focusing on the ways
+in which mesh data is used in simulations rather than on how mesh data
+is stored by meshing tools.  The data model, described in detail in
+Section~\ref{sec:Data-Model}, includes fundamental mesh entities ---
+vertices, faces, elements, etc --- and the topological relationships
+between them, as well as the concepts of general mesh subsets and
+arbitrary data associated with mesh entities.
+
+The mesh interface is built on this data model.  The interface
+(Section~\ref{sec:Interface}) supports global and local mesh query, mesh
+modification, and collections and tagging of mesh entities.  
+% This needs to be said somewhere, but where exactly?  Is this the right
+% place? 
+The TSTT mesh interface is built on a client-server model, with the
+explicit assumption that the client (application) and server (mesh
+database) may be written in different programming languages.  To address
+cross-language issues, especially with arrays and strings, the TSTT
+interface is defined using the Scientific Interface Description Language
+(SIDL)\cite{babel:site05,babel:usersguide05}.  This language neutral
+description is then processed by an existing interpreter, Babel, to
+produce a language-specific client API and server skeleton, as well as
+glue code that mediates language translation issues.
+
+Performance data from early usage of the interface suggests there is a
+preferred coding style for using the TSTT mesh interface (see
+Section~\ref{sec:Programming}).  The interface is already in use in
+various meshing tools and simulation applications and on-going
+development continues to improve the usability and accessibility of
+TSTT-compliant software (see Section ~\ref{sec:Conclusions}).
+

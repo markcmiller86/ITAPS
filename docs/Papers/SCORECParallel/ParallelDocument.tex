@@ -1,0 +1,112 @@
+\documentclass[10pt]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+
+%opening
+\title{Parallel Interface Design for Petascale Parallel Adaptive Simulations}
+
+\author{Ting Xie, Onkar Sahni, Xiaojuan Luo, Min Zhou,   \\ 
+        Andrew C. Bauer, Kenneth E. Jansen, Mark Shephard}
+
+\date{\today}
+
+\begin{document}
+\maketitle 
+
+\section{Abstract}
+
+Our main goal is to provide the parallel cababilities of the adaptive
+control of meshes of billions of elements on petascale
+computers.
+
+This paper focuses on entity group and multiple parts per
+process, and presents the whole parallel interface design in
+SCOREC software framework (FMDB and MeshAdapt), including management of distributed mesh
+and field data structures, parallel data
+input/output, interface to data partitioning and
+load balancing, transfer of data and fields between 
+distributed meshes, and predictive load balancing for parallel
+adaptive computations. 
+All these interfaces are based on distributed memory (MIMD) computing
+and message passing (MPI) communication.  
+
+
+\section{Introduction}     \input{intro.tex}
+
+
+\section{Partitions}         \input{partitions.tex}
+
+
+\section{List of Symbols}  \input{symbols.tex}
+
+
+\section{Mesh Entity Group} \footnote{Only one operation is added in
+  this updated document: getBdryEntity.}         
+
+
+\input{entitygroup.tex}
+ 
+
+\section{Partition Model}   \input{pmodel.tex}
+
+
+
+\section{Using Zoltan to Perform Partition}    \input{zoltan.tex}
+
+   
+
+
+\section{Dynamic Load Balance and Data Migration}  %\input{lb_migrate.tex}
+
+Static load balance and dynamic load balance, 
+Data migration algorithm on multiple parts per process, considering
+entity group. 
+Attached data migration. 
+
+\section{Parallel File I/O}       %\input{io.tex}
+
+The number of partitioned data files is different from the number of
+processes. Multiple partitioned files can be loaded on one process. 
+
+\section{Predictive Load Balance} \input{lb.tex} 
+
+% memory discussion. 
+
+
+\section{Conclusion}
+
+
+\begin{thebibliography}{9}
+\bibitem{LLNL} Steven F.Ashby. \textit{Scalable Algorithms and Novel
+  Paradigms for Petascale Simulation}. Feb, 2006.
+\bibitem{TACC} H. Carter Edwards. \textit{TACC Seminar:
+SIERRA Framework Supporting Parallel Adaptive Multiphysics
+Applications}. May, 2004. 
+\bibitem{devine} Karen Devine. \textit{Partitioning and Dynamic Load
+  Balancing for Petascale Applications}. SciDAC, 2007.
+\bibitem{ITAPS} ITAPS. \textit{ITAPS Parallel Interface: Requirements
+  Document}. Jun 12, 2007. 
+\bibitem{Seol} Seegyoung Seol. \textit{FMDB:Flexible Distributed Mesh
+  Database for Parallel Automated Adaptive Analysis}. PhD dissertation
+  in RPI, 2005.
+\bibitem{Zoltan} \textit{Zoltan: Parallel Partitioning, Load Balancing and Data-Management
+Services}. http://www.cs.sandia.gov/Zoltan/.
+\bibitem{R} Loy R. \textit{Autopack User Mannual}. Science Division
+  Argonne National Laboratory, 2000. 
+\bibitem{Pain} C.C.Pain, A.P.Umpleby, C.R.E.de Oliveira and
+  etc. \textit{Tetrahedron mesh optimization and adaptivity for steady-state and transient finite
+element calculations}. Computer methods in applied mechanics and
+engineering. 2001.
+\bibitem{Li} X.Li, \textit{Mesh Modification procedures for general 3-D non-manifold domains}. PhD thesis, Rensselaer Polytechnic Institute, August 2003.
+\bibitem{Flaherty} J.E.Flaherty, R.M.Loy, P.C.Scully, M.S.Shephard and
+  etc. \textit{Load Balancing and communication Optimization for
+  Parallel Adaptive Finite Element Methods}, SCCC'97.
+
+\end{thebibliography}
+
+
+
+
+\end{document}
+
+

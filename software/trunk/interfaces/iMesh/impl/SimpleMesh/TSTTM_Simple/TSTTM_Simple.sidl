@@ -1,0 +1,8 @@
+package SimpleMesh version 0.7 {
+  class Mesh
+    implements-all TSTTM.Mesh, TSTTM.Entity, TSTTM.Arr, TSTTM.Modify, 
+                   TSTTM.ArrMod, TSTTB.EntSet, TSTTB.SetRelation, 
+		   TSTTB.Tag, TSTTB.EntTag, TSTTB.ArrTag, TSTTB.SetTag,
+		   TSTTB.SetBoolOps
+        {}
+}

@@ -1,0 +1,55 @@
+  - Overview and introduction (20 min)
+       - High level overview and philosophy
+       - Where we're going as part of the philosophy
+
+   - What ITAPS has done and will do going forward
+      for applications
+       - Identify application area 
+       - Simulation technologies
+       - People involved 
+       - Application's goal for getting ITAPS involved
+       - Descrption of ITAPS technologies used
+       - Results obtained and benefits afforded the application
+       - Examples
+         - Accelerator (Tim, Mark)
+           - design optimization, adaptivity, curving tool
+         - Fusion (Mark)
+           - adaptive loop and pellet injection
+         - GNEP (Ahmed)
+           - mesh geom
+         - Diesel Jet (Xiaolin)
+
+   - Overview of services w/ POC information (30 min)
+           (5-6 min each, what it is, who's using it)
+        - Mesh Quality Improvement (Mesquite, swapping)
+        - Fronttracking
+        - Mesh Adapt (global)
+        - Mesh Geometry Relations (short)
+        - Zoltan (limited functionality done, rest in progress)
+
+     - Break
+
+     - ITAPS data models and interfaces (75 min)
+          - Data model and what's supported
+              - Mesh/Geom Query/Modification
+              - Relations
+              - MeshGeom
+              - Parallel
+     - Teach through simple examples
+             - hello itaps
+             - mesh information/adjacency
+             - tags
+             - sets
+      - Best practices / performance
+      - Language interoperability through SIDL
+
+  - How to build your own ITAPS compliant implementation
+
+  - Getting the ITAPS software (15 min)
+
+  - Future Plans (5 min)
+
+  - Questions (10 min)
+
+
+

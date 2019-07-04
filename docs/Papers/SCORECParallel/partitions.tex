@@ -1,0 +1,174 @@
+\subsection{Definitions and Properties}   
+
+
+\textbf{Definition: Process and Process Rank} \footnote{Process or
+  processor? ITAPS\cite{ITAPS} uses term 'processor' instead of 'process'. If
+  we assume one process per processor(one core), we can use term
+  'processor'.} 
+
+In computing, a process is an instance of a computer program that is
+being executed. A program is a collection of instructions, and a
+process is the actual execution of those instructions. Multiple
+processes may be associated with the same program, but execute
+independently. A process has its own variables, stack, and local
+memory allocation. At any time, multiple processes may exist on one
+physical processor, but cannot be split across multiple processors. 
+
+For an application program run with m processes, the processes are
+numbered 0 through m-1. And the assigning number is the rank. The
+process with process rank i in the execution is denoted
+$P_{r\_i}$.\footnote{To be different from part denotation of $P_i$.}   
+
+
+\textbf{Definition: Entity}
+
+Entity is the basic unit in the problem domain that the application
+program works
+with. It has a dimension, and entity of higher dimension can be
+bounded by other entities of lower dimension.  
+For example, consider a finite element
+mesh, an entity is a mesh entity (vertex, edge, face,
+or region). A mesh region of tetrahedron
+type can be bounded by 4 mesh faces, 6 mesh edges, and 4 mesh
+vertices. 
+
+\textbf{Definition: Part Entity}
+
+Part entity is an entity that does not bound any other entities of
+higher dimension. The definition of part mesh entity is presented in
+section5. 
+
+\textbf{Definition: Entity Group}
+
+Entity group is a group of part entities that are required to stay
+together during the process of data partition and migration. The
+definitions and operations of mesh entity group are defined in
+Section5. 
+
+
+\textbf{Definition: Part Object} 
+
+A part object is the basic unit of data to which a destination part
+can be assigned during the the process of data partition and
+migration. It can be a part entity or an entity group. 
+ For example, consider a finite element
+ mesh, a part object can be a part mesh entity, or a mesh entity
+ group. 
+
+
+\textbf{Definition: Partition}
+
+A partition is a distribution of data into sub-sets called parts
+according to some distribution rule, such that one part object is
+assigned to a single part. Within a partition, part objects are
+assigned to
+different parts, and parts are assigned to different processes. The
+number of parts is independent from the number of processes. All these
+assignments can be changed dynamically. For example, in finite element
+space, a mesh partition can be a distribution of a mesh into
+sub-meshes.  
+
+
+\textbf{Definition: Part} 
+
+A part is a collection of subset data. A part is assigned to one and
+only one process at any time, i.e, a part can not span across
+processes \cite{ITAPS}. A process can contain multiple parts. For example,
+consider a finite element mesh, a part is a collection of mesh
+entities.  
+
+\textbf{Definition: Part Id}  
+
+For each part, a globally unique part id (short for global part
+identifier) can be given over a set of processes within a 
+partition. The part with part id i can be denoted $P_i$. \footnote{To
+  be 
+  consistent with the situation of one part per process, in which the
+  value of part id equals to that of the process rank for each part,
+  part id will be implemented as a globally unique integer within the
+  partition.}  
+
+The application program can access a part though its part id. The
+process rank of a process that a part resides can be decided through
+the part id. Except the situation of one part per process, the value
+of part id is always different from the value of process rank for each
+part.  
+
+\textbf{Definition: Part Boundary} 
+
+ A part boundary is a set of data shared by multiple parts, which
+ reside in one process or multiple processes. The data on a part
+ boundary is in the closure of the part, not belonging to the interior
+ of the part. A part can have multiple part boundaries shared by
+ different parts. It is also called inter-part boundary. 
+
+
+\textbf{Definition: Part Boundary Entity}\footnote{Once a part
+  boundary
+  entity is defined, the information of partition classification and
+  residence parts is stored only for a small part of mesh entities.}
+
+Part boundary entity is short for an entity that resides in a part
+boundary. Maintaining the information of part boundary entity is very
+important to perforam parallel partition and migration within the
+partition. For example, in a finite element mesh, the $i^{th}$ part
+boundary mesh entity of dimension d is denoted as $M^d_{B\_i}$.
+
+
+\textbf{Definition: Residence Part} 
+
+For a part object, the residence part is the part where it
+resides. For a part boundary entity, the residence part(s) is the
+union of residence part(s) where the part object(s) that the part
+boundary entity bounds resides. 
+
+
+\subsection{Functional Requirement Definitions for Partitions}
+
+For a part boundary entity, it must be aware where it is
+duplicated. 
+
+\textbf{Definition: Remote Copy} 
+
+Given a part boundary entity $V^d_{B\_i}$ on one part $P_i$, the
+memory location of
+the part boundary entity duplicated on parts other than part $P_i$. 
+
+The data of a part boundary entity duplicated on
+different parts must be consistent at any time. Once a part boundary
+entity is
+modified on one part, its remote copies must be modified
+accordingly.
+
+% remote copy = entity pointer+ part id   
+
+For a part boundary entity, it is beneficial to assign a specific copy
+as the owner of the others and let the owner be in charge of
+communication or computation between the copies \cite{Seol}. 
+
+\textbf{Definition: Owner Part}
+
+For a part boundary entity, one of the parts sharing the part boundary
+entity
+will be assigned as its owner part according to some rule dynamically,
+such as poor-to-rich ownership, which assigns the poorest part to be
+the owner part, where the poorest part is the part that has the least
+number of part objects among residence parts of the entity
+\cite{Seol}.\footnote{The poor-to-rich assignment may have some problem, since
+the poorest part may be not on the the poorest process that has the
+least work load.}
+
+\textbf{Definition: Residence Part Operator $\mathcal{P}$} 
+
+An operator that returns a set of part id(s) where part object or part
+boundary entity exists. 
+
+For a part object $PO_i$ \footnote{Please refer symbol list in Section4.}, $\mathcal{P}[PO_i]={p}$ where p is the
+id of a part where $PO_i$ exists. The part object $PO_i$ can be a part
+entity $V^d_{P\_j}$, or an entity group $V^d_{G\_j}$.
+
+For a part boundary entity $V^d_{B\_i}$, 
+
+\begin{equation}
+\mathcal{P}[V^{d_i}_{B\_i}]=\{\mathcal{P}[V^{d_j}_{P\_j}|V^d_{B\_i}\in\{\theta(V^{d_j}_{P\_j})]\}\cup\{\mathcal{P}[V^{d_j}_{G\_j}|V^d_{B\_i}\in\{\theta(V^{d_j}_{G\_j})]\}.  
+\end{equation}

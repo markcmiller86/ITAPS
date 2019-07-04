@@ -1,0 +1,247 @@
+#!/bin/sh
+
+##
+## Useful tool to help find spelling errors in english language comments
+## in various ITAPS Interface header files.
+## 
+## Usage:
+##     spellck iBase.h
+##     spellck iMesh.h
+##
+## It will print out a list of unrecognized words. Its not perfect. So,
+## this script also has an explicit list of acceptable words which you
+## are welcome to add to as needed.
+##
+
+if [[ -z "$1" ]]; then
+    echo "Must specify one of the ITAPS interface header files as \$1"
+    exit
+fi
+h=$(basename $1)
+if [[ "$h" != iBase.h && "$h" != iMesh.h && "$h" != iMeshP.h &&
+      "$h" != iGeom.h && "$h" != iRel.h && "$h" != iField.h &&
+      "$h" != iField_dfk.h ]]; then
+    echo "Must specify one of the ITAPS interface header files as \$1"
+    exit 1
+fi
+
+# decide upon a temporary directory for the ignore_words file
+tmpDir=$TMPDIR
+if test -z "$tmpDir"; then
+    if test -d /usr/tmp; then
+       tmpDir=/usr/tmp
+    elif test -d /tmp; then
+       tmpDir=/tmp
+    else
+       tmpDir=.
+    fi
+fi
+
+# build an initial list of words to ignore
+rm -f $tmpDir/ignore_words
+cat $1 | tr ' ' '\n' | grep 'iBase_\|IBASE_\|iMesh_\|IMESH_\|iMeshP_\|IMESHP_\|iRel_\|IREL_\|iGeom_\|IGEOM_\|iField_\|IFIELD_' | cut -d'(' -f1 | tr -d '*,;"][' | tr '_' '\n' | tr '[:upper:]' '[:lower:]' | sort | uniq | grep . > $tmpDir/ignore_words
+
+# Add some specific words we know are ok
+# Some of these are doxygen things
+cat >> $tmpDir/ignore_words <<- EOF
+aaa
+abc
+adjacencycost
+alg
+alloc
+api
+arehandlesinvariant
+arg
+argorder
+bbb
+bool
+bootcamp
+bunits
+candela
+cartesian
+ccc
+cgs
+cmm
+const
+coord
+coords
+cplusplus
+cpp
+createdomain
+createent
+creationstatus
+cvtr
+datatype
+datatypes
+defgroup
+deriveable
+descr
+dest
+dfk
+dfunc
+dir
+discretizations
+discretize
+dlopen
+dof
+dofs
+doreset
+drvt
+dtype
+dvrt
+dvtr
+endcode
+endif
+ent
+entarr
+entiter
+entityset
+entitytype
+entset
+enum
+erroractions
+errorhandling
+errortype
+evaldfunc
+evalgrad
+evalhessian
+extern
+feti
+fmdb
+fortran
+func
+galerkin
+getallvtxcoord
+getarr
+getcontinuous
+getdegree
+getdof
+getdofassoc
+getdofs
+getent
+getentarr
+getname
+getnext
+getnumx
+getparamcoords
+gettag
+getvtx
+getx
+gpu
+grummp
+hdf
+hessian
+hessians
+hexahedra
+hexahedral
+html
+ie
+ierr
+ies
+iface
+ifacetype
+ifdef
+iff
+ifndef
+igeom
+illuminance
+imesh
+imeshp
+impl
+indices
+ingroup
+inout
+insensitive
+invald
+ipcomman
+irel
+itaps
+ith
+jacobians
+jpeg
+kdd
+kernal
+kludgy
+lagrange
+len
+logbase
+logcoef
+logn
+mainpage
+moab
+mpi
+multi
+multiplexor
+namespaces
+nbor
+nbors
+ndadj
+nddrvt
+ness
+nist
+nrml
+null
+num
+ok
+onkar's
+param
+pre
+primetime
+protos
+prt
+pset
+psets
+ptn
+quant
+ref
+relationtype
+setvtxcoords
+silant
+ssl
+stdrvt
+stl
+strlen
+struct
+subpage
+subsubsection
+svn
+taghandle
+tagvaluetype
+tensorfield
+tensorfields
+tgnt
+topo
+towards
+tradeoffs
+tuple
+tuples
+twophaseio
+typedef
+typedef'ed
+typedef's
+undef
+uu
+uv
+value'd
+vec
+vert
+vertices
+verts
+vfd
+visit
+vv
+wwwwww
+xiaolin
+xml
+xy
+xyz
+yyy
+yzx
+zyx
+zzz
+EOF
+#spell $1 | grep -i -v -f $tmpDir/ignore_words
+aspell --lang=en --dont-validate-words --dont-validate-affixes create master $tmpDir/ignore_words_aspell < $tmpDir/ignore_words
+cat $1 | aspell --ignore-case=true --master=$tmpDir/ignore_words_aspell list
+exit
+rm -f $tmpDir/ignore_words $tmpDir/ignore_words_aspell

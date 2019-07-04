@@ -1,0 +1,2006 @@
+%&LaTeX
+\documentclass{article}
+\usepackage{graphicx}
+
+\oddsidemargin 0.5in    %   Note that \oddsidemargin = \evensidemargin
+\evensidemargin 0.5in
+\marginparwidth 40pt      
+\marginparsep 20pt      % Horizontal space between outer margin and
+                % marginal note
+\textwidth 5.5in        % width of text
+
+% VERTICAL SPACING:
+             % Top of page:
+%\topmargin .5in     %    distance from top of page to running head
+\headheight 14pt     %    Height of box containing running head.
+\headsep .4in        %    Space between running head and text.
+\textheight 8.8in    %    space for text
+\footskip 30pt       %    Distance from baseline of box containing foot
+             %    to baseline of last line of text.
+                                                  
+\begin{document}
+
+\hspace{-1in}
+\includegraphics[height=8.5in, width=7.3in]{figures/iGeom.eps}
+
+\newpage
+\tableofcontents
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+A key component of the problem definition for mathematical 
+physics problems governed by PDE's is a definition of the physical 
+domain, to be referred to herein as the geometric model. The 
+overall role of the geometric model as an information structure 
+component within mesh-based simulation processes is discussed 
+in reference \cite{r22}. It is important that the ITAPS interoperability 
+tools are able to work with general high level definitions of 
+the domain that can effectively support operations such as automatic 
+mesh generation, tracking changes to the domain determined via 
+the simulation, adapting the mesh as the simulation proceeds 
+to properly control the discretization errors, relating information 
+between alternative spatial discretizations (meshes) for multiphysics 
+analyses, etc. \\
+
+The ITAPS geometry interface must account for the fact that 
+the software modules that provide geometry information are typically 
+independent of the simulation modules that employ the supplied 
+geometry information to make, and/or solve a PDE over, a mesh. 
+Thus, the goal of the ITAPS geometry interface is to provide a 
+generic functional interface to support the communication of 
+geometry information to mesh-based applications. \\
+
+To gain an appreciation for the ITAPS geometry interface functions 
+needed to support mesh-based simulations.  Section 2 overviews 
+the functions needed by some of the applications currently under 
+consideration. The approach being taken to the development of 
+the ITAPS geometry interface is given in  Section 3 which 
+indicates that the functions will be placed into groups that 
+effectively account for the different sets of functionalities 
+needed.  Section 4 then provides the groups of ITAPS geometry 
+interface functions. Appendix I provides a brief introduction 
+to the commonly available sources of geometry information.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Geometry Functions to Support Typical Applications}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+This section briefly overviews typical geometry interface 
+functions needed for tasks being supported by the ITAPS interoperable 
+libraries.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mesh Optimization Processes}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Given a mesh and information on the classification of the 
+mesh against the geometric model entities \cite{r2, r22}, the MESQUITE 
+mesh quality improvement toolkit \cite{r7, r15} repositions mesh vertices 
+and performs local mesh modification operations. When the mesh 
+entities involved with one of these operations are classified 
+on the boundary of the model MESQUITE needs to be sure the operations 
+performed maintain the proper geometric representation of the 
+domain by the mesh. The geometry interface operations used to 
+support these processes are pointwise surface normal and pointwise 
+closest point.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{An Adaptive Mesh Control loop }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+One example is the ITAPS adaptive control loop supporting 
+h-refinement adaptive analysis for SLAC. The model domains are 
+defined as ACIS solid models and the analysis engine is SLAC's 
+OMEGA-3P. The ITAPS and other simulation automation tools used 
+in the construction of the adaptive loop include:
+
+\begin{itemize}
+\item MeshSim automatic mesh \cite{r24}
+\item FMDB mesh database \cite{r1, r20}
+\item MeshAdapt routines \cite{r13}
+\item Trellis Field Library  \cite{r4}
+\end{itemize}
+
+Both MeshSim and FMDB invoke the ACIS API to support interactions 
+with the geometric model. In both cases these procedures interact 
+through an API to load a ``unified'' non-manifold model topology 
+(the details of the unified topology are likely different in 
+the two). Both have shell and loop structures (FMDB for sure, 
+Simmetrix I would think they would but do not know for sure) 
+as needed to ensure all operations. In the cases where the interactions 
+with the geometric model are based on geometric model entities 
+the mesh entities are classified upon, there should be no need 
+to expose the shells and loops. However, I know in FMDB the loops 
+and shells are used in determination of specific adjacencies.\footnote{In 
+the case when model topologies for mesh models need to be updated 
+based on simulation results, the loop and shell structures may 
+need to be more directly interact with. In the case of the metal 
+forming adaptive loop, we have to update both the loop and shell 
+structures based on evolution of the contact. The fact that 
+those topological entities are used within FMDB need not be explicitly 
+exposed to other applications.}\\
+
+
+MeshAdapt interacts with the geometric model based on things 
+driven at the mesh entity level. Therefore, the classification 
+of the mesh against the geometric model is critical. MeshAdapt 
+is focused on mesh modification operations. It interacts with 
+the geometric model to place new mesh vertices classified on 
+model boundaries on the model boundaries. The key operation used 
+for this process is to request the xyz location of a point on 
+a model face or edge given its parametric value. Reparameterization 
+of a vertex with respect to the model edges using that vertex 
+is needed so starting and end parameter values are obtained. 
+Parameter ranges and determination of periodicity for faces and 
+edges is needed. The sense of the normal to a face with respect 
+to regions is needed. \\
+
+
+The field library in Trellis is used to support local solution 
+transfer after mesh modifications. At this time it interacts 
+only with the mesh. There are potential situations where more 
+advanced transfer functions will need to interact with the geometric 
+model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Structure of ITAPS Geometry Interface Functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+As indicated in Appendix I, there are multiple forms of geometric 
+model representations with those based on boundary representations 
+being the most common and the form being supported by the ITAPS 
+geometry interface. An examination of the geometry needs of mesh-based 
+simulation applications indicates a large fraction of their needs 
+can be satisfied through interface functions keyed by the primary 
+topological entities of regions, faces, edges and vertices. A 
+few situations, particularly those dealing with evolving geometry, 
+will have needs for the additional topological constructs of 
+loops and shells. It is therefore, useful to have the geometry 
+interface functions placed in groups at different levels of interface. 
+It is also useful to group the interface functions based on if 
+they deal with topological entities and their adjacencies only, 
+provide information associated the geometric shape associated 
+with the topological entities, provide control information, etc.\\
+
+It is expected that three types of geometric model API's 
+will be supported including:
+
+\begin{itemize}
+\item Commercial modeler API's (e.g., Parasolid, ACIS, 
+Granite).
+\item Geometric modelers that operate off of a utility 
+that reads and operates on models that have been written to standard 
+files like IGES and STEP (e.g., Overture's geometry interface, 
+and ACIS model read into Parasolid via a STEP file). 
+\item Geometric models constructed for an input mesh.
+\end{itemize}
+
+The first two API types have no difficulty up-loading the 
+model topology and linking to the shape information since in 
+the first case the modeler already has it and in the second case 
+the model structure is defined within the standard file. In the 
+last case the input is a mesh and algorithms must be applied 
+to define the geometric model topological entities in terms of 
+the sets of appropriate mesh entities. Such algorithms are not 
+unique and depend on both the level of information available 
+with the mesh and knowledge of the analysis process. The ITAPS 
+mesh functions can be used to load a mesh from which the set 
+of mesh entities classified on each geometric model topological 
+entities can be constructed using algorithms like that in reference 
+\cite{r10, r19, r28}. The shape of the geometric model topological model 
+entities can be defined directly by the mesh geometry of the 
+entities classified on it, or that information can be enhanced 
+\cite{r5, r28}.\\
+
+It should be possible to employ the most effective means 
+possible to determine any geometric parameters that have to be 
+calculated. The primary complexity that arises in meeting this 
+is that not all geometric model forms support the same methods 
+and using the least common denominator can introduce huge computation 
+penalty over alternatives that are supported in most cases. The 
+primary example of this is the use of parametric coordinates 
+for model faces and edges. The vast majority of the CAD systems 
+employ parametric coordinates and algorithms such as snapping 
+a vertex to a model face using parametric values can be make 
+two orders of magnitude faster that using the alternative of 
+closest point to a point in space. Therefore, it is critical 
+that the geometry interface functions support the use of parametric 
+values while having the ability to deal with those cases when 
+they are not available. This can be done by having different 
+sets of functions for when one does and does not have parametrization.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ITAPS Geometry Interface Functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The ITAPS geometric interface functions are grouped by the 
+level of geometric model information needed to support them and 
+the type of information they provide. The set of groups defined 
+as the base level includes:
+
+\begin{itemize}
+
+\item Model loading which must load the model and initiate 
+any supporting processes. (e.g., CAD kernel like ACIS or Parasolid).
+\item Topological queries based on the primary topological 
+entities and their adjacencies.
+\item Pointwise interrogations which request geometric 
+shape information with respect to a point in a single global 
+coordinate system. 
+\item Entity level tags for associating information 
+with entities. 
+\end{itemize}
+
+Other groups of functions increase the functionality and/or 
+the efficiency of the interface. Some of these are quite commonly 
+used while others are not. They include:
+
+\begin{itemize}
+\item Basic geometric sense information that indicates 
+how face normals and edge tangents are oriented. 
+\item Support of parametric coordinates systems for 
+edges and faces. 
+\item Support of geometric model tolerance information
+\item Support of more complete topological models
+\item Model topology modification functions
+\item Entity geometric shape information
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Load/Save Function}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Functions to load and save a geometric model (\textit{name}). 
+The actual operations required are a strong function of the type 
+of modeling source. If the modeling source is a CAD modeler with 
+an appropriate API, the load or save operation will initiate 
+the modeler API requesting it to load or save the model in native 
+form. It may further interact with the CAD modeler to construct 
+the appropriate ``mappings'' between topological entities in the 
+modeler to support the ITAPS functions. If the model is stored 
+in an IGES or STEP file, the file name identifies the geometric 
+model. An appropriate reader is activated to load that model 
+information and link it to appropriate modeling tools capable 
+of supporting the ITAPS functions. For example, models stored 
+in IGES files can be loaded and queried through functions using 
+the Rapsodi geometry preparation and grid generation module of 
+Overture. In the cases where the geometric model is constructed 
+from the mesh the ITAPS mesh interface can be used to load the 
+mesh which is then operated on to define the geometric model 
+which the ITAPS geometry interface functions interact with.\\
+
+
+\hspace{-16pt}The load and save functions are:
+
+\begin{verbatim}
+    void load( in string name, in array<string> information,
+               in int information_size) throws iBase.Error;
+
+    void save( in string name, in array<string> information,
+               in int information_size) throws iBase.Error;
+\end{verbatim}		   
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Primary Entity Topological Functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In all cases it is assumed that the primary geometric model 
+topological entities of region, face, edge and vertex have been 
+created and the adjacencies between them can be provided. The 
+functions given assume that during the execution of the process 
+each model topological entity has a unique ``handle''. Whenever 
+information relating to that entity is requested of the ITAPS 
+geometry interface, it will be keyed by the entity handle.\\
+
+\hspace{-16pt}Given a topological entity handle, the following are the 
+functions that are supported:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Return the dimension of the topological entity:}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+There is one operator for single entity requests and one 
+for a list of them. \\
+
+\hspace{-16pt}For a single topological entity:
+
+\begin{verbatim}
+    int getTopoDim( in opaque entity_handle) throws iBase.Error;
+\end{verbatim}	
+The dimensions are: 0 for a vertex, 1 for an edge, 2 for 
+a face and 3 for a region.\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void getArrTopoDim( in array<opaque> entity_handles, 
+                        in int entity_handles_size, 
+                        inout array<int> dim, out int dim_size
+                      ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Return the entities of a given dimension that 
+are adjacent to the given entity}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Note that this function is strictly for ``first order'' adjacencies 
+where ``first order'' means only entities that bound or are bounded 
+by the given entity. See $\S$4.2.3 for consideration of ``second-order'' adjacencies. 
+For a single entity:
+
+\begin{verbatim}
+    void getEntAdj( in opaque entity_handle, 
+                    in iBase.EntityType requested_entity_type, 
+                    inout array<opaque> adj_entity_handles, 
+                    out int adj_entity_handles_size) throws iBase.Error;
+\end{verbatim}
+The returned array contains the entity handles of the adjacent 
+entities. The number of adjacent entities is returned in {\tt adj\_entity\_handles\_size}. In the case when the 
+order of the given entity is greater than the order of the adjacent 
+entities requested, the returned entities are those of the requested 
+order that bound the given entity. In the case when the order 
+of the given entity is less than the order of the adjacent entities 
+requested, the returned entities are those of the requested order 
+that the given entity is bounding. A request for the entities 
+of the same order produces an error. \\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void getArrAdj( in array<opaque> entity_handles, 
+                    in int entity_handles_size,
+                    in iBase.EntityType requested_entity_type, 
+                    inout array<opaque> adj_entity_handles, 
+                    out int adj_entity_handles_size, 
+                    inout array<int> offset, out int offset_size
+                  ) throws iBase.Error;
+\end{verbatim}
+
+\hspace{-16pt}See the ITAPS mesh interface  \cite{r26} for an explanation of how 
+information in for the entity set functions operate.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Return second order adjacencies }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+There are times when applications would want to know not 
+just what bounds an entity or the what an entity bounds, but 
+the next level of neighbors. Although such information can always 
+be determined from the appropriate first order adjacencies, their 
+application is common enough that supporting a second order adjacency 
+function is useful.\\
+
+\hspace{-16pt}For a single entity:
+\begin{verbatim}
+    void getEnt2ndAdj( in opaque entity_handle, 
+                       in iBase.EntityType order_adjacent_key,
+                       in iBase.EntityType requested_entity_type, 
+                       inout array<opaque> adj_entity_handles, 
+                       out int adj_entity_handles_size) throws iBase.Error;
+\end{verbatim}
+
+The function of a second order adjacency request is to determine 
+the set of topological entities of a given order (\textit{requested\_entity\_type}) 
+adjacent to entities that that share common boundary entities 
+of the specified order (\textit{order\_adjacent\_key}). An example 
+would be to determine the set of model regions (\textit{requested\_entity\_type=REGION})
+that share a bounding edge (\textit{order\_adjacent\_key=EDGE}) with 
+the given region ({\tt entity\_handle}). The integer {\tt adj\_entity\_handles\_size} indicates 
+the number of adjacent entities returned. \\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void getArr2ndAdj( in array<opaque> entity_handles, 
+                       in int entity_handles_size, 
+                       in iBase.EntityType order_adjacent_key, 
+                       in iBase.EntityType requested_entity_type, 
+                       inout array<opaque> adj_entity_handles, 
+                       out int adj_entity_handles_size, 
+                       inout array<int> offset, out int offset_size
+                     ) throws iBase.Error;
+\end{verbatim}
+The offset array ({\tt offset}) gives the starting index in the
+{\tt adj\_entity\_handles} array for the entities adjacent to $i^{th}$
+entity in {\tt entity\_handles}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Determine if an entity is adjacent to another}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For a single entity:
+
+\begin{verbatim}
+    int isEntAdj( in opaque entity_handle_1, in opaque entity_handle_2
+                ) throws iBase.Error;
+\end{verbatim}
+Returns 1 if {\tt entity\_handle\_2} is adjacent to {\tt entity\_handle\_1}. 
+Returns 0 if it is not. In the case when the dimension of {\tt entity\_handle\_1} is 
+higher than that of {\tt entity\_handle\_2} , it indicates {\tt entity\_handle\_2} is 
+on the closure of {\tt entity\_handle\_1}. In the case when 
+the dimension of {\tt entity\_handle\_1} is lower than that of {\tt entity\_handle\_2}, it 
+indicates {\tt entity\_handle\_1} is on the closure of {\tt entity\_handle\_2}. 
+Note that an error will be thrown if the dimension of both entities 
+is the same.\\
+
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void isArrAdj ( in array<opaque> entity_handles_1, 
+                    in int entity_handles_1_size, 
+                    in array<opaque> entity_handles_2, 
+                    in int entity_handles_2_size, 
+                    inout array <int> is_adjacent_info, 
+                    out int is_adjacent_info_size
+                  ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Get number of entities of each dimension in the geometric model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+These functions are used to determine the numbers of basic 
+entities in the model:
+
+\begin{verbatim}
+    int getNumOfType( in opaque entity_set_handle, 
+                      in iBase.EntityType entity_type) throws iBase.Error;
+\end{verbatim}
+Returns the number of geometric model vertices, edges, faces 
+and regions for values of {\tt entity\_type} of \textit{VERTEX, EDGE, 
+FACE, REGION} respectively with the given geometric model 
+or model set.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Geometric model entity iterators }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+These functions support iteration of the geometric model 
+entities.\\
+
+\hspace{-16pt}\textbf{4.2.6.1 Initiate an iterator}\\
+
+This function initiates an iterator for the model entities 
+of a given dimension. For single entities:
+
+\begin{verbatim}
+    void initEntIter( in opaque entity_dim, 
+                      out opaque entity_iterator) throws iBase.Error;
+\end{verbatim}
+where {\tt entity\_dim} indicates the dimension of the entity 
+type (0-vertex, 1-edge, 2-face, 3-region) and {\tt entity\_iterator} is 
+the iterator pointing at the first geometric entity of that dimension. \\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    bool initEntArrIter( in opaque entity_set_handle, 
+                         in iBase.EntityType requested_entity_type, 
+                         in int requested_array_size, 
+                         out opaque entArr_iterator
+                       ) throws iBase.Error;
+\end{verbatim}
+
+\hspace{-16pt}\textbf{4.2.6.2 Get the next entity}\\
+
+\hspace{-16pt}For single entities:\\
+
+\begin{verbatim}
+    void getNextEntIter( in opaque entity_iterator,
+                         out opaque entity_handle,
+                         out int has_data) throws iBase.Error;
+\end{verbatim}
+where {\tt entity\_iterator} is the iterator for the entity 
+type of interest, {\tt entity\_handle} is 
+the passed-back handle for the current entity if there is another
+entity before the end, and {\tt has\_data} is non-zero if a valid
+handle is passed back or zero if the iteratation has reached the
+end. The iterator is advanced to the next entity upon completion of 
+the call.\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void getNextEntArrIter( in opaque entArr_iterator,
+                            inout array<opaque> entity_handles,
+                            out int entity_handles_size,
+                            out int has_data) throws iBase.Error;
+\end{verbatim}
+
+\hspace{-16pt}\textbf{4.2.6.3 Reset an iterator}\\
+
+
+\hspace{-16pt}Resets the iterator back to the first one. For single entities:
+
+\begin{verbatim}    
+    void resetEntIter( in opaque entity_iterator) throws iBase.Error;
+\end{verbatim}
+where {\tt entity\_iterator} is reset to point to the 
+first entity.\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void resetEntArrIter( in opaque entArr_iterator) throws iBase.Error;
+\end{verbatim}
+
+\hspace{-16pt} \textbf{4.2.6.4 Delete an iterator}\\
+
+\hspace{-16pt}For single entities:
+
+\begin{verbatim}
+    void endEntIter( in opaque entity_iterator) throws iBase.Error;
+\end{verbatim}
+where {\tt entity\_iterator} is the iterator to be deleted 
+(memory is released).\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}    
+    void endEntArrIter( in opaque entArr_iterator) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Pointwise Geometric Interrogations}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Closest point in real space}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+For a single point:
+
+\begin{verbatim}
+    void getEntClosestPt( in opaque entity_handle, 
+                    in double near_x, in double near_y, in double near_z,
+                    out double on_x, out double on_y, out double on_z
+                    ) throws iBase.Error;
+\end{verbatim}
+Given the coordinates of a point ``near'' the model entity 
+({\tt near\_x}, {\tt near\_y}, {\tt near\_z}), this routine returns the coordinates 
+of the closest point on the model entity ({\tt on\_x}, {\tt on\_y}, {\tt
+  on\_z}).
+
+\hspace{-16pt}For a list of points:
+
+\begin{verbatim}
+    void getArrClosestPt( in array<opaque> entity_handles, 
+                          in int entity_handles_size,
+                          in iBase.StorageOrder storage_order,
+                          in array<double> near_coords, 
+                          in int near_coords_size,
+                          inout array<double> on_coords, 
+                          out int on_coords_size
+                        ) throws iBase.Error;
+\end{verbatim}
+The storage order of arrays {\tt near\_coords} and {\tt on\_coords} is
+specified in {\tt storage\_order}. If the {\tt storage\_order} is {\tt UNDETERMINED} upon entry, an error is returned.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Normal vector at a point on a face given the 
+point's global coordinates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For a single point:
+
+\begin{verbatim}
+    void getEntNrmlXYZ( in opaque entity_handle, 
+                  in double x, in double y, in double z,
+                  out double nrml_i, out double nrml_j, out double nrml_k
+                  ) throws iBase.Error;
+\end{verbatim}
+where {\tt x}, {\tt y}, {\tt z} are coordinates of the point and {\tt
+  nrml\_i}, {\tt nrml\_j}, {\tt nrml\_k}
+are the three components of a unit normal at that point. The unit normal to 
+a face must always be returned such that it is pointing out the 
+same side of the face.
+
+\hspace{-16pt}For a list of points:
+
+\begin{verbatim}
+    void getArrNrmlXYZ( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+                        in array<double> coords, in int coords_size,
+                        inout array<double> normal, out int normal_size
+                      ) throws iBase.Error;
+\end{verbatim}
+The storage order of arrays {\tt coords} and {\tt normal} is specified in
+{\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Tangent vector at a point on an edge given 
+the point's global coordinates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For a single point:
+
+\begin{verbatim}
+    void getEntTgntXYZ( in opaque entity_handle, 
+                  in double x, in double y, in double z,
+                  out double tgnt_i, out double tgnt_j, out double tgnt_k
+                  ) throws iBase.Error;
+\end{verbatim}
+where {\tt x}, {\tt y}, {\tt z} are coordinates of the point and {\tt
+  tgnt\_i}, {\tt tgnt\_j},
+{\tt tgnt\_k} are the three components of a unit tangent at that point. The unit tangent 
+must always be returned such that it moves in the same direction 
+(sense) along the edge. \\
+
+\hspace{-16pt}For a list of points:
+
+\begin{verbatim}
+    void getArrTgntXYZ( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+                        in array<double> coords, in int coords_size,
+                        inout array<double> tangent, out int tangent_size
+                      ) throws iBase.Error;
+\end{verbatim}
+The storage order of arrays {\tt coords} and {\tt tangent} is specified in
+{\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Edge/Face Curvatures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For a single point on a face:
+
+\begin{verbatim}
+    void getFcCvtrXYZ( in opaque face_handle, 
+                 in double x, in double y, in double z,
+                 out double cvtr1_i, out double cvtr1_j, out double cvtr1_k,
+                 out double cvtr2_i, out double cvtr2_j, out double cvtr2_k
+                 ) throws iBase.Error;
+\end{verbatim}
+where {\tt x}, {\tt y}, and {\tt z} are the three coordinates of the point 
+on the face {\tt face\_handle}. {\tt cvtr1\_i}, {\tt cvtr1\_j}, and {\tt
+  cvtr1\_k} are the three
+components of the first principal radius of curvature at the specified
+point. {\tt cvtr2\_i}, {\tt cvtr2\_j}, and {\tt cvtr2\_k}
+are the three components of the second principal radius 
+of curvature at the specified point.\\ %{\tt rad\_vector\_1} and {\tt rad\_vector\_2} are 
+%vectors in the directions of principal curvature, with lengths 
+%equal to the principal radii of curvature with the condition 
+%that {\tt \mid rad\_vector\_2 \mid > \mid rad\_vector\_1 \mid}. 
+%That is, the maximum curvature is in the direction of {\tt rad\_vector\_1}, 
+%since its radius of curvature would be less
+
+\hspace{-16pt}For a single point on an edge:
+\begin{verbatim}
+    void getEgCvtrXYZ( in opaque edge_handle, 
+                 in double x, in double y, in double z,
+                 out double cvtr_i, out double cvtr_j, out double cvtr_k
+                 ) throws iBase.Error;
+\end{verbatim}
+
+\hspace{-16pt}For a list of points on entities (edges or faces):
+
+\begin{verbatim}
+    void getEntArrCvtrXYZ( in array<opaque> entity_handles, 
+                           in int entity_handles_size,
+                           in iBase.StorageOrder storage_order,
+                           in array<double> coords, in int coords_size,
+                           inout array<double> cvtr_1, out int cvtr_1_size,
+                           inout array<double> cvtr_2, out int cvtr_2_size
+                        ) throws iBase.Error;
+\end{verbatim}
+The storage order of the arrays {\tt coords}, {\tt cvtr\_1} and {\tt cvtr\_2} is specified
+in {\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Closest point and normal or tangent vector}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This function returns a description of a plane normal to the specified
+entity at the location on that entity closest to the input position.  The
+plane is returned as a position on the entity and the normal of the plane.
+The input entity must be either a edge or a face. \\
+
+This function is functionally the combination of {\tt getEntClosestPt} and
+{\tt getEntTgntXYZ} for curves and the combination of {\tt getEntClosestPt} and
+{\tt getEntNrmlXYZ} for surfaces. \\
+
+\hspace{-16pt}For a single point on an entity:
+\begin{verbatim}
+    void getEntNrmlPlXYZ( in opaque entity_handle, 
+                          in double x, in double y, in double z,
+                          out double pt_x, out double pt_y, out double pt_z,
+                          out double nrml_i, out double nrml_j, out double nrml_k
+                        ) throws iBase.Error;			
+\end{verbatim}
+
+\hspace{-16pt}For a list of points on entities:
+\begin{verbatim}
+    void getArrNrmlPlXYZ( in array<opaque> entity_handles,
+                          in int entity_handles_size,
+                          in iBase.StorageOrder storage_order,
+                          in array<double> coords, in int coords_size,
+                          inout array<double> pt_coords, out int pt_coords_size,
+                          inout array<double> normals, out int normals_size,
+                        ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Closest point, normal/tangent vector and curvatures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This set of functions perform all three point-wise interrogations of a 
+edge or face in a single call. Given an input position, the functions
+will return the closest point on the entity, the normal or tangent at that
+point, and the principal curvature(s) at that point.  These functions are 
+a combination of {\tt getEntClosestPt}, {\tt getEntNrmlXYZ} or {\tt getEntTgntXYZ}, and 
+{\tt getEgCvtrXYZ} or {\tt getFcCvrtXYZ}. \\
+
+\hspace{-16pt}For a single point on an entity:
+\begin{verbatim}
+    void getEgEvalXYZ( in opaque edge_handle, 
+                       in double x, in double y, in double z,
+                       out double on_x, out double on_y, out double on_z,
+                       out double tgnt_i, out double tgnt_j, out double tgnt_k,
+                       out double cvtr_i, out double cvtr_j, out double cvtr_k
+                     ) throws iBase.Error;			
+    void getFcEvalXYZ( in opaque face_handle, 
+                       in double x, in double y, in double z,
+                       out double on_x, out double on_y, out double on_z,
+                       out double nrml_i, out double nrml_j, out double nrml_k,
+                       out double cvtr1_i, out double cvtr1_j, out double cvtr1_k,
+                       out double cvtr2_i, out double cvtr2_j, out double cvtr2_k
+                     ) throws iBase.Error;			
+\end{verbatim}
+
+\hspace{-16pt}For a list of points on entities:
+\begin{verbatim}			
+    void getArrEgEvalXYZ( in array<opaque> edge_handles,
+                          in int edge_handles_size,
+                          in iBase.StorageOrder storage_order,
+                          in array<double> coords, in int coords_size,
+                          inout array<double> on_coords, out int on_coords_size,
+                          inout array<double> tangent, out int tangent_size,
+                          inout array<double> cvtr, out int cvtr_size
+                        ) throws iBase.Error;
+    void getArrFcEvalXYZ( in array<opaque> face_handles,
+                          in int face_handles_size,
+                          in iBase.StorageOrder storage_order,
+                          in array<double> coords, in int coords_size,
+                          inout array<double> on_coords, out int on_coords_size,
+                          inout array<double> normal, out int normal_size,
+                          inout array<double> cvtr_1, out int cvtr_1_size,
+                          inout array<double> cvtr_2, out int cvtr_2_size
+                        ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Bounding Box}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Request a box in three space that the model lies within.
+
+\begin{verbatim}
+    void getEntBoundBox( in opaque entity_handle,
+                     out double min_x, out double min_y, out double min_z,
+                     out double max_x, out double max_y, out double max_z
+                     ) throws iBase.Error;
+\end{verbatim}
+Request a box in three space that the entity lies within. {\tt min\_x},
+{\tt min\_y}, and {\tt min\_z} are the coordinates of the 
+lower left corner of the bounding box, and {\tt max\_x}, {\tt max\_y},
+and {\tt max\_z} are
+the coordinates of the upper right corner of the bounding box.\\
+
+\hspace{-16pt}For a single entity:
+
+\begin{verbatim}
+    void getBoundBox( out double min_x, out double min_y, out double min_z,
+                      out double max_x, out double max_y, out double max_z
+                    ) throws iBase.Error;
+\end{verbatim}
+where {\tt min\_x}, {\tt min\_y}, and {\tt min\_z} are the coordinates of the 
+lower left corner of the bounding box, and {\tt max\_x}, {\tt max\_y},
+and {\tt max\_z} are
+the coordinates of the upper right corner of the bounding box.\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void getArrBoundBox( in array<opaque> entity_handles, 
+                         in int entity_handles_size,
+                         inout iBase.StorageOrder storage_order,
+                         inout array<double> min_corner_coords, 
+                         out int min_corner_coords_size,
+                         inout array<double> max_corner_coords, 
+                         out int max_corner_coords_size
+                       ) throws iBase.Error;
+\end{verbatim}
+The storage order of arrays {\tt min\_corner\_coords} and {\tt max\_corner\_coords} is specified in
+{\tt storage\_order}. If the order is {\tt UNDETERMINED} upon entry, the variable
+{\tt storage\_order} contains the storage order provided by the implementation upon
+exit.
+                          
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Coordinates of a vertex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For a single vertex:
+
+\begin{verbatim}
+    void getVtxCoord( in opaque vertex_handle, 
+                      out double x, out double y, out double z
+                    ) throws iBase.Error;
+\end{verbatim}
+Returns the coordinates of a vertex entity.\\
+
+\hspace{-16pt}For a list of them:
+
+\begin{verbatim}
+    void getVtxArrCoords( in array<opaque> vertex_handles, 
+                          in int vertex_handles_size,
+                          inout iBase.StorageOrder storage_order,
+                          inout array<double> coords, out int coords_size
+                        ) throws iBase.Error;
+\end{verbatim}
+Returns the coordinates of an array of vertices in the specified 
+storage order. If the order is {\tt UNDETERMINED} upon entry, the variable
+{\tt storage\_order} contains the storage order provided by the implementation upon
+exit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Intersecting a ray with the model}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+A common inquiry used in many modeling operations is the intersection 
+with the model boundary of a line that starts at a given point and goes 
+to infinity in a given direction. Since there can be multiple 
+intersections with multiple model entities, this function will return a 
+list of model entities (can be faces, edges and/or vertices) and the 
+coordinates of each intersection. Note that most geometric modeling 
+API's will determine these intersections to within the geometric 
+modeling tolerance of that entity. For example, a line that intersects 
+the toleranced size cylinder around an edge will be flagged as 
+intersecting that edge and none of the faces that come into that edge.\\
+
+\hspace{-16pt}For a single point:
+\begin{verbatim}
+    void getPntIntsct( in double x, in double y, in double z,
+                       in double dir_x, in double dir_y, in double dir_z,
+                       inout array<opaque> intersect_entity_handles,
+                       out int intersect_entity_handles_size,
+                       inout iBase.StorageOrder storage_order,
+                       inout array<double> intersect_coords, 
+                       out int intersect_coords_size,
+                       inout array<int> param_coords, 
+                       out int param_coords_size
+                     ) throws iBase.Error;
+\end{verbatim}
+where {\tt x}, {\tt y}, and {\tt z} are the coordinates of a point, and
+{\tt dir\_x}, {\tt dir\_y}, and
+{\tt dir\_z} are the direction of a line. The entities intersecting with the line
+are returned in {\tt intersect\_entity\_handles} with its number
+{\tt intersect\_entity\_handles\_size}. For each intersecting model entity, 
+ the coordinates of
+each intersection and parametric coordinates (0, 1 or 2) are returned,
+respectively, in {\tt intersect\_coords} and {\tt param\_coords}. The variable
+{\tt storage\_order} specifies the order of intersecting coordinates. If
+the order is {\tt UNDETERMINED} upon entry, 
+{\tt storage\_order} contains the storage order provided by the implementation upon
+exit.\\
+
+\hspace{-16pt}For a list of them:
+\begin{verbatim}
+    void getPntArrRayIntsct( in iBase.StorageOrder storage_order,
+                             in array<double> coords, in int coords_size,
+                             in array<double> directions, 
+                             in int directions_size,
+                             inout array<opaque> intersect_entity_handles,
+                             out int intersect_entity_handles_size,
+                             inout array<int> offset, out int offset_size,
+                             inout array<double> intersect_coords, 
+                             out int intersect_coords_size,
+                             inout array<int> param_coords, 
+                             out int param_coords_size,
+                           ) throws iBase.Error;
+\end{verbatim}
+An offset array ({\tt offset}) gives the starting index in the
+{\tt intersect\_entity\_handles} array for the intersecting model entities of point
+{\tt i}. The variable {\tt storage\_order} specifies the order of
+coordinates of points ({\tt coords}),
+the directions of lines ({\tt directions}) and intersecting coordinates
+({\tt intersect\_coords}). An error is returned if the order is {\tt UNDETERMINED} upon
+entry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Point Classification}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+A common inquiry used in many modeling operations is point 
+classification. Given a point in space this function returns information 
+indicating which region it is inside, or which model face, edge of 
+vertex it is on. Again, modeling API's will determine this information 
+in a manner consistent with the modeling system tolerances.\\
+
+\hspace{-16pt}For a single point:
+\begin{verbatim}
+    void getPntClsf( in double x, in double y, in double z,
+                     out opaque entity_handle) throws iBase.Error;    
+\end{verbatim}
+where {\tt x}, {\tt y}, and {\tt z} are the coordinates of a point, and
+{\tt entity\_handle} is the entity where the point is on or in.\\
+
+\hspace{-16pt}For a list of them:
+\begin{verbatim}
+    void getPntArrClsf( in iBase.StorageOrder storage_order,
+      	                in array<double> coords, in int coords_size,
+      	                inout array<opaque> entity_handles, 
+                        out int entity_handles_size
+      	              ) throws iBase.Error;
+\end{verbatim}
+The variable {\tt storage\_order} specifies the order of coordinates of
+points ({\tt coords}). An error is returned if the order is {\tt UNDETERMINED} upon
+entry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Entity Tags}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Model entity tags work the same as mesh entity tags. See 
+the iBase tag interface  \cite{r27}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Basic Geometric Sense Information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+An examination of the geometric modeling literature describes 
+a number of alternative forms of entity sense information (indicates 
+orientation of one entity to another) that is used to support 
+a variety of different operations. When working with the geometric 
+information defining an object, the most fundamental of this 
+information has to do with the which side of a face the normal 
+vectors point out of and which of the two possible directions 
+of traversing an edge the tangent vector to the edge points. 
+Knowledge of this information and entity adjacencies is sufficient 
+to easily support the construction of other entity sense information 
+structures.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Sense of a face normal with respect to a region}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The sense of a face normal indicates which of the two sides 
+of a face the normal is pointing out of. In the case when the 
+face is not bounded by any regions, the options for determining 
+this information has to either use a convention associated with 
+the cross product of parametric coordinates or examining the 
+normal vector returned at one or more points on the surface. 
+In general, great care needs to be exercised in using such real 
+valued information, particularity over anything other than infinitesimal 
+neighborhoods on the face. If such information is needed when 
+parametric coordinates are not used, the pointwise normal operators 
+can be used as part of the process to construct it. As it turns 
+out, such information is not commonly required in the cases where 
+there are no regions bounding the face.\\
+
+
+In the case where the face is bounded by one or more regions, 
+the region is attached to one side, or possibly both sides, of 
+the face. Therefore, in these cases, a simple function can be 
+used to return the required information. That function for one 
+entity is:
+
+\begin{verbatim}
+    int getEntNrmlSense( in opaque face_handle, 
+                         in opaque region_handle) throws iBase.Error;
+\end{verbatim}
+where {\tt face\_handle} is the face of interest and {\tt region\_handle} is 
+the region it bounds for which we want to know if the normals 
+are consistent or not. A value of 1 is returned if the face normal 
+is pointing out of the region, -1 is returned if the normal is 
+pointing into the region and a 0 is returned when the same region 
+is using both sides of the face.\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void getArrNrmlSense( in array<opaque> face_handles, 
+                          in int face_handles_size, 
+                          in array<opaque> region_handles, 
+                          in int region_handles_size, 
+                          inout array<int> sense, out int sense_size
+                        ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Sense of the edge tangent}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Since an edge is an one-dimensional entity, the tangent to 
+the edge naturally defines a consistent direction for the traversal 
+of the edge. There are two conventions of possible interest with 
+respect to the sense of the edge tangent. The first is with respect 
+to the direction of the internal representation of the edge curve 
+as defined in the parametric coordinates of each face using the 
+edge and the second is with respect to the vertex ordering.\\
+
+
+The sense of the edge curve as defined in the parametric 
+coordinates a face using the edge for a single edge:
+
+\begin{verbatim}
+    int getEgFcSense( in opaque edge_handle, 
+                      in opaque face_handle) throws iBase.Error;
+\end{verbatim}
+where {\tt edge\_handle} is the edge of interest and {\tt face\_handle} is 
+the face it bounds for which we want to know if the normals are 
+consistent or not. A value of 1 is returned if the tangents are 
+in the same direction, -1 is returned if the tangents are in 
+the opposite direction and a 0 is returned when the face uses 
+the edge more that once (twice is common, however, more than 
+twice is also possible).\\
+
+\hspace{-16pt}For a list of edges:
+
+\begin{verbatim}
+    void getEgFcArrSense( in array<opaque> edge_handles, 
+                          in int edge_handles_size, 
+                          in array<opaque> face_handles, 
+                          in int face_handles_size, 
+                          inout array<int> sense, out int sense_size
+                        ) throws iBase.Error;
+\end{verbatim}
+
+\hspace{-16pt}For the vertex ordering:
+
+\begin{verbatim}
+    int getEgVtxSense( in opaque edge_handle, 
+                       in opaque vertex_handle_1, in opaque vertex_handle_2
+                     ) throws iBase.Error;
+\end{verbatim}
+where {\tt edge\_handle} is the edge of interest, {\tt vertex\_handle\_1} is 
+one of the vertices bounding the edge and {\tt vertex\_handle\_2} is 
+the other vertex bounding the edge. A value of 1 is returned 
+if the tangent is consistent with traversing the edge from the 
+vertex {\tt vertex\_handle\_1} to vertex {\tt vertex\_handle\_2} . 
+A value of 1 is returned it the tangent is consistent with traversing 
+the edge from the vertex {\tt vertex\_handle\_2} to vertex {\tt vertex\_handle\_1}. 
+A value of -1 is returned when the edge is closed and thus the 
+two vertices are the same.\\
+
+\hspace{-16pt}For a list of them:
+
+\begin{verbatim}
+    void getEgVtxArrSense( in array<opaque> edge_handles, 
+                           in int edge_handles_size, 
+                           in array<opaque> vertex_handles_1, 
+                           in int vertex_handles_1_size, 
+                           in array<opaque> vertex_handles_2, 
+                           in int vertex_handles_2_size, 
+                           inout array<int> sense, out int sense_size
+                         ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Support of Parametric Coordinate Systems}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The majority of CAD systems employ local parametrized coordinates 
+for the faces and edges, where the faces are parametrized in 
+terms of two coordinates and the edges in terms of one. Most 
+of the modelers used trimmed faces meaning that portions of the 
+face coordinate range do not define valid points since that portion 
+of the face has been removed by some modeling operation. It is 
+important to know when model edges and faces are parametrized 
+since it is possible to use geometric interrogations that are 
+at least an order of magnitude faster to execute some of the 
+common operations needed.\\
+
+A set of functions are provided for operating on models where 
+all or some of the geometric model faces and edges are defined 
+in a parametric coordinate system. To make use of these functions 
+when generating or modifying a mesh one must maintain information 
+on the parametric coordinates associated with the mesh entities. 
+This must be done such that extraneous information need not be 
+stored. For example, on effective means to deal with this is 
+to store only parametric coordinates of mesh vertices classified 
+on model faces and edges for the geometric model entity it is 
+classified on. (The reparametrization operations below can deal 
+with the fact that mesh vertices classified on geometric model 
+vertices and edges can need the parametric values on the edges 
+and/or faces they bound.)\\
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Determine what entities are parametrized}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Indicate which model entities are or are not defined with 
+parametric coordinates.
+
+\begin{verbatim}
+    int getParametric ( ) throws iBase.Error;
+\end{verbatim}
+The definition of the returned integer has the following 
+meaning:
+\begin{itemize}
+\item 0 - no parametrized entities
+\item 1 - all entities parametrized and faces can be 
+trimmed
+\item 2 - all entities parametrized and no faces are 
+trimmed
+\item 3 - some entities parametrized and faces can 
+be trimmed
+\item 4 - some entities parametrized and no faces are 
+trimmed
+\end{itemize}
+In the cases where only some of the model entities are parametrized 
+a function is needed to indicate if individual geometric model 
+entities have parametric coordinates.
+
+\begin{verbatim}
+    int isEntParametric(in opaque entity_handle) throws iBase.Error;
+\end{verbatim}
+returns a 1 if the entity has a parametric coordinate system 
+and 0 if it does not.\\
+
+\hspace{-16pt}For a list of model entities:
+
+\begin{verbatim}
+    void isArrParametric( in array<opaque> entity_handles, 
+                          in int entity_handles_size, 
+                          inout array<int> is_parametric, 
+                          out int is_parametric_size
+                        ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Parametric to real}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Given the parametric coordinates of a point on a model face 
+or edge, return the x,y,z coordinates of the point.
+
+\begin{verbatim}
+    void getEntUVtoXYZ( in opaque entity_handle, in double u, in double v,
+                        out double x, out double y, out double z
+                      ) throws iBase.Error;
+\end{verbatim}
+where {\tt u} and {\tt v} are the parametric coordinates of the 
+point on a geometric model face, {\tt entity\_handle}, and {\tt x}, {\tt
+  y} and {\tt z} are 
+the global x,y,z coordinates of the point.
+
+\begin{verbatim}
+    void getEntUtoXYZ( in opaque entity_handle, in double u,
+                       out double x, out double y, out double z
+                     ) throws iBase.Error;
+\end{verbatim}
+where {\tt u} is the parametric coordinate of the point 
+on a geometric model edge, {\tt entity\_handle}, and {\tt x}, {\tt y}
+and {\tt z} are 
+the global x,y,z coordinates of the point.\\
+
+\hspace{-16pt}In the case of a list of model faces or edges the functions 
+are:
+
+\begin{verbatim}
+    void getArrUVtoXYZ( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+                        in array<double> uv, in int uv_size,
+                        inout array<double> on_coords, out int on_coords_size
+                      ) throws iBase.Error;
+\end{verbatim}
+The storage order of arrays {\tt uv} and {\tt on\_coords} is specified in
+{\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+
+\begin{verbatim}
+    void getArrUtoXYZ( in array<opaque> entity_handles, 
+                       in int entity_handles_size, 
+         	       in array<double> u, in int u_size,
+         	       inout iBase.StorageOrder storage_order,
+         	       inout array<double> on_coords, out int on_coords_size
+         	     ) throws iBase.Error;
+\end{verbatim}
+The storage order of output array {\tt on\_coords} is specified in {\tt
+  storage\_order}. If the order is {\tt UNDETERMINED} upon entry, the variable
+{\tt storage\_order} contains the storage order provided by the implementation upon
+exit.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Real to parametric}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Given the real coordinates of a point near a geometric model 
+face or edge return the parametric coordinate of the closest 
+point on the model entity.
+
+\begin{verbatim}
+    void getEntXYZtoUV( in opaque entity_handle, 
+                        in double x, in double y, in double z,
+                        out double u, out double v) throws iBase.Error;
+\end{verbatim}
+where {\tt x}, {\tt y}, and {\tt z} are the global x,y,z coordinates 
+of a point near a geometric model face, {\tt entity\_handle}, and {\tt
+  u} and {\tt v} are 
+the parametric coordinates of the closest point on a geometric 
+model face.\\
+
+\hspace{-16pt}{\tt getEntXYZtoUVHint} returns u, v values with hint.
+\begin{verbatim}
+    void getEntXYZtoUVHint( in opaque entity_handle, 
+                            in double x, in double y, in double z,
+                            out double u, out double v) throws iBase.Error;
+\end{verbatim}			      
+			      
+\begin{verbatim}
+    void getEntXYZtoU( in opaque entity_handle, 
+                       in double x, in double y, in double z,
+                       out double u) throws iBase.Error;
+\end{verbatim}
+where {\tt x}, {\tt y}, and {\tt z} are the global x,y,z coordinates 
+of a point near a geometric model edge, {\tt entity\_handle}, and {\tt u} is 
+the parametric coordinates of the closest point on a geometric 
+model edge.\\
+
+
+\hspace{-16pt}In the case of a list of model faces or edges the functions 
+are:
+
+\begin{verbatim}
+    void getArrXYZtoUV( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+                        in array<double> coords, in int coords_size,
+                        inout array<double> uv, out int uv_size
+                      ) throws iBase.Error;
+\end{verbatim}
+The storage order of array {\tt coords} and {\tt uv} is specified in
+ {\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+ 
+ \begin{verbatim}
+    void getArrXYZtoUVHint( in array<opaque> entity_handles, 
+                            in int entity_handles_size,
+                            in iBase.StorageOrder storage_order,
+                            in array<double> coords, in int coords_size,
+                            inout array<double> uv, out int uv_size
+                          ) throws iBase.Error;
+\end{verbatim}
+The storage order of array {\tt coords} and {\tt uv} is specified in
+ {\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+
+\begin{verbatim}
+    void getArrXYZtoU( in array<opaque> entity_handles, 
+                       in int entity_handles_size,
+                       in iBase.StorageOrder storage_order,
+                       in array<double> coords, in int near_coords_size,
+                       inout array<double> u, out int u_size
+                     ) throws iBase.Error;
+\end{verbatim}
+The storage order of array {\tt coords} is specified in {\tt
+ storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Parametric range}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Request the parametric range of for a geometric model face 
+or edge.
+
+\begin{verbatim}
+    void getEntUVRange( in opaque entity_handle,
+                        out double u_min, out double v_min,
+                        out double u_max, out double v_max
+                      ) throws iBase.Error;
+\end{verbatim}
+where {\tt u\_min} and {\tt v\_min} are the minimum u, v values 
+and {\tt u\_max} and {\tt v\_max} are the maximum u, v values on the
+model face {\tt entity\_handle}.
+
+\begin{verbatim}
+    void getEntURange( in opaque entity_handle, 
+                       out double u_min, out double u_max) throws iBase.Error;
+\end{verbatim}
+where {\tt u\_min} is the minimum u value and {\tt u\_max} are 
+the maximum u value on the model edge {\tt entity\_handle}.\\
+
+\hspace{-16pt}In the case of a list of model faces or edges the functions 
+are:
+
+\begin{verbatim}
+    void getArrUVRange( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        inout iBase.StorageOrder storage_order,
+                        inout array<double> uv_min, out int uv_min_size,
+                        inout array<double> uv_max, out int uv_max_size
+                      ) throws iBase.Error;
+\end{verbatim}
+where {\tt uv\_min} and {\tt uv\_max} contains respectively minimum u,v values and maximum u,
+v, values in a specific storage order given in {\tt storage\_order}. If
+the order is {\tt UNDETERMINED} upon entry, the variable
+{\tt storage\_order} contains the storage order provided by the implementation upon
+exit.
+
+\begin{verbatim}
+    void getArrURange( in array<opaque> entity_handles, 
+                       in int entity_handles_size,
+                       inout array<double> u_min, out int u_min_size,
+                       inout array<double> u_max, out int u_max_size
+                     ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Reparametrization}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+These functions return the parametric coordinates of points 
+classified on geometric model entities that are part of the closure 
+of higher order geometric model entities for which the parametric 
+coordinates are desired. These functions allow the effective 
+use of parametric values in various operations while only requiring 
+the storage of the parametric value of a point of interest with 
+respect to the model entity it is classified on (as apposed to 
+that parametric value and the parametric values of all the model 
+entities of which it is on the closure). As an example consider 
+a mesh generation process where nodes are generated first on 
+model edges, then on model faces and finally in model regions. 
+Further assume that the mesh generator makes use of the parametric 
+values of the entity being meshed (most surface mesh generators 
+do this). The nodes on the model edges know their parametric 
+values with respect to the edge. However, to mesh any of the 
+faces this edge bounds, the parametric coordinates of that node 
+with respect to that face is needed. In the general case of trimmed 
+faces and edges, the parametric coordinates of nodes classified 
+on model vertices with respect to the model faces and edges it 
+is on the closure of is also needed
+
+\begin{verbatim}
+    void getEntUtoUV( in opaque edge_handle, in opaque face_handle,  
+                      in double in_u, out double u, out double v
+                    ) throws iBase.Error;
+\end{verbatim}
+where {\tt edge\_handle} is the edge the point is classified 
+on, {\tt face\_handle} is the face the parametric values of 
+the point that are needed, {\tt in\_u} is the parametric value of 
+the point on the edge, and {\tt u} and {\tt v} are the parametric 
+coordinates on the face.
+
+\begin{verbatim}
+    void getVtxToUV (in opaque vertex_handle, in opaque face_handle, 
+                     out double v, out double v) throws iBase.Error;
+
+\end{verbatim}
+where {\tt vertex\_handle} is the vertex the point is classified 
+on, {\tt face\_handle} is the face the parametric values of 
+the point that are needed, and {\tt u} and {\tt v} are the parametric coordinates 
+on the face.
+
+\begin{verbatim}
+    void getVtxToU( in opaque vertex_handle, in opaque edge_handle, 
+                    out double u) throws iBase.Error;
+\end{verbatim}
+where {\tt vertex\_handle} is the vertex the point is classified 
+on, {\tt edge\_handle} is the edge the parametric values of 
+the point that are needed, and {\tt u} is the parametric coordinate 
+on the edge.\\
+
+\hspace{-16pt}In the case where there are an list of entities or vertices 
+these functions are:
+
+\begin{verbatim}
+    void getArrUtoUV( in array<opaque> edge_handles, 
+                      in int edge_handles_size,
+                      in array<opaque> face_handles, 
+                      in int face_handles_size,
+                      in array<double> u_in, in int u_in_size,
+                      inout iBase.StorageOrder storage_order,
+                      inout array<double> uv, out int uv_size
+                    ) throws iBase.Error;
+\end{verbatim}
+u, v values are returned in the order specified in {\tt storage\_order}. If the
+order is {\tt UNDETERMINED} upon entry, the variable
+{storage\_order} contains the storage order provided by the implementation upon
+exit.
+
+\begin{verbatim}
+    void getVtxArrToUV( in array<opaque> vertex_handles, 
+                        in int vertex_handles_size,
+                        in array<opaque> face_handles, 
+                        in int face_handles_size,
+                        inout iBase.StorageOrder storage_order,
+                        inout array<double> uv, out int uv_size
+                      ) throws iBase.Error;
+\end{verbatim}
+u, v values are returned in array {\tt uv} in the order specified in
+{\tt storage\_order}. If the order is {\tt UNDETERMINED} upon entry, the variable
+{\tt storage\_order} contains the storage order provided by the implementation upon
+exit.
+
+\begin{verbatim}
+    void getVtxArrToU( in array<opaque> vertex_handles, 
+                       in int vertex_handles_size,
+                       in array<opaque> edge_handles, 
+                       in int edge_handles_size,
+                       inout array<double> u, out int u_size
+                     ) throws iBase.Error;
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Normal vector given parametric coordinates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For the case where point's parametric coordinates on a face 
+are used:
+
+\begin{verbatim}
+void getEntNrmlUV( in opaque entity_handle, in double u, in double v,
+                   out double nrml_i, out double nrml_j, out double nrml_k
+                 ) throws iBase.Error;
+\end{verbatim}
+where {\tt u} and {\tt v} are the u and v coordinates of 
+the point on the face {\tt entity\_handle}, and {\tt nrml\_i}, {\tt
+  nrml\_j} and {\tt nrml\_k}
+are the three components of a unit normal at that point (in the global 
+coordinate directions). The unit normal to a face must always 
+be returned such that it is pointing out the same side of the 
+face.\\
+
+\hspace{-16pt}For a list of points:
+
+\begin{verbatim}
+    void getArrNrmlUV( in array<opaque> entity_handles, 
+                       in int entity_handles_size,
+                       in iBase.StorageOrder storage_order,
+                       in array<double> uv, in int uv_size,
+                       inout array<double> normal, out int normal_size
+                     ) throws iBase.Error;
+\end{verbatim}
+The storage order of the arrays {\tt uv} and {\tt normal} is specified
+ in {\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Tangent vector at a point on an edge given 
+the points global coordinates}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+For the case of when the point's parametric value is used:
+
+\begin{verbatim}
+    void getEntTgntU( in opaque entity_handle, in double param_coord,
+                      out double tngt_i, out double tngt_j, out double tngt_k
+                    ) throws iBase.Error;
+\end{verbatim}
+where {\tt param\_coord} has the parametric coordinate of 
+the point and {\tt tngt\_i}, {\tt tngt\_j} and {\tt tngt\_k} are the three components of 
+a unit tangent at that point (in the global coordinate directions). 
+The unit tangent to a face must always be returned such that 
+it is always giving a direction the moves one in the same sense 
+along the edge.\\
+
+\hspace{-16pt}For a list of points:
+
+\begin{verbatim}
+    void getArrTgntU( in array<opaque> entity_handles, 
+                      in int entity_handles_size,
+                      in iBase.StorageOrder storage_order,
+                      in array<double> coords, in int coords_size,
+                      inout array<double> tangent, out int tangent_size
+                    ) throws iBase.Error;
+\end{verbatim}
+The storage order of the arrays {\tt coords} and {\tt tangent} is
+ specified in {\tt storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Derivatives and Curvatures for a Face}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The derivatives modelers return for faces are with respect 
+to the parametric coordinate system. The function for the first 
+derivatives is:
+
+
+The function for the first derivatives is:
+
+
+\begin{verbatim}
+    void getEnt1stDrvt( in opaque entity_handle, in double u, in double v,
+                        inout array<double> drvt_u, out int drvt_u_size,
+                        inout array<double> drvt_v, out int drvt_v_size
+                      ) throws iBase.Error;
+\end{verbatim}
+where {\tt u} and {\tt v} are the u and v coordinates of 
+the point on the face {\tt entity\_handle}, {\tt drvt\_u} is 
+the vector defining the first derivative with respect to u, and {\tt drvt\_v} is 
+the vector defining the first derivative with respect to v.\\
+
+\hspace{-16pt}First derivatives for a list of points:
+
+\begin{verbatim}
+    void getArr1stDrvt( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+                        in array<double> uv, in int uv_size,
+                        inout array<double> drvt_u, out int drvt_u_size,
+                        inout array<int> u_offset, out int u_offset_size,
+                        inout array<double> drvt_v, out int drvt_v_size,
+                        inout array<int> v_offset, out int v_offset_size
+                      ) throws iBase.Error;
+\end{verbatim}
+The offset arrays ({\tt u\_offset}, {\tt v\_offset}) give the starting index in the
+{\tt drvt\_u} and {\tt drvt\_v} arrays for the derivatives of the
+{$i^{th}$} entity in {\tt entity\_handles}.
+The storage order of array {\tt uv} is specified in {\tt
+  storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.\\
+ 
+\hspace{-16pt}The function for the second derivatives at a point is:
+
+\begin{verbatim}
+    void getEnt2ndDrvt ( in opaque entity_handle, in double u, in double v,
+                         inout array<double> drvt_uu, out int drvt_uu_size,
+                         inout array<double> drvt_vv, out int drvt_vv_size,
+                         inout array<double> drvt_uv, out int drvt_uv_size
+                       ) throws iBase.Error;
+\end{verbatim}
+where {\tt u} and {\tt v} are the u and v coordinates of 
+the point on the face {\tt entity\_handle}, {\tt drvt\_uu} is 
+the vector defining the second derivative with respect to u, {\tt drvt\_vv} is 
+the vector defining the second derivative with respect to v, 
+and {\tt drvt\_uv} is the vector defining the second 
+derivative with respect to u and v.\\
+
+\hspace{-16pt}Second derivatives for a list of points:
+
+\begin{verbatim}
+    void getArr2ndDrvt( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+                        in array<double> uv, in int uv_size,
+                        inout array<double> drvt_uu, out int drvt_uu_size,
+                        inout array<int> uu_offset, out int uu_offset_size,
+                        inout array<double> drvt_vv, out int drvt_vv_size,
+                        inout array<int> vv_offset, out int vv_offset_size,
+                        inout array<double> drvt_uv, out int drvt_uv_size,
+                        inout array<int> uv_offset, out int uv_offset_size
+                      ) throws iBase.Error;
+\end{verbatim}
+The offset arrays ({\tt uu\_offset}, {\tt vv\_offset}, {\tt uv\_offset}) give the starting index in the
+{\tt drvt\_uu}, {\tt drvt\_vv} and {\tt drvt\_uv} arrays for the
+derivatives of the {$i^{th}$} entity in {\tt entity\_handles}.
+The storage order of the arrays {\tt uv} is specified in {\tt
+  storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.\\
+ 
+The function to get the principal curvatures at a given uv 
+location is:
+
+\begin{verbatim}
+    void getFcCvtrUV( in opaque entity_handle, in double u, in double v,
+                out double cvtr1_i, out double cvtr1_j, out double cvtr1_k,
+                out double cvtr2_i, out double cvtr2_j, out double cvtr2_k
+                ) throws iBase.Error;
+\end{verbatim}
+where {\tt u} and {\tt v} are the u and v coordinates of 
+the point on the face {\tt face\_handle}. {\tt cvtr1\_i}, {\tt cvtr1\_j}
+and {\tt cvtr1\_k} are first 
+principal radius of curvature at the specified point. {\tt cvtr2\_i},
+{\tt cvtr2\_j} and
+{\tt cvtr2\_k} are the second principal radius of curvature at the specified 
+point.\\ %{\tt rad\_vector\_1} and {\tt rad\_vector\_2} are vectors 
+%in the directions of principal curvature, with lengths equal 
+%to the principal radii of curvature with the condition that {\tt \mid rad\_vector\_2 \mid 
+%> \mid rad\_vector\_1 \mid}. That is, the maximum 
+%curvature is in the direction of {\tt rad\_vector\_1}. That 
+%is, the maximum curvature is in the direction of {\tt rad\_vector\_1}, 
+%since its radius of curvature would be less.
+
+\hspace{-16pt}To get the principal curvatures at a set of points:
+
+\begin{verbatim}
+    void getFcArrCvtrUV( in array<opaque> face_handles, 
+                         in int face_handles_size,
+                         in iBase.StorageOrder storage_order,
+                         in array<double> uv, in int uv_size,
+                         inout array<double> cvtr_1, out int cvtr_1_size,
+                         inout array<double> cvtr_2, out int cvtr_2_size
+                       ) throws iBase.Error;								    
+\end{verbatim}
+The storage order of the arrays {\tt uv} is specified in {\tt
+ storage\_order}. An error is returned if {\tt storage\_order}
+ is {\tt UNDETERMINED} upon entry.
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Periodic and degenerate entities}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+It is possible for model edges or faces to be periodic in 
+that they close onto themselves and for specific portions of 
+their boundary have two different parametric values correspond 
+to the same point is real space. The function to test if an entity 
+is periodic is:
+
+\begin{verbatim}
+  void isEntPeriodic( in opaque entity_handle, out int in_u, out int in_v
+                    ) throws iBase.Error;
+\end{verbatim}
+where {\tt entity\_handle} is an edge or face handle. A 
+return of 0 for {\tt in\_u} means it is not periodic in u and 
+ca return of 1 means it is periodic in u. A return of 0 for {\tt in\_v} means 
+it is not periodic in v and a return of 1 means it is periodic 
+in v (not used in the case of an edge).\\
+
+\hspace{-16pt}For a list of entities:
+
+\begin{verbatim}
+    void isArrPeriodic( in array<opaque> entity_handles, 
+                        in int entity_handles_size,
+                        inout array<int> in_uv, out int in_uv_size
+                      ) throws iBase.Error;
+\end{verbatim}
+ 
+It is also possible for model faces to have degeneracies 
+in the sense that a range of points in parametric space map to 
+a single point in real space. Common examples are the poles of 
+a sphere of a three sides surface constructed by degenerating 
+one of the sides of a four sided face to a point. Since determining 
+the specifics of the situations encountered are specific to the 
+geometry and parametrization used for the face, the function 
+indicates only the number of degeneracy locations for a given 
+face. The function to test for degeneracies is:
+
+\begin{verbatim}
+    int isFcDegenerate( in opaque face_handle) throws iBase.Error;
+\end{verbatim}
+where {\tt face\_handle} is a face handle. The number returned 
+is the number of degenerate locations with 0 meaning there are 
+no degenerate locations. \\
+
+In some modelers the face for a complete sphere would have 
+one periodic direction and two degeneracies, while a cone would 
+have one periodic direction and one degeneracy.
+
+
+\hspace{-16pt}For a list of faces:
+
+\begin{verbatim}
+    void isFcArrDegenerate( in array<opaque> face_handles, 
+                            in int face_handles_size,
+                            inout array<int> degenerate, 
+                            out int degenerate_size
+                          ) throws iBase.Error;
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Support of Geometric Model Tolerance Information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Geometric modeling systems use finite tolerance information 
+to define when the geometry associated with topological entities 
+is to be considered close enough to decide that they share common 
+boundaries. This information must be used in a consistent manner 
+during specific mesh generation and modification operations to 
+ensure the resulting mesh provides a valid triangulation of the 
+domain \cite{r21, r23}. Some modelers associate a single value with 
+all model entities while others employ a hierarchy where each 
+model entity can have its own tolerance. The functions to obtain 
+the tolerance information are:
+
+\begin{verbatim}
+    void getTolerance( out int form, out double tolerance
+                     ) throws iBase.Error;
+\end{verbatim}
+The integer {\tt form} is returned to indicate the type 
+of tolerance information 0 for no tolerance information, 1 for 
+a single tolerance value and 2 for entity level tolerances. In 
+the case of a single tolerance it is returned in the double {\tt tolerance}. 
+When each model entity has its own tolerance, the following function 
+will return the entity's value.
+
+\begin{verbatim}
+    double getEntTolerance( in opaque entity_handle) throws iBase.Error; 
+\end{verbatim}
+
+\hspace{-16pt}In the case of a list of entities:
+
+\begin{verbatim}
+    void getArrTolerance( in array<opaque> entity_handles, 
+                          in int entity_handles_size, 
+                          inout array<double> tolerance, 
+                          out int tolerance_size
+                        ) throws iBase.Error;
+\end{verbatim}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Support of More Models}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The ITAPS interface assumes that all models support the basic 
+topological entities and their adjacencies. In cases where a 
+complete manifold (2-manifold), or complete non-manifold representation 
+is used there are additional topological entities available. 
+In many cases the geometry interface routines can take advantage 
+of these entities to more quickly determine requested information 
+and in other cases the information is needed to support some 
+operations that can be requested.
+
+\begin{verbatim}
+    int getTopoLevel( in string model_name) throws iBase.Error;
+\end{verbatim}
+The returned values are 0 for primary entities only (the 
+default), 1 for manifold and 2 for non-manifold
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Model Topology Modification Functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Entity Geometric Shape Information}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{thebibliography}{99}
+\addtocontents{toc}{\parindent0pt\vskip12pt References} %toc entry, no page #
+
+\bibitem{r1} FMDB web page, http://www.scorec.rpi.edu/FMDB.
+
+\bibitem{r2} Beall, M.W. and Shephard, M.S., ``A General Topology-Based 
+Mesh Data Structure'', \textit{Int. J. Num. Meth. Engng}., 
+40(9):1573-1596, 1997.
+
+\bibitem{r3} Beall, M.W., Walsh, J. and Shephard, M.S., ``Accessing 
+CAD Geometry for Mesh Generation'', \textit{12th Int. Meshing 
+Roundtable}, Sandia National Laboratories, SAND-2003-3030P, 
+pp. 33-42, 2003
+
+\bibitem{r4} Beall, M.W. and Shephard, M.S., ``An Object-Oriented Framework 
+for Reliable Numerical Simulations'', \textit{Engineering with 
+Computers}, 15(1):61-72, 1999.
+
+\bibitem{r5} Cirak, F., Ortiz, M. and Schroder, ``Subdivision surfaces: 
+a new paradigm for thin shell finite-element analysis'', \textit{Int 
+J. Num. Meth. Engng.}, 47:2039-2072, 2000.
+
+\bibitem{r6} Dey, S., O'Bara, R.M. and Shephard, M.S., ``Curvilinear 
+mesh generation in 3D'', \textit{Computer-Aided Design}, 33:199-209, 
+2001
+
+\bibitem{r7} Freitag, L., Leurent, T., Knupp, P. and Melander, D., 
+``MESQUITE Design: Issues in the Development of a Mesh Quality 
+Improvement Toolkit,'' p159-168, \textit{Proc. of the 8th Intl. 
+Conf. on Num. Grid Generation in Comp. Field Simulations}, 
+Hawaii 2002.
+
+\bibitem{r8} Gursoz, E.L., Choi, Y. and Prinz, F.B., ``Vertex-Based 
+Representation of Non-Manifold Boundaries'', \textit{Geometric 
+Modeling Product Engineering}, North Holland, pp. 107-130, 
+1990.
+
+\bibitem{r9} Kramer, T.R., ``Extracting STEP Geometry and Topology 
+from a Solid Modeler: Parasolid-to-STEP, NISTIR 4577, \\
+http://www.mel.nist.gov/msidlibrary/summary/9116.html, 
+1991.
+
+\bibitem{r10} Krysl, P. and Ortiz, M., ``Extraction of boundary representation 
+from surface triangulations'', \textit{Int J. Num. Meth. Engng.}, 
+50:1737-1758, 2001.
+
+\bibitem{r11} Lee, C.K., ``Automatic metric 3-D surface mesh generation 
+using subdivision surface geometry model. Part 1: Construction 
+of underlying geometric model'', \textit{Int J. Num. Meth. Engng.}, 
+56:1593-1614, 2003.
+
+\bibitem{r12} Li, X., Shephard, M.S. and Beall, M.W., ``Accounting 
+for curved domains in mesh adaptation'', \textit{Int J. Num. Meth. 
+Engng.}, 2002.
+
+\bibitem{r13} Li, X., Shephard, M.S. and Beall, M.W., ``3-D Anisotropic 
+Mesh Adaptation by Mesh Modifications'', submitted to \textit{Comp. 
+Meth. Appl. Mech. Engng.}, 2003.
+
+\bibitem{r14} Luo, X., Shephard, M.S., Remacle, J.-F., O'Bara, R.M., 
+Beall, M.W., Szab\'{o}, B.A. and Actis, R., ``p-Version Mesh Generation 
+Issues'', \textit{Proc. 11th Int. Meshing Roundtable}, Sandia 
+National Laboratories, pp. 343-354, 2002
+
+\bibitem{r15} Mesquite web page, http://sass3075.endo.sandia.gov/\ensuremath{\sim}pknupp/Mesquite/Mesquite.html
+
+\bibitem{r16} ``OLE for Design and Modeling: Geometry and Topology 
+Query Interfaces - Version 1.0'', http://www.dmac.org/tech/GandT/index.htm, 
+1997
+
+\bibitem{r17} Owen, S.J. and White D.R., ``Mesh-based geometry: A systematic 
+approach to constructing geometry from a finite element mesh'', \textit{Proc. 
+10th Int. Meshing Roundtable}, Sandia report SAND 2001-2967C, 
+pp. 83-96, 2001.
+
+\bibitem{r18} Owen, S.J., White D.R. and Tautges, T.J., ``Facet-based 
+surfaces for 3-D mesh generation'', \textit{Proc. 11th Int. Meshing 
+Roundtable}, pp. 297-311, 2002.
+
+\bibitem{r19} Pandofi, A. and Ortiz, M., ``An efficient procedure for 
+fragmentation simulations'', \textit{Engng. With Computers}, 
+18(2):148-159, 2002.
+
+\bibitem{r20} Remacle, J.-F. and Shephard, M.S., ``An algorithm oriented 
+mesh database'', \textit{Int J. Num. Meth. Engng.}, 58:349-374, 
+2003.
+
+\bibitem{r21} Schroeder, W.J. and Shephard, M.S., ``On rigorous conditions 
+for automatically generated finite element meshes'', Turner, J.U., 
+Pegna, J. and Wozny, M.J., eds., \textit{Product Modeling for 
+Computer-Aided Design and Manufacturing,} North Holland, Amsterdam, 
+267-291, 1991.
+
+\bibitem{r22} Shephard, M.S., Fischer, P., Chand, K.K. and Flaherty, 
+J.E., ``Simulation Information Structures'', http://tstt-scidac.org, 
+2003.
+
+\bibitem{r23} Shephard, M.S. and Georges, M.K., ``Reliability of Automatic 
+3-D Mesh Generation'', \textit{Comp. Meth. Appl. Mech. and Engng.}, 
+101:443-462, 1992.
+
+\bibitem{r24} Simmetrix web page, http://www.simmetrix.com.
+
+\bibitem{r25} Tautges, T.J., ``The common geometry module (CGM): A 
+generic, extensible geometry interface'', \textit{Proc. 9th Int. 
+Meshing Roundtable}, Sandia report SAND 2000-2207, pp. 337-359, 
+2000.
+
+\bibitem{r26} ITAPS Mesh Interface, http://www.tstt-scidac.org/software/software.html.
+
+\bibitem{r27}ITAPS Base Interface, http://www.tstt-scidac.org/software/software.html.
+
+
+\bibitem{r28} Wan, J., Kocak, S. and Shephard, M.S., ``Automated adaptive 
+3-D forming simulation process'', to appear \textit{Engineering 
+with Computers}, 2005.
+
+\bibitem{r29} Weiler, K.J., ``The radial-edge structure: A topological 
+representation for non-manifold geometric boundary representations'', 
+M.J. Wozny, H.W. McLaughlin, J.L. Encarnacao, editors. \textit{Geometric 
+modeling for CAD applications}, North Holland, pp. 3-36, 1988.
+
+\end{thebibliography}
+
+
+\newpage
+\begin{Large}
+\hspace{-16pt}{Appendix I: The Geometric Model\\}    % This command is used only once!
+\end{Large}
+%\addcontentsline{toc}{chapter}{APPENDICES}             %toc entry  or:
+\addtocontents{toc}{\parindent0pt\vskip12pt APPENDIX I: The Geometric Model} %toc entry, no page #
+\vspace{.2in}
+
+From the functional viewpoint of supporting a numerical simulation, 
+the geometric model must be able to:
+
+\begin{itemize}
+\item Support the ability to address any domain interrogation 
+required during the numerical analysis procedures. This includes 
+the processes of creating and adapting meshes that properly represent 
+the domain of the simulation
+
+\item Support the association of the physical and mathematical 
+attributes with the mesh discretization in a manner consistent 
+with the simulation process. Track domain changes in the cases 
+where the domain evolves as part of the solution process
+\end{itemize}
+
+There are multiple sources for high-level domain definitions; 
+the most common are CAD models, image data and cell-based (mesh-based) 
+models. Each of these sources has one or more representational 
+forms. For example, CAD systems use various forms of boundary 
+representations or volume-based forms defined in terms of positioned 
+primitive shapes combined by a set of Boolean operations. Image 
+data is defined using a volumetric form such as voxels or octrees. 
+Depending on the configuration of the cells (mesh entities) a 
+variety of implicit and explicit boundary or volumetric representations 
+have been used to represent these domains.\\
+
+
+Except in the case of image data or a regular grid and when 
+all aspects of the simulation process can be effectively defined 
+in terms of volume metrics, it is generally accepted that the 
+use of a boundary representation is well suited for the domain 
+definition in simulations based on solving partial differential 
+equations \cite{r3, r19, r21, r25}. We note that different boundary representations 
+contain different levels of information. At the simplest level, 
+the geometry is represented in terms of basic 0-3 dimensional 
+topological entities of vertices, edges, faces and regions. However, 
+this is not sufficient to represent the general combinations 
+and configurations of these building blocks used in numerical 
+simulations. The boundary representation that can fully and properly 
+represent such geometric domains are non-manifold boundary representations 
+\cite{r8, r29}. These representations include loops and shells where 
+a loop is a closed circuit of edges (faces are bounded by one 
+or more loops) and a shell is a closed circuit of faces (regions 
+are bounded by one or more shells). In the case of non-manifold 
+models the representation must also indicate how topological 
+entities are used by bounding higher order entities. For example, 
+each side of a face may be used by a different region. Therefore, 
+faces have two uses. Another terminology for the use of a topological 
+entity by higher order entities is co-entities  \cite{r25} where a 
+co-face indicates the sense use of a face in a shell and a co-edge 
+indicates the sense use of an edge in a loop. \\
+
+
+Common to all boundary representations is an abstract representation 
+of the topological entities in the geometry and their adjacencies. 
+Therefore, we will build the ITAPS geometry interface to key on 
+these entities which will provide an effective means to interact 
+with multiple domain definition sources. \\
+
+
+The abstraction of topology provides an effective means to 
+develop functionality driven interfaces to boundary-based modelers 
+that are independent of any of the specific shape information. 
+The information that gives the actual shape of the topological 
+entities is model specific but can also be abstracted by thinking 
+of it as attribute information associated with the topological 
+entities. The ability to generalize these interfaces is further 
+enhanced by the fact that in the vast majority of cases, the 
+geometry shape information needed by simulation procedures (normals, 
+nearest point, conversion between parametric and real, and various 
+derivatives) consists of pointwise interrogations that can be 
+answered independently of any particular shape representation 
+used by the modeler. An examination of more advanced situations, 
+like evolving geometry simulations or automated geometric domain 
+idealization processes, indicates that they can also be satisfied 
+using methods independent of any shape representation \cite{r10, r28}. 
+Although there are some situations where the simulation procedure 
+is actually changing the model topology that functions may need 
+to deal with loop and shell entities, it is possible to support 
+the geometric interrogations used by simulation procedures focused 
+on the basic model entities of vertices, edges, faces and regions 
+(and their adjacencies). \\
+
+
+In addition to the abstraction of topological entities (which 
+indicates how things are connected) and geometry (the information 
+that defines shape), geometric modeling systems must maintain 
+tolerance information giving numerical information on how well 
+the entities actually fit together. The algorithms and methods 
+within the geometric modeling system are able to use the tolerance 
+information to effectively define and maintain a consistent representation 
+of the geometric model. (The vast majority of what various geometry-based 
+applications have referred to as dirty geometry is caused by 
+a lack of knowledge or proper use of the tolerance information 
+ \cite{r3}.) \\
+
+
+The developers of CAD systems have recognized the possibility 
+of supporting geometry-based applications through general API's. 
+This has lead to the development of geometric modeling kernels 
+like ACIS and Parasolid which are now used as the geometry engines 
+for the majority of geometric modeling systems. Even those systems 
+that do not use one of these kernels have made function driven 
+API's available (Granite from PTC). These geometric modeling 
+API's have been successfully used to develop automated finite 
+element modeling processes \cite{r12, r23} and are the basis for commercial 
+automatic mesh generators and simulation-based design procedures 
+ \cite{r3}. The ITAPS geometry is being designed so that we can take 
+direct advantage of these API's.\\
+
+
+In cases where the shape and topology of the domain evolves 
+based during the course of a simulation, it is necessary to have 
+a high level topological representation of the domain, even in 
+the cases where the only known representation of the domain is 
+a mesh. In this case, the topological representation must be 
+built based on information available from the simulation which 
+is limited to the mesh and its deformation (e.g., node point 
+coordinates), the model topology before the current set of analysis 
+steps (in the case of an evolving geometry simulation), and simulation 
+specific information such as contacting mesh entities, entities 
+that have separated due to fracture, etc. In these cases the 
+process of constructing or updating the topological entities 
+associated with the domain geometric model is focused on determining 
+the appropriate sets of mesh faces, edges, and vertices to associate 
+with the model faces, edges and vertices respectively. Algorithms 
+to do this based on mesh based geometry parameters and/or simulation 
+contact or fracture information have been developed \cite{r10, r11, 
+r19}. Once the model topology has been defined, the geometric 
+shape information can be defined directly in terms of the mesh 
+facets, or can be made higher order using subdivision surfaces 
+\cite{r5, r11} or higher order triangular patches \cite{r17,r18}.
+
+\end{document}
+
+% LocalWords:  ITAPS multiphysics PDE functionalities pointwise ACIS FMDB nrml
+% LocalWords:  Simmetrix MeshAdapt

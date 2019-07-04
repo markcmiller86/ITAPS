@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Petascale Mesh Generation</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>Petascale Mesh Generation</h1>
+
+<p>
+Parallel unstructured mesh generation has been proposed as a way of
+overcoming memory limitations of serial mesh generation for large
+meshes.  For example, modeling long-range
+electro-magnetic effects in the International Linear Collider (ILC) in
+SciDAC-2 will require meshes four to eight times the size of those
+currently generated.  The use of larger meshes also routinely stresses
+downstream capabilities like mesh partitioning for parallel analysis and
+parallel IO.  In SciDAC-1, ITAPS researchers developed a prototype
+CAD-based parallel mesh generation capability and demonstrated
+superior performance and scaling for SLAC's NLC accelerator design.
+We propose to upgrade this prototype to a production-class, scalable
+parallel meshing capability.
+<p>
+In particular, we will update the tetrahedral meshing library used by
+the current parallel meshing code, to take advantage of adaptive
+sizing control and robustness improvements (both needed for meshing
+the highly-curved ILC geometry).  We will link parallel mesh
+generation with mesh partitioning and load balancing capabilities
+to eliminate the reading and
+writing of parallel mesh files.  We will also extend parallel geometry
+IO in CGM to treat discrete or facet-based models, which will be
+needed to represent higher-order geometry in accelerator and
+front-tracking applications.
+<p>
+Applications such as combustion and
+biological modeling place extra demands on the geometric models
+supporting meshing, e.g. for moving boundaries and discrete
+(facet-based) models.  Therefore we also propose to extend parallel
+geometry IO in CGM to support these types of models, and to access
+this capability through the ITAPS geometry interface.
+
+
+
+	</div>
+</div>
+
+</body>
+</html>

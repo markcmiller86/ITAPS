@@ -1,0 +1,21 @@
+.SILENT:
+
+CLIENT_LANGS=@CLIENT_LANGS@
+
+# The client directories and Makefiles are created by configure and
+# removed only by distclean.
+all: 
+	$(MAKE) TARGET=all recurse
+
+recurse:
+	for i in $(CLIENT_LANGS) ; do \
+	  (cd $${i} && $(MAKE) $(TARGET)) ; \
+	done
+
+clean:
+	-rm *~
+	$(MAKE) TARGET=clean recurse
+	  
+distclean: clean
+	$(MAKE) TARGET=distclean recurse
+

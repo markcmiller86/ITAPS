@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageAccelerator" -->
+</head>
+
+<body class="pageApplications pageAccelerator">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+<h1>Particle Accelerator Design</h1>
+<h3>PI: Panagiotis Spentzouris</h3>
+<p class="research"><a href="https://compass.fnal.gov/" target="_blank">Community Petascale Project for Accelerator Science and Simulation (COMPASS)</a><br />
+          ITAPS Personnel: Mark Shephard (RPI), Tim Tautges (ANL)<br />
+        COMPASS Personnel: Kwok Ko (SLAC), Rich Lee (SLAC) <br />
+        Project Status: Active </p>
+        
+<p>Particle accelerators are a significant part of the DOE science  goals, accounting for seven of the top twenty facilities priorities over the next two decades.  Simulation will play an increasingly important role in the design of these accelerators because of its impact on the performance improvements and operating cost reductions required to make new facilities successful. Accelerator performance is sensitive to geometric shape because of the high-frequency operating regime of beam cavities in large-scale accelerators and placement of waveguide elements in reduced-scale accelerators.  This sensitivity drives the need for sophisticated geometric modeling and body-fitted mesh generation services from ITAPS. </p>
+<p> ITAPS geometry and mesh services are already playing a crucial role in design and optimization of accelerator cavities used in the International Linear Collider (ILC), the Continuous Electron Beam Accelerator Facility (CEBAF) upgrade, Spallation Neutron Source (SNS), and other near- and mid-term priority accelerator facilities. We will continue to work with accelerator scientists to provide shape optimization services that allow exploration of the design space in a more automated way. Moreover, there are a number of additional areas where ITAPS can continue to improve the state-of-the-art in accelerator modeling.  For example, important accelerator design codes such as VORPAL (Tech-X) require new open source geometry tools that provide fast geometric queries for embedded boundary mesh generation and to track the motion of particles through accelerators with geometrically complex boundaries.  In addition, more efficient and faithful solutions of the underlying physics can be achieved by incorporating parallel algorithms for the construction of adaptive grids to concentrate degrees of freedom where they have the most impact.  Improved partitioning and load balancing services will be critical to obtaining maximal parallel performance of these adaptive methods.  Future accelerator designs are currently analyzed using manual design evaluations, which are impractical or impossible to perform efficiently.  for future accelerator designs, maximizing the performance using simulation where manual design evaluations would be impractical or impossible. </p>
+<h2>Mesh Generation and Problem Set Up</h2>
+
+<div class="imgContainer fLeftClr" style="width: 200px;">
+	<img src="../assets/images/slac_mesh.gif" width="200" height="200" alt="SLAC mesh" />
+    <p>Figure 1: An all-hexahedral mesh generated for the SLAC waveguide  geometry</p>
+</div>
+
+
+<h2>Mesh Generation and Problem Set Up</h2>
+<p>Our initial efforts with SLAC focused on the widely recognized issue of reducing the time needed to create a mesh starting with a CAD (computer-aided design) model giving the physical geometry for the simulation. There are two main bottlenecks involved in this process. One is the clean-up of the initial geometry such that it can be used for mesh generation. The second bottleneck (for SLAC) concerns the generation of high quality meshes as it relates to accuracy and convergence of the simulation code. Currently, many meshes may be generated before a successful simulation is obtained. </p>
+<p>The geometry clean up process consists of removing unwanted detail, healing gaps between surfaces and volumes, and removing non-physical overlaps. This process can be quite tedious and time-consuming, often delaying simulations for months. ITAPS members have been assisting SLAC in the use of these tools. For example, toward the end of FY02, SLAC presented a very complex tapered waveguide geometry that needed to be cleaned up and meshed as quickly as possible (see Figure 1). The challenge in this geometry is that the position of the beam axis relative to the centroid of the geometric cross-section varies along the waveguide which makes it difficult to achieve sufficient mesh quality. Tim Tautges at ANL/ITAPS has been working with the SLAC analysts to clean up this geometry and mesh it using CUBIT. </p>
+
+<div class="imgContainer fLeftClr" style="width: 380px;">
+	<img src="../assets/images/AcceleratorApplication.gif" width="380" height="150" alt="Mesh Curving Service" />
+    <p>An example of mesh curving service.</p>
+</div>
+
+
+
+
+<p>In terms of generation of high quality meshes, the ITAPS team at SCOREC/RPI has been working with SLAC in developing a mesh curving service that can effectively construct valid unstructured meshes with properly curved high-order elements over general 3D curved domains such as the accelerator cavities. The service is able to generate valid meshes in serial as well as large partitioned meshes in parallel.</p>
+
+
+
+<h3>Invalidity Correction for High-Order Curved Meshes </h3>
+
+<p>The electromagnetic simulations performed by SLAC are characterized by extremely complex geometries and the use of higher order numerical methods. Due to those characteristics, the generated meshes must be valid and properly curved to provide sufficient geometric approximation to achieve the desired level of accuracy. Conventional mesh generation tools have difficulty creating such meshes and often produce inverted elements, which poses a significant challenge for the simulation software. The ITAPS team has developed a mesh curving service which has the functionality to automatically identify the inverted elements and performs a series of mesh quality improvement operations to eliminate the inversion. The mesh curving service allows SLAC to perform more accurate simulations that are also more computationally efficient; resulting in up to a 30% savings in CPU time due to a better conditioned system. Furthermore, the mesh curving service takes advantage of the increasing power of the large super-computing clusters to provide partitioned curved meshes in parallel to meet the need of larger scale simulations by SLAC. </p>
+
+<h3>Mesh Curve Correction Tools</h3>
+<p>The electromagnetic simulations performed by SLAC are characterized by extremely complex geometries and the use of higher order methods. Because the domains are curved and high order methods are being used, the meshes must also be curved to provide a sufficiently higher order geometric approximation to effectively achieve the desired level of accuracy. Standard mesh generation tools have difficulty creating such meshes and often contain inverted elements which pose a significant challenge for the simulation software. The ITAPS team has developed a mesh curve correction tool for this problem that automatically identifies the inverted elements and performs a seriers of mesh quality improvement operations to correct the inversion.  The mesh curving procedures allowed SLAC to perform more accurate simulations that were also more computationally efficient; resulting in up to a 30% savings in CPU time due to a better conditioned system. </p>
+
+
+<div class="imgContainer fLeftClr" style="width: 650px;">
+	<img src="../assets/images/curve_correct.jpg" width="650" height="194" alt="Mesh Curving Service" />
+    <p>Figure: The curved geometries and high order methods used by SLAC to model next generation accelerators require that the meshes also be curved to achieve high accuracy.  We have developed automatic procedures to locate and correct inverted elements which significantly improves simulation accuracy and efficiency.</p>
+</div>
+
+
+<h3>Omega3p Adaptive Loop Creation</h3>
+<p> The <a href="../tools/services/adaptive-loops.html">ITAPS  Mesh adapt</a> service is being used by the Stanford Linear Accelerator Center (SLAC) with their high-order finite element methods for calculating electromagnetic fields.  In order for Omega3p to be a useful design tool, extremely accurate solutions needed to be computed with less than 0.01% error.  This had to be done in complex CAD models such as shown in Figure 2 where tools such as automatic mesh generation and general mesh adaptation which maintains a proper approximation of the underlying geometry are required.</p>
+<p>Results for the adaptive loop included obtaining accurate simulation results at a much lower cost.  The figure belwo shows an initial mesh of 1,595 elements and the final adapted mesh of 23,082,517 elements for one accelerator component that they model and solve for in parallel. To achieve the same level of accuracy using a uniform mesh would add at least two orders of magnitude more elements. </p>
+
+
+
+<div class="imgContainer fLeftClr" style="width: 650px;">
+	<img src="../assets/images/geometry.jpg" width="650" height="113" alt="Geometry Mesh" />
+    <p>Figure:  The original geometry, mesh and adapted mesh of an accelerator component.  Colors indicate the mesh partitions in the  example.</p>
+</div>
+
+
+
+<h3>Moving mesh windows </h3>
+
+<p>The short-range wakefield simulations also require adaptive mesh refinement around the beam to resolve high frequency while the rest of the domain can have a large mesh size. As an example, an ILC coupler has a beam pipe radius of 39mm, but the beam region in a short-range wakefield simulation is only 300 microns. If the beam size is used to generate a uniform mesh, it will contain over 100 million tetrahedral elements which is computationally infeasible. The TIAPS mesh adaption service is being used to provide SLAC with a &#8220;moving mesh&#8221; refinement procedure that allows the computational scientists to focus elements in the areas that the beam is moving through and keep a coarse mesh everywhere else in the domain. The figure below shows this refinement region moving with the particles through the curved domains to achieve high accuracy at an acceptable level of computational efficiency. Considering that the domains are curved and high-order finite elements are used, the refined meshes must also be curved to provide a sufficiently high-order geometric approximation to ensure convergence of the solution. Using such techniques has resulted in a tenfold reduction in the computational cost of these simulations. </p>
+
+
+<div class="imgContainer fLeftClr" style="width: 620px;">
+	<img src="../assets/images/moving_mesh.jpg" width="620" height="233" alt="Moving Mesh" />
+    <p>Figure:  The left three images show the adapted mesh for  following particles in an accelerator cavity at three points in time.   The right image shows a cut on the interior of the mesh.</p>
+</div>
+
+
+<h3>Shape Optimization Procedures</h3>
+
+<p>Future accelerator designs are currently performed using manual design evaluations in which a simulation is performed to analyze the performance of a given design. Given the results of simulation, the geometry of the accelerator cavity is modified slightly, a new mesh is generated, and the simulation is rerun to evaluate the new shape. This process currently requires significant human interaction and is impractical or impossible to perform efficiently. Advanced optimization techniques will allow accelerator scientists to explore the design space in a more automated way. The ITAPS center is working to provide tools that automatically adjust the geometry and mesh based on the optimization procedure. Such a technique requires significant interactions among many different ITAPS technologies including the CGM geometry modules, MOAB mesh database, and Mesquite mesh quality improvement tools. The figure below shows the steps of this procedure as the first the geometry and then the mesh are modified at each design step. </p>
+<p class="clear">&nbsp;</p>
+
+
+ <h1>Numerical Simulation of High Power Liquid Mercury Targets</h1>
+
+
+  <p>ITAPS Personnel: Roman Samulyak (SBU / BNL), Wurigen Bo (SBU / LANL), Tongfei Guo (SBU)<br />
+      Accelerator applications: Harold Kirk (BNL), Kirk McDonald (Princeton University)<br />
+      Project Status: Active </p>
+      
+  <div class="imgContainer fLeft" style="width: 200px;">
+    <a href="../assets/images/web_accelerator_full.png" rel="lightbox">
+	<img src="../assets/images/web_accelerator_mini.png" width="200" height="310" alt="Web Accelerator" />
+    </a>
+    <p>Surface instabilities of the mercury target interacting with a proton pulse in 5 T magnetic field.</p>
+</div>
+<p>Liquid metal targets for particle accelerators that convert intense proton beams into neutrons or other particle are important for fundamental and applied studies. In the energy research area, they are used in subcritical reactors proposed for the burning of nuclear waste by neutron irradiation, and spallation neutron sources. The aim of the targetry group of the international, multi-institutional research group Neutrino Factory/Muon Collider Collaboration is to explore the feasibility of high power targets for future particle accelerators. The need to operate high atomic number material targets that will be able to withstand intense shock and thermal waves has led to the choice of liquid mercury jets as potential target candidates for future accelerators, and in particular, for the proposed Neutrino Factory / Muon Collider. The target will contain a series of mercury jet pulses of about 1 cm in diameter and 30 cm in length. Each pulse will be shot at a velocity of 20 m/s into a 15 - 20 Tesla magnetic field at a small angle to the axis of the magnetic field. When the jet reaches the center of the magnet it will be hit with a series of proton pulses depositing about 100 J/g of energy in the mercury. The aim of numerical simulations is to describe the hydrodynamic response of the target interacting with proton pulses in magnetic fields, understanding of which is of major importance for the reliable target design.  </p>
+
+<p><b>Accomplishments</b>. Using ITAPS Front tracking technilogies, we performed software development and simulations of liquid mercury jet targets interacting with high power proton beams in magnetic fields. Simulations aimed to make predictions for the future targetry experiment at CERN called MERIT. MHD simulations predicted strong distortion of the jet entering 15 Tesla solenoid and the reduction of the target efficiency. These studies have led to the change of design parameters of the MERIT experiment. Simulation also predicted strong instabilities and cavitation of the mercury jet interacting with proton pulses at zero magnetic field, and strong stabilizing effect of the magnetic field. Simulation predictions were confirmed by the MERIT experiment conducted in CERN in the fall of 2007. Current work focuses on important details of the MERIT experiment and new targetry problems that require incompressible MHD approximation.</p>
+
+<p><b>Significance</b>. Guided by simulations and the MERIT experiment, the targetry group of the Neutrino Factory / Muon Collider Collaboration have come to the conclusion that liquid mercury jet targets can reliably work in the future accelerators and neutron sources up to 8 MW power limit. For comparison, the current Spallation Neutron Source target will not be able to work reliably when the facility reaches its design power limit of 4 MW in the future. This research resulted in a unique computational code that will be able to serve as a design tool for future accelerator and neutron source targets and other MHD simulations. After the full benchmark with MERIT data, simulations will be able to replace or reduce the cost of future experiments.</p>
+
+<p><b>Future efforts</b>. Simulations become more important as the design tool. Future work will focus on complete benchmark with MERIT experimental data and simulations of targets for future accelerators and neutron sources.</p>
+
+
+<p class="clear">&nbsp;</p>
+<h2>Publications</h2>
+<blockquote>
+
+<p>R. Samulyak, W. Bo, X. Li, K. McDonald, H. Kirk, Computational algorithms for multiphase magnetohydrodynamics and applications, Condensed Matter Physics, 2010. In press.</p>
+
+<p>R. Samulyak, J. Du, J. Glimm, Z. Xu, A numerical algorithm for MHD of free surface flows at low magnetic Reynolds numbers, J. Comp. Phys., 226 (2007), 1532 - 1549.</p>
+
+<p>T. Lu, R. Samulyak, J. Glimm, Direct numerical simulation of bubbly flows and its application, J. Fluid Eng., 129 (2007), 595 - 604.</p>
+
+<p>Z. L. Xu, T. Lu, R. Samulyak, J. Glimm, X. M. Ji, Dynamic phase boundaries for compressible fluids, SIAM J. Sci. Computing, 30 (2008), 895 - 915.</p>
+
+<p>R. Samulyak at el., Comparison of heterogeneous and homogenized numerical models of cavitation, Int. J. Multiscale Comp. Eng., 4 (2006), 377 - 389.</p>
+
+</blockquote>
+
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+ <title>ITAPS Component Services</title>
+ <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+
+
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>ITAPS Component Services</h1>
+
+<p> Several mesh and geometry component services have been
+developed that are useful to applications in their own right and can also
+used as building blocks by integrated services.  We give an overview
+of several of the services that have seen the most development to date.
+More information can be obtained by following the links to the left.
+
+</p><p> <i> <b><a href="mesquite.html"> Mesh Quality Improvement</a>.</b> </i>&nbsp;Mesh quality is critical for
+obtaining optimal efficiency and accuracy in numerical simulations.
+The Mesh Quality Improvement Toolkit (<a href="http://www.cs.sandia.gov/optimization/knupp/Mesquite.html">Mesquite</a>) is a highly
+flexible, efficient, and comprehensive software package that
+incorporates state-of-the-art algorithms to optimize the shape of mesh
+elements by relocating vertices in both two and three dimensions.
+Close collaborations with the 
+<a href="http://www.scalablesolvers.org/">TOPS center</a> has resulted in a
+new feasible Newton solver for Mesquite that can find the optimal
+location of millions of vertices in just a few minutes \cite{FeasNewt}.
+Mesquite interactions with SciDAC-1 applications include: updating
+meshes on deforming geometry for the SLAC design optimization effort, improvement of hybrid and unstructured
+meshes in several meshing codes (Cubit, Overture, NWGrid, GRUMMP), and
+smoothing of geodesic meshes in support of the SciDAC climate group at
+CSU.  In addition, Mesquite has been used in many non-SciDAC
+applications including smoothing of arteriovenous graft meshes, Alegra ALE rezone, and CSAR propellant burn.  The
+code has been released as open source&nbsp;and
+downloaded over 400 times in the past two years.
+
+</p><p> <i> <b><a href="frontier.html">Front Tracking</a>.</b></i>  
+Front tracking can significantly improve
+the accuracy of simulations which have sharply defined moving surfaces
+of discontinuity.  These surfaces are given explicit computational
+degrees of freedom, supplementing the continuous solution values at
+regular grid points. Our method uses the locally grid-based method
+which
+employs an accurate Lagrangian algorithm for front propagation but adopts
+the boxed Eulerian reconstruction for topological
+bifurcation. This method is both accurate and robust
+and was found to be the best of
+several methods tested, including level sets and volume of fluids
+\cite{DuFixGli05}.  During SciDAC-1, the front tracking algorithms
+implemented in {\sl FronTierLite} underwent several important
+innovations and was modularized into a physics-independent scientific
+software package. In addition, a conservative scheme was implemented
+in all dimensions; its efficiency is still to be tuned.  The
+FronTierLite code has been used in many application areas including
+the simulation of the diesel jet injection, the study of the fluid
+mixing, the MHD simulation of fusion pellet injection, target design 
+for advanced accelerators, and the
+simulation of type Ia supernova.  
+<a href="frontier.html">FronTierLite</a> is now in
+public release, with over 1000 hits per month and 10's of downloads
+per month.
+
+</p><p> <a href="swapping.html"><i> <b>Mesh Swapping</b></i></a>.  Mesh swapping improves the quality of 
+unstructured meshes by changing the local topology of the mesh.
+This technique is
+especially helpful in three dimensions, where the combination of
+swapping and vertex relocation has been shown to dramatically improve
+mesh quality and simulation efficiency
+\cite{frei-cfog:ijnme97,fo-g:cost-benefit}.  As part of SciDAC-1, a
+state-of-the-art swapping algorithm \cite{grummp} was re-implemented
+as a stand-alone library using the mesh and geometry interfaces
+\cite{tstt-swap-tool}.  In two dimensions, edge swapping is supported,
+while in three dimensions, both edge and face swapping are supported.
+In addition, users can define their own mesh quality metrics, allowing
+great flexibility in usage.  This swapping software is already in use in
+one widely-distributed SciDAC meshing code (<a href="http://tetra.mech.ubc.ca/GRUMMP">GRUMMP</a>), which
+is used in numerous non-SciDAC applications in fluid and solid
+mechanics, medicine, and astrophysics, with over 500 downloads per year.
+
+</p><p> <i> <b><a href="adaptive-loops.html">Unstructured Mesh <i>h</i>-Adaptation</a>.</b></i>
+The mesh adaptation service modifies a given input mesh to be
+consistent with a specified target mesh size field.  That is,
+refinement and coarsening operators are applied to tetrahedral mesh
+elements until they match the specified target sizes
+\cite{shep05,wan05} which can include anisotropic \cite{li04,li05} mesh configurations. 
+These procedures have been developed to work in conjunction with a CAD
+definition of the geometric domain so that as the mesh is refined its
+geometric approximation is automatically improved \cite{li05,shep05}.
+A preliminary version of this service has been used in the accelerator
+and fusion application areas and has recently been made available
+through the <a href="../software/download_services.html">ITAPS software web site</a>.
+
+</p><p> <i> <b>Support for Distributed Meshes.</b></i>
+Many of the SciDAC applications require ITAPS services operate on
+meshes that are distributed over the processors of a parallel
+computer. To meet these needs, the ITAPS team has developed two tools
+that support distributed mesh operations. The first is a parallel mesh
+generation process that distributes a
+CAD model over multiple processors allowing each processor to mesh
+surfaces and volumes in parallel yielding a valid
+conforming mesh of the entire domain. The second tool is the addition
+of a partition model and parallel mesh migration procedures to our
+flexible mesh database (<a href="http://gforge.scorec.rpi.edu/projects/fmdb">FMDB</a>)&nbsp; to support
+dynamic load balancing in the parallel adaptive loops service.  Both
+of the distributed mesh support tools have been used on the SLAC
+accelerator modeling project. The parallel partitioning and migration
+are part of FMDB which is available for <a href="../software/download_interfaces.html">download</a>.
+
+
+	</p></div>
+</div>
+
+</body></html>

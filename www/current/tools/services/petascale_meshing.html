@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pagePetascale_meshing" -->
+</head>
+
+<body class="pageTools pageToolsServices pagePetascale_meshing">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Petascale Mesh Generation</h1>
+
+        <img src="../../assets/images/petascale.jpg" alt="petascale mesh generation" width="200" height="262" class="floatright" />
+        <p>Parallel unstructured mesh generation has been proposed as a way of overcoming memory limitations of serial mesh generation for large meshes.  For example, modeling long-range electro-magnetic effects in the International Linear Collider (ILC) in SciDAC-2 will require meshes four to eight times the size of those currently generated.  The use of larger meshes also routinely stresses downstream capabilities like mesh partitioning for parallel analysis and parallel IO.  In SciDAC-1, ITAPS researchers developed a prototype CAD-based parallel mesh generation capability and demonstrated superior performance and scaling for SLAC's NLC accelerator design. We propose to upgrade this prototype to a production-class, scalable parallel meshing capability. </p>
+        <p>In particular, we will update the tetrahedral meshing library used by the current parallel meshing code, to take advantage of adaptive sizing control and robustness improvements (both needed for meshing the highly-curved ILC geometry).  We will link parallel mesh generation with mesh partitioning and load balancing capabilities to eliminate the reading and writing of parallel mesh files.  We will also extend parallel geometry IO in CGM to treat discrete or facet-based models, which will be needed to represent higher-order geometry in accelerator and front-tracking applications. </p>
+        <p>Applications such as combustion and biological modeling place extra demands on the geometric models supporting meshing, e.g. for moving boundaries and discrete (facet-based) models.  Therefore we also propose to extend parallel geometry IO in CGM to support these types of models, and to access this capability through the ITAPS geometry interface. </p>
+<p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

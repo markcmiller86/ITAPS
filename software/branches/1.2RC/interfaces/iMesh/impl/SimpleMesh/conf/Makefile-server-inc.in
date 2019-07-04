@@ -1,0 +1,92 @@
+.SILENT:
+include babel.make
+include @IMPL_ROOT@/TSTTB-Defs.inc
+
+PWD=$(shell pwd)
+PARENT_DIR=$(shell dirname ${PWD})
+PACKAGE_NAME=$(shell basename ${PARENT_DIR})
+GENERIC_NAME=$(shell echo $(PACKAGE_NAME) | sed -e "s/_.*//")
+
+include @IMPL_ROOT@/$(GENERIC_NAME)-Defs.inc
+
+ALL_INCLUDES=$(INCLUDES) $(SIDL_INCLUDES) $(TSTTB_SERVER_INCLUDES) $($(GENERIC_NAME)_SERVER_INCLUDES) $(TSTTB_CLIENT_${CLIENT_LANG}_INCLUDES) $($(GENERIC_NAME)_CLIENT_${CLIENT_LANG}_INCLUDES) -I.
+
+OPTDebug = -DNDEBUG
+
+CXX=@CXX@
+CC=@CC@
+CFLAGS=@CFLAGS@ $(OPTDebug)
+CXXFLAGS=@CXXFLAGS@ $(OPTDebug)
+CPPFLAGS=@CPPFLAGS@ $(ALL_INCLUDES)
+# Yes, Virginia, make and autoconf disagree about the variable names.
+FC=@F77@
+F90=@FC@
+FFLAGS=@FFLAGS@
+F90FLAGS=@FCFLAGS@ $(OPTDebug)
+
+.cc.o:
+	echo Compiling $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_INCLUDES) -c $<
+
+.c.o:
+	echo Compiling $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_INCLUDES) -c $<
+
+.F90.o:
+	echo Compiling $<
+	$(F90) $(F90FLAGS) $(CPPFLAGS) $(EXTRA_INCLUDES) -c $<
+
+.f90.o:
+	echo Compiling $<
+	$(F90) $(F90FLAGS) -c $<
+
+.F.o:
+	echo Compiling $<
+	$(FC) $(FFLAGS) $(CPPFLAGS) $(EXTRA_INCLUDES) -c $<
+
+.f.o:
+	echo Compiling $<
+	$(FC) $(FFLAGS) -c $<
+
+AUTO_MODULE_SRCS=${ARRAYMODULESRCS} ${STUBMODULESRCS} ${TYPEMODULESRCS} ${IMPLMODULESRCS}
+AUTO_HDRS=$(IORHDRS) $(STUBHDRS) $(STUBFORTRANINC)
+AUTO_SERVER_SRCS=$(IORSRCS) $(SKELSRCS) $(STUBSRCS)
+AUTO_CLIENT_SRCS=$(STUBSRCS)
+AUTO_DOC_FILES=$(STUBDOCS)
+AUTO_SRCS=${AUTO_SERVER_SRCS} ${IMPLSRCS}
+
+# Don't add IMPLSRCS to the following line!  Or you'll lose your
+# implementation when you make distclean!
+ALL_AUTO_FILES=$(AUTO_CLIENT_SRCS) $(AUTO_SERVER_SRCS) $(AUTO_MODULE_SRCS) $(AUTO_HDRS) $(AUTO_DOC_FILES)
+
+STATIC_LIB=../lib${PACKAGE_NAME}.a
+SHARED_LIB=../lib${PACKAGE_NAME}.so
+
+all: $(STATIC_LIB) $(SHARED_LIB)
+
+objects: 
+	echo Compiling server for $(PACKAGE_NAME)...
+	make $(AUTO_OBJS) $(INTERNAL_OBJS)
+
+$(STATIC_LIB): objects
+	echo Creating static library for $(PACKAGE_NAME) server...
+	@AR_STATIC@ $@ $(AUTO_OBJS) $(INTERNAL_OBJS)
+
+$(SHARED_LIB): objects
+	echo Creating shared library for $(PACKAGE_NAME) server...
+	@AR_SHARED_CXX@ $@ $(AUTO_OBJS) $(INTERNAL_OBJS)
+
+clean: 
+	-rm -f *.o *~
+
+distclean: clean
+	-rm -f $(ALL_AUTO_FILES)
+	-rm -f babel.make* Makefile $(STATIC_LIB) $(SHARED_LIB)
+
+INSTALL=@INSTALL@
+  
+install:
+	# Libraries are installed already.
+	@INSTALL_DATA@ $(AUTO_HDRS) $(AUTO_DOC_FILES) @prefix@/include/TSTT
+
+

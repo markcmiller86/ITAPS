@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageFrontier" -->
+</head>
+
+<body class="pageTools pageToolsServices pageFrontier">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Front Tracking</h1>
+ <p>Front tracking method is a Lagrangian method for the propagation of a moving manifold. Front tracking works by moving marker particles  which represent the interface. It is distinguished from the marker particle  method  in that the particles are located only on the interface, rather than  in a volume region near the interface, and in that the particles are  connected to each other, to form a triangulated mesh (3D) or piecewise  linear segments (2D) of the interface. It is significantly faster than  other particle methods, since fewer particles (one or two in 2D) are used  per cell in front tracking than the number used in typical particle  method  simulations. 2D bifurcations of interface topology in front tracking are   resolved accurately through detection of interface intersections. In three dimensions, we use a local Eulerian reconstruction method. This method has the robustness of the Eulerian method while it maintains the high resolution and accuracy of the Lagrangian method.</p>
+        <p>The front tracking method has showed its advantage in the computation  of several important physical problems such as the study of fluid interface instabilities, providing the first or the only  physically validated simulation for the solution of turbulent mixing. Figure 1 shows the dynamic motion of the two fluid interface in the simulation of three dimensional Rayleigh-Taylor instability.</p>
+        <p> Front tracking method is a Lagrangian method for the propagation of a moving manifold. Front tracking works by moving marker particles  which represent the interface. It is distinguished from the marker particle  method  in that the particles are located only on the interface, rather than  in a volume region near the interface, and in that the particles are  connected to each other, to form a triangulated mesh (3D) or piecewise  linear segments (2D) of the interface. It is significantly faster than  other particle methods, since fewer particles (one or two in 2D) are used  per cell in front tracking than the number used in typical particle  method  simulations. 2D bifurcations of interface topology in front tracking are   resolved accurately through detection of interface intersections. In three dimensions, we use a local Eulerian reconstruction method. This method has the robustness of the Eulerian method while it maintains the high resolution and accuracy of the Lagrangian method.</p>
+        <p>The front tracking method has showed its advantage in the computation  of several important physical problems such as the study of fluid interface instabilities, providing the first or the only  physically validated simulation for the solution of turbulent mixing. </p>
+     
+ 
+
+ <div class="imgContainer fLeft" style="width: 171px;margin-left: 20px">
+    	<img src="http://www.tstt-scidac.org/graphics/frontier_fig1.gif" alt="dynamic motion" width="171" height="266" />
+    <p>Figure 1 shows the dynamic motion 
+      of the two fluid interface in the simulation of three dimensional Rayleigh-Taylor instability.</p>
+  </div>	
+            
+            
+ <p>Supported by the ITAPS grant of DOE, we have extracted the  geometrical component of the front tracking code as a stand-alone software library named FronTier-Lite. We have also built a user interface to allow easy loading of the library to any application program which requires the tracking of a moving  front. This library provides a toolkit to make, copy and manipulate the data  structures of the meshed interface. It contains functionality for mathematical calculations with respect to the moving interface and tools to couple the moving interface with computational domains bounded by the moving interface. The library hides the most complicated operations of mesh redistribution and topological bifurcation from the eyes of the  user and provides a pleasant, smooth and accurate computation of the  moving front. All the users need to do is to provide the initialization  of the manifold and the velocity field for the propagation of the front.   Figure 2 shows the three dimensional surface evolution of a sphere under a prescribed shear velocity field. The FronTier library also furnishes the calculation of such geometry-dependent variables as normal and  curvature at the interface, thus enabling users to perform computation of interface propagation in the direction of the surface normal, when the speed that is a function of curvature.</p>
+ 
+ 
+   <p class="clear">Besides the study of the Rayleigh-Taylor instability, the FronTier  library has also been applied to the simulation of diesel fuel-injection, a part of SciDAC combustion study and many other problems. For example, Figure 3 shows the application of the FronTier-Lite code in the  simulation of the forest fire front with two initial fire fronts.</p>
+ 
+ <div class="imgContainer fLeft" style="width: 200px;margin-left: 20px"">
+    	<img src="http://www.tstt-scidac.org/graphics/frontier_fig2.gif" alt="3-dimensional surface" width="200" height="200" />
+    <p>Figure 2 shows the three dimensional surface evolution of a sphere under a prescribed shear velocity field.</p>
+  </div>	
+              
+        
+        
+         
+         
+ <div class="imgContainer fRight" style="width: 300px;margin-right: 20px"">
+    	<img src="http://www.tstt-scidac.org/graphics/frontier_fig3.gif" alt="FronTier-Lite code" width="300" height="300" />
+    <p>Figure 3 shows the application of the FronTier-Lite code in the simulation of the forest fire front with two initial fire fronts.</p>
+  </div>	
+  
+
+                      
+         
+        
+<p class="clear">&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

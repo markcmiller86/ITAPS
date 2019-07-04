@@ -1,0 +1,32 @@
+
+\section{Programming Using the TSTT Mesh Interface\label{sec:Programming}}
+
+Early experience with the TSTT interface shows that there are significant
+performance penalties created by certain programming practices, including
+some practices that naturally arise when translating an existing library-specific
+code to use TSTT instead. This section highlights recommended best
+practices that come from our early experiences with the interface; more
+work in this area is ongoing.
+
+\begin{description}
+\item [Use~direct~array~access.]Many TSTT calls return data in SIDL
+arrays. Because TSTT uses only one-dimensional SIDL arrays, access to
+data in these arrays is simpler and more efficient when using direct
+array access rather than calls to the SIDL \texttt{get()} and
+\texttt{set()} functions. To use direct array access, the address of the
+actual array within the SIDL array structure must be exposed so that it
+can be treated directly as a simple array by the application code.
+\item [Retrieve~data~in~chunks.]Whenever possible, retrieve data using
+the TSTT array access calls instead of entity by entity calls. Experiments
+indicate that chunks containing as few as 20 entities were sufficient
+to reduce interoperability overhead to less than 5\%, especially when
+combined with direct array access~\cite{mcinnes05}.
+\item [Re-use~SIDL~arrays.]Especially in inner loops, the time spent
+creating and destroying SIDL arrays can represent a significant overhead.
+In many cases, this can easily be prevented by moving array creation
+and destruction outside the inner loop. In cases where an array is
+created within a function call in the original code, the SIDL array
+can be made static or created outside the function call and passed
+in.
+\end{description}
+

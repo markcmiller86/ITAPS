@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-research_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS &ndash; Research on Petascale Technologies</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResearch pageIndex" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResearch pageIndex">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="index.html" id="linkIndex">Research</a><span class="hide"> | </span>
+<a class="nav sub" href="partition.html" id="linkPartition">Partition Improvement</a><span class="hide"> | </span>
+<a class="nav sub" href="predictiveLoad.html" id="linkPredictiveLoad">Predictive Load Balance</a><span class="hide"> | </span>
+<a class="nav sub" href="commLib.html" id="linkCommLib">Communication Libraries</a><span class="hide"> | </span>
+<a class="nav sub" href="mapReduce.html" id="linkMapReduce">MapReduce Experiments</a><span class="hide"> | </span>
+<a class="nav" href="../results/index.html">Scaling Results</a>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Research on Petascale Technologies</h1>
+  <p>A critical component of ITAPS technology development is the drive toward peta and exa-scale computing for unstructured, adaptive computations; particularly for applications that use implicit solution technologies.  Parallel adaptive solution procedures require the ability to adaptively modify meshes on distributed parallel computers and to regain load balance before the next set of solution steps. The ITAPS MeshAdapt service has supported the execution of such processes for some time and provides acceptable performance on moderately sized computers. However, we have found that a number of new technical developments are required to deal with the move to very large core counts of petascale computers.   In particular, while achieving equal load balance across all processors has been important for machines with 1000's of processors, it becomes both more challenging and more impactful as the number of processors grows to 100,000 and beyond.  Even the smallest imbalance can result in 10s of thousands of processors sitting idle; a significant inefficiency that results in wasted resources.    We are developing new algorithms to improve both load balance and partition quality for complex simulations.   In addition, we are developing predictive load balancing tools to ensure that local operations such as mesh refinement do not exceed the physical memory of the processor.  </p>
+
+<p>Another significant challenge with large numbers of processors, is ensuring that operations such as passing information among all processors doesn't begin to dominate the computational cost of the simulation.   To address this challenge, we are developing new communication libraries that focus on eliminating all reduce MPI calls by operating on local neighborhoods.</p>
+
+<p>Finally, we are exploring novel mechanisms to address issues of fault tolerance.  One of the major issues facing the community with so many processing elements has to do with the recovery of user application codes after CPU, communication, and I/O related failures. Over the past twenty years there has been considerable effort put into the design of "state recovery" at both the system and user code level that allows applications to back up and restart at a point before the failure. Since the Cray machines in the mid-80's, these attempts have not been effective or successful, and as systems get larger, the problem becomes more difficult.  To address this, the ITAPS team is researching the redesign of mesh-based computational algorithms so that they are inherently tolerant to component failure. Our approach leverages transaction-based parallel computing techniques using a MapReduce formulation within a Hadoop framework.
+</p>
+
+<p>&nbsp;</p>
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

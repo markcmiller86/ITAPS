@@ -1,0 +1,50 @@
+#
+# This makefile can be used without using autoconf,
+# as long as you have IMESH_DIR set to the location
+# of the IMESH implementation you're using and 
+# F77, FC, CC, and CXX point to the appropriate compilers
+#
+
+include ${IMESH_DIR}/lib/iMesh-Defs.inc
+
+F77LINK=${F77}
+FCLINK=${FC}
+CCLINK=${CC}
+CXXLINK=${CXX}
+
+PROGRAMS=HelloMeshC HelloMeshCXX HelloMeshF77 HelloMeshF90
+
+default: ${PROGRAMS}
+
+HelloMeshF77: HelloMeshF77.o
+	${F77LINK} -o $@ $< ${IMESH_LIBS}
+
+HelloMeshF90: HelloMeshF90.o
+	-${FCLINK} -o $@ $< ${IMESH_LIBS}
+
+HelloMeshC: HelloMeshC.o
+	${CCLINK} -o $@ $< ${IMESH_LIBS}
+
+HelloMeshCXX: HelloMeshCXX.o
+	${CXXLINK} -o $@ $< ${IMESH_LIBS}
+
+.SUFFIXES: .F90 .F .c .cpp
+
+.F90.o:
+	${FC} -c ${IMESH_FCFLAGS} ${IMESH_INCLUDES} ${FCFLAGS} $<
+
+.F.o:
+	${F77} -c ${IMESH_FFLAGS} ${IMESH_INCLUDES} ${F77FLAGS} $<
+
+.c.o:
+	${CC} -c ${IMESH_CFLAGS} ${IMESH_INCLUDES} ${CFLAGS} $<
+
+.cpp.o:
+	${CXX} -c ${IMESH_CXXFLAGS} ${IMESH_INCLUDES} ${CXXFLAGS} $<
+
+clean:
+	rm -f $$(echo ${PROGRAMS} | sed -e 's/ \|$$/.o /g')
+	rm -f ${PROGRAMS}
+
+install:
+	-install ${PROGRAMS} ${IMESH_DIR}/bin

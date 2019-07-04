@@ -1,0 +1,152 @@
+
+\section{Data Model\label{sec:Data-Model}}
+
+In the iMesh data model, all mesh primitives --- vertices (0D),
+edges (1D), faces (2D), and regions (3D) --- are referred to as
+\emph{entities}.  Mesh entities are collected together to form
+\emph{entity sets}. All topological and geometric mesh
+data\footnote{\emph{Geometric mesh data} is geometric data required to
+define shapes of mesh entities. This is distinct from \emph{geometric
+model data}, which defines the shapes of the problem domain.} is stored
+in a \emph{root entity set} and there is a single root set for each
+computational domain; all other entity sets are contained in the root
+set. Many implementations will represent the root set as a database
+containing all of the mesh entities, with other entity sets containing
+handles for these entities.  Any iMesh data object --- an entity or
+any entity set including the root set --- can have one or more
+\emph{tags} associated with it, so that arbitrary data can be attached
+to the object. To preserve data structure neutrality, all iMesh data
+objects are identified by opaque handles.
+
+
+\subsection{Mesh Entities\label{sub:Mesh-Entities}}
+
+All the primitive components of a mesh are defined by the iMesh data
+model to be of type \texttt{Entity}. iMesh entities are
+distinguished by their entity type (effectively, their topological
+dimension) and entity topology; each topology has a unique entity type
+associated with it. Examples of entities include a vertex, an edge,
+triangular or quadrilateral faces in 2D or 3D, and tetrahedral or
+hexahedral regions in 3D. Faces and regions have no interior holes.
+Higher-dimensional entities are defined by lower-dimensional entities
+using a canonical ordering.
+
+
+\subsection{Entity Adjacencies\label{sub:Entity-Adjacencies}}
+
+Adjacencies describe how mesh entities connect to each other. For an
+entity of dimension $d$, first-order adjacency returns all of the mesh
+entities of dimension $q$ which are on the closure of the entity for
+downward adjacency ($d>q$), or for which the entity is part of the
+closure for upward adjacency ($d<q$). For a particular implementation,
+not all first-order adjacencies are necessarily available.  For
+instance, in a classic finite element element-node connectivity storage,
+requests for faces or edges adjacent to an entity may return nothing,
+because the implementation has no stored data to return.  For
+first-order adjacencies that are available in the implementation, the
+implementation may store the adjacency information directly, or compute
+adjacencies by either a local traversal of the entity's neighborhood or
+by global traversal of the entity set. Each iMesh implementation
+must provide information about the availability of and relative cost of
+first-order adjacency queries.
+
+For an entity of dimension $d$, second-order adjacencies describe
+all of the mesh entities of dimension $q$ that share any adjacent
+entities of dimension $b$, where $d\neq b$ and $b\neq q$. Second-order
+adjacencies can be derived from first-order adjacencies. Note that,
+in the iMesh data model, requests such as all vertices that are neighbors
+to a given vertex are requests for second-order adjacencies.
+
+Examples of adjacency requests include: for a given face, the regions
+on either side of the face (first-order upward); the vertices bounding
+the face (first-order downward); and the faces that share any vertex
+with the face (second-order). 
+
+
+\subsection{Meshes\label{sub:Meshes}}
+
+To be useful to applications, information
+in the root set or one or more of its constituent entity sets is assumed
+to be a valid computational mesh, examples of which include: 
+
+\begin{itemize}
+\item A non-overlapping, connected set of iMesh entities; for example,
+the structured and unstructured meshes commonly used in finite element
+simulations (\emph{simple mesh}).  
+\item Overlapping grids in which a collection of simple meshes are used
+to represent some portion of the computational domain, including
+chimera, multiblock, and multigrid meshes (\emph{multiple mesh}). The
+interfaces presented here handle these mesh types in a general way;
+higher-level convenience functions may be added later to support
+specific functionalities needed by these meshes. In this case, each of
+the simple meshes is a valid computational mesh, stored as an entity
+set.
+\item Adaptive meshes in which all entities in a sequence of refined (simple or multiple)
+meshes are retained in the root set. The most highly refined adaptation
+level typically comprises a simple or multiple mesh. Typically,
+different levels of mesh adaptation will be represented by different entity
+sets, with many of the entities shared by multiple entity sets.
+\item Smooth particle hydrodynamic (SPH) meshes, which consist of a collection
+of iMesh vertices with no connectivity or adjacency information. 
+\end{itemize}
+At the most fundamental level, we consider a static simple mesh. This
+mesh provides only basic query capabilities to return entities and their
+adjacencies.  This implies that all implementations have a root set, but
+not necessarily the subsetting capabilities described in
+Section~\ref{sec:Data-Model}.\ref{sub:Entity-Sets}.
+
+In addition, meshes can also be extended to be modifiable, through
+support for creation and deletion of mesh entities (see
+Section~\ref{sec:Interface}.\ref{sub:Mesh-Modification}).  Modifiable
+meshes require a minimal interaction with the underlying geometric model
+to uniquely associate mesh entities with geometric model entities of
+equal or greater dimension\cite{geoclas}.
+
+
+\subsection{Entity Sets\label{sub:Entity-Sets}}
+
+The iMesh interface defines a mechanism for creating arbitrary
+groupings of entities; these groupings are called \emph{entity sets}.
+Each entity set may be a true set (in the set theoretic sense) or it may be
+a (possibly non-unique) ordered list of entities; in the latter case,
+entities are retrieved in the order in which they were added to the
+entity set. An entity set also may or may not be a simple mesh; entity
+sets that \emph{are} simple meshes have obvious application in
+multiblock and multigrid contexts, for instance. Entity sets (other than
+the root set) are populated by addition or removal of entities from the
+set. In addition, set boolean operations --- subtraction, intersection,
+and union --- are also supported.
+
+Two primary relationships among entity sets are supported. First,
+entity sets may contain one or more entity sets (by definition, all
+entity sets belong to the root set). An entity set contained
+in another may be either a subset or an element (each in the set theoretic
+sense) of that entity set. The choice between these two interpretations
+is left to the application; the iMesh interface does not impose either
+interpretation. Set contents can be queried recursively or non-recursively;
+in the former case, if entity set A is contained in entity set B,
+a request for the contents of B will include the entities in A (and
+the entities in sets contained in A). Second, parent/child relationships
+between entity sets are used to represent logical relationships between
+sets, including multigrid and adaptive mesh sequences. These logical
+relationships naturally form a directed, acyclic graph.
+
+Examples of entity sets include the ordered list of vertices bounding
+a geometric face, the set of all mesh faces classified on that geometric
+face, the set of regions assigned to a single processor by mesh partitioning,
+and the set of all entities in a given level of a multigrid mesh sequence. 
+
+
+\subsection{Tags\label{sub:Tags}}
+
+Tags are used as containers for user-defined data that can be attached
+to iMesh entities, meshes, and entity sets. Different values of a particular
+tag can be associated with different mesh entities; for instance,
+a boundary condition tag will have different values for an inflow
+boundary than for a no-slip wall. In the general case, iMesh tags do
+not have a predefined type and allow the user to attach arbitrary
+data to mesh entities; this data is stored and retrieved by implementations
+as a bit pattern. To improve performance and ease of use, we support
+three specialized tag types: integers, doubles, and handles. These
+typed tags enable correct saving and restoring of tag data when a
+mesh is written to a file.

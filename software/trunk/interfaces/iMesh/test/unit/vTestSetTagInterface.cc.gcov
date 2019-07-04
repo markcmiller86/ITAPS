@@ -1,0 +1,398 @@
+        -:    0:Source:vTestSetTagInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestSetTagInterface(iMesh_Instance& instance)
+        -:    4:{
+        1:    5:  iBase_TagHandle *aGotTags = NULL;
+        -:    6:  iBase_TagHandle aTags[7];
+        1:    7:  iBase_EntitySetHandle apvSets[6] = {NULL};
+        -:    8:  iBase_EntityHandle aEnts[3];
+        -:    9:  int iNumChars, err;
+        -:   10:  // Testing normal operation of SetTag
+        -:   11:  //     getEntSetData, getEntSetIntData, getEntSetDblData,
+        -:   12:  //     getEntSetEHData, setEntSetData, setEntSetIntData,
+        -:   13:  //     setEntSetDblData, setEntSetEHData, getAllEntSetTags,
+        -:   14:  //     rmvEntSetTag
+        1:   15:  cout << "Testing entity set tagging functionality...\n";
+        -:   16:
+        -:   17:  {
+        -:   18:    iBase_EntityIterator pvIter;
+        -:   19:    // Get at least 3 entities to work with
+        -:   20:    iMesh_initEntIter(instance, pvRootSet, iBase_ALL_TYPES, 
+        1:   21:		      iMesh_ALL_TOPOLOGIES, 0, &pvIter, &err);
+        1:   22:    CHECK_ERR(err);
+        1:   23:    if (err != iBase_SUCCESS) {
+    #####:   24:      cout << "\nCould not get mesh data to work with... exiting...\n";
+    #####:   25:      TEST ( data_preparation );
+        -:   26:      return;
+        -:   27:    }
+        -:   28:    
+        1:   29:    int qGotData, i = 0;  
+        1:   30:    iMesh_getNextEntIter(instance, pvIter, &aEnts[i], &qGotData, &err);
+        1:   31:    CHECK_ERR(err);
+        1:   32:    i++;
+        4:   33:    while (qGotData && i < 3) {
+        2:   34:      iMesh_getNextEntIter(instance, pvIter, &aEnts[i], &qGotData, &err);
+        2:   35:      CHECK_ERR(err);
+        2:   36:      i++;
+        -:   37:    }
+        1:   38:    if (!qGotData) {
+    #####:   39:      cout << "\nCould not get enough mesh data to work with... exiting...\n";
+    #####:   40:      TEST ( data_preparation );
+        -:   41:      return;
+        -:   42:    }
+        1:   43:    iMesh_endEntIter(instance, pvIter, &err);
+        1:   44:    CHECK_ERR(err);
+        -:   45:  }
+        -:   46:
+        -:   47:  // Create a tag of each type and 3 entity sets to be tagged
+        4:   48:  for ( int i=0; i<3; i++ ) {
+        3:   49:    iMesh_createTag(instance, astrTagNames[i], 1, aTagTypes[i],
+        6:   50:		    &aTags[i], &err, aiTagNameLen[i]);
+        3:   51:    CHECK_ERR(err);
+        3:   52:    iMesh_createEntSet(instance,  false, &apvSets[i], &err);
+        3:   53:    CHECK_ERR(err);
+        3:   54:    if (err != iBase_SUCCESS) {
+        -:   55:      cout << "Could not create entity sets to work with... "
+    #####:   56:	   << "exiting...\n";
+    #####:   57:      TEST ( data_preparation );
+        -:   58:      return;
+        -:   59:    }
+        -:   60:  }
+        -:   61:
+        -:   62:  // Be sure to test tagging of the root set (mesh) as well.  Yes, this
+        -:   63:  // leaks a set; so what?
+        1:   64:  apvSets[0] = pvRootSet;
+        -:   65:  // ... and a generic tag for completeness
+        1:   66:  iMesh_createTag(instance, astrTagNames[3], 6, aTagTypes[3], &aTags[3], &err, aiTagNameLen[3]);
+        1:   67:  CHECK_ERR(err);
+        -:   68:
+        1:   69:  cout << "Testing get and set methods with integers...              ";
+        -:   70:  {
+        -:   71:    // Try setting the data using the generic function...
+        1:   72:    iNumChars = sizeof(int);
+        1:   73:    int* piData = new int(25);
+        1:   74:    char *aChars = (char*)piData;
+        -:   75:
+        1:   76:    iMesh_setEntSetData(instance, apvSets[0], aTags[0], aChars, iNumChars, &err);
+        1:   77:    CHECK_ERR(err);
+        -:   78:    // ... then seeing if it comes back intact
+        1:   79:    void *aOutput = NULL;
+        1:   80:    int iOutputAlloc = 0;
+        1:   81:    iMesh_getEntSetData(instance, apvSets[0], aTags[0], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:   82:    CHECK_ERR(err);
+        1:   83:    TESTEQ(iNumChars,(int)sizeof(int));
+        1:   84:    TESTEQ(*(int*)aOutput,25);
+        -:   85:    // Now try to change the data using the specific function
+        -:   86:    // and ensure it comes back intact
+        1:   87:    iMesh_setEntSetIntData(instance, apvSets[0], aTags[0], 30, &err);
+        1:   88:    CHECK_ERR(err);
+        -:   89:    int iVal;
+        1:   90:    iMesh_getEntSetIntData(instance,apvSets[0], aTags[0], &iVal, &err);
+        1:   91:    CHECK_ERR(err);
+        1:   92:    TESTEQ(iVal,30);
+        1:   93:    UT_FREE(aOutput);
+        1:   94:    delete piData;
+        -:   95:  }
+        1:   96:  cout << "DONE\n";
+        -:   97:
+        1:   98:  cout << "Testing get and set methods with doubles...               ";
+        -:   99:  {
+        -:  100:    // Try setting the data using the generic function...
+        1:  101:    iNumChars = sizeof(double);
+        1:  102:    double* pdData = new double(1.8);
+        1:  103:    char *aChars = (char*)pdData;
+        -:  104:
+        1:  105:    iMesh_setEntSetData(instance, apvSets[0], aTags[1], aChars, iNumChars, &err);
+        1:  106:    CHECK_ERR(err);
+        -:  107:    // ... then seeing if it comes back intact
+        1:  108:    void *aOutput = NULL;
+        1:  109:    int iOutputAlloc = 0;
+        1:  110:    iMesh_getEntSetData(instance, apvSets[0], aTags[1], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  111:    CHECK_ERR(err);
+        1:  112:    TESTEQ(iNumChars,(int)sizeof(double));
+        1:  113:    TESTEQ(*(double*)aOutput,1.8);
+        -:  114:    // Now try to change the data using the specific function
+        -:  115:    // and ensure it comes back intact
+        1:  116:    iMesh_setEntSetDblData(instance, apvSets[0], aTags[1], 1.9, &err);
+        1:  117:    CHECK_ERR(err);
+        -:  118:    double dVal;
+        1:  119:    iMesh_getEntSetDblData(instance,apvSets[0], aTags[1], &dVal, &err);
+        1:  120:    CHECK_ERR(err);
+        1:  121:    TESTEQ(dVal,1.9);
+        1:  122:    UT_FREE(aOutput);
+        1:  123:    delete pdData;
+        -:  124:  }
+        1:  125:  cout << "DONE\n";
+        -:  126:
+        1:  127:  cout << "Testing get and set methods with entity handles...        ";
+        -:  128:  {
+        -:  129:    // Try setting the data using the generic function...
+        1:  130:    iNumChars = sizeof(void*);
+        1:  131:    char *aChars = (char*)(&aEnts[0]);
+        -:  132:
+        1:  133:    iMesh_setEntSetData(instance, apvSets[0], aTags[2], aChars, iNumChars, &err);
+        1:  134:    CHECK_ERR(err);
+        -:  135:
+        -:  136:    // ... then seeing if it comes back intact
+        1:  137:    void *aOutput = NULL;
+        1:  138:    int iOutputAlloc = 0;
+        1:  139:    iMesh_getEntSetData(instance, apvSets[0], aTags[2], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  140:    CHECK_ERR(err);
+        1:  141:    TESTEQ(iNumChars,(int)sizeof(void*) );
+        1:  142:    TESTEQ(*(iBase_EntityHandle*)aOutput,aEnts[0]);
+        -:  143:    // Now try to change the data using the specific function
+        -:  144:    // and ensure it comes back intact
+        1:  145:    iMesh_setEntSetEHData(instance, apvSets[0], aTags[2], aEnts[1], &err);
+        1:  146:    CHECK_ERR(err);
+        -:  147:
+        -:  148:    iBase_EntityHandle EH;
+        1:  149:    iMesh_getEntSetEHData(instance,apvSets[0], aTags[2], &EH, &err);
+        1:  150:    CHECK_ERR(err);
+        1:  151:    UT_FREE(aOutput);
+        1:  152:    TESTEQ(EH,aEnts[1]);
+        -:  153:  } 
+        1:  154:  cout << "DONE\n";
+        -:  155:
+        1:  156:  cout << "Testing get and set methods with generic data (bytes)...  ";
+        -:  157:  {
+        -:  158:    // Try setting the data using the generic function...
+        1:  159:    iNumChars = 6;
+        1:  160:    char acData[] = "abcdef";
+        1:  161:    iMesh_setEntSetData(instance, apvSets[0], aTags[3], acData, iNumChars, &err);
+        1:  162:    CHECK_ERR(err);
+        -:  163:    // ... then seeing if it comes back intact
+        1:  164:    void *aOutput = NULL;
+        1:  165:    int iOutputAlloc = 0;
+        1:  166:    iMesh_getEntSetData(instance, apvSets[0], aTags[3], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  167:    CHECK_ERR(err);
+        -:  168:    bool qGotData = ( iNumChars == 6 ) && 
+        1:  169:      !strncmp(reinterpret_cast<char*>(aOutput), acData, iNumChars);
+        1:  170:    UT_FREE(aOutput);
+        1:  171:    TEST ( qGotData );
+        -:  172:  }
+        1:  173:  cout << "DONE\n";
+        -:  174:
+        1:  175:  cout << "Testing tag finding...                                    ";
+        -:  176:  {
+        1:  177:    int iNumTags, iGotTagsAlloc = 0;
+        1:  178:    iMesh_getAllEntSetTags(instance, apvSets[0], &aGotTags, &iGotTagsAlloc, &iNumTags, &err);
+        1:  179:    CHECK_ERR(err);
+        1:  180:    bool qTagsPresent = false;
+        1:  181:    if ( iNumTags == 4 )
+        1:  182:      GOT_ALL_ITEMS ( aTags, aGotTags, iNumTags, qTagsPresent );
+        1:  183:    TEST ( qTagsPresent );
+        -:  184:  } 
+        1:  185:  cout << "DONE\n";
+        1:  186:  vDoSaveLoad(&instance, &pvRootSet);
+        -:  187:
+        1:  188:  if (qSaveLoad) {
+        -:  189:    iBase_EntityHandle ent;
+        1:  190:    vRecoverTags(instance, pvRootSet, aTags);
+        1:  191:    apvSets[0] = pvRootSet;
+        -:  192:
+        1:  193:    cout << "Retesting get methods after load/save...\n";
+        1:  194:    cout << "Testing get method with integers...              ";
+        -:  195:    {
+        -:  196:      int iVal;
+        1:  197:      iMesh_getEntSetIntData(instance,apvSets[0], aTags[0], &iVal, &err);
+        1:  198:      CHECK_ERR(err);
+        1:  199:      TESTEQ(iVal,30);
+        -:  200:    }
+        1:  201:    cout << "DONE\n";
+        -:  202:
+        1:  203:    cout << "Testing get method with doubles...               ";
+        -:  204:    {
+        -:  205:      double dVal;
+        1:  206:      iMesh_getEntSetDblData(instance,apvSets[0], aTags[1], &dVal, &err);
+        1:  207:      CHECK_ERR(err);
+        1:  208:      TESTEQ(dVal,1.9);
+        -:  209:    }
+        1:  210:    cout << "DONE\n";
+        -:  211:
+        -:  212:    // No practical way to test entity handle tags:  what's the right
+        -:  213:    // answer?
+        -:  214:
+        1:  215:    cout << "Testing get method with generic data (bytes)...  ";
+        -:  216:    {
+        -:  217:      int iNumChars;
+        1:  218:      char acData[] = "abcdef";
+        1:  219:      void  *aOutput = NULL;
+        1:  220:      int iOutputAlloc = 0;
+        1:  221:      iMesh_getEntSetData(instance, apvSets[0], aTags[3], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  222:      CHECK_ERR(err);
+        -:  223:      bool qGotData = ( iNumChars == 6 ) && 
+        1:  224:	!strncmp(reinterpret_cast<char*>(aOutput), acData, iNumChars);
+        1:  225:      UT_FREE(aOutput);
+        1:  226:      TEST ( qGotData );
+        -:  227:    }
+        1:  228:    cout << "DONE\n";
+        -:  229:  }
+        -:  230:
+        -:  231:  // Testing error behavior
+        1:  232:  if ( qErrTests ) {
+        -:  233:    // Error throwing tests simply try to create a situation where the interface
+        -:  234:    // should, according to the spec, throw an error, and verify that:
+        -:  235:    // (a) an error is thrown, and (b) the error is the one expected.
+        -:  236:    // If an error is not thrown, the reversal of the action is attempted, if
+        -:  237:    // it would interfere with further tests.
+        -:  238:    
+        -:  239:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -:  240:    // entity as an entity set or vice versa, etc., but sometimes try more
+        -:  241:    // difficult tests such as passing in a pointer to character data as an
+        -:  242:    // entity handle.
+        -:  243:    {
+        -:  244:      iMesh_Instance new_instance;
+        1:  245:      iMesh_newMesh("", &new_instance, &err, 0);
+        1:  246:      cout << "Testing error throwing for SetTag methods...              ";
+        1:  247:      char data[] = {'a', 'b', 'c', 'd'};
+        1:  248:      void *aOutput = data;
+        1:  249:      int iOutputAlloc = 4;
+        -:  250:      {
+        4:  251:	for ( int i=0; i<3; i++ ) {
+        3:  252:	  iMesh_createTag(new_instance, astrTagNames[i], 1, aTagTypes[i],
+        6:  253:			  &aTags[i+4], &err, aiTagNameLen[i]);
+        3:  254:	  CHECK_ERR(err);
+        3:  255:	  iMesh_createEntSet(new_instance, false, &apvSets[i+3], &err);
+        3:  256:	  CHECK_ERR(err);
+        3:  257:	  if ( err != iBase_SUCCESS ) {
+        -:  258:	    cout << "Could not create entity sets to work with... "
+    #####:  259:		 << "exiting...\n";
+    #####:  260:	    TEST ( data_preparation );
+        -:  261:	    return;
+        -:  262:	  }
+        -:  263:	}
+        -:  264:      }
+        -:  265:      //setting tag data for a mesh with no data
+        -:  266:      iMesh_setEntSetData(new_instance, apvSets[3], aTags[4], aOutput,
+        1:  267:			  iOutputAlloc, &err);
+        1:  268:      CHECK_ERR(err);
+        -:  269:
+        -:  270:      // setting tag data for a mesh with no data
+        1:  271:      iMesh_setEntSetIntData(new_instance, apvSets[3], aTags[4], 15, &err);
+        1:  272:      CHECK_ERR(err);
+        -:  273:
+        -:  274:      //  setting tag data for a mesh with no data
+        1:  275:      iMesh_setEntSetDblData(new_instance, apvSets[3], aTags[5], 1.5, &err);
+        1:  276:      CHECK_ERR(err);
+        -:  277:
+        -:  278:      // setting tag data for a mesh with no data
+        1:  279:      iMesh_setEntSetEHData(new_instance, apvSets[3], aTags[6], aEnts[0], &err);
+        1:  280:      CHECK_ERR2(err, iBase_INVALID_ENTITY_HANDLE );
+        -:  281:
+        -:  282:      //  getting tag data for a mesh with no data
+        1:  283:      iMesh_getEntSetData(new_instance, apvSets[3], aTags[4], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  284:      CHECK_ERR(err);
+        -:  285:
+        -:  286:      //  getting tag data for a mesh with no data
+        -:  287:      int iData;
+        1:  288:      iMesh_getEntSetIntData(new_instance, apvSets[3], aTags[4], &iData, &err);
+        1:  289:      CHECK_ERR(err);
+        -:  290:
+        -:  291:      //  getting tag data for a mesh with no data
+        -:  292:      double dData;
+        1:  293:      iMesh_getEntSetDblData(new_instance, apvSets[3], aTags[5], &dData, &err);
+        1:  294:      CHECK_ERR(err);
+        -:  295:
+        -:  296:      //  getting tag data for a mesh with no data
+        -:  297:      iBase_EntityHandle EH;
+        1:  298:      iMesh_getEntSetEHData(new_instance, apvSets[3], aTags[6], &EH, &err);
+        1:  299:      CHECK_ERR2(err, iBase_TAG_NOT_FOUND );
+        -:  300:
+        -:  301:      //  removing tag data for a mesh with no data
+        1:  302:      iMesh_rmvEntSetTag(new_instance, apvSets[3], aTags[6], &err);
+        1:  303:      CHECK_ERR(err);
+        -:  304:
+        1:  305:      iMesh_dtor(new_instance, &err);
+        -:  306:    }
+        -:  307:
+        -:  308:    //  getting tag data for an invalid output array size
+        1:  309:    int iOutputAlloc = 1;
+        1:  310:    char aOutput[] = "";
+        1:  311:    iMesh_getEntSetData(instance, apvSets[0], aTags[0], &aOutput, &iOutputAlloc, &iNumChars, &err);
+        1:  312:    CHECK_ERR2(err, iBase_BAD_ARRAY_SIZE );
+        -:  313:    
+        -:  314:    // setting integer tag data for a double tag handle
+        1:  315:    iMesh_setEntSetIntData(instance, apvSets[0], aTags[1], 15, &err);
+        1:  316:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  317:
+        -:  318:    //  setting double tag data for an integer tag handle
+        1:  319:    iMesh_setEntSetDblData(instance, apvSets[0], aTags[0], 1.5, &err);
+        1:  320:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  321:
+        1:  322:    if (!qSaveLoad) {
+        -:  323:      // If you've done save/load, then you'd need to re-establish the
+        -:  324:      //  identify of the entity in question.  Yuck.
+        -:  325:
+        -:  326:      //  setting entity handle tag data for an integer tag handle
+    #####:  327:      iMesh_setEntSetEHData(instance, apvSets[0], aTags[0], aEnts[0], &err);
+    #####:  328:      CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  329:    }
+        -:  330:
+        -:  331:    //  getting integer tag data for a double tag handle
+        -:  332:    int iData;
+        1:  333:    iMesh_getEntSetIntData(instance, apvSets[0], aTags[1], &iData, &err);
+        1:  334:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  335:
+        -:  336:    //  getting double tag data for an integer tag handle
+        -:  337:    double dData;
+        1:  338:    iMesh_getEntSetDblData(instance, apvSets[0], aTags[0], &dData, &err);
+        1:  339:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  340:
+        -:  341:    //  getting entity handle tag data for an integer tag handle
+        -:  342:    iBase_EntityHandle EH;
+        1:  343:    iMesh_getEntSetEHData(instance, apvSets[0], aTags[0], &EH, &err);
+        1:  344:    CHECK_ERR2(err, iBase_INVALID_TAG_HANDLE );
+        -:  345:
+        -:  346:    //  getting all tags into an array of the wrong size
+        1:  347:    int iGotTagsAlloc = 1;
+        1:  348:    iMesh_getAllEntSetTags(instance, apvSets[0], &aGotTags, &iGotTagsAlloc, &iNumChars, &err);
+        1:  349:    CHECK_ERR2(err, iBase_BAD_ARRAY_SIZE );
+        -:  350:
+        1:  351:    cout << "DONE\n";
+        -:  352:  }
+        1:  353:  cout << "Testing tag removal and forced/unforced destruction...    ";
+        -:  354:  {
+        1:  355:    bool qOK = true;
+        1:  356:    iMesh_rmvEntSetTag(instance, apvSets[0], aTags[0], &err);
+        1:  357:    qOK = (err == iBase_SUCCESS);
+        1:  358:    CHECK_ERR(err);
+        -:  359:
+        1:  360:    iMesh_rmvEntSetTag(instance, apvSets[0], aTags[1], &err);
+        1:  361:    qOK = (err == iBase_SUCCESS);
+        1:  362:    CHECK_ERR(err);
+        -:  363:
+        1:  364:    iMesh_destroyTag(instance, aTags[0], false, &err);
+        1:  365:    qOK = (err == iBase_SUCCESS);
+        1:  366:    CHECK_ERR(err);
+        -:  367:
+        1:  368:    iMesh_destroyTag(instance, aTags[1], false, &err);
+        1:  369:    qOK = (err == iBase_SUCCESS);
+        1:  370:    CHECK_ERR(err);
+        -:  371:    
+        1:  372:    TEST(qOK);
+        -:  373:  }
+        -:  374:  // trying to destroy tag with data without using forced
+        1:  375:  iMesh_destroyTag(instance, aTags[2], false, &err);
+        1:  376:  CHECK_ERR2(err, iBase_TAG_IN_USE );
+        -:  377:
+        -:  378:  //  trying to destroy tag with data without using forced
+        1:  379:  iMesh_destroyTag(instance, aTags[3], false, &err);
+        1:  380:  CHECK_ERR2(err, iBase_TAG_IN_USE );
+        -:  381:
+        -:  382:  {
+        1:  383:    bool qOK = true;
+        1:  384:    iMesh_destroyTag(instance, aTags[2], true, &err);
+        1:  385:    qOK = (err == iBase_SUCCESS);
+        1:  386:    CHECK_ERR(err);
+        -:  387:    
+        1:  388:    iMesh_destroyTag(instance, aTags[3], true, &err);
+        1:  389:    qOK = (err == iBase_SUCCESS);
+        1:  390:    CHECK_ERR(err);
+        -:  391:
+        1:  392:    TEST(qOK);
+        -:  393:  }
+        1:  394:  cout << "DONE\n";
+        1:  395:  UT_FREE(aGotTags);
+        2:  396:}

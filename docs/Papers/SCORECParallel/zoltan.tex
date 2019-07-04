@@ -1,0 +1,114 @@
+% This is section{Using Zoltan to Do Partition}
+
+FMDB uses Zoltan load-balancing interface functions to perform
+partition and repartition of the part objects across the processes. In
+order To use Zoltan in FMDB, three steps are needed. 
+
+1. Assign a global identifier to each part object.
+2. Set options to control the behavior of Zoltan, the application
+program can choose any option to do multilevel
+partitioning  
+  geometric, graph or hypergraph based partitioner;
+  coarse or refine partition; 
+  tolerant imbalancings.  
+ 
+3. Provide necessary query functions to provide part object
+information to Zoltan (geometric, graph, and hypergraph query functions). 
+
+
+\subsection{Define global identifier for part object}   
+% part object(po) pointer + process rank 
+
+Each part object in the data is required to have global identifier (ID) in
+Zoltan partition. And each part object can be represented as local
+memory allocation plus the process rank. This global
+ID is easy to build and rebuild, and would save the time to search the
+corresponding part object based on a global ID. 
+
+% From FMDB's aspect, to desribe how to provide options and query
+% functions to Zoltan. 
+
+\subsection{Set Zoltan's Parameters} % I am not sure that I should use
+				% graph node or part object. Even
+				% though they have the same meaning. 
+
+A specific structure of partition options is provided by FMDB to the
+application program, which can set Zoltan's partition parameters
+through the partition options. The structure of the partition options
+is listed as follows. Currently, FMDB only uses Zoltan graph-based
+load balancing interface functions.  
+
+\begin{itemize}
+
+\item{lb\_method:} The partition algorithm used by Zoltan. The default
+  value is 'GRAPH'.
+
+\item{lb\_approach:} The desired load balancing approach. 'PARTITION',
+  'REPARTITION' or 'REFINE' \cite{Zoltan}. The default value is 'PARTITION'.  
+
+\item obj\_weight\_dim: The number of weights associated with a graph
+  node. The default value is zero, indicates all graph nodes have
+  equal weight.  
+
+\item edge\_weight\_dim: The number of weights associated with a graph
+  edge. The default value is zero, indicates all graph edges have
+  equal weight. 
+
+\item num\_global\_partitions:   The total number of partitions to be
+  generated in the partition result. Integer values greater than zero
+  are accepted \cite{Zoltan}. The default value is the number of processes. 
+
+\item num\_local\_partitions: 
+  The number of partitions to be generated on this processor in the
+  partition result. Integer values greater than zero
+  are accepted. If any process is set with the option, the value on
+  processes not setting this option is assumed to be zero \cite{Zoltan}. The
+  default value is one for each process.   
+
+\item imblance\_tol: The amount of load imbalance the partitioning
+  algorithm should deem acceptable. The default value is 1.1, which
+  ndicates that 10\% imbalance is OK; that is, the maximum over the
+  average shouldn't exceed 1.1  \cite{Zoltan}.    
+
+\item debug\_level: An integer indicating how much debugging
+  information is printed by Zoltan. Higher values produce more output
+  and potentially slow down Zoltan's computation \cite{Zoltan}. 
+
+\item timer: The timer with which the application program wish to measure time. Valid
+  choices are wall, cpu, and user  \cite{Zoltan}. 
+
+
+\end{itemize}
+
+
+\subsection{Provide Query Functions to Zoltan}
+
+In order to use Zoltan graph-based load-balacing interface functions,
+FMDB defines a class  'pmZoltanCallbacks' to interact with Zoltan, and provides four query
+functions to Zoltan in that class as follows. Please see Appendix for
+the details of the class  'pmZoltanCallbacks'. 
+
+\begin{itemize}
+
+\item \textbf{get\_num\_po} a query function returns the number of
+  graph nodes that are currently assigned to the processor.
+
+  
+\item \textbf{get\_po\_list} a query function returns the information about
+  the graph nodes  currently assigned to the processor, including an
+  array of global ID(s) for all graph nodes,  and optionally
+  their weights. 
+
+\item \textbf{get\_num\_edges\_multi} a query function returns the number of
+  graph edges for connected to each graph node returned by query
+  function get\_po\_list. 
+
+\item \textbf{get\_edge\_list\_multi} a query function returns arrays of global
+  ID(s), process ID(s), and optionally edge weights for graph nodes
+  connected to each graph node returned by query
+  function get\_po\_list. 
+
+\end{itemize}
+
+
+\subsection{Construct Graph Nodes and Graph Edges}   %\input{graph.tex}

@@ -1,0 +1,3 @@
+Store an interface specification here. Currently, this is sort of language
+agnostic header files. However, in future, this could look more like XML
+that is then used to generate C, C++ and Fortran specific header files.

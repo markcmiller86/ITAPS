@@ -1,0 +1,11 @@
+--2013-01-21 17:29:02--  https://redmine.scorec.rpi.edu/anonsvn/itaps/software/trunk/tools/ITAPS.supp
+Resolving redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)... 128.113.131.53, 2620:0:2820:4108:80::53
+Connecting to redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)|128.113.131.53|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 792 [text/plain]
+Saving to: `ITAPS.supp.1'
+
+     0K                                                       100% 37.9M=0s
+
+2013-01-21 17:29:06 (37.9 MB/s) - `ITAPS.supp.1' saved [792/792]
+

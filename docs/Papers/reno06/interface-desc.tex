@@ -1,0 +1,843 @@
+
+\section{Interface Description\label{sec:Interface}}
+
+We have defined interfaces for a variety of commonly needed and
+supported functionalities for mesh and entity query, mesh modification,
+entity set operations, and tags.  In this section we describe the
+functionality available through the TSTT mesh interface, including
+semantic descriptions of the function calls in the
+interface.\footnote{Note that these descriptions do not include detailed
+syntax, which can be found in the interface user guide\cite{TSTTB-UG,TSTTM-UG}.}
+For listings of allowable values of all TSTT enumerated data types,
+see Appendix~\ref{app:TSTT-enum}.
+
+\subsection{Global Queries\label{sub:Mesh-Interface}}
+
+Global query functions can be categorized into two groups: 1)
+\emph{database functions}, that manipulate the properties of the
+database as a whole and 2) \emph{set query functions}, that query the
+contents of entity sets as a whole; these functions require an entity
+set argument, which may be the root set as a special case.  These
+functions are summarized in Table~\ref{table:Mesh-Int}.
+
+\begin{table}[tbp]
+\caption{Functions for Global Queries}\label{table:Mesh-Int}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+load&
+filename, ES&
+---&
+Loads mesh data from file into entity set\tabularnewline
+\hline 
+save&
+filename, ES&
+---&
+Saves data from entity set to file\tabularnewline
+\hline 
+getRootSet&
+---&
+ES&
+Returns handle for the root set\tabularnewline
+\hline 
+getGeometricDim&
+---&
+dimen&
+Returns geometric dimension of mesh\tabularnewline
+\hline 
+getDfltStorage&
+---&
+SO&
+Tells whether implementation prefers blocked or interleaved coordinate
+data\tabularnewline
+\hline 
+getAdjTable&
+---&
+AI table&
+Returns table indicating availability and cost of entity adjacency
+data\tabularnewline
+\hline 
+areEHValid&
+reset?&
+handles changed?&
+Returns true if EH remain unchanged since last user-requested status
+reset\tabularnewline
+\hline 
+\hline 
+getNumOfType&
+ES, Type&
+\# of Type&
+Returns number of entities of type in ES\tabularnewline
+\hline 
+getNumOfTopo&
+ES, Topo&
+\# of Topo&
+Returns number of entities of topo in ES\tabularnewline
+\hline 
+getAllVtxCoords&
+ES, SO&
+coords, SO&
+Returns coords of all vertices in the set and all vertices on the
+closure of higher-dimensional entities in the set; storage order can
+be user-specified\tabularnewline
+\hline 
+getEntities&
+ES, Type, Topo&
+entities&
+Returns all entities in ES of the given type and topology\tabularnewline
+\hline 
+getAdjEntities&
+ES, Type, Topo, adj\_Type&
+entities&
+For all entities of given type and topology in ES, return adjacent entities
+of adj\_type\tabularnewline
+\hline 
+getVtxArrCoords&
+vertex handles, SO&
+coords, SO&
+For all input vertex handles, return coords; storage order can be
+user-specified.\tabularnewline
+\hline 
+getVtxCoordIndex&
+ES, Type, Topo, adj\_Type&
+indices&
+For all entities of given type and topology, find adjacent entities of
+adj\_Type, and return the coordinate indices for their vertices. Vertex
+ordering matches that in getAllVtxCoords.\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+Database functions include functions to load and save information to a
+file; file format is implementation dependent.  As mesh data is loaded,
+entities are stored in the root set, and can optionally be placed into
+a subsidiary entity set as well.  TSTT implementations must be able to provide
+coordinate information in both blocked (xxx...yyy...zzz...) and
+interleaved (xyzxyzxyz...) formats; an application can query the
+implementation to determine the implementation's preferred storage
+order.  Also, implementations must provide information about the
+availability and relative cost of computing adjacencies between entities
+of different types.  Finally, each instance of the interface must
+provide a handle for the root set.
+
+Set query functions allow an application to retrieve information about
+entities in a set.  The entity set may be the root set, which will
+return selected contents of the entire database, or may be any
+subsidiary entity set.  For example, functions exist to request the
+number of mesh entities of a given type or topology; the types and
+topologies are defined as enumerations.  Applications can request
+handles for all entities of a given type or topology or handles for
+entities of a given type adjacent to all entities of a given type or
+topology.  Also, vertex coordinates are available in either blocked or
+interleaved order. Coordinate requests can be made for all vertices or
+for the vertex handles returned by an adjacency call. Finally, indices
+into the global vertex coordinate array can be obtained for both entity
+and adjacent entity requests.
+
+\subsection{Entity- and Array-Based Query\label{sub:Ent-Interface}}
+
+\begin{table}[tbp]
+\caption{Functions for Single Entity Queries}\label{table:Entity}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+initEntIter&
+ES, Type, Topo&
+anyData?, iter&
+Create an iterator to traverse entities of type and topo in ES; return
+true if any entities exist\tabularnewline
+\hline 
+getNextEntIter&
+iter&
+anyData?, EH&
+Return true and a handle to next entity if there is one; false otherwise\tabularnewline
+\hline 
+resetEntIter&
+iter&
+---&
+Reset iterator to restart traverse from the first entity\tabularnewline
+\hline 
+endEntIter&
+iter&
+---&
+Destroy iterator\tabularnewline
+\hline 
+\hline 
+getType&
+EH&
+Type&
+Return type of entity\tabularnewline
+\hline 
+getTopo&
+EH&
+Topo&
+Return topology of entity\tabularnewline
+\hline 
+getVtxCoord&
+EH&
+coords&
+Return coordinates of a vertex\tabularnewline
+\hline 
+getEntAdj&
+EH, Type&
+entities&
+Return entities of given type adjacent to EH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+\begin{table}[tbp]
+\caption{Functions for Block Entity Queries}\label{table:EntArr}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+initEntArrIter&
+ES, Type, Topo, size&
+anyData?, iter&
+Create a block iterator to traverse entities of type and topo in ES;
+return true if any entities exist\tabularnewline
+\hline 
+getNextEntArrIter&
+iter&
+anyData?, EH array&
+Return true and a block of handles if there are any; false otherwise\tabularnewline
+\hline 
+resetEntArrIter&
+iter&
+---&
+Reset block iterator to restart traverse from the first entity\tabularnewline
+\hline 
+endEntArrIter&
+iter&
+---&
+Destroy block iterator\tabularnewline
+\hline 
+\hline 
+getEntArrType&
+EH array&
+Type array&
+Return type of each entity\tabularnewline
+\hline 
+getEntArrTopo&
+EH array&
+Topo array&
+Return topology of each entity\tabularnewline
+\hline 
+getEntAdj&
+EH array, type&
+entities&
+Return entities of type adjacent to each EH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+The global queries described in the previous section are used to
+retrieve information about all entities in an entity set. While this is
+certainly a practical alternative for some types of problems and for
+small problem size, larger problems or situations involving mesh
+modification require access to single entities or to blocks of
+entities. The TSTT mesh interface supports traversal and query functions
+for single entities and for blocks of entities; the query functions
+supported are entity type and topology, vertex coordinates, and entity
+adjacencies.  Tables~\ref{table:Entity} and~\ref{table:EntArr} summarize
+these functions.
+
+\subsection{Mesh Modification\label{sub:Mesh-Modification}}
+
+
+The TSTT mesh interface supports mesh modification by providing a
+minimal set of operators for low-level modification; both single entity
+(see Table~\ref{table:Modify}) and block versions (see
+Table~\ref{table:ModArr}) of these operators are provided.  High-level
+functionality, including mesh generation, quality assessment, and
+validity checking, can in principle be built from these operators,
+although in practice such functionality is more likely to be provided
+using intermediate-level services that perform complete unit operations,
+including vertex insertion and deletion with topology updates, edge and
+face swapping, and smoothing.
+
+\begin{table}[tbp]
+\caption{Functions for Single Entity Mesh Modification}\label{table:Modify}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+createVtx&
+coords&
+VH&
+Create vertex at given location\tabularnewline
+\hline 
+setVtxCoords&
+VH, coords&
+---&
+Changes coordinates of existing vertex\tabularnewline
+\hline 
+createEnt&
+Topo, handles&
+EH, status&
+Create entity of given topology from lower-dimensional entities; return
+entity handle and creation status\tabularnewline
+\hline 
+deleteEnt&
+EH&
+---&
+Delete EH from the mesh\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+\begin{table}[tbp]
+\caption{Functions for Block Mesh Modification}\label{table:ModArr}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+createVtxArr&
+coords, SO&
+VH array&
+Create vertices at given location\tabularnewline
+\hline 
+setVtxArrCoords&
+VH array, coords, SO&
+---&
+Changes coordinates of existing vertices\tabularnewline
+\hline 
+createEntArr&
+topo, handles&
+EH array, status array&
+Create entities of given topology from lower-dimensional entities;
+return entity handle and status\tabularnewline
+\hline 
+deleteEntArr&
+EH array&
+---&
+Delete each EH from the mesh\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+
+Geometry modification is achieved through functions that change vertex
+locations.  Vertex locations are set at creation, and can be changed as
+required, for instance, by mesh smoothing or other node movement
+algorithms.
+
+Topology modification is achieved through the creation and deletion of
+mesh entities.  Creation of higher-dimensional entities requires
+specification, in canonical order, of an appropriate collection of
+lower-dimensional entities. For instance, a tetrahedron can be created
+using four vertices, six edges or four faces, but not from
+combinations of these. Upon creation, adjacency information properly
+connecting the new entity to its components is set up by the
+implementation. Some implementations may allow the creation of
+duplicate entities (for example, two edges connecting the same two
+vertices), while others will respond to such a creation request by
+returning a copy of the already-existing entity.
+
+Deletion of existing entities must always be done from highest to
+lowest dimension, because the TSTT interface forbids the deletion
+of an entity with existing upward adjacencies (for instance, an edge
+that is still in use by one or more faces or regions).
+
+\subsection{Entity Sets\label{sub:Entity-Set-Interface}}
+
+The TSTT entity set interface is divided into three parts: basic set
+functionality, hierarchical set relations, and set boolean operations.
+
+\begin{table}[tbp]
+\caption{Functions for Basic Entity Set Functionality}\label{table:EntSet}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+createEntSet&
+isList&
+SH&
+Creates a new entity set (ordered and non-unique if isList is true)\tabularnewline
+\hline 
+destroyEntSet&
+SH&
+---&
+Destroys existing entity set\tabularnewline
+\hline 
+isList&
+SH&
+ordered?&
+Return true if the set is ordered and non-unique\tabularnewline
+\hline 
+\hline 
+getNumEntSets&
+SH, levels&
+\# of sets&
+Returns number of entity sets contained in SH\tabularnewline
+\hline 
+getEntSets&
+SH, levels&
+SH array&
+Returns entity sets contained in SH\tabularnewline
+\hline 
+addEntSet&
+SH1, SH2&
+---&
+Adds entity set SH1 as a member of SH2\tabularnewline
+\hline 
+rmvEntSet&
+SH1, SH2&
+---&
+Removes entity sets SH1 as a member of SH2\tabularnewline
+\hline 
+isEntSetContained&
+SH1, SH2&
+contained?&
+Returns true if SH2 is a member of SH1\tabularnewline
+\hline 
+\hline 
+addEntToSet&
+EH, SH&
+---&
+Add entity EH to set SH\tabularnewline
+\hline 
+rmvEntFromSet&
+EH, SH&
+---&
+Remove entity EH from set SH\tabularnewline
+\hline 
+addEntArrToSet&
+EH array, SH&
+---&
+Add array of entities to set SH\tabularnewline
+\hline 
+rmvEntArrFromSet&
+EH array, SH&
+---&
+Remove array of entities from set SH\tabularnewline
+\hline
+isEntContained&
+SH, EH&
+contained?&
+Returns true if EH is a member of SH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+Basic set functionality, summarized in Table~\ref{table:EntSet}, includes
+creating and destroying entity sets; adding and removing entities and
+sets; and several entity set specific query functions.  \footnote{Note
+that the global mesh query functions (Section~\ref{sec:Interface}.\ref{sub:Mesh-Interface})
+and traversal functions (Section~\ref{sec:Interface}.\ref{sub:Ent-Interface}) defined above
+can be used with the root set or any other entity set as their first
+argument.} Entity sets can be either ordered and non-unique, or
+unordered and unique; an ordered set guarantees that query results
+(including traversal) will always be given in the order in which
+entities were added to the set. The ordered/unordered status of an
+entity set must be specified when the set is created and can be queried.
+
+Entity sets are created empty. Entities can be added to or removed from
+the set individually or in blocks; for ordered sets, the last of a
+number of duplicate entries will be the first to be deleted.  Also,
+entity sets can be added to or removed from each other; note that,
+because all sets are automatically contained in the root set from
+creation, calls that would add or remove a set from the root set are not
+permitted.  An entity set can also be queried to determine the number
+and handles of sets that it contains, and to determine whether a given
+entity or set belongs to that set.
+
+\begin{table}[tbp]
+\caption{Functions for Entity Set Relationships}\label{table:SetRel}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+addPrntChld&
+SH1, SH2&
+---&
+Create a parent (SH1) to child (SH2) relationship\tabularnewline
+\hline 
+rmvPrntChld&
+SH1, SH2&
+---&
+Remove a parent (SH1) to child (SH2) relationship\tabularnewline
+\hline 
+isChildOf&
+SH1, SH2&
+bool&
+Return true if SH2 is a child of SH1\tabularnewline
+\hline 
+getNumChld&
+SH, levels&
+\# children&
+Return number of children of SH\tabularnewline
+\hline 
+get Chldn&
+SH, levels&
+SH array&
+Return children of SH\tabularnewline
+\hline 
+getNumPrnt&
+SH, levels&
+\# parents&
+Return number of parents of SH\tabularnewline
+\hline 
+get Prnts&
+SH, levels&
+SH array&
+Return parents of SH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+Hierarchical relationships between entity sets are intended to describe,
+for example, multilevel meshes and mesh refinement hierarchies. The
+directional relationships implied here are labeled as parent-child
+relationships in the TSTT interface. Functions are provided to add,
+remove, count, and identify parents and children and to determine if one
+set is a child of another; see Table~\ref{table:SetRel}.
+
+\begin{table}[tbp]
+\caption{Functions for Entity Set Boolean Operations}\label{table:SetBool}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+subtract&
+SH1, SH2&
+SH&
+Return set difference SH1-SH2 in SH\tabularnewline
+\hline 
+intersect&
+SH1, SH2&
+SH&
+Return set intersection of SH1 and SH2 in SH\tabularnewline
+\hline 
+unite&
+SH1, SH2&
+SH&
+Return set union of SH1 and SH2 in SH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+Set boolean operations --- intersection, union, and subtraction --- are
+also defined by the TSTT interface; these functions are summarized in
+Table~\ref{table:SetBool}. The definitions are intended to be compatible
+with their C++ standard template library (STL) counterparts, both for
+semantic clarity and so that STL algorithms can be used by
+implementations where appropriate. All set boolean operations apply not
+only to \emph{entity} members of the set, but also to \emph{set}
+members. Note that set hierarchical relationships are not included: the
+set resulting from a set boolean operation on sets with hierarchical
+relationships will \emph{not} have any hierarchical relationships
+defined for it, regardless of the input data. For instance, if one were
+to take the intersection of two directionally-coarsened meshes (stored
+as sets) with the same parent mesh (also a set) in a multigrid
+hierarchy, there is no reason to expect that the resulting set will
+necessarily be placed in the multigrid hierarchy at all. On the other
+hand, if both of those directionally-coarsened meshes contain a set of
+boundary faces, then their intersection will contain that set as well.
+
+While set boolean operations are completely unambiguous for unordered
+entity sets, ordered sets make things more complicated. For operations
+in which one set is ordered and one unordered, the result set is unordered;
+its contents are the same as if an unordered set were created with
+the (unique) contents of the ordered set and the operation were
+then performed. In the case of two ordered sets, the TSTT specification
+follows the spirit of the STL definition, with complications related
+to the possibility of multiple copies of a given entity handle in
+each set. In the following discussion, assume that a given entity
+handle appears $m$ times in the first set and $n$ times in the second
+set. 
+
+\begin{itemize}
+\item For intersection of two ordered sets, the output set will contain
+the $\min\left(m,n\right)$ copies of the entity handle. These will
+appear in the same order as in the first input set, with the first
+copies of the handle surviving. For example, intersection of the two
+sets $A=\textrm{\{$abacdbca$\}}$ and $B=\{ dadbac\}$ will result
+in $A\bigcap B=\{ abacd\}$.
+\item Union of two ordered sets is easy: the output set is a concatenation
+of the input sets: $A\bigcup B=\{ abacdbcadadbac\}$.
+\item Subtraction of two ordered sets results in a set containing $\min\left(m-n,0\right)$
+copies of an entity handle. These will appear in the same order as
+in the first input set, with the first copies of the handle surviving.
+For example, $A-B=\{ abc\}$.
+\end{itemize}
+Regardless of whether the entity members of an entity set are ordered or unordered, the
+set members are always unordered and unique, with correspondingly
+simple semantics for boolean operations.
+
+\subsection{Tags\label{sub:Tag-Interface}}
+
+\begin{table}[tbp]
+\caption{Basic Tag Functions}\label{table:Tags}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Name&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+createTag&
+name, \# values, TVT&
+TH&
+Creates a new tag of the given type and number of values\tabularnewline
+\hline 
+destroyTag&
+TH, force&
+---&
+Destroys the tag if no entity is using it or if force is true\tabularnewline
+\hline 
+\hline 
+getTagName&
+TH&
+name&
+Returns tag ID string\tabularnewline
+\hline 
+getTagSizeValues&
+TH&
+size&
+Returns tag size in number of values\tabularnewline
+\hline 
+getTagSizeBytes&
+TH&
+size&
+Returns tag size in number of bytes\tabularnewline
+\hline 
+getTagHandle&
+name&
+TH&
+Return tag with given ID string, if it exists\tabularnewline
+\hline 
+getTagType&
+TH&
+TVT&
+Return data type of this tag\tabularnewline
+\hline 
+\hline 
+getAllTags&
+EH&
+TH array&
+Return handles of all tags associated with entity EH\tabularnewline
+\hline 
+getAllEntSetTags&
+SH&
+TH array&
+Return handles of all tags associated with entity set SH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+Tags are used to associate application-dependent data with a mesh,
+entity, or entity set.  Basic tag functionality defined in the TSTT
+interface is summarized in Table~\ref{table:Tags}, while functionality
+for setting, getting, and removing tag data is summarized in
+Table~\ref{table:Tags2}.
+
+When creating a tag, the application must provide its data type and
+size, as well as a unique name. For generic tag data, the tag size
+specifies how many bytes of data to store; for other cases, the size
+tells how many values of that data type will be stored.  The
+implementation is expected to manage the memory needed to store tag
+data. The name string and data size can be retrieved based on the tag's
+handle, and the tag handle can be found from its name. Also, all tags
+associated with a particular entity can be retrieved; this can be
+particularly useful in saving or copying a mesh.
+
+\begin{table}[tbp]
+\caption{Setting, Getting, and Removing Tag Data}\label{table:Tags2}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Function&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+setData&
+EH, TH, tagVal&
+---&
+The value in tag TH for entity EH is set to the first tagValSize bytes
+of the array<char> tagVal\tabularnewline
+\hline 
+setArrData&
+EH array, TH, tagVal array&
+---&
+The value in tag TH for entities in EHarray{[}i{]} is set using data
+in the array<char> tagValArray and the tag size\tabularnewline
+\hline 
+setEntSetData&
+SH, TH, tagVal&
+---&
+The value in tag TH for entity set SH is set to the first tagValSize
+bytes of the array<char> tagVal\tabularnewline
+\hline 
+set{[}Int,Dbl,EH{]}Data&
+EH, TH, tagVal&
+---&
+The value in tag TH for entity EH is set to the int, double, or entity
+handle in tagVal; array and entity set versions also exist.\tabularnewline
+\hline 
+\hline 
+getData&
+EH, TH&
+tagVal&
+Return the value of tag TH for entity EH\tabularnewline
+\hline 
+getArrData&
+EH array, TH&
+tagVal array&
+Retrieve the value of tag TH for all entities in EH array, with data
+returned as an array of tagVal's\tabularnewline
+\hline 
+getEntSetData&
+SH, TH&
+tagVal&
+Return the value of tag TH for entity EH\tabularnewline
+\hline 
+get{[}Int,Dbl,EH{]}Data&
+EH, TH&
+tagVal&
+Return the value of tag TH for entity EH; array and entity set versions
+also exist.\tabularnewline
+\hline
+\hline 
+rmvTag&
+EH, TH&
+---&
+Remove tag TH from entity EH\tabularnewline
+\hline 
+rmvArrTag&
+EH array, TH&
+---&
+Remove tag TH from all entities in EH array\tabularnewline
+\hline 
+rmvEntSetTag&
+SH, TH&
+---&
+Remove tag TH from entity set SH\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+Initially, a tag is not associated with any entity or entity set,
+and no tag values exist; association is made explicitly by setting
+data for a tag-entity pair. Tag data can be set for single entities,
+arrays of entities (each with its own value), or for entity sets.
+In each of these cases, separate functions exist for setting generic
+tag data and type-specific data. Analogous data retrieval functions
+exist for each of these cases. 
+
+When an entity or set no longer needs to be associated with a tag
+--- for instance, a vertex was tagged for smoothing and the smoothing
+operation for that vertex is complete --- the tag can be removed from that entity
+without affecting other entities associated with the tag. When a tag
+is no longer needed at all --- for instance, when all vertices have
+been smoothed --- the tag can be destroyed through one of two variant
+mechanisms. First, an application can remove this tag from all
+tagged entities, and then request destruction of the tag. Simpler
+for the application is forced destruction, in which the tag is destroyed
+even though the tag is still associated with mesh entities, and all
+tag values and associations are deleted. Some implementations may
+not support forced destruction.
+
+\subsection{Error Handling\label{sub:Error-Handling}}
+
+Like any API, the TSTT interface is vulnerable to errors, either through
+incorrect input or through internal failure within an implementation.
+For instance, it is an error for an application to request entities with
+conflicting types and topologies. Also, an error in the implementation
+occurs when memory for a new object cannot be allocated. The TSTT error
+interface, summarized in Table~\ref{table:Error}, supports error
+handling by defining standard behavior when an error occurs. Severity of
+error actions range from ignoring errors through ``throwing'' errors to
+aborting on errors.  Applications can set the default action.  Also, the
+error interface defines a number of standard error conditions which
+could occur in TSTT mesh functions, either because of illegal input or
+internal implementation errors.
+
+\begin{table}[tbp]
+\caption{Error Handling Functionality}\label{table:Error}
+{\small
+\begin{tabular}{|p{1.25in}|p{0.75in}|p{0.75in}|p{223pt}|}
+\hline 
+Name&
+Input&
+Output&
+Description\tabularnewline
+\hline
+\hline 
+set&
+ET, desc&
+---&
+Sets error type and description\tabularnewline
+\hline 
+getErrorType&
+---&
+ET&
+Retrieves error type\tabularnewline
+\hline 
+getDescription&
+---&
+desc string&
+Retrieves error description\tabularnewline
+\hline 
+echo&
+label&
+---&
+Prints label and description string to stderr\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}

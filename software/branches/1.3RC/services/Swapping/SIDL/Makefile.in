@@ -1,0 +1,72 @@
+.SILENT:
+
+CLIENT_LANGS=@CLIENT_LANGS@
+SERVER_LANG=@SERVER_LANG@
+
+TSTTB_REPOS=@TSTTB_ROOT@/repos/TSTTB
+TSTTG_REPOS=@TSTTG_ROOT@/repos/TSTTG
+TSTTM_REPOS=@TSTTM_ROOT@/repos/TSTTM
+TSTTR_REPOS=@TSTTR_ROOT@/repos/TSTTR
+
+@SET_MAKE@
+
+PWD=$(shell pwd)
+PACKAGE_NAME=Swap
+BABEL_REPOS="-R $(TSTTB_REPOS) -R $(TSTTM_REPOS) -R $(TSTTG_REPOS) -R $(TSTTR_REPOS)"
+
+SIDL_FILE=$(PACKAGE_NAME).sidl
+BABEL=@BABEL@ --suppress-timestamp -E $(BABEL_REPOS)
+
+# The client directories and Makefiles are created by configure and
+# removed only by distclean.
+all: 
+	$(MAKE) server/babel.make
+	-(cd server && $(MAKE) all)
+	for i in $(CLIENT_LANGS) ; do \
+	  mkdir -p client_$${i} ; \
+	  $(MAKE) client_$${i}/babel.make client_$${i}/Makefile client_$${i}/make.local ; \
+	  (cd client_$${i} && $(MAKE) all) ; \
+	done
+
+clean:
+	-rm *~
+	$(MAKE) TARGET=clean recurse
+	  
+distclean: clean
+	$(MAKE) TARGET=distclean recurse
+	-rm -rf client_* Makefile lib*
+
+recurse:
+	(cd server && $(MAKE) $(TARGET))
+	for i in $(CLIENT_LANGS) ; do \
+	  (cd client_$$i && $(MAKE) $(TARGET)) ; \
+	done
+
+maintainer-clean: 
+	$(MAKE) TARGET=maintainer-clean recurse
+	$(MAKE) distclean
+
+server/babel.make: $(SIDL_FILE)
+	echo "Creating server source files for $(PACKAGE_NAME)..."
+	$(BABEL) --server @SERVER_LANG@ -o server $(SIDL_FILE)
+	touch $@
+
+client_C/babel.make client_C++/babel.make client_F77/babel.make \
+client_F90/babel.make client_java/babel.make client_python/babel.make \
+: $(SIDL_FILE)
+	export SIDL_LANG=`dirname $@ | sed "s,client_,,"` ; \
+	echo "Creating $${SIDL_LANG} client source code for $(PACKAGE_NAME)..." ;\
+	$(BABEL) --client $${SIDL_LANG} -o client_$${SIDL_LANG} $(SIDL_FILE)
+	touch $@
+
+client_C/Makefile client_C++/Makefile client_F77/Makefile \
+client_F90/Makefile client_java/Makefile client_python/Makefile \
+: Makefile-client
+	cp Makefile-client $@
+
+client_C/make.local client_F77/make.local \
+client_F90/make.local client_java/make.local client_python/make.local :
+	echo "STUBEXT=.c" > $@	
+
+client_C++/make.local:
+	echo "STUBEXT=.cc" > $@

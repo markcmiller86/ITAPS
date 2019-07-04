@@ -1,0 +1,64 @@
+#
+# This makefile can be used without using autoconf,
+# as long as you have IMESH_DIR set to the location
+# of the IMESH implementation you're using and 
+# F77, FC, CC, and CXX point to the appropriate compilers
+#
+include ${IMESH_DEFS}
+IMESH_INSTALL_DIR=`echo $(IMESH_DEFS) | rev | cut -d'/' -f3- | rev`
+IMESH_RPATH_FLAGS=`echo $(IMESH_LIBS) | tr ' ' '\n' | grep -e -L | sed -e 's|-L|-Wl,-rpath,|'`
+
+##  temporary fix until all codes use IMESH_CPPFLAGS
+IMESH_INCS=${IMESH_INCLUDES} ${IMESH_CPPFLAGS}
+
+EXECS = SimpleIteratorF77 SimpleIteratorF90 SimpleIteratorC SimpleIteratorCXX
+EXECSOBJ = ${EXECS:=.o}
+EXECSOUT = ${EXECS:=.out}
+EXECSERR = ${EXECS:=.err}
+
+default: $(EXECS)
+
+SimpleIteratorF77: SimpleIteratorF77.o
+	${F77} -o $@ $^ ${IMESH_LIBS} ${EXTRA_F77_LIBS} ${IMESH_RPATH_FLAGS}
+
+SimpleIteratorF90: SimpleIteratorF90.o
+	${FC} -o $@ $^ ${IMESH_LIBS} ${EXTRA_FC_LIBS} ${IMESH_RPATH_FLAGS}
+
+SimpleIteratorC: SimpleIteratorC.o
+	${CC} -o $@ $^ ${IMESH_LIBS} ${EXTRA_CC_LIBS} ${IMESH_RPATH_FLAGS}
+
+SimpleIteratorCXX: SimpleIteratorCXX.o
+	${CXX} -o $@ $^ ${IMESH_LIBS} ${EXTRA_CXX_LIBS} ${IMESH_RPATH_FLAGS}
+
+.SUFFIXES: .F90 .F .c .cpp .o
+
+.F90.o:
+	${FC} -c -fcray-pointer ${IMESH_FCFLAGS} ${IMESH_INCS} ${FCFLAGS} $<
+
+.F.o:
+	${F77} -c -fcray-pointer ${IMESH_FFLAGS} ${IMESH_INCS} ${FFLAGS} $<
+
+.c.o:
+	${CC} -c ${IMESH_CFLAGS} ${IMESH_INCS} ${CFLAGS} $<
+
+.cpp.o:
+	${CXX} -c ${IMESH_CXXFLAGS} ${IMESH_INCS} ${CXXFLAGS} $<
+
+check: ${EXECS}
+	./SimpleIteratorF77 1>SimpleIteratorF77.out 2>SimpleIteratorF77.err
+	!(test -s SimpleIteratorF77.err && cat SimpleIteratorF77.err)
+	./SimpleIteratorF90 1>SimpleIteratorF90.out 2>SimpleIteratorF90.err
+	!(test -s SimpleIteratorF90.err && cat SimpleIteratorF90.err)
+	./SimpleIteratorC 1>SimpleIteratorC.out 2>SimpleIteratorC.err
+	!(test -s SimpleIteratorC.err && cat SimpleIteratorC.err)
+	./SimpleIteratorCXX 1>SimpleIteratorCXX.out 2>SimpleIteratorCXX.err
+	!(test -s SimpleIteratorCXX.err && cat SimpleIteratorCXX.err)
+	diff -w SimpleIteratorF90.out SimpleIteratorF77.out
+	diff -w SimpleIteratorC.out SimpleIteratorF77.out
+	diff -w SimpleIteratorCXX.out SimpleIteratorF77.out
+
+clean:
+	rm -f ${EXECS} ${EXECSOBJ} ${EXECSOUT} ${EXECSERR}
+
+install:
+	-install ${EXECS} ${IMESH_INSTALL_DIR}/bin

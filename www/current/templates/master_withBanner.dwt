@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="description" content="Your description goes here." />
+<meta name="keywords" content="your,keywords,goes,here" />
+<meta name="author" content="KEYWORD OPEN PARAGRAPH" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+</head>
+
+<body>
+<div id="container">
+
+
+<div id="sitename">
+
+<div id="itban">
+<h1>ITAPS</h1>
+</div>
+
+
+</div>
+
+<div id="mainmenu">
+<ul>
+<li><a class="current" href="../index.html">Home</a></li>
+<li><a href="../technologies/index.html">Petascale technologies</a></li>
+<li><a href="../tools/index.html">Interoperable Tools</a></li>
+<li><a href="../applications/index.html">Application Impact</a></li>
+<li><a href="../software/index.html">Download Software</a></li>
+<li><a href="../team.html">Team</a></li>
+<li><a href="http://redmine.scorec.rpi.edu/projects/itaps">Developers Corner</a></li>
+</ul>
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>ITAPS</h1>
+<p>
+<a class="nav" href="../index.html">HOME</a><span class="hide"> | </span>
+<a class="nav sub" href="../introduction.html">Introduction</a><span class="hide"> | </span>
+<a class="nav sub" href="../team.html">Team</a><span class="hide"> | </span>
+<a class="nav sub" href="../contact.html">Contact Us</a>
+</p>
+
+
+</div>
+
+<div id="rightside"><!-- TemplateBeginEditable name="rightColContent" -->
+<h1>Upcoming and Recent Events</h1>
+<p>ACTS Toolkit tutorial on August 17, 2010 / Location is Berkeley, CA</p>
+<p>ITAPS Bootcamp from August 23-28, 2010 / Location is Albuquerque, NM</p>
+<p>ITAPS Tutorial at the Meshing Roundtable Conference on October 17, 2010 / Location is Chattanooga, TN</p>
+<p>ITAPS Plenary Lecture at the SIAM CSE 11 Conference March 2011 / Location is Reno, NV</p>
+<!-- TemplateEndEditable --></div>
+
+<div id="content"><!-- TemplateBeginEditable name="content" -->
+  <h1>Interoperable Technologies for Advanced Petascale Simulations (ITAPS)</h1>
+  <img src="../assets/images/Lori-Diachin.jpg" height="165" width="130" alt="Thumbnail example" />
+  <p>The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in  the <a href="http://www.energy.gov/">Department of Energy's</a> <a href="http://www.scidac.gov/">Scientific Discovery through Advanced Computing (SciDAC)</a> program.</p>
+  <p>Many applications need advanced software tools to manage the complexities associated with sophisticated geometry, mesh, and field manipulation tasks, particularly as computer architectures move toward the petascale. The Center for Interoperable Technologies for Advanced Petascale Simulations (ITAPS) will deliver interoperable and interchangeable mesh, geometry, and field manipulation services that are of direct use to scientific applications. The premise of our technology development goal is that such services can be provided as libraries that can be used with minimal intrusion into application codes. Through SciDAC funding, the ITAPS team is developing and deploying a number of advanced technologies including front tracking, mesh quality improvement via smoothing and swapping, adaptive mesh refinement (AMR), and dynamic load balancing that are used by application scientists and provide ample evidence of the viability of this approach. </p>
+  <p>To allow applications easy use of all ITAPS tools and to create interoperability among those tools, we have defined common interfaces that provide data-structure neutral access to mesh, geometry, and field information. Using these technologies we are working with application scientists to develop the next generation of petascale simulation codes. In particular, we are collaborating with domain scientists interested in accelerator modeling, fusion, nuclear energy, subsurface flow, blood flow, wind energy, to name a few. </p>
+  <p></p>
+<!-- TemplateEndEditable -->
+  <p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+
+
+</div>
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">If you require additional information or have comments, please <a href="mailto:diachin2@llnl.gov">contact us</a>.</div>
+</body>
+</html>

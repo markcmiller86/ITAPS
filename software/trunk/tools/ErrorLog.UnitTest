@@ -1,0 +1,30 @@
+           Error Log for iMesh trunk UnitTests
+             Mon 21 Jan 2013 05:29:02 PM PST
+*********************************************************
+Message #1 [05:29:10 PM]: unitTest/GRUMMP config
+CONFIGURE error
+Details follow . . . 
+/imesh_GRUMMP.config.err
+
+
+*********************************************************
+Message #2 [05:29:10 PM]: unitTest/MOAB config
+CONFIGURE error
+Details follow . . . 
+/imesh_MOAB.config.err
+
+
+*********************************************************
+Message #3 [05:29:10 PM]: unitTest/FMDB config
+CONFIGURE error
+Details follow . . . 
+/imesh_FMDB.config.err
+
+
+*********************************************************
+Message #4 [05:29:10 PM]: unitTest/REFI config
+CONFIGURE error
+Details follow . . . 
+/imesh_REFI.config.err
+
+

@@ -1,0 +1,100 @@
+Parallel mesh management using interoperable tools
+
+Speakers:
+ Tim
+ Karen?
+ Lori?
+
+(90 minutes)
+
+Goals of the session:
+  - to manage meshes in parallel requires more than what you typically
+    use in serial
+  - they are convinced we rule in this area (and know what we're talking
+    about and are moving in the right direction)
+  - there are tools that are available to them if they want to explore
+    these issues
+
+Introduction  -- 5 minutes
+ - What are we going to talk about?
+   - Mesh management on parallel architectures
+   - Interoperability issues
+ - Why do they care?
+   - Need to to move to parallel architectures
+      - Meshes increase in size, processor memory shrinking
+         what to do with a 5B element mesh on machines with limited memory?
+      - Services available to help with this
+         - mechanisms for managing parallel meshes
+            - e.g. loading the mesh, getting metadata, managing adjacencies
+         - higher level services - mesh generation, managing commmunication for
+           parallel analysis codes, mesh adapatiation, load balancing
+   - Tools can provide infrastructure for parallel mesh generation algorithm
+     development and research - allows them to focus on new algorithm
+     development
+   - Can provide the foundation for interoperability in mesh generation
+     algorithms
+   - Provides a quick route to use in applications
+
+Basic concepts of managing a mesh in parallel  -- 10 minutes
+  - High level details - what you see and why you need it
+  - Distributed mesh, a partition, ghosts for communication
+    partition boundaries, I/O (load/store) - how do you get a mesh on
+    the parallel machine
+  - Examples of parallel algorithms for services they will care about:
+    (parallel computing 101) - need to worry about synchronization,
+    communication of relevant data, performance (local and parallel)
+     - Parallel mesh smoothing
+     - Parallel swapping
+     - Parallel mesh refinement
+
+Why interoperability is important  -- 5 minutes
+  - Motivations for why interoperable interfaces -
+    - could use Frameworks, could implement it all themselves,
+      use services through interfaces
+  - Plug and play allows for experimentation
+  - Allows for incremental adoption
+
+ITAPS project and goals  -- 5 minutes
+ - Develop interoperable interfaces for use by a broad range of tools
+ - Provide implementations and services
+    - things they will care about:  partitioning a mesh, improving
+      the quality of a mesh, visualizing a mesh, generating and
+      modifying a mesh
+ - Show use in SciDAC/DOE applications
+
+ITAPS parallel data model  -- 20 minutes
+  - How to obtain interoperability
+     - handles, language, functional interfaces
+  - Explicitly representing parallelism in the data model
+  - Managing communication and partitions in the data model
+  - Examples of interface functions?
+  - Performance issues to keep in mind (5-15 minutes only)
+     - Memory management and usage
+     - Performance and accessing data (Tim's data)
+     - Language interoperability/natural representations
+     - Code development costs
+         - robustness issues, latest library advancements in apps
+         - costs in developing interoperable services and code
+     - Impact on scaling (w/ examples/?)
+
+Examples of things we are doing with parallel meshes/interfaces  -- 30 minutes
+  - Implementations
+      - Reference Impl, FMDB, MOAB, GRUMMP, compliance testing,
+  - Services
+      - Zoltan, Mesquite, Swapping, VisIt, FronTier, Adaptive loops
+      - How do you take advantage of the services you care about?
+        (conceptual level only)
+          - use a mesh database and copy data as a first pass
+          - write the wrapper functions on your implementation
+      - Numbers of functions used as an example of partial interface usage
+  - Availability of software
+
+Application examples (do they care about this?) -- 10 minutes
+  - Nuclear energy, fusion, accelerators (1-2 slides each)
+  - Phasta example w/ mesh adapt on large scale machines (32K/64K)
+ 
+Future work/Next steps  -- 5 minutes
+  - architectures are evolving to many-core as we go to exascale
+    - threading
+    - accelerators
+  - adoption of interfaces

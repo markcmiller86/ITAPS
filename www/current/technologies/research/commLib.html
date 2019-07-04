@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-research_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS - Communication Libraries</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResearch pageCommLib" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResearch pageCommLib">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="index.html" id="linkIndex">Research</a><span class="hide"> | </span>
+<a class="nav sub" href="partition.html" id="linkPartition">Partition Improvement</a><span class="hide"> | </span>
+<a class="nav sub" href="predictiveLoad.html" id="linkPredictiveLoad">Predictive Load Balance</a><span class="hide"> | </span>
+<a class="nav sub" href="commLib.html" id="linkCommLib">Communication Libraries</a><span class="hide"> | </span>
+<a class="nav sub" href="mapReduce.html" id="linkMapReduce">MapReduce Experiments</a><span class="hide"> | </span>
+<a class="nav" href="../results/index.html">Scaling Results</a>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+ <h1>Communication Libraries</h1>
+<p>The Inter-Processor Communication Manager (IPComMan) is a general-purpose communication package built on top of MPI, which aims to reduce data exchange costs by exploiting communications in a local neighborhood for each processor. The neighborhood is the subset of processors exchanging messages with each other during a specific communication round, which in many applications is bounded by a constant, typically under 40, independent of the total number of processors. The basic idea of the library is to keep the message-passing within subdomains, and eliminate, or reduce, the number of collective calls needed. The library provides several useful features including: i) automatic message packing, ii) management of sends and receives with non-blocking MPI functions, iii) asynchronous behavior unless the other is specified, and iv) support of dynamically changing neighborhoods during communication steps.</p>
+
+<p>Each processor has its own neighborhood. While initializing a library object, each processor specifies the neighbors it is going to communicate with. From that point, the library delivers messages between a processor and its neighbors only. There are no collective calls during each communication round. There are situations when it is not possible to a priori define all the neighbors for processors, i.e., new neighbors may be encountered during a communication step. As new neighbors needing to communicate will be unaware of each other, one collective call at the end of the communication round is performed to support neighborhood changes.</p>
+
+<p>To measure the performance of mesh migration, an essential part of parallel adaptive unstructured mesh procedures, IPComMan was compared with the Autopack communication utility. Initial results on IBM Blue Gene/L show that IPComMan's ability to localize communication to neighborhoods and its use of nonblocking functions leads to large decreases in communication time as the number of processors increases. Even though the differences in communication times between Autopack and IPComMan are not substantial at 128 processors, IPComMan is from 3 to 7 times faster in the 4096 processor case.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+
+ 
+ 
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

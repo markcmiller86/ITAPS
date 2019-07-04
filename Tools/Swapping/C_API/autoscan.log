@@ -1,0 +1,2 @@
+autoscan: warning: missing AC_TYPE_SIZE_T wanted by: 
+	ITAPS_QualMeasure.hh:106

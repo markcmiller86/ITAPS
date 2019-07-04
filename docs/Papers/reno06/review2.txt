@@ -1,0 +1,57 @@
+Each of the following categories was rated on a scale from 1 to 7 with 1
+being on the low end and 7 being on the high end.
+
+Originality: 	3
+
+The paper does not explain clearly which aspects of the proposed
+interface are new and original.
+
+Significance: 	4
+
+Relevance to the IMR: 	5
+
+Not much of the content of the paper discusses specific and unique
+aspects of developing such an interface for mesh and geometry data
+processing. (This type of language-independent interface would be useful
+for many areas of computer code development, sharing, and re-use.)
+
+Technical Quality: 	3
+
+Presentation: 	4
+
+Overall Rating: 	3
+
+
+Reviewer's Expertise on Topic: 	medium
+Amount of Rewriting Required: 	high
+
+
+Comments to the Authors
+
+Main Contributions
+
+The paper describes a language-independent interface for mesh and
+geometry data processing. It also shows how to use the proposed
+interface with simple examples.
+
+Positive Aspects
+
+- The paper proposes an approach to addressing a common difficulty in
+large-scale, multi-team software development.
+- The paper is easy to read.
+
+Negative Aspects
+
+- The paper reads more like a software manual than an academic paper.
+- The paper does not explain clearly which aspects of the proposed
+interface are new and original.
+- The work is still on-going and evolving.
+
+Further Comments
+
+- This type of language-independent interface would be useful for
+general computer code development, sharing, and re-use. However, the
+authors should focus more on the specific and unique aspects of
+developing such an interface for mesh and geometry data processing.
+- Check the reference in the last sentence of Section 2.3.
+- In Section 3, explain more in detail how SIDL works.

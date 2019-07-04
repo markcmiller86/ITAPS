@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+<!-- TemplateParam name="bodyID" type="text" value="default" -->
+<!-- TemplateParam name="bodyClass" type="text" value="" -->
+</head>
+
+<body class="@@(_document['bodyClass'])@@">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="../technologies/research/index.html">Research</a><span class="hide"> | </span>
+<a class="nav" href="../technologies/results/index.html" id="linkIndex">Scaling Results</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/phastaScaling-LAD.html" id="linkPhastaScaling-LAD">PHASTA Scaling</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/FMDB_imesh.html" id="linkFMDB_imesh">FMDB iMesh Implementation</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/meshAdapt.html" id="linkMeshAdapt">Mesh Adapt </a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/zoltan.html" id="linkZoltan">Zoltan Partitioning </a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/mesquite.html" id="linkMesquite">Mesquite Mesh Quality </a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/FronTier.html" id="linkFronTier">FronTier Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/parallelScaling.html" id="linkParallelScaling">FronTier parallel scaling</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/webAccelerator.html" id="linkWebAccelerator">Web Accelerator</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/reactor.html" id="linkReactor">Nuclear Reaction</a><span class="hide"> | </span>
+<a class="nav sub" href="../technologies/results/windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- TemplateBeginEditable name="Content" -->
+  <h1>title...</h1>
+  <img src="../img/thumb1.jpg" height="130" width="130" alt="Thumbnail example" />
+  <p class="intro">Intro information:</p>
+  <p> Lorem Ipsum comes from sections 1.10.32 and 1.10.33  of &quot;de Finibus Bonorum et Malorum&quot; (The Extremes of Good and Evil) by  Cicero, written in 45 BC. This book is a treatise on the theory of  ethics, very popular during the Renaissance. The first line of Lorem  Ipsum, &quot;Lorem ipsum dolor sit amet..&quot;, comes from a line in section  1.10.32.</p>
+<!-- TemplateEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+</html>

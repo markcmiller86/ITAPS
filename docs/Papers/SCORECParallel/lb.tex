@@ -1,0 +1,170 @@
+%predictive load balancing
+
+\subsection{Motivation and Goal}
+The motivation for predictive load balancing is to improve the
+efficiency of parallel mesh adaptation procedures. The goal is to
+balance both the amount of calculation to be carried out during mesh
+adaptation and the amount of physical memory used on each processor
+for a given input mesh and mesh size field.
+\subsection{Introduction}
+During the course of parallel mesh modification, without predictive load
+balancing, some processors may have nearly all their elements
+scheduled for mesh modification which may exceed the limit of the physical memory of
+these processors and would either slow down the process or even kill
+process. Moreover, if the amount of calculation to be carried out
+during mesh adaptation is not balanced, the processors which carry out
+more calculations would keep all other ones waiting. By predictive load
+balancing procedures, about equal number of elements in the adapted mesh
+on each processor may be achieved while
+moving smaller number of mesh entities between processors as compared to migration
+after mesh adaptation and the process of mesh adaptation could be
+scaled better by balancing the amount of calculation on each
+processor. To achieve the goal of predictive load balancing, weights
+have to be specified to graph nodes and a weighted graph-based
+repartitioning is carried out. To balance both the amount of
+calculation during mesh adaptation operations and the amount of
+physical memory used on each processor multiple weight need to be
+specified to graph nodes. One weight is used to estimate the amount of
+calculation related to mesh modification operations to be carried out and the
+other one is used to estimate the physical memory usage which is
+proportional to the number of elements to be
+generated. The weighted graph-based repartitioning is carried out before
+each stage of mesh modification.
+
+The number of estimated elements can be found as follow: Pain et al. \cite{Pain} uses the ratio of
+element volume of the input mesh to the volume of desired element in
+the adapted mesh to estimate the number of elements to be
+generated. Flaherty et al. \cite{Flaherty} uses error indicator information and
+refinement threshold to choose the edges to be marked for splitting
+and determine the proper 3-D refinement templates. The number of
+elements to be generated is determined by the refinement
+templates. For estimating the amount of calculation related to mesh
+modification operations, we propose to determine a representative
+number of floating point operation for each type of mesh modification operation.
+ 
+\subsection{Review of procedures of SCOREC mesh adapt}
+In the course of mesh adaptation, mesh modification procedures
+repeatedly modify the mesh to satisfy the mesh metric field. In
+particular, it consists of three stages: mesh coarsening, mesh
+refinement and shape correction. Generally speaking mesh coarsening
+eliminates all the mesh edges shorter than the lower bound of a given
+interval in the transformed space, if possible. Mesh refinement splits all the mesh edges longer than the upper bound of the interval.The third stage re-aligns local mesh configurations through the determination and elimination of sliver tetrahedra using local mesh modifications\cite{Li}. The details of mesh adaptation referred to \cite{Li}.
+
+\subsection{Predictive load balancing for each stage}
+\subsubsection{Coarsening}
+For the stage of mesh coarsening, predictive load balancing is
+designed to balance both edge collapse operation and the number of
+elements after coarsening. Multiple-weight (two) is specified to graph
+nodes.
+
+{\bf (1) Balance of edge collapse operation:}
+
+The input of mesh coarsening stage is a list of short edges. Predictive
+load balancing tries to make each processor has about equal number of
+short edges (marked for edge collapse). But weights need to be
+specified to graph nodes (mesh elements). A relation between short
+edges and mesh elements need to be built up. 
+The weights of mesh elements are initialized to be zero. Loop over the
+short edges in the list. Let \begin{math}M_i^1 \end{math} denote the
+current short edge, and \begin{math}L_c \end{math} denote a
+representative count of floating point operation of edge collapse. Then \begin{math} L_c/m
+\end{math} is added to the weight of tetrahedra in set \begin{math}
+  M_i^1\{M^3\} \end{math}, where m is the number of tetrahedra in set \begin{math}
+  M_i^1\{M^3\} \end{math}. (Note the element which is not bounded by any
+  edges marked for collapsing has weight zero)
+
+{\bf (2) Estimate the number of elements after coarsening:}
+
+The ratio of element volume of the initial mesh to the volume of
+desired element in the adapted mesh could be used as weight to balance
+the number of elements after coarsening. Loop over the list of short edges, compute the
+element volume in the transformed space for each tetrahedron in the set of \begin{math}
+M_i^1\{M^3\} \end{math} (where \begin{math}M_i^1 \end{math} is the
+current short edge) by \begin{equation}
+  V'=min(\sqrt{|T|}dV),i=0,1,2,3\end{equation} where \begin{math} T
+  \end{math} is the mesh metric tensor and \begin{math}dV\end{math} is
+    the volume of infinitesimal tetrahedron in the physical
+    space\cite{Li}. The desired element volume equals one in ideal case. The
+    ratios (smaller than one due to coarsening) are specified to the tetrahedra in the
+    set respectively if no weight has been specified yet. After looping over the
+    short edge list, one is specified as weight to the graph nodes
+    which has been assigned no weight(no coarsening operation carried
+    out). The values specified to the input elements could be normalized by the smallest one.
+\subsubsection{Refinement}
+For the stage of mesh refinement, predictive load balancing is
+designed to balance the mesh refinement operation and the number of
+elements after refinement for each iteration. Again, multiple-weight
+(two) is specified to
+graph nodes.
+
+{\bf (1) Balance of mesh refinement operation:}
+
+The list of edges marked for split (long edge) is the input of mesh
+refinement. Initialize the graph nodes weight to be zero. Loop over the
+long edge list, let \begin{math}M_i^1 \end{math} denote the current long edge
+and \begin{math}L_{es} \end{math} denote a representative count of floating point operation
+of edge split, then \begin{math}L_{es}/m\end{math} is added
+  to the weight of tetrahedra in the set of
+  \begin{math}M_i^1\{M^3\}\end{math}, where m is the number of
+  tetrahedra of the set. Then, loop over the list of faces to be split, let
+  \begin{math}M_i^2\end{math} denote the current face, and
+    \begin{math}L_{fs}\end{math}denote a representative count of floating point operation
+    of face split (based on the subdivision templates determined by
+    refinement edges that bound the face), then \begin{math}L_{fs}/m\end{math} is added
+  to the weight of tetrahedra in the set of
+  \begin{math}M_i^2\{M^3\}\end{math}, where m is the number of
+  tetrahedra of the set. Finally, loop over the list of mesh regions to be split,
+  let \begin{math}M_i^3\end{math} be the current region, and
+  \begin{math}L_{rs}\end{math} denote a representative count of floating point operation of
+  region split (based on the subdivision templates), then
+  \begin{math}L_{rs}\end{math} is added to the weight of
+  \begin{math}M_i^3\end{math}. (Note: the element which is not bounded
+    by any edges marked for split has weight zero) 
+
+{\bf (2) Estimate the number of elements after refinement:}
+
+Similar idea to \cite{Flaherty} could be applied to estimate the number of
+elements to be generated. The mesh refinement of SCOREC mesh adapt splits long edges in
+transformed space using the full set of edge-based refinement
+templates. As long as the list of edges to be split is given, the
+subdivision templates to each element is determined as well as the
+number of elements to be generated. The number of elements to be
+generated is specified as weight to each element. One is
+specified as weight if no new element to be generated (no edge marked for
+split). 
+
+\subsubsection{Shape Correction}
+
+For the stage of shape correction, predictive load balancing is
+designed to balance the shape correction operation and the number of
+element after correction. Multiple-weight (two) is specified to graph nodes
+as well.
+
+{\bf (1) Balance of shape correction operation:}
+
+All the elements with quality below a given threshold are insert into
+a dynamics list. Initialize the element weight to be zero. Loop over
+the element in the low quality list, specify the floating point
+operations of shape correction (analysis of silver tetrahedra and local
+modification, particularly edge swap operation) as the weight of the
+element.
+
+{\bf (2) Estimate the number of elements after shape correction:}
+
+Shape correction will not dramatically change the number of elements,
+default value one could be specified as the weight to each element.
+
+\subsection{Discussion}
+To balance the floating point operation and number of elements to be
+generated for each stage is expensive. For the coarsening and shape
+correction stage, only the initial list is considered (the dynamics
+list is updated during operation). For the mesh refinement stage, only
+mesh refinement is considered, other mesh modification in this stage
+(like edge collapse to new created short edges and projection of newly
+created nodes on curved boundaries) are not considered, which may
+affect the load balance as well. The count of floating point operation
+needs to be determined by testing, which is not aware now. The
+proposed predictive load balancing methods are just ideas without
+testing, which may or may not work. 
+
+%\end{document}

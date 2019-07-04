@@ -1,0 +1,1139 @@
+        -:    0:Source:/usr/include/pthread.h
+        -:    0:Programs:15
+        -:    1:/* Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+        -:    2:   Free Software Foundation, Inc.
+        -:    3:   This file is part of the GNU C Library.
+        -:    4:
+        -:    5:   The GNU C Library is free software; you can redistribute it and/or
+        -:    6:   modify it under the terms of the GNU Lesser General Public
+        -:    7:   License as published by the Free Software Foundation; either
+        -:    8:   version 2.1 of the License, or (at your option) any later version.
+        -:    9:
+        -:   10:   The GNU C Library is distributed in the hope that it will be useful,
+        -:   11:   but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   12:   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   13:   Lesser General Public License for more details.
+        -:   14:
+        -:   15:   You should have received a copy of the GNU Lesser General Public
+        -:   16:   License along with the GNU C Library; if not, write to the Free
+        -:   17:   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+        -:   18:   02111-1307 USA.  */
+        -:   19:
+        -:   20:#ifndef _PTHREAD_H
+        -:   21:#define _PTHREAD_H	1
+        -:   22:
+        -:   23:#include <features.h>
+        -:   24:#include <endian.h>
+        -:   25:#include <sched.h>
+        -:   26:#include <time.h>
+        -:   27:
+        -:   28:#define __need_sigset_t
+        -:   29:#include <signal.h>
+        -:   30:#include <bits/pthreadtypes.h>
+        -:   31:#include <bits/setjmp.h>
+        -:   32:#include <bits/wordsize.h>
+        -:   33:
+        -:   34:
+        -:   35:/* Detach state.  */
+        -:   36:enum
+        -:   37:{
+        -:   38:  PTHREAD_CREATE_JOINABLE,
+        -:   39:#define PTHREAD_CREATE_JOINABLE	PTHREAD_CREATE_JOINABLE
+        -:   40:  PTHREAD_CREATE_DETACHED
+        -:   41:#define PTHREAD_CREATE_DETACHED	PTHREAD_CREATE_DETACHED
+        -:   42:};
+        -:   43:
+        -:   44:
+        -:   45:/* Mutex types.  */
+        -:   46:enum
+        -:   47:{
+        -:   48:  PTHREAD_MUTEX_TIMED_NP,
+        -:   49:  PTHREAD_MUTEX_RECURSIVE_NP,
+        -:   50:  PTHREAD_MUTEX_ERRORCHECK_NP,
+        -:   51:  PTHREAD_MUTEX_ADAPTIVE_NP
+        -:   52:#ifdef __USE_UNIX98
+        -:   53:  ,
+        -:   54:  PTHREAD_MUTEX_NORMAL = PTHREAD_MUTEX_TIMED_NP,
+        -:   55:  PTHREAD_MUTEX_RECURSIVE = PTHREAD_MUTEX_RECURSIVE_NP,
+        -:   56:  PTHREAD_MUTEX_ERRORCHECK = PTHREAD_MUTEX_ERRORCHECK_NP,
+        -:   57:  PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
+        -:   58:#endif
+        -:   59:#ifdef __USE_GNU
+        -:   60:  /* For compatibility.  */
+        -:   61:  , PTHREAD_MUTEX_FAST_NP = PTHREAD_MUTEX_TIMED_NP
+        -:   62:#endif
+        -:   63:};
+        -:   64:
+        -:   65:
+        -:   66:#ifdef __USE_XOPEN2K
+        -:   67:/* Robust mutex or not flags.  */
+        -:   68:enum
+        -:   69:{
+        -:   70:  PTHREAD_MUTEX_STALLED,
+        -:   71:  PTHREAD_MUTEX_STALLED_NP = PTHREAD_MUTEX_STALLED,
+        -:   72:  PTHREAD_MUTEX_ROBUST,
+        -:   73:  PTHREAD_MUTEX_ROBUST_NP = PTHREAD_MUTEX_ROBUST
+        -:   74:};
+        -:   75:#endif
+        -:   76:
+        -:   77:
+        -:   78:#ifdef __USE_UNIX98
+        -:   79:/* Mutex protocols.  */
+        -:   80:enum
+        -:   81:{
+        -:   82:  PTHREAD_PRIO_NONE,
+        -:   83:  PTHREAD_PRIO_INHERIT,
+        -:   84:  PTHREAD_PRIO_PROTECT
+        -:   85:};
+        -:   86:#endif
+        -:   87:
+        -:   88:
+        -:   89:/* Mutex initializers.  */
+        -:   90:#if __WORDSIZE == 64
+        -:   91:# define PTHREAD_MUTEX_INITIALIZER \
+        -:   92:  { { 0, 0, 0, 0, 0, 0, { 0, 0 } } }
+        -:   93:# ifdef __USE_GNU
+        -:   94:#  define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP \
+        -:   95:  { { 0, 0, 0, 0, PTHREAD_MUTEX_RECURSIVE_NP, 0, { 0, 0 } } }
+        -:   96:#  define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP \
+        -:   97:  { { 0, 0, 0, 0, PTHREAD_MUTEX_ERRORCHECK_NP, 0, { 0, 0 } } }
+        -:   98:#  define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP \
+        -:   99:  { { 0, 0, 0, 0, PTHREAD_MUTEX_ADAPTIVE_NP, 0, { 0, 0 } } }
+        -:  100:# endif
+        -:  101:#else
+        -:  102:# define PTHREAD_MUTEX_INITIALIZER \
+        -:  103:  { { 0, 0, 0, 0, 0, { 0 } } }
+        -:  104:# ifdef __USE_GNU
+        -:  105:#  define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP \
+        -:  106:  { { 0, 0, 0, PTHREAD_MUTEX_RECURSIVE_NP, 0, { 0 } } }
+        -:  107:#  define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP \
+        -:  108:  { { 0, 0, 0, PTHREAD_MUTEX_ERRORCHECK_NP, 0, { 0 } } }
+        -:  109:#  define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP \
+        -:  110:  { { 0, 0, 0, PTHREAD_MUTEX_ADAPTIVE_NP, 0, { 0 } } }
+        -:  111:# endif
+        -:  112:#endif
+        -:  113:
+        -:  114:
+        -:  115:/* Read-write lock types.  */
+        -:  116:#if defined __USE_UNIX98 || defined __USE_XOPEN2K
+        -:  117:enum
+        -:  118:{
+        -:  119:  PTHREAD_RWLOCK_PREFER_READER_NP,
+        -:  120:  PTHREAD_RWLOCK_PREFER_WRITER_NP,
+        -:  121:  PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP,
+        -:  122:  PTHREAD_RWLOCK_DEFAULT_NP = PTHREAD_RWLOCK_PREFER_READER_NP
+        -:  123:};
+        -:  124:
+        -:  125:/* Read-write lock initializers.  */
+        -:  126:# define PTHREAD_RWLOCK_INITIALIZER \
+        -:  127:  { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+        -:  128:# ifdef __USE_GNU
+        -:  129:#  if __WORDSIZE == 64
+        -:  130:#   define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP \
+        -:  131:  { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,					      \
+        -:  132:	PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP } }
+        -:  133:#  else
+        -:  134:#   if __BYTE_ORDER == __LITTLE_ENDIAN
+        -:  135:#    define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP \
+        -:  136:  { { 0, 0, 0, 0, 0, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP, \
+        -:  137:      0, 0, 0, 0 } }
+        -:  138:#   else
+        -:  139:#    define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP \
+        -:  140:  { { 0, 0, 0, 0, 0, 0, 0, 0, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP,\
+        -:  141:      0 } }
+        -:  142:#   endif
+        -:  143:#  endif
+        -:  144:# endif
+        -:  145:#endif  /* Unix98 or XOpen2K */
+        -:  146:
+        -:  147:
+        -:  148:/* Scheduler inheritance.  */
+        -:  149:enum
+        -:  150:{
+        -:  151:  PTHREAD_INHERIT_SCHED,
+        -:  152:#define PTHREAD_INHERIT_SCHED   PTHREAD_INHERIT_SCHED
+        -:  153:  PTHREAD_EXPLICIT_SCHED
+        -:  154:#define PTHREAD_EXPLICIT_SCHED  PTHREAD_EXPLICIT_SCHED
+        -:  155:};
+        -:  156:
+        -:  157:
+        -:  158:/* Scope handling.  */
+        -:  159:enum
+        -:  160:{
+        -:  161:  PTHREAD_SCOPE_SYSTEM,
+        -:  162:#define PTHREAD_SCOPE_SYSTEM    PTHREAD_SCOPE_SYSTEM
+        -:  163:  PTHREAD_SCOPE_PROCESS
+        -:  164:#define PTHREAD_SCOPE_PROCESS   PTHREAD_SCOPE_PROCESS
+        -:  165:};
+        -:  166:
+        -:  167:
+        -:  168:/* Process shared or private flag.  */
+        -:  169:enum
+        -:  170:{
+        -:  171:  PTHREAD_PROCESS_PRIVATE,
+        -:  172:#define PTHREAD_PROCESS_PRIVATE PTHREAD_PROCESS_PRIVATE
+        -:  173:  PTHREAD_PROCESS_SHARED
+        -:  174:#define PTHREAD_PROCESS_SHARED  PTHREAD_PROCESS_SHARED
+        -:  175:};
+        -:  176:
+        -:  177:
+        -:  178:
+        -:  179:/* Conditional variable handling.  */
+        -:  180:#define PTHREAD_COND_INITIALIZER { { 0, 0, 0, 0, 0, (void *) 0, 0, 0 } }
+        -:  181:
+        -:  182:
+        -:  183:/* Cleanup buffers */
+        -:  184:struct _pthread_cleanup_buffer
+        -:  185:{
+        -:  186:  void (*__routine) (void *);             /* Function to call.  */
+        -:  187:  void *__arg;                            /* Its argument.  */
+        -:  188:  int __canceltype;                       /* Saved cancellation type. */
+        -:  189:  struct _pthread_cleanup_buffer *__prev; /* Chaining of cleanup functions.  */
+        -:  190:};
+        -:  191:
+        -:  192:/* Cancellation */
+        -:  193:enum
+        -:  194:{
+        -:  195:  PTHREAD_CANCEL_ENABLE,
+        -:  196:#define PTHREAD_CANCEL_ENABLE   PTHREAD_CANCEL_ENABLE
+        -:  197:  PTHREAD_CANCEL_DISABLE
+        -:  198:#define PTHREAD_CANCEL_DISABLE  PTHREAD_CANCEL_DISABLE
+        -:  199:};
+        -:  200:enum
+        -:  201:{
+        -:  202:  PTHREAD_CANCEL_DEFERRED,
+        -:  203:#define PTHREAD_CANCEL_DEFERRED	PTHREAD_CANCEL_DEFERRED
+        -:  204:  PTHREAD_CANCEL_ASYNCHRONOUS
+        -:  205:#define PTHREAD_CANCEL_ASYNCHRONOUS	PTHREAD_CANCEL_ASYNCHRONOUS
+        -:  206:};
+        -:  207:#define PTHREAD_CANCELED ((void *) -1)
+        -:  208:
+        -:  209:
+        -:  210:/* Single execution handling.  */
+        -:  211:#define PTHREAD_ONCE_INIT 0
+        -:  212:
+        -:  213:
+        -:  214:#ifdef __USE_XOPEN2K
+        -:  215:/* Value returned by 'pthread_barrier_wait' for one of the threads after
+        -:  216:   the required number of threads have called this function.
+        -:  217:   -1 is distinct from 0 and all errno constants */
+        -:  218:# define PTHREAD_BARRIER_SERIAL_THREAD -1
+        -:  219:#endif
+        -:  220:
+        -:  221:
+        -:  222:__BEGIN_DECLS
+        -:  223:
+        -:  224:/* Create a new thread, starting with execution of START-ROUTINE
+        -:  225:   getting passed ARG.  Creation attributed come from ATTR.  The new
+        -:  226:   handle is stored in *NEWTHREAD.  */
+        -:  227:extern int pthread_create (pthread_t *__restrict __newthread,
+        -:  228:			   __const pthread_attr_t *__restrict __attr,
+        -:  229:			   void *(*__start_routine) (void *),
+        -:  230:			   void *__restrict __arg) __THROW __nonnull ((1, 3));
+        -:  231:
+        -:  232:/* Terminate calling thread.
+        -:  233:
+        -:  234:   The registered cleanup handlers are called via exception handling
+        -:  235:   so we cannot mark this function with __THROW.*/
+        -:  236:extern void pthread_exit (void *__retval) __attribute__ ((__noreturn__));
+        -:  237:
+        -:  238:/* Make calling thread wait for termination of the thread TH.  The
+        -:  239:   exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
+        -:  240:   is not NULL.
+        -:  241:
+        -:  242:   This function is a cancellation point and therefore not marked with
+        -:  243:   __THROW.  */
+        -:  244:extern int pthread_join (pthread_t __th, void **__thread_return);
+        -:  245:
+        -:  246:#ifdef __USE_GNU
+        -:  247:/* Check whether thread TH has terminated.  If yes return the status of
+        -:  248:   the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL.  */
+        -:  249:extern int pthread_tryjoin_np (pthread_t __th, void **__thread_return) __THROW;
+        -:  250:
+        -:  251:/* Make calling thread wait for termination of the thread TH, but only
+        -:  252:   until TIMEOUT.  The exit status of the thread is stored in
+        -:  253:   *THREAD_RETURN, if THREAD_RETURN is not NULL.
+        -:  254:
+        -:  255:   This function is a cancellation point and therefore not marked with
+        -:  256:   __THROW.  */
+        -:  257:extern int pthread_timedjoin_np (pthread_t __th, void **__thread_return,
+        -:  258:				 __const struct timespec *__abstime);
+        -:  259:#endif
+        -:  260:
+        -:  261:/* Indicate that the thread TH is never to be joined with PTHREAD_JOIN.
+        -:  262:   The resources of TH will therefore be freed immediately when it
+        -:  263:   terminates, instead of waiting for another thread to perform PTHREAD_JOIN
+        -:  264:   on it.  */
+        -:  265:extern int pthread_detach (pthread_t __th) __THROW;
+        -:  266:
+        -:  267:
+        -:  268:/* Obtain the identifier of the current thread.  */
+        -:  269:extern pthread_t pthread_self (void) __THROW __attribute__ ((__const__));
+        -:  270:
+        -:  271:/* Compare two thread identifiers.  */
+        -:  272:extern int pthread_equal (pthread_t __thread1, pthread_t __thread2) __THROW;
+        -:  273:
+        -:  274:
+        -:  275:/* Thread attribute handling.  */
+        -:  276:
+        -:  277:/* Initialize thread attribute *ATTR with default attributes
+        -:  278:   (detachstate is PTHREAD_JOINABLE, scheduling policy is SCHED_OTHER,
+        -:  279:    no user-provided stack).  */
+        -:  280:extern int pthread_attr_init (pthread_attr_t *__attr) __THROW __nonnull ((1));
+        -:  281:
+        -:  282:/* Destroy thread attribute *ATTR.  */
+        -:  283:extern int pthread_attr_destroy (pthread_attr_t *__attr)
+        -:  284:     __THROW __nonnull ((1));
+        -:  285:
+        -:  286:/* Get detach state attribute.  */
+        -:  287:extern int pthread_attr_getdetachstate (__const pthread_attr_t *__attr,
+        -:  288:					int *__detachstate)
+        -:  289:     __THROW __nonnull ((1, 2));
+        -:  290:
+        -:  291:/* Set detach state attribute.  */
+        -:  292:extern int pthread_attr_setdetachstate (pthread_attr_t *__attr,
+        -:  293:					int __detachstate)
+        -:  294:     __THROW __nonnull ((1));
+        -:  295:
+        -:  296:
+        -:  297:/* Get the size of the guard area created for stack overflow protection.  */
+        -:  298:extern int pthread_attr_getguardsize (__const pthread_attr_t *__attr,
+        -:  299:				      size_t *__guardsize)
+        -:  300:     __THROW __nonnull ((1, 2));
+        -:  301:
+        -:  302:/* Set the size of the guard area created for stack overflow protection.  */
+        -:  303:extern int pthread_attr_setguardsize (pthread_attr_t *__attr,
+        -:  304:				      size_t __guardsize)
+        -:  305:     __THROW __nonnull ((1));
+        -:  306:
+        -:  307:
+        -:  308:/* Return in *PARAM the scheduling parameters of *ATTR.  */
+        -:  309:extern int pthread_attr_getschedparam (__const pthread_attr_t *__restrict
+        -:  310:				       __attr,
+        -:  311:				       struct sched_param *__restrict __param)
+        -:  312:     __THROW __nonnull ((1, 2));
+        -:  313:
+        -:  314:/* Set scheduling parameters (priority, etc) in *ATTR according to PARAM.  */
+        -:  315:extern int pthread_attr_setschedparam (pthread_attr_t *__restrict __attr,
+        -:  316:				       __const struct sched_param *__restrict
+        -:  317:				       __param) __THROW __nonnull ((1, 2));
+        -:  318:
+        -:  319:/* Return in *POLICY the scheduling policy of *ATTR.  */
+        -:  320:extern int pthread_attr_getschedpolicy (__const pthread_attr_t *__restrict
+        -:  321:					__attr, int *__restrict __policy)
+        -:  322:     __THROW __nonnull ((1, 2));
+        -:  323:
+        -:  324:/* Set scheduling policy in *ATTR according to POLICY.  */
+        -:  325:extern int pthread_attr_setschedpolicy (pthread_attr_t *__attr, int __policy)
+        -:  326:     __THROW __nonnull ((1));
+        -:  327:
+        -:  328:/* Return in *INHERIT the scheduling inheritance mode of *ATTR.  */
+        -:  329:extern int pthread_attr_getinheritsched (__const pthread_attr_t *__restrict
+        -:  330:					 __attr, int *__restrict __inherit)
+        -:  331:     __THROW __nonnull ((1, 2));
+        -:  332:
+        -:  333:/* Set scheduling inheritance mode in *ATTR according to INHERIT.  */
+        -:  334:extern int pthread_attr_setinheritsched (pthread_attr_t *__attr,
+        -:  335:					 int __inherit)
+        -:  336:     __THROW __nonnull ((1));
+        -:  337:
+        -:  338:
+        -:  339:/* Return in *SCOPE the scheduling contention scope of *ATTR.  */
+        -:  340:extern int pthread_attr_getscope (__const pthread_attr_t *__restrict __attr,
+        -:  341:				  int *__restrict __scope)
+        -:  342:     __THROW __nonnull ((1, 2));
+        -:  343:
+        -:  344:/* Set scheduling contention scope in *ATTR according to SCOPE.  */
+        -:  345:extern int pthread_attr_setscope (pthread_attr_t *__attr, int __scope)
+        -:  346:     __THROW __nonnull ((1));
+        -:  347:
+        -:  348:/* Return the previously set address for the stack.  */
+        -:  349:extern int pthread_attr_getstackaddr (__const pthread_attr_t *__restrict
+        -:  350:				      __attr, void **__restrict __stackaddr)
+        -:  351:     __THROW __nonnull ((1, 2)) __attribute_deprecated__;
+        -:  352:
+        -:  353:/* Set the starting address of the stack of the thread to be created.
+        -:  354:   Depending on whether the stack grows up or down the value must either
+        -:  355:   be higher or lower than all the address in the memory block.  The
+        -:  356:   minimal size of the block must be PTHREAD_STACK_MIN.  */
+        -:  357:extern int pthread_attr_setstackaddr (pthread_attr_t *__attr,
+        -:  358:				      void *__stackaddr)
+        -:  359:     __THROW __nonnull ((1)) __attribute_deprecated__;
+        -:  360:
+        -:  361:/* Return the currently used minimal stack size.  */
+        -:  362:extern int pthread_attr_getstacksize (__const pthread_attr_t *__restrict
+        -:  363:				      __attr, size_t *__restrict __stacksize)
+        -:  364:     __THROW __nonnull ((1, 2));
+        -:  365:
+        -:  366:/* Add information about the minimum stack size needed for the thread
+        -:  367:   to be started.  This size must never be less than PTHREAD_STACK_MIN
+        -:  368:   and must also not exceed the system limits.  */
+        -:  369:extern int pthread_attr_setstacksize (pthread_attr_t *__attr,
+        -:  370:				      size_t __stacksize)
+        -:  371:     __THROW __nonnull ((1));
+        -:  372:
+        -:  373:#ifdef __USE_XOPEN2K
+        -:  374:/* Return the previously set address for the stack.  */
+        -:  375:extern int pthread_attr_getstack (__const pthread_attr_t *__restrict __attr,
+        -:  376:				  void **__restrict __stackaddr,
+        -:  377:				  size_t *__restrict __stacksize)
+        -:  378:     __THROW __nonnull ((1, 2, 3));
+        -:  379:
+        -:  380:/* The following two interfaces are intended to replace the last two.  They
+        -:  381:   require setting the address as well as the size since only setting the
+        -:  382:   address will make the implementation on some architectures impossible.  */
+        -:  383:extern int pthread_attr_setstack (pthread_attr_t *__attr, void *__stackaddr,
+        -:  384:				  size_t __stacksize) __THROW __nonnull ((1));
+        -:  385:#endif
+        -:  386:
+        -:  387:#ifdef __USE_GNU
+        -:  388:/* Thread created with attribute ATTR will be limited to run only on
+        -:  389:   the processors represented in CPUSET.  */
+        -:  390:extern int pthread_attr_setaffinity_np (pthread_attr_t *__attr,
+        -:  391:					size_t __cpusetsize,
+        -:  392:					__const cpu_set_t *__cpuset)
+        -:  393:     __THROW __nonnull ((1, 3));
+        -:  394:
+        -:  395:/* Get bit set in CPUSET representing the processors threads created with
+        -:  396:   ATTR can run on.  */
+        -:  397:extern int pthread_attr_getaffinity_np (__const pthread_attr_t *__attr,
+        -:  398:					size_t __cpusetsize,
+        -:  399:					cpu_set_t *__cpuset)
+        -:  400:     __THROW __nonnull ((1, 3));
+        -:  401:
+        -:  402:
+        -:  403:/* Initialize thread attribute *ATTR with attributes corresponding to the
+        -:  404:   already running thread TH.  It shall be called on uninitialized ATTR
+        -:  405:   and destroyed with pthread_attr_destroy when no longer needed.  */
+        -:  406:extern int pthread_getattr_np (pthread_t __th, pthread_attr_t *__attr)
+        -:  407:     __THROW __nonnull ((2));
+        -:  408:#endif
+        -:  409:
+        -:  410:
+        -:  411:/* Functions for scheduling control.  */
+        -:  412:
+        -:  413:/* Set the scheduling parameters for TARGET_THREAD according to POLICY
+        -:  414:   and *PARAM.  */
+        -:  415:extern int pthread_setschedparam (pthread_t __target_thread, int __policy,
+        -:  416:				  __const struct sched_param *__param)
+        -:  417:     __THROW __nonnull ((3));
+        -:  418:
+        -:  419:/* Return in *POLICY and *PARAM the scheduling parameters for TARGET_THREAD. */
+        -:  420:extern int pthread_getschedparam (pthread_t __target_thread,
+        -:  421:				  int *__restrict __policy,
+        -:  422:				  struct sched_param *__restrict __param)
+        -:  423:     __THROW __nonnull ((2, 3));
+        -:  424:
+        -:  425:/* Set the scheduling priority for TARGET_THREAD.  */
+        -:  426:extern int pthread_setschedprio (pthread_t __target_thread, int __prio)
+        -:  427:     __THROW;
+        -:  428:
+        -:  429:
+        -:  430:#ifdef __USE_UNIX98
+        -:  431:/* Determine level of concurrency.  */
+        -:  432:extern int pthread_getconcurrency (void) __THROW;
+        -:  433:
+        -:  434:/* Set new concurrency level to LEVEL.  */
+        -:  435:extern int pthread_setconcurrency (int __level) __THROW;
+        -:  436:#endif
+        -:  437:
+        -:  438:#ifdef __USE_GNU
+        -:  439:/* Yield the processor to another thread or process.
+        -:  440:   This function is similar to the POSIX `sched_yield' function but
+        -:  441:   might be differently implemented in the case of a m-on-n thread
+        -:  442:   implementation.  */
+        -:  443:extern int pthread_yield (void) __THROW;
+        -:  444:
+        -:  445:
+        -:  446:/* Limit specified thread TH to run only on the processors represented
+        -:  447:   in CPUSET.  */
+        -:  448:extern int pthread_setaffinity_np (pthread_t __th, size_t __cpusetsize,
+        -:  449:				   __const cpu_set_t *__cpuset)
+        -:  450:     __THROW __nonnull ((3));
+        -:  451:
+        -:  452:/* Get bit set in CPUSET representing the processors TH can run on.  */
+        -:  453:extern int pthread_getaffinity_np (pthread_t __th, size_t __cpusetsize,
+        -:  454:				   cpu_set_t *__cpuset)
+        -:  455:     __THROW __nonnull ((3));
+        -:  456:#endif
+        -:  457:
+        -:  458:
+        -:  459:/* Functions for handling initialization.  */
+        -:  460:
+        -:  461:/* Guarantee that the initialization function INIT_ROUTINE will be called
+        -:  462:   only once, even if pthread_once is executed several times with the
+        -:  463:   same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
+        -:  464:   extern variable initialized to PTHREAD_ONCE_INIT.
+        -:  465:
+        -:  466:   The initialization functions might throw exception which is why
+        -:  467:   this function is not marked with __THROW.  */
+        -:  468:extern int pthread_once (pthread_once_t *__once_control,
+        -:  469:			 void (*__init_routine) (void)) __nonnull ((1, 2));
+        -:  470:
+        -:  471:
+        -:  472:/* Functions for handling cancellation.
+        -:  473:
+        -:  474:   Note that these functions are explicitly not marked to not throw an
+        -:  475:   exception in C++ code.  If cancellation is implemented by unwinding
+        -:  476:   this is necessary to have the compiler generate the unwind information.  */
+        -:  477:
+        -:  478:/* Set cancelability state of current thread to STATE, returning old
+        -:  479:   state in *OLDSTATE if OLDSTATE is not NULL.  */
+        -:  480:extern int pthread_setcancelstate (int __state, int *__oldstate);
+        -:  481:
+        -:  482:/* Set cancellation state of current thread to TYPE, returning the old
+        -:  483:   type in *OLDTYPE if OLDTYPE is not NULL.  */
+        -:  484:extern int pthread_setcanceltype (int __type, int *__oldtype);
+        -:  485:
+        -:  486:/* Cancel THREAD immediately or at the next possibility.  */
+        -:  487:extern int pthread_cancel (pthread_t __th);
+        -:  488:
+        -:  489:/* Test for pending cancellation for the current thread and terminate
+        -:  490:   the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
+        -:  491:   cancelled.  */
+        -:  492:extern void pthread_testcancel (void);
+        -:  493:
+        -:  494:
+        -:  495:/* Cancellation handling with integration into exception handling.  */
+        -:  496:
+        -:  497:typedef struct
+        -:  498:{
+        -:  499:  struct
+        -:  500:  {
+        -:  501:    __jmp_buf __cancel_jmp_buf;
+        -:  502:    int __mask_was_saved;
+        -:  503:  } __cancel_jmp_buf[1];
+        -:  504:  void *__pad[4];
+        -:  505:} __pthread_unwind_buf_t __attribute__ ((__aligned__));
+        -:  506:
+        -:  507:/* No special attributes by default.  */
+        -:  508:#ifndef __cleanup_fct_attribute
+        -:  509:# define __cleanup_fct_attribute
+        -:  510:#endif
+        -:  511:
+        -:  512:
+        -:  513:/* Structure to hold the cleanup handler information.  */
+        -:  514:struct __pthread_cleanup_frame
+        -:  515:{
+        -:  516:  void (*__cancel_routine) (void *);
+        -:  517:  void *__cancel_arg;
+        -:  518:  int __do_it;
+        -:  519:  int __cancel_type;
+        -:  520:};
+        -:  521:
+        -:  522:#if defined __GNUC__ && defined __EXCEPTIONS
+        -:  523:# ifdef __cplusplus
+        -:  524:/* Class to handle cancellation handler invocation.  */
+        -:  525:class __pthread_cleanup_class
+        -:  526:{
+        -:  527:  void (*__cancel_routine) (void *);
+        -:  528:  void *__cancel_arg;
+        -:  529:  int __do_it;
+        -:  530:  int __cancel_type;
+        -:  531:
+        -:  532: public:
+        -:  533:  __pthread_cleanup_class (void (*__fct) (void *), void *__arg)
+        -:  534:    : __cancel_routine (__fct), __cancel_arg (__arg), __do_it (1) { }
+        -:  535:  ~__pthread_cleanup_class () { if (__do_it) __cancel_routine (__cancel_arg); }
+        -:  536:  void __setdoit (int __newval) { __do_it = __newval; }
+        -:  537:  void __defer () { pthread_setcanceltype (PTHREAD_CANCEL_DEFERRED,
+        -:  538:					   &__cancel_type); }
+        -:  539:  void __restore () const { pthread_setcanceltype (__cancel_type, 0); }
+        -:  540:};
+        -:  541:
+        -:  542:/* Install a cleanup handler: ROUTINE will be called with arguments ARG
+        -:  543:   when the thread is canceled or calls pthread_exit.  ROUTINE will also
+        -:  544:   be called with arguments ARG when the matching pthread_cleanup_pop
+        -:  545:   is executed with non-zero EXECUTE argument.
+        -:  546:
+        -:  547:   pthread_cleanup_push and pthread_cleanup_pop are macros and must always
+        -:  548:   be used in matching pairs at the same nesting level of braces.  */
+        -:  549:#  define pthread_cleanup_push(routine, arg) \
+        -:  550:  do {									      \
+        -:  551:    __pthread_cleanup_class __clframe (routine, arg)
+        -:  552:
+        -:  553:/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
+        -:  554:   If EXECUTE is non-zero, the handler function is called. */
+        -:  555:#  define pthread_cleanup_pop(execute) \
+        -:  556:    __clframe.__setdoit (execute);					      \
+        -:  557:  } while (0)
+        -:  558:
+        -:  559:#  ifdef __USE_GNU
+        -:  560:/* Install a cleanup handler as pthread_cleanup_push does, but also
+        -:  561:   saves the current cancellation type and sets it to deferred
+        -:  562:   cancellation.  */
+        -:  563:#   define pthread_cleanup_push_defer_np(routine, arg) \
+        -:  564:  do {									      \
+        -:  565:    __pthread_cleanup_class __clframe (routine, arg);			      \
+        -:  566:    __clframe.__defer ()
+        -:  567:
+        -:  568:/* Remove a cleanup handler as pthread_cleanup_pop does, but also
+        -:  569:   restores the cancellation type that was in effect when the matching
+        -:  570:   pthread_cleanup_push_defer was called.  */
+        -:  571:#   define pthread_cleanup_pop_restore_np(execute) \
+        -:  572:    __clframe.__restore ();						      \
+        -:  573:    __clframe.__setdoit (execute);					      \
+        -:  574:  } while (0)
+        -:  575:#  endif
+        -:  576:# else
+        -:  577:/* Function called to call the cleanup handler.  As an extern inline
+        -:  578:   function the compiler is free to decide inlining the change when
+        -:  579:   needed or fall back on the copy which must exist somewhere
+        -:  580:   else.  */
+        -:  581:__extern_inline void
+        -:  582:__pthread_cleanup_routine (struct __pthread_cleanup_frame *__frame)
+        -:  583:{
+        -:  584:  if (__frame->__do_it)
+        -:  585:    __frame->__cancel_routine (__frame->__cancel_arg);
+        -:  586:}
+        -:  587:
+        -:  588:/* Install a cleanup handler: ROUTINE will be called with arguments ARG
+        -:  589:   when the thread is canceled or calls pthread_exit.  ROUTINE will also
+        -:  590:   be called with arguments ARG when the matching pthread_cleanup_pop
+        -:  591:   is executed with non-zero EXECUTE argument.
+        -:  592:
+        -:  593:   pthread_cleanup_push and pthread_cleanup_pop are macros and must always
+        -:  594:   be used in matching pairs at the same nesting level of braces.  */
+        -:  595:#  define pthread_cleanup_push(routine, arg) \
+        -:  596:  do {									      \
+        -:  597:    struct __pthread_cleanup_frame __clframe				      \
+        -:  598:      __attribute__ ((__cleanup__ (__pthread_cleanup_routine)))		      \
+        -:  599:      = { .__cancel_routine = (routine), .__cancel_arg = (arg),	 	      \
+        -:  600:	  .__do_it = 1 };
+        -:  601:
+        -:  602:/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
+        -:  603:   If EXECUTE is non-zero, the handler function is called. */
+        -:  604:#  define pthread_cleanup_pop(execute) \
+        -:  605:    __clframe.__do_it = (execute);					      \
+        -:  606:  } while (0)
+        -:  607:
+        -:  608:#  ifdef __USE_GNU
+        -:  609:/* Install a cleanup handler as pthread_cleanup_push does, but also
+        -:  610:   saves the current cancellation type and sets it to deferred
+        -:  611:   cancellation.  */
+        -:  612:#   define pthread_cleanup_push_defer_np(routine, arg) \
+        -:  613:  do {									      \
+        -:  614:    struct __pthread_cleanup_frame __clframe				      \
+        -:  615:      __attribute__ ((__cleanup__ (__pthread_cleanup_routine)))		      \
+        -:  616:      = { .__cancel_routine = (routine), .__cancel_arg = (arg),		      \
+        -:  617:	  .__do_it = 1 };						      \
+        -:  618:    (void) pthread_setcanceltype (PTHREAD_CANCEL_DEFERRED,		      \
+        -:  619:				  &__clframe.__cancel_type)
+        -:  620:
+        -:  621:/* Remove a cleanup handler as pthread_cleanup_pop does, but also
+        -:  622:   restores the cancellation type that was in effect when the matching
+        -:  623:   pthread_cleanup_push_defer was called.  */
+        -:  624:#   define pthread_cleanup_pop_restore_np(execute) \
+        -:  625:    (void) pthread_setcanceltype (__clframe.__cancel_type, NULL);	      \
+        -:  626:    __clframe.__do_it = (execute);					      \
+        -:  627:  } while (0)
+        -:  628:#  endif
+        -:  629:# endif
+        -:  630:#else
+        -:  631:/* Install a cleanup handler: ROUTINE will be called with arguments ARG
+        -:  632:   when the thread is canceled or calls pthread_exit.  ROUTINE will also
+        -:  633:   be called with arguments ARG when the matching pthread_cleanup_pop
+        -:  634:   is executed with non-zero EXECUTE argument.
+        -:  635:
+        -:  636:   pthread_cleanup_push and pthread_cleanup_pop are macros and must always
+        -:  637:   be used in matching pairs at the same nesting level of braces.  */
+        -:  638:# define pthread_cleanup_push(routine, arg) \
+        -:  639:  do {									      \
+        -:  640:    __pthread_unwind_buf_t __cancel_buf;				      \
+        -:  641:    void (*__cancel_routine) (void *) = (routine);			      \
+        -:  642:    void *__cancel_arg = (arg);						      \
+        -:  643:    int not_first_call = __sigsetjmp ((struct __jmp_buf_tag *) (void *)	      \
+        -:  644:				      __cancel_buf.__cancel_jmp_buf, 0);      \
+        -:  645:    if (__builtin_expect (not_first_call, 0))				      \
+        -:  646:      {									      \
+        -:  647:	__cancel_routine (__cancel_arg);				      \
+        -:  648:	__pthread_unwind_next (&__cancel_buf);				      \
+        -:  649:	/* NOTREACHED */						      \
+        -:  650:      }									      \
+        -:  651:									      \
+        -:  652:    __pthread_register_cancel (&__cancel_buf);				      \
+        -:  653:    do {
+        -:  654:extern void __pthread_register_cancel (__pthread_unwind_buf_t *__buf)
+        -:  655:     __cleanup_fct_attribute;
+        -:  656:
+        -:  657:/* Remove a cleanup handler installed by the matching pthread_cleanup_push.
+        -:  658:   If EXECUTE is non-zero, the handler function is called. */
+        -:  659:# define pthread_cleanup_pop(execute) \
+        -:  660:      do { } while (0);/* Empty to allow label before pthread_cleanup_pop.  */\
+        -:  661:    } while (0);							      \
+        -:  662:    __pthread_unregister_cancel (&__cancel_buf);			      \
+        -:  663:    if (execute)							      \
+        -:  664:      __cancel_routine (__cancel_arg);					      \
+        -:  665:  } while (0)
+        -:  666:extern void __pthread_unregister_cancel (__pthread_unwind_buf_t *__buf)
+        -:  667:  __cleanup_fct_attribute;
+        -:  668:
+        -:  669:# ifdef __USE_GNU
+        -:  670:/* Install a cleanup handler as pthread_cleanup_push does, but also
+        -:  671:   saves the current cancellation type and sets it to deferred
+        -:  672:   cancellation.  */
+        -:  673:#  define pthread_cleanup_push_defer_np(routine, arg) \
+        -:  674:  do {									      \
+        -:  675:    __pthread_unwind_buf_t __cancel_buf;				      \
+        -:  676:    void (*__cancel_routine) (void *) = (routine);			      \
+        -:  677:    void *__cancel_arg = (arg);						      \
+        -:  678:    int not_first_call = __sigsetjmp ((struct __jmp_buf_tag *) (void *)	      \
+        -:  679:				      __cancel_buf.__cancel_jmp_buf, 0);      \
+        -:  680:    if (__builtin_expect (not_first_call, 0))				      \
+        -:  681:      {									      \
+        -:  682:	__cancel_routine (__cancel_arg);				      \
+        -:  683:	__pthread_unwind_next (&__cancel_buf);				      \
+        -:  684:	/* NOTREACHED */						      \
+        -:  685:      }									      \
+        -:  686:									      \
+        -:  687:    __pthread_register_cancel_defer (&__cancel_buf);			      \
+        -:  688:    do {
+        -:  689:extern void __pthread_register_cancel_defer (__pthread_unwind_buf_t *__buf)
+        -:  690:     __cleanup_fct_attribute;
+        -:  691:
+        -:  692:/* Remove a cleanup handler as pthread_cleanup_pop does, but also
+        -:  693:   restores the cancellation type that was in effect when the matching
+        -:  694:   pthread_cleanup_push_defer was called.  */
+        -:  695:#  define pthread_cleanup_pop_restore_np(execute) \
+        -:  696:      do { } while (0);/* Empty to allow label before pthread_cleanup_pop.  */\
+        -:  697:    } while (0);							      \
+        -:  698:    __pthread_unregister_cancel_restore (&__cancel_buf);		      \
+        -:  699:    if (execute)							      \
+        -:  700:      __cancel_routine (__cancel_arg);					      \
+        -:  701:  } while (0)
+        -:  702:extern void __pthread_unregister_cancel_restore (__pthread_unwind_buf_t *__buf)
+        -:  703:  __cleanup_fct_attribute;
+        -:  704:# endif
+        -:  705:
+        -:  706:/* Internal interface to initiate cleanup.  */
+        -:  707:extern void __pthread_unwind_next (__pthread_unwind_buf_t *__buf)
+        -:  708:     __cleanup_fct_attribute __attribute__ ((__noreturn__))
+        -:  709:# ifndef SHARED
+        -:  710:     __attribute__ ((__weak__))
+        -:  711:# endif
+        -:  712:     ;
+        -:  713:#endif
+        -:  714:
+        -:  715:/* Function used in the macros.  */
+        -:  716:struct __jmp_buf_tag;
+        -:  717:extern int __sigsetjmp (struct __jmp_buf_tag *__env, int __savemask) __THROW;
+        -:  718:
+        -:  719:
+        -:  720:/* Mutex handling.  */
+        -:  721:
+        -:  722:/* Initialize a mutex.  */
+        -:  723:extern int pthread_mutex_init (pthread_mutex_t *__mutex,
+        -:  724:			       __const pthread_mutexattr_t *__mutexattr)
+        -:  725:     __THROW __nonnull ((1));
+        -:  726:
+        -:  727:/* Destroy a mutex.  */
+        -:  728:extern int pthread_mutex_destroy (pthread_mutex_t *__mutex)
+        -:  729:     __THROW __nonnull ((1));
+        -:  730:
+        -:  731:/* Try locking a mutex.  */
+        -:  732:extern int pthread_mutex_trylock (pthread_mutex_t *__mutex)
+        -:  733:     __THROW __nonnull ((1));
+        -:  734:
+        -:  735:/* Lock a mutex.  */
+        -:  736:extern int pthread_mutex_lock (pthread_mutex_t *__mutex)
+        -:  737:     __THROW __nonnull ((1));
+        -:  738:
+        -:  739:#ifdef __USE_XOPEN2K
+        -:  740:/* Wait until lock becomes available, or specified time passes. */
+        -:  741:extern int pthread_mutex_timedlock (pthread_mutex_t *__restrict __mutex,
+        -:  742:                                    __const struct timespec *__restrict
+        -:  743:                                    __abstime) __THROW __nonnull ((1, 2));
+        -:  744:#endif
+        -:  745:
+        -:  746:/* Unlock a mutex.  */
+        -:  747:extern int pthread_mutex_unlock (pthread_mutex_t *__mutex)
+        -:  748:     __THROW __nonnull ((1));
+        -:  749:
+        -:  750:
+        -:  751:#ifdef __USE_UNIX98
+        -:  752:/* Get the priority ceiling of MUTEX.  */
+        -:  753:extern int pthread_mutex_getprioceiling (__const pthread_mutex_t *
+        -:  754:					 __restrict __mutex,
+        -:  755:					 int *__restrict __prioceiling)
+        -:  756:     __THROW __nonnull ((1, 2));
+        -:  757:
+        -:  758:/* Set the priority ceiling of MUTEX to PRIOCEILING, return old
+        -:  759:   priority ceiling value in *OLD_CEILING.  */
+        -:  760:extern int pthread_mutex_setprioceiling (pthread_mutex_t *__restrict __mutex,
+        -:  761:					 int __prioceiling,
+        -:  762:					 int *__restrict __old_ceiling)
+        -:  763:     __THROW __nonnull ((1, 3));
+        -:  764:#endif
+        -:  765:
+        -:  766:
+        -:  767:#ifdef __USE_XOPEN2K8
+        -:  768:/* Declare the state protected by MUTEX as consistent.  */
+        -:  769:extern int pthread_mutex_consistent_np (pthread_mutex_t *__mutex)
+        -:  770:     __THROW __nonnull ((1));
+        -:  771:# ifdef __USE_GNU
+        -:  772:extern int pthread_mutex_consistent_np (pthread_mutex_t *__mutex)
+        -:  773:     __THROW __nonnull ((1));
+        -:  774:# endif
+        -:  775:#endif
+        -:  776:
+        -:  777:
+        -:  778:/* Functions for handling mutex attributes.  */
+        -:  779:
+        -:  780:/* Initialize mutex attribute object ATTR with default attributes
+        -:  781:   (kind is PTHREAD_MUTEX_TIMED_NP).  */
+        -:  782:extern int pthread_mutexattr_init (pthread_mutexattr_t *__attr)
+        -:  783:     __THROW __nonnull ((1));
+        -:  784:
+        -:  785:/* Destroy mutex attribute object ATTR.  */
+        -:  786:extern int pthread_mutexattr_destroy (pthread_mutexattr_t *__attr)
+        -:  787:     __THROW __nonnull ((1));
+        -:  788:
+        -:  789:/* Get the process-shared flag of the mutex attribute ATTR.  */
+        -:  790:extern int pthread_mutexattr_getpshared (__const pthread_mutexattr_t *
+        -:  791:					 __restrict __attr,
+        -:  792:					 int *__restrict __pshared)
+        -:  793:     __THROW __nonnull ((1, 2));
+        -:  794:
+        -:  795:/* Set the process-shared flag of the mutex attribute ATTR.  */
+        -:  796:extern int pthread_mutexattr_setpshared (pthread_mutexattr_t *__attr,
+        -:  797:					 int __pshared)
+        -:  798:     __THROW __nonnull ((1));
+        -:  799:
+        -:  800:#ifdef __USE_UNIX98
+        -:  801:/* Return in *KIND the mutex kind attribute in *ATTR.  */
+        -:  802:extern int pthread_mutexattr_gettype (__const pthread_mutexattr_t *__restrict
+        -:  803:				      __attr, int *__restrict __kind)
+        -:  804:     __THROW __nonnull ((1, 2));
+        -:  805:
+        -:  806:/* Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
+        -:  807:   PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or
+        -:  808:   PTHREAD_MUTEX_DEFAULT).  */
+        -:  809:extern int pthread_mutexattr_settype (pthread_mutexattr_t *__attr, int __kind)
+        -:  810:     __THROW __nonnull ((1));
+        -:  811:
+        -:  812:/* Return in *PROTOCOL the mutex protocol attribute in *ATTR.  */
+        -:  813:extern int pthread_mutexattr_getprotocol (__const pthread_mutexattr_t *
+        -:  814:					  __restrict __attr,
+        -:  815:					  int *__restrict __protocol)
+        -:  816:     __THROW __nonnull ((1, 2));
+        -:  817:
+        -:  818:/* Set the mutex protocol attribute in *ATTR to PROTOCOL (either
+        -:  819:   PTHREAD_PRIO_NONE, PTHREAD_PRIO_INHERIT, or PTHREAD_PRIO_PROTECT).  */
+        -:  820:extern int pthread_mutexattr_setprotocol (pthread_mutexattr_t *__attr,
+        -:  821:					  int __protocol)
+        -:  822:     __THROW __nonnull ((1));
+        -:  823:
+        -:  824:/* Return in *PRIOCEILING the mutex prioceiling attribute in *ATTR.  */
+        -:  825:extern int pthread_mutexattr_getprioceiling (__const pthread_mutexattr_t *
+        -:  826:					     __restrict __attr,
+        -:  827:					     int *__restrict __prioceiling)
+        -:  828:     __THROW __nonnull ((1, 2));
+        -:  829:
+        -:  830:/* Set the mutex prioceiling attribute in *ATTR to PRIOCEILING.  */
+        -:  831:extern int pthread_mutexattr_setprioceiling (pthread_mutexattr_t *__attr,
+        -:  832:					     int __prioceiling)
+        -:  833:     __THROW __nonnull ((1));
+        -:  834:#endif
+        -:  835:
+        -:  836:#ifdef __USE_XOPEN2K
+        -:  837:/* Get the robustness flag of the mutex attribute ATTR.  */
+        -:  838:extern int pthread_mutexattr_getrobust (__const pthread_mutexattr_t *__attr,
+        -:  839:					int *__robustness)
+        -:  840:     __THROW __nonnull ((1, 2));
+        -:  841:# ifdef __USE_GNU
+        -:  842:extern int pthread_mutexattr_getrobust_np (__const pthread_mutexattr_t *__attr,
+        -:  843:					   int *__robustness)
+        -:  844:     __THROW __nonnull ((1, 2));
+        -:  845:# endif
+        -:  846:
+        -:  847:/* Set the robustness flag of the mutex attribute ATTR.  */
+        -:  848:extern int pthread_mutexattr_setrobust (pthread_mutexattr_t *__attr,
+        -:  849:					int __robustness)
+        -:  850:     __THROW __nonnull ((1));
+        -:  851:# ifdef __USE_GNU
+        -:  852:extern int pthread_mutexattr_setrobust_np (pthread_mutexattr_t *__attr,
+        -:  853:					   int __robustness)
+        -:  854:     __THROW __nonnull ((1));
+        -:  855:# endif
+        -:  856:#endif
+        -:  857:
+        -:  858:
+        -:  859:#if defined __USE_UNIX98 || defined __USE_XOPEN2K
+        -:  860:/* Functions for handling read-write locks.  */
+        -:  861:
+        -:  862:/* Initialize read-write lock RWLOCK using attributes ATTR, or use
+        -:  863:   the default values if later is NULL.  */
+        -:  864:extern int pthread_rwlock_init (pthread_rwlock_t *__restrict __rwlock,
+        -:  865:				__const pthread_rwlockattr_t *__restrict
+        -:  866:				__attr) __THROW __nonnull ((1));
+        -:  867:
+        -:  868:/* Destroy read-write lock RWLOCK.  */
+        -:  869:extern int pthread_rwlock_destroy (pthread_rwlock_t *__rwlock)
+        -:  870:     __THROW __nonnull ((1));
+        -:  871:
+        -:  872:/* Acquire read lock for RWLOCK.  */
+        -:  873:extern int pthread_rwlock_rdlock (pthread_rwlock_t *__rwlock)
+        -:  874:     __THROW __nonnull ((1));
+        -:  875:
+        -:  876:/* Try to acquire read lock for RWLOCK.  */
+        -:  877:extern int pthread_rwlock_tryrdlock (pthread_rwlock_t *__rwlock)
+        -:  878:  __THROW __nonnull ((1));
+        -:  879:
+        -:  880:# ifdef __USE_XOPEN2K
+        -:  881:/* Try to acquire read lock for RWLOCK or return after specfied time.  */
+        -:  882:extern int pthread_rwlock_timedrdlock (pthread_rwlock_t *__restrict __rwlock,
+        -:  883:				       __const struct timespec *__restrict
+        -:  884:				       __abstime) __THROW __nonnull ((1, 2));
+        -:  885:# endif
+        -:  886:
+        -:  887:/* Acquire write lock for RWLOCK.  */
+        -:  888:extern int pthread_rwlock_wrlock (pthread_rwlock_t *__rwlock)
+        -:  889:     __THROW __nonnull ((1));
+        -:  890:
+        -:  891:/* Try to acquire write lock for RWLOCK.  */
+        -:  892:extern int pthread_rwlock_trywrlock (pthread_rwlock_t *__rwlock)
+        -:  893:     __THROW __nonnull ((1));
+        -:  894:
+        -:  895:# ifdef __USE_XOPEN2K
+        -:  896:/* Try to acquire write lock for RWLOCK or return after specfied time.  */
+        -:  897:extern int pthread_rwlock_timedwrlock (pthread_rwlock_t *__restrict __rwlock,
+        -:  898:				       __const struct timespec *__restrict
+        -:  899:				       __abstime) __THROW __nonnull ((1, 2));
+        -:  900:# endif
+        -:  901:
+        -:  902:/* Unlock RWLOCK.  */
+        -:  903:extern int pthread_rwlock_unlock (pthread_rwlock_t *__rwlock)
+        -:  904:     __THROW __nonnull ((1));
+        -:  905:
+        -:  906:
+        -:  907:/* Functions for handling read-write lock attributes.  */
+        -:  908:
+        -:  909:/* Initialize attribute object ATTR with default values.  */
+        -:  910:extern int pthread_rwlockattr_init (pthread_rwlockattr_t *__attr)
+        -:  911:     __THROW __nonnull ((1));
+        -:  912:
+        -:  913:/* Destroy attribute object ATTR.  */
+        -:  914:extern int pthread_rwlockattr_destroy (pthread_rwlockattr_t *__attr)
+        -:  915:     __THROW __nonnull ((1));
+        -:  916:
+        -:  917:/* Return current setting of process-shared attribute of ATTR in PSHARED.  */
+        -:  918:extern int pthread_rwlockattr_getpshared (__const pthread_rwlockattr_t *
+        -:  919:					  __restrict __attr,
+        -:  920:					  int *__restrict __pshared)
+        -:  921:     __THROW __nonnull ((1, 2));
+        -:  922:
+        -:  923:/* Set process-shared attribute of ATTR to PSHARED.  */
+        -:  924:extern int pthread_rwlockattr_setpshared (pthread_rwlockattr_t *__attr,
+        -:  925:					  int __pshared)
+        -:  926:     __THROW __nonnull ((1));
+        -:  927:
+        -:  928:/* Return current setting of reader/writer preference.  */
+        -:  929:extern int pthread_rwlockattr_getkind_np (__const pthread_rwlockattr_t *
+        -:  930:					  __restrict __attr,
+        -:  931:					  int *__restrict __pref)
+        -:  932:     __THROW __nonnull ((1, 2));
+        -:  933:
+        -:  934:/* Set reader/write preference.  */
+        -:  935:extern int pthread_rwlockattr_setkind_np (pthread_rwlockattr_t *__attr,
+        -:  936:					  int __pref) __THROW __nonnull ((1));
+        -:  937:#endif
+        -:  938:
+        -:  939:
+        -:  940:/* Functions for handling conditional variables.  */
+        -:  941:
+        -:  942:/* Initialize condition variable COND using attributes ATTR, or use
+        -:  943:   the default values if later is NULL.  */
+        -:  944:extern int pthread_cond_init (pthread_cond_t *__restrict __cond,
+        -:  945:			      __const pthread_condattr_t *__restrict
+        -:  946:			      __cond_attr) __THROW __nonnull ((1));
+        -:  947:
+        -:  948:/* Destroy condition variable COND.  */
+        -:  949:extern int pthread_cond_destroy (pthread_cond_t *__cond)
+        -:  950:     __THROW __nonnull ((1));
+        -:  951:
+        -:  952:/* Wake up one thread waiting for condition variable COND.  */
+        -:  953:extern int pthread_cond_signal (pthread_cond_t *__cond)
+        -:  954:     __THROW __nonnull ((1));
+        -:  955:
+        -:  956:/* Wake up all threads waiting for condition variables COND.  */
+        -:  957:extern int pthread_cond_broadcast (pthread_cond_t *__cond)
+        -:  958:     __THROW __nonnull ((1));
+        -:  959:
+        -:  960:/* Wait for condition variable COND to be signaled or broadcast.
+        -:  961:   MUTEX is assumed to be locked before.
+        -:  962:
+        -:  963:   This function is a cancellation point and therefore not marked with
+        -:  964:   __THROW.  */
+        -:  965:extern int pthread_cond_wait (pthread_cond_t *__restrict __cond,
+        -:  966:			      pthread_mutex_t *__restrict __mutex)
+        -:  967:     __nonnull ((1, 2));
+        -:  968:
+        -:  969:/* Wait for condition variable COND to be signaled or broadcast until
+        -:  970:   ABSTIME.  MUTEX is assumed to be locked before.  ABSTIME is an
+        -:  971:   absolute time specification; zero is the beginning of the epoch
+        -:  972:   (00:00:00 GMT, January 1, 1970).
+        -:  973:
+        -:  974:   This function is a cancellation point and therefore not marked with
+        -:  975:   __THROW.  */
+        -:  976:extern int pthread_cond_timedwait (pthread_cond_t *__restrict __cond,
+        -:  977:				   pthread_mutex_t *__restrict __mutex,
+        -:  978:				   __const struct timespec *__restrict
+        -:  979:				   __abstime) __nonnull ((1, 2, 3));
+        -:  980:
+        -:  981:/* Functions for handling condition variable attributes.  */
+        -:  982:
+        -:  983:/* Initialize condition variable attribute ATTR.  */
+        -:  984:extern int pthread_condattr_init (pthread_condattr_t *__attr)
+        -:  985:     __THROW __nonnull ((1));
+        -:  986:
+        -:  987:/* Destroy condition variable attribute ATTR.  */
+        -:  988:extern int pthread_condattr_destroy (pthread_condattr_t *__attr)
+        -:  989:     __THROW __nonnull ((1));
+        -:  990:
+        -:  991:/* Get the process-shared flag of the condition variable attribute ATTR.  */
+        -:  992:extern int pthread_condattr_getpshared (__const pthread_condattr_t *
+        -:  993:                                        __restrict __attr,
+        -:  994:                                        int *__restrict __pshared)
+        -:  995:     __THROW __nonnull ((1, 2));
+        -:  996:
+        -:  997:/* Set the process-shared flag of the condition variable attribute ATTR.  */
+        -:  998:extern int pthread_condattr_setpshared (pthread_condattr_t *__attr,
+        -:  999:                                        int __pshared) __THROW __nonnull ((1));
+        -: 1000:
+        -: 1001:#ifdef __USE_XOPEN2K
+        -: 1002:/* Get the clock selected for the conditon variable attribute ATTR.  */
+        -: 1003:extern int pthread_condattr_getclock (__const pthread_condattr_t *
+        -: 1004:				      __restrict __attr,
+        -: 1005:				      __clockid_t *__restrict __clock_id)
+        -: 1006:     __THROW __nonnull ((1, 2));
+        -: 1007:
+        -: 1008:/* Set the clock selected for the conditon variable attribute ATTR.  */
+        -: 1009:extern int pthread_condattr_setclock (pthread_condattr_t *__attr,
+        -: 1010:				      __clockid_t __clock_id)
+        -: 1011:     __THROW __nonnull ((1));
+        -: 1012:#endif
+        -: 1013:
+        -: 1014:
+        -: 1015:#ifdef __USE_XOPEN2K
+        -: 1016:/* Functions to handle spinlocks.  */
+        -: 1017:
+        -: 1018:/* Initialize the spinlock LOCK.  If PSHARED is nonzero the spinlock can
+        -: 1019:   be shared between different processes.  */
+        -: 1020:extern int pthread_spin_init (pthread_spinlock_t *__lock, int __pshared)
+        -: 1021:     __THROW __nonnull ((1));
+        -: 1022:
+        -: 1023:/* Destroy the spinlock LOCK.  */
+        -: 1024:extern int pthread_spin_destroy (pthread_spinlock_t *__lock)
+        -: 1025:     __THROW __nonnull ((1));
+        -: 1026:
+        -: 1027:/* Wait until spinlock LOCK is retrieved.  */
+        -: 1028:extern int pthread_spin_lock (pthread_spinlock_t *__lock)
+        -: 1029:     __THROW __nonnull ((1));
+        -: 1030:
+        -: 1031:/* Try to lock spinlock LOCK.  */
+        -: 1032:extern int pthread_spin_trylock (pthread_spinlock_t *__lock)
+        -: 1033:     __THROW __nonnull ((1));
+        -: 1034:
+        -: 1035:/* Release spinlock LOCK.  */
+        -: 1036:extern int pthread_spin_unlock (pthread_spinlock_t *__lock)
+        -: 1037:     __THROW __nonnull ((1));
+        -: 1038:
+        -: 1039:
+        -: 1040:/* Functions to handle barriers.  */
+        -: 1041:
+        -: 1042:/* Initialize BARRIER with the attributes in ATTR.  The barrier is
+        -: 1043:   opened when COUNT waiters arrived.  */
+        -: 1044:extern int pthread_barrier_init (pthread_barrier_t *__restrict __barrier,
+        -: 1045:				 __const pthread_barrierattr_t *__restrict
+        -: 1046:				 __attr, unsigned int __count)
+        -: 1047:     __THROW __nonnull ((1));
+        -: 1048:
+        -: 1049:/* Destroy a previously dynamically initialized barrier BARRIER.  */
+        -: 1050:extern int pthread_barrier_destroy (pthread_barrier_t *__barrier)
+        -: 1051:     __THROW __nonnull ((1));
+        -: 1052:
+        -: 1053:/* Wait on barrier BARRIER.  */
+        -: 1054:extern int pthread_barrier_wait (pthread_barrier_t *__barrier)
+        -: 1055:     __THROW __nonnull ((1));
+        -: 1056:
+        -: 1057:
+        -: 1058:/* Initialize barrier attribute ATTR.  */
+        -: 1059:extern int pthread_barrierattr_init (pthread_barrierattr_t *__attr)
+        -: 1060:     __THROW __nonnull ((1));
+        -: 1061:
+        -: 1062:/* Destroy previously dynamically initialized barrier attribute ATTR.  */
+        -: 1063:extern int pthread_barrierattr_destroy (pthread_barrierattr_t *__attr)
+        -: 1064:     __THROW __nonnull ((1));
+        -: 1065:
+        -: 1066:/* Get the process-shared flag of the barrier attribute ATTR.  */
+        -: 1067:extern int pthread_barrierattr_getpshared (__const pthread_barrierattr_t *
+        -: 1068:					   __restrict __attr,
+        -: 1069:					   int *__restrict __pshared)
+        -: 1070:     __THROW __nonnull ((1, 2));
+        -: 1071:
+        -: 1072:/* Set the process-shared flag of the barrier attribute ATTR.  */
+        -: 1073:extern int pthread_barrierattr_setpshared (pthread_barrierattr_t *__attr,
+        -: 1074:                                           int __pshared)
+        -: 1075:     __THROW __nonnull ((1));
+        -: 1076:#endif
+        -: 1077:
+        -: 1078:
+        -: 1079:/* Functions for handling thread-specific data.  */
+        -: 1080:
+        -: 1081:/* Create a key value identifying a location in the thread-specific
+        -: 1082:   data area.  Each thread maintains a distinct thread-specific data
+        -: 1083:   area.  DESTR_FUNCTION, if non-NULL, is called with the value
+        -: 1084:   associated to that key when the key is destroyed.
+        -: 1085:   DESTR_FUNCTION is not called if the value associated is NULL when
+        -: 1086:   the key is destroyed.  */
+        -: 1087:extern int pthread_key_create (pthread_key_t *__key,
+        -: 1088:			       void (*__destr_function) (void *))
+        -: 1089:     __THROW __nonnull ((1));
+        -: 1090:
+        -: 1091:/* Destroy KEY.  */
+        -: 1092:extern int pthread_key_delete (pthread_key_t __key) __THROW;
+        -: 1093:
+        -: 1094:/* Return current value of the thread-specific data slot identified by KEY.  */
+        -: 1095:extern void *pthread_getspecific (pthread_key_t __key) __THROW;
+        -: 1096:
+        -: 1097:/* Store POINTER in the thread-specific data slot identified by KEY. */
+        -: 1098:extern int pthread_setspecific (pthread_key_t __key,
+        -: 1099:				__const void *__pointer) __THROW ;
+        -: 1100:
+        -: 1101:
+        -: 1102:#ifdef __USE_XOPEN2K
+        -: 1103:/* Get ID of CPU-time clock for thread THREAD_ID.  */
+        -: 1104:extern int pthread_getcpuclockid (pthread_t __thread_id,
+        -: 1105:				  __clockid_t *__clock_id)
+        -: 1106:     __THROW __nonnull ((2));
+        -: 1107:#endif
+        -: 1108:
+        -: 1109:
+        -: 1110:/* Install handlers to be called when a new process is created with FORK.
+        -: 1111:   The PREPARE handler is called in the parent process just before performing
+        -: 1112:   FORK. The PARENT handler is called in the parent process just after FORK.
+        -: 1113:   The CHILD handler is called in the child process.  Each of the three
+        -: 1114:   handlers can be NULL, meaning that no handler needs to be called at that
+        -: 1115:   point.
+        -: 1116:   PTHREAD_ATFORK can be called several times, in which case the PREPARE
+        -: 1117:   handlers are called in LIFO order (last added with PTHREAD_ATFORK,
+        -: 1118:   first called before FORK), and the PARENT and CHILD handlers are called
+        -: 1119:   in FIFO (first added, first called).  */
+        -: 1120:
+        -: 1121:extern int pthread_atfork (void (*__prepare) (void),
+        -: 1122:			   void (*__parent) (void),
+        -: 1123:			   void (*__child) (void)) __THROW;
+        -: 1124:
+        -: 1125:
+        -: 1126:#ifdef __USE_EXTERN_INLINES
+        -: 1127:/* Optimizations.  */
+        -: 1128:__extern_inline int
+    #####: 1129:__NTH (pthread_equal (pthread_t __thread1, pthread_t __thread2))
+        -: 1130:{
+    #####: 1131:  return __thread1 == __thread2;
+        -: 1132:}
+        -: 1133:#endif
+        -: 1134:
+        -: 1135:__END_DECLS
+        -: 1136:
+        -: 1137:#endif	/* pthread.h */

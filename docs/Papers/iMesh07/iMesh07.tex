@@ -1,0 +1,107 @@
+\documentclass{aiaa-tc}
+\usepackage{pslatex}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\pagestyle{empty}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\usepackage{float}
+\usepackage{geometry}
+\geometry{verbose,letterpaper,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{multicol}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Bold symbol macro for standard LaTeX users
+\providecommand{\boldsymbol}[1]{\mbox{\boldmath $#1$}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\renewcommand{\floatpagefraction}{1}
+\renewcommand{\textfraction}{0}
+\renewcommand{\topfraction}{0.9}
+\setcounter{topnumber}{4}
+\usepackage{url}
+
+\newenvironment{lyxlist}[1]
+ {\begin{list}{}
+   {\settowidth{\labelwidth}{#1}
+    \setlength{\leftmargin}{\labelwidth}
+    \addtolength{\leftmargin}{\labelsep}
+    \renewcommand{\makelabel}[1]{##1\hfil}}}
+ {\end{list}}
+ \newenvironment{lyxcode}
+   {\begin{list}{}{
+     \setlength{\rightmargin}{\leftmargin}
+     \setlength{\listparindent}{0pt}% needed for AMS classes
+     \raggedright
+     \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{0pt}
+     \normalfont\ttfamily}%
+    \item[]}
+   {\end{list}}
+
+\begin{document}
+
+\title{An Interoperable Mesh Component for PDE Simulation Development}
+
+
+\author{Lori Freitag Diachin\thanks{Center for Applied Scientific
+  Computing, Lawrence Livermore National Laboratory} \and Carl
+  Ollivier-Gooch\thanks{Advanced Numerical Simulation Laboratory,
+  University of British Columbia} \and Mark
+  S. Shephard\thanks{Scientific Computation Research Center, Rensselaer
+  Polytechnic Institute } \and Timothy Tautges\thanksibid{Mathematics
+  and Computer Science Division, Argonne National Laboratory} \and
+  Harold Trease\thanks{Pacific Northwest National Laboratory} }
+
+\maketitle
+\begin{abstract}
+
+PDE-based numerical simulation applications commonly use basic software
+infrastructure to manage mesh, geometry, and discretization data. The
+commonality of this infrastructure implies the software is theoretically
+amenable to re-use. However, the traditional reliance on library-based
+implementations of these functionalities hampers experimentation with
+different software instances that provide similar functionality.  This
+is especially true for meshing and geometry libraries where applications
+often directly access the underlying data structures, which can be quite
+different from implementation to implementation.  Thus, using different
+libraries interchangeably or interoperably for this functionality has
+proven difficult at best and has hampered the wide spread use of
+advanced meshing and geometry tools developed by the research community.
+To address these issues, the Terascale Simulation Tools and Technologies
+center is working to develop standard interfaces to enable the creation
+of interoperable and interchangeable simulation tools. In this paper, we
+focus on a language- and data-structure-independent interface supporting
+query and modification of mesh data conforming to a general abstract
+data model. We describe the model and interface, and provide programming
+``best practices'' recommendations based on early experience
+implementing and using the interface.
+
+\end{abstract}
+
+\input{intro.tex}
+
+\input{design.tex}
+
+\input{interface-desc.tex}
+
+\input{best-practices.tex}
+
+\input{conclusions.tex}
+
+\section*{Acknowledgements}
+
+This work was performed under the auspices of the U.S. Department of
+Energy by the University of California Lawrence Livermore National
+Laboratory under contract No. W-7405-Eng-48 (UCRL-JRNL-213577); by The
+University of British Columbia under Canadian Natural Sciences and
+Engineering Research Council (NSERC) Special Research Opportunities
+Grant SRO-299160; and by Rensselaer Polytechnic Institute under DOE
+grant number DE-FC02-01ER25460.
+
+\bibliographystyle{plain}
+\bibliography{../biblio/tstt}
+
+\input{appendix.tex}
+
+\end{document}

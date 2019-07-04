@@ -1,0 +1,524 @@
+        -:    0:Source:vTestBoolOpsInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestBoolOpsInterface(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  int err;
+        1:    6:  cout << "Testing methods with regular sets and lists...\n";
+        -:    7:  iBase_EntitySetHandle aTestSets[12];
+        -:    8:  iBase_EntityHandle aTestEnts[10];
+        -:    9:  int i;
+        -:   10:
+        -:   11:  // Get some entities to work with
+        1:   12:  GET_ENTS(aTestEnts, 10);
+        -:   13:
+        -:   14:  // Create a number of entity sets for testing
+        -:   15:  // Call the entities in use a,b,c,d,e,f,g,h,i,j (indices 0-9)
+        -:   16:  // Entity set 0 is a list and contains      : a,b,c,d,e,a,b,c,d,e,E1,E2,E3,E4,E5
+        -:   17:  // Entity set 1 is a list and contains      : g,f,e,d,E2,E3,E4,E5
+        -:   18:  // Entity set 2 is a list and contains      : f,f,g,g,h,h,i,i,j,j
+        -:   19:  // Entity set 3 is not a list and contains  : a,b,c,d,e,E1
+        -:   20:  // Entity set 4 is not a list and contains  : d,e,f,g,E1,E2
+        -:   21:  // Entity set 5 is not a list and contains  : f,g,h,i,j
+        7:   22:  for ( i=0; i<6; i++ ) {
+        6:   23:    iMesh_createEntSet(instance, i<3, &aTestSets[i], &err);
+        6:   24:    CHECK_ERR(err);
+        -:   25:  }
+        -:   26:
+        6:   27:  for ( i=0; i<5; i++ ) {
+        -:   28:    /* Add ents a,b,c,d,e to sets 0 and 3. */
+        5:   29:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[0], &err);
+        5:   30:    CHECK_ERR(err);
+        5:   31:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[3], &err);
+        5:   32:    CHECK_ERR(err);
+        -:   33:    /* Add sets 1, 2, 3, 4, 5 to set 0 */
+        5:   34:    iMesh_addEntSet(instance,  aTestSets[i+1], aTestSets[0], &err);
+        5:   35:    CHECK_ERR(err);
+        -:   36:  }
+        -:   37:
+        -:   38:    /* Add ents a,b,c,d,e to sets 0 again. */
+        6:   39:  for ( i=0; i<5; i++ ) {
+        5:   40:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[0], &err);
+        5:   41:    CHECK_ERR(err);
+        -:   42:  }
+        -:   43:
+        -:   44:
+        5:   45:  for ( i=3; i<7; i++ ) {
+        -:   46:    // Add g,f,e,d to set 1
+        4:   47:    iMesh_addEntToSet(instance,  aTestEnts[9-i], aTestSets[1], &err);
+        4:   48:    CHECK_ERR(err);
+        -:   49:
+        -:   50:    // Add sets 2,3,4,5 to set 1
+        4:   51:    iMesh_addEntSet(instance,  aTestSets[i-1], aTestSets[1], &err);
+        4:   52:    CHECK_ERR(err);
+        -:   53:
+        -:   54:    // Add ents d, e, f, g to set 4
+        4:   55:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[4], &err);
+        4:   56:    CHECK_ERR(err);
+        -:   57:
+        -:   58:    // Add sets 1 and 2 twice each to set 4.
+        4:   59:    iMesh_addEntSet(instance,  aTestSets[(i+1)/3], aTestSets[4], &err);
+        4:   60:    CHECK_ERR(err);
+        -:   61:  }
+        -:   62:
+        6:   63:  for ( i=5; i<10; i++ ) {
+        -:   64:    // Add f,g,h,i,j twice in succession to both set 2 and set 5
+        5:   65:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[2], &err);
+        5:   66:    CHECK_ERR(err);
+        5:   67:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[2], &err);
+        5:   68:    CHECK_ERR(err);
+        5:   69:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[5], &err);
+        5:   70:    CHECK_ERR(err);
+        5:   71:    iMesh_addEntToSet(instance,  aTestEnts[i], aTestSets[5], &err);
+        5:   72:    CHECK_ERR(err);
+        -:   73:  }
+        -:   74:
+        -:   75:  // Add set 1 to set 3.
+        1:   76:  iMesh_addEntSet(instance,  aTestSets[1], aTestSets[3], &err);
+        1:   77:  CHECK_ERR(err);
+        -:   78:
+        1:   79:  cout << "Testing intersect with regular lists...                   ";
+        -:   80:
+        -:   81:  // E0 n E2; expect empty list
+        1:   82:  iMesh_intersect(instance,  aTestSets[0], aTestSets[2], &aTestSets[6], &err);
+        1:   83:  CHECK_ERR(err);
+        1:   84:  vCheckBoolOpResult(instance, aTestSets[6], true, aTestSets, 0, aTestEnts, 0);
+        -:   85:
+        -:   86:  // E0 n E1; expect d,e,E2,E3,E4,E5
+        1:   87:  iMesh_intersect(instance,  aTestSets[0], aTestSets[1], &aTestSets[7], &err);
+        1:   88:  CHECK_ERR(err);
+        1:   89:  vCheckBoolOpResult(instance, aTestSets[7], true, aTestSets+2, 4, aTestEnts+3, 2);
+        -:   90:
+        -:   91:  // E1 n E0; expect e,d,E2,E3,E4,E5
+        1:   92:  iMesh_intersect(instance,  aTestSets[1], aTestSets[0], &aTestSets[8], &err);
+        1:   93:  CHECK_ERR(err);
+        -:   94:  {
+        1:   95:    iBase_EntityHandle aEnts[] = {aTestEnts[4], aTestEnts[3]};
+        1:   96:    vCheckBoolOpResult(instance, aTestSets[8], true, aTestSets+2, 4, aEnts, 2);
+        -:   97:  }
+        -:   98:
+        -:   99:  // E1 n E2; expect g,f
+        1:  100:  iMesh_intersect(instance,  aTestSets[1], aTestSets[2], &aTestSets[9], &err);
+        1:  101:  CHECK_ERR(err);
+        -:  102:  {
+        1:  103:    iBase_EntityHandle aEnts[] = {aTestEnts[6], aTestEnts[5]};
+        1:  104:    vCheckBoolOpResult(instance, aTestSets[9], true, aTestSets, 0, aEnts, 2);
+        -:  105:  }
+        -:  106:
+        -:  107:  // E2 n E0; expect empty list
+        1:  108:  iMesh_intersect(instance,  aTestSets[2], aTestSets[0], &aTestSets[10], &err);
+        1:  109:  CHECK_ERR(err);
+        1:  110:  vCheckBoolOpResult(instance, aTestSets[10], true, aTestSets, 0, aTestEnts, 0);
+        -:  111:
+        -:  112:  // E2 n E1; expect f,g
+        1:  113:  iMesh_intersect(instance,  aTestSets[2], aTestSets[1], &aTestSets[11], &err);
+        1:  114:  CHECK_ERR(err);
+        1:  115:  vCheckBoolOpResult(instance, aTestSets[11], true, aTestSets, 0, aTestEnts+5, 2);
+        -:  116:
+        7:  117:  for ( i=6; i<12; i++ ) {
+        6:  118:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        6:  119:    CHECK_ERR(err);
+        -:  120:  }
+        1:  121:  cout << "DONE\n";
+        -:  122:
+        1:  123:  cout << "Testing intersect with regular sets...                    ";
+        -:  124:
+        -:  125:  // E3 n E4; expect d,e,E1 (unordered)
+        1:  126:  iMesh_intersect(instance,  aTestSets[3], aTestSets[4], &aTestSets[6], &err);
+        1:  127:  CHECK_ERR(err);
+        1:  128:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets+1, 1, aTestEnts+3, 2);
+        -:  129:
+        -:  130:  // E4 n E3; expect d,e,E1 (unordered)
+        1:  131:  iMesh_intersect(instance,  aTestSets[4], aTestSets[3], &aTestSets[7], &err);
+        1:  132:  CHECK_ERR(err);
+        1:  133:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets+1, 1, aTestEnts+3, 2);
+        -:  134:
+        -:  135:  // E3 n E5; expect empty set
+        1:  136:  iMesh_intersect(instance,  aTestSets[3], aTestSets[5], &aTestSets[8], &err);
+        1:  137:  CHECK_ERR(err);
+        1:  138:  vCheckBoolOpResult(instance, aTestSets[8], false, aTestSets, 0, aTestEnts, 0);
+        -:  139:
+        -:  140:  // E5 n E3; expect empty set
+        1:  141:  iMesh_intersect(instance,  aTestSets[3], aTestSets[5], &aTestSets[9], &err);
+        1:  142:  CHECK_ERR(err);
+        1:  143:  vCheckBoolOpResult(instance, aTestSets[9], false, aTestSets, 0, aTestEnts, 0);
+        -:  144:
+        -:  145:  // E4 n E5; expect f,g (unordered)
+        1:  146:  iMesh_intersect(instance,  aTestSets[4], aTestSets[5], &aTestSets[10], &err);
+        1:  147:  CHECK_ERR(err);
+        1:  148:  vCheckBoolOpResult(instance, aTestSets[10], false, aTestSets, 0, aTestEnts+5, 2);
+        -:  149:
+        -:  150:  // E5 n E4; expect f,g (unordered)
+        1:  151:  iMesh_intersect(instance,  aTestSets[4], aTestSets[5], &aTestSets[11], &err);
+        1:  152:  CHECK_ERR(err);
+        1:  153:  vCheckBoolOpResult(instance, aTestSets[11], false, aTestSets, 0, aTestEnts+5, 2);
+        -:  154:
+        7:  155:  for ( i=6; i<12; i++ ) {
+        6:  156:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        6:  157:    CHECK_ERR(err);
+        -:  158:  }
+        1:  159:  cout << "DONE\n";
+        -:  160:
+        1:  161:  cout << "Testing intersect with sets and lists...                  ";
+        -:  162:
+        -:  163:  // E0 n E5; expect empty set
+        1:  164:  iMesh_intersect(instance,  aTestSets[0], aTestSets[5], &aTestSets[6], &err);
+        1:  165:  CHECK_ERR(err);
+        1:  166:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets, 0, aTestEnts, 0);
+        -:  167:
+        -:  168:  // E0 n E4; expect d,e,E1,E2 (unordered)
+        1:  169:  iMesh_intersect(instance,  aTestSets[0], aTestSets[4], &aTestSets[7], &err);
+        1:  170:  CHECK_ERR(err);
+        1:  171:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets+1, 2, aTestEnts+3, 2);
+        -:  172:
+        -:  173:  // E4 n E0; expect d,e,E1,E2 (unordered)
+        1:  174:  iMesh_intersect(instance,  aTestSets[4], aTestSets[0], &aTestSets[8], &err);
+        1:  175:  CHECK_ERR(err);
+        1:  176:  vCheckBoolOpResult(instance, aTestSets[8], false, aTestSets+1, 2, aTestEnts+3, 2);
+        -:  177:
+        -:  178:  // E4 n E2; expect f,g (unordered)
+        1:  179:  iMesh_intersect(instance,  aTestSets[4], aTestSets[2], &aTestSets[9], &err);
+        1:  180:  CHECK_ERR(err);
+        1:  181:  vCheckBoolOpResult(instance, aTestSets[9], false, aTestSets, 0, aTestEnts+5, 2);
+        -:  182:
+        5:  183:  for ( i=6; i<10; i++ ) {
+        4:  184:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  185:    CHECK_ERR(err);
+        -:  186:  }
+        1:  187:  cout << "DONE\n";
+        -:  188:
+        1:  189:  cout << "Testing subtract with regular lists...                    ";
+        -:  190:
+        -:  191:  // E0 - E2; expect E0 = a,b,c,d,e,a,b,c,d,e,E1,E2,E3,E4,E5
+        1:  192:  iMesh_subtract(instance,  aTestSets[0], aTestSets[2], &aTestSets[6], &err);
+        1:  193:  CHECK_ERR(err);
+        -:  194:  {
+        -:  195:    iBase_EntityHandle aEnts[10];
+        6:  196:    for (int i_ = 0; i_ < 5; i_ ++) {
+        5:  197:      aEnts[i_] = aEnts[i_ + 5] = aTestEnts[i_];
+        -:  198:    }
+        1:  199:    vCheckBoolOpResult(instance, aTestSets[6], true, aTestSets+1, 5, aEnts, 10);
+        -:  200:  }
+        -:  201:
+        -:  202:  // E0 - E1; expect a,b,c,d,e,a,b,c,E1
+        1:  203:  iMesh_subtract(instance,  aTestSets[0], aTestSets[1], &aTestSets[7], &err);
+        1:  204:  CHECK_ERR(err);
+        -:  205:  {
+        -:  206:    // This time, only eight of these ents should match...
+        -:  207:    iBase_EntityHandle aEnts[10];
+        6:  208:    for (int i_ = 0; i_ < 5; i_ ++) {
+        5:  209:      aEnts[i_] = aEnts[i_ + 5] = aTestEnts[i_];
+        -:  210:    }
+        1:  211:    vCheckBoolOpResult(instance, aTestSets[7], true, aTestSets+1, 1, aEnts, 8);
+        -:  212:  }
+        -:  213:
+        -:  214:  // E1 - E0; expect g,f
+        1:  215:  iMesh_subtract(instance,  aTestSets[1], aTestSets[0], &aTestSets[8], &err);
+        1:  216:  CHECK_ERR(err);
+        -:  217:  {
+        1:  218:    iBase_EntityHandle aEnts[] = {aTestEnts[6], aTestEnts[5]};
+        1:  219:    vCheckBoolOpResult(instance, aTestSets[8], true, aTestSets, 0, aEnts, 2);
+        -:  220:  }
+        -:  221:
+        -:  222:  // E2 - E1; expect f,g,h,h,i,i,j,j
+        1:  223:  iMesh_subtract(instance,  aTestSets[2], aTestSets[1], &aTestSets[9], &err);
+        1:  224:  CHECK_ERR(err);
+        -:  225:  {
+        -:  226:    iBase_EntityHandle aEnts[] =
+        1:  227:      {aTestEnts[5], aTestEnts[6], aTestEnts[7], aTestEnts[7], aTestEnts[8], aTestEnts[8], aTestEnts[9], aTestEnts[9]};
+        1:  228:    vCheckBoolOpResult(instance, aTestSets[9], true, aTestSets, 0, aEnts, 8);
+        -:  229:  }
+        5:  230:  for ( i=6; i<10; i++ ) {
+        4:  231:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  232:    CHECK_ERR(err);
+        -:  233:  }
+        1:  234:  cout << "DONE\n";
+        -:  235:
+        1:  236:  cout << "Testing subtract with regular sets...                     ";
+        -:  237:
+        -:  238:  // E3 - E5; expect E3 = a,b,c,d,e,E1 (unordered)
+        1:  239:  iMesh_subtract(instance,  aTestSets[3], aTestSets[5], &aTestSets[6], &err);
+        1:  240:  CHECK_ERR(err);
+        1:  241:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets+1, 1, aTestEnts, 5);
+        -:  242:
+        -:  243:  // E3 - E4; expect a,b,c (unordered)
+        1:  244:  iMesh_subtract(instance,  aTestSets[3], aTestSets[4], &aTestSets[7], &err);
+        1:  245:  CHECK_ERR(err);
+        1:  246:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets, 0, aTestEnts, 3);
+        -:  247:
+        -:  248:  // E4 - E3; expect f,g,E2 (unordered)
+        1:  249:  iMesh_subtract(instance,  aTestSets[4], aTestSets[3], &aTestSets[8], &err);
+        1:  250:  CHECK_ERR(err);
+        1:  251:  vCheckBoolOpResult(instance, aTestSets[8], false, aTestSets+2, 1, aTestEnts+5, 2);
+        -:  252:
+        -:  253:  // E4 - E5; expect d,e,E1,E2 (unordered)
+        1:  254:  iMesh_subtract(instance,  aTestSets[4], aTestSets[5], &aTestSets[9], &err);
+        1:  255:  CHECK_ERR(err);
+        1:  256:  vCheckBoolOpResult(instance, aTestSets[9], false, aTestSets+1, 2, aTestEnts+3, 2);
+        -:  257:
+        5:  258:  for ( i=6; i<10; i++ ) {
+        4:  259:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  260:    CHECK_ERR(err);
+        -:  261:  }
+        1:  262:  cout << "DONE\n";
+        -:  263:
+        1:  264:  cout << "Testing subtract with lists and sets...                   ";
+        -:  265:
+        -:  266:  // E0 - E5; expect a,b,c,d,e,E1,E2,E3,E4,E5 (unordered)
+        1:  267:  iMesh_subtract(instance,  aTestSets[0], aTestSets[5], &aTestSets[6], &err);
+        1:  268:  CHECK_ERR(err);
+        1:  269:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets+1, 5, aTestEnts, 5);
+        -:  270:
+        -:  271:  // E0 - E4; expect a,b,c,E3,E4,E5 (unordered)
+        1:  272:  iMesh_subtract(instance,  aTestSets[0], aTestSets[4], &aTestSets[7], &err);
+        1:  273:  CHECK_ERR(err);
+        1:  274:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets+3, 3, aTestEnts, 3);
+        -:  275:
+        -:  276:  // E4 - E0; expect f,g (unordered)
+        1:  277:  iMesh_subtract(instance,  aTestSets[4], aTestSets[0], &aTestSets[8], &err);
+        1:  278:  CHECK_ERR(err);
+        1:  279:  vCheckBoolOpResult(instance, aTestSets[8], false, aTestSets, 0, aTestEnts+5, 2);
+        -:  280:
+        -:  281:  // E4 - E2; expect d,e,E1,E2 (unordered)
+        1:  282:  iMesh_subtract(instance,  aTestSets[4], aTestSets[2], &aTestSets[9], &err);
+        1:  283:  CHECK_ERR(err);
+        1:  284:  vCheckBoolOpResult(instance, aTestSets[9], false, aTestSets+1, 2, aTestEnts+3, 2);
+        -:  285:
+        5:  286:  for ( i=6; i<10; i++ ) {
+        4:  287:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  288:    CHECK_ERR(err);
+        -:  289:  }
+        1:  290:  cout << "DONE\n";
+        -:  291:
+        1:  292:  cout << "Testing unite with regular lists...                       ";
+        -:  293:
+        -:  294:  // E0 U E2; expect a,b,c,d,e,a,b,c,d,e,f,f,g,g,h,h,i,i,j,j,E1,E2,E3,E4,E5
+        1:  295:  iMesh_unite(instance,  aTestSets[0], aTestSets[2], &aTestSets[6], &err);
+        1:  296:  CHECK_ERR(err);
+        -:  297:  {
+        -:  298:    iBase_EntityHandle aEnts[] =
+        5:  299:      {aTestEnts[0], aTestEnts[1], aTestEnts[2], aTestEnts[3], aTestEnts[4],
+        5:  300:       aTestEnts[0], aTestEnts[1], aTestEnts[2], aTestEnts[3], aTestEnts[4],
+        5:  301:       aTestEnts[5], aTestEnts[5], aTestEnts[6], aTestEnts[6], aTestEnts[7],
+       16:  302:       aTestEnts[7], aTestEnts[8], aTestEnts[8], aTestEnts[9], aTestEnts[9]};
+        1:  303:    vCheckBoolOpResult(instance, aTestSets[6], true, aTestSets+1, 5, aEnts, 20);
+        -:  304:  }
+        -:  305:
+        -:  306:  // E0 U E1; expect a,b,c,d,e,a,b,c,d,e,g,f,e,d,E1,E2,E3,E4,E5
+        1:  307:  iMesh_unite(instance,  aTestSets[0], aTestSets[1], &aTestSets[7], &err);
+        1:  308:  CHECK_ERR(err);
+        -:  309:  {
+        -:  310:    iBase_EntityHandle aEnts[] =
+        5:  311:      {aTestEnts[0], aTestEnts[1], aTestEnts[2], aTestEnts[3], aTestEnts[4],
+        5:  312:       aTestEnts[0], aTestEnts[1], aTestEnts[2], aTestEnts[3], aTestEnts[4],
+       11:  313:       aTestEnts[6], aTestEnts[5], aTestEnts[4], aTestEnts[3]};
+        1:  314:    vCheckBoolOpResult(instance, aTestSets[7], true, NULL, -1, aEnts, 14);
+        -:  315:  }
+        -:  316:
+        -:  317:  // E1 U E0; expect g,f,e,d,a,b,c,d,e,a,b,c,d,e,E1,E2,E3,E4,E5
+        1:  318:  iMesh_unite(instance,  aTestSets[1], aTestSets[0], &aTestSets[8], &err);
+        1:  319:  CHECK_ERR(err);
+        -:  320:  {
+        -:  321:    iBase_EntityHandle aEnts[] =
+        4:  322:      {aTestEnts[6], aTestEnts[5], aTestEnts[4], aTestEnts[3],
+        5:  323:       aTestEnts[0], aTestEnts[1], aTestEnts[2], aTestEnts[3], aTestEnts[4],
+       10:  324:       aTestEnts[0], aTestEnts[1], aTestEnts[2], aTestEnts[3], aTestEnts[4]};
+        1:  325:    vCheckBoolOpResult(instance, aTestSets[8], true, NULL, -1, aEnts, 14);
+        -:  326:  }
+        -:  327:
+        -:  328:  // E1 U E2; expect g,f,e,d,f,f,g,g,h,h,i,i,j,j,E2,E3,E4,E5
+        1:  329:  iMesh_unite(instance,  aTestSets[1], aTestSets[2], &aTestSets[9], &err);
+        1:  330:  CHECK_ERR(err);
+        -:  331:  {
+        -:  332:    iBase_EntityHandle aEnts[] =
+        4:  333:      {aTestEnts[6], aTestEnts[5], aTestEnts[4], aTestEnts[3],
+        5:  334:       aTestEnts[5], aTestEnts[5], aTestEnts[6], aTestEnts[6], aTestEnts[7],
+       10:  335:       aTestEnts[7], aTestEnts[8], aTestEnts[8], aTestEnts[9], aTestEnts[9]};
+        1:  336:    vCheckBoolOpResult(instance, aTestSets[9], true, aTestSets+2, 4, aEnts, 14);
+        -:  337:  }
+        -:  338:
+        5:  339:  for ( i=6; i<10; i++ ) {
+        4:  340:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  341:    CHECK_ERR(err);
+        -:  342:  }
+        1:  343:  cout << "DONE\n";
+        -:  344:
+        1:  345:  cout << "Testing unite with regular sets...                        ";
+        -:  346:
+        -:  347:  // E3 U E5; expect a,b,c,d,e,f,g,h,i,j,E1 (unordered)
+        1:  348:  iMesh_unite(instance,  aTestSets[3], aTestSets[5], &aTestSets[6], &err);
+        1:  349:  CHECK_ERR(err);
+        1:  350:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets+1, 1, aTestEnts, 10);
+        -:  351:
+        -:  352:  // E3 U E4; expect a,b,c,d,e,f,g,E1,E2 (unordered)
+        1:  353:  iMesh_unite(instance,  aTestSets[3], aTestSets[4], &aTestSets[7], &err);
+        1:  354:  CHECK_ERR(err);
+        1:  355:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets+1, 2, aTestEnts, 7);
+        -:  356:
+        -:  357:  // E4 U E3; expect a,b,c,d,e,f,g,E1,E2 (unordered)
+        1:  358:  iMesh_unite(instance,  aTestSets[4], aTestSets[3], &aTestSets[8], &err);
+        1:  359:  CHECK_ERR(err);
+        1:  360:  vCheckBoolOpResult(instance, aTestSets[8], false, aTestSets+1, 2, aTestEnts, 7);
+        -:  361:
+        -:  362:  // E4 U E5; expect d,e,f,g,h,i,j,E1,E2 (unordered)
+        1:  363:  iMesh_unite(instance,  aTestSets[4], aTestSets[5], &aTestSets[9], &err);
+        1:  364:  CHECK_ERR(err);
+        1:  365:  vCheckBoolOpResult(instance, aTestSets[9], false, aTestSets+1, 2, aTestEnts+3, 7);
+        -:  366:
+        5:  367:  for ( i=6; i<10; i++ ) {
+        4:  368:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  369:    CHECK_ERR(err);
+        -:  370:  }
+        1:  371:  cout << "DONE\n";
+        -:  372:
+        1:  373:  cout << "Testing unite with lists and sets...                      ";
+        -:  374:
+        -:  375:  // E0 U E5; expect a,b,c,d,e,f,g,h,i,j,E1,E2,E3,E4,E5 (unordered)
+        1:  376:  iMesh_unite(instance,  aTestSets[0], aTestSets[5], &aTestSets[6], &err);
+        1:  377:  CHECK_ERR(err);
+        1:  378:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets+1, 5, aTestEnts, 10);
+        -:  379:
+        -:  380:  // E0 U E4; expect a,b,c,d,e,f,g,E1,E2,E3,E4,E5 (unordered)
+        1:  381:  iMesh_unite(instance,  aTestSets[0], aTestSets[4], &aTestSets[7], &err);
+        1:  382:  CHECK_ERR(err);
+        1:  383:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets+1, 5, aTestEnts, 7);
+        -:  384:
+        -:  385:  // E4 U E0; expect a,b,c,d,e,f,g,E1,E2,E3,E4,E5 (unordered)
+        1:  386:  iMesh_unite(instance,  aTestSets[4], aTestSets[0], &aTestSets[8], &err);
+        1:  387:  CHECK_ERR(err);
+        1:  388:  vCheckBoolOpResult(instance, aTestSets[8], false, aTestSets+1, 5, aTestEnts, 7);
+        -:  389:
+        -:  390:  // E4 U E2; expect d,e,f,g,h,i,j,E1,E2 (unordered)
+        1:  391:  iMesh_unite(instance,  aTestSets[4], aTestSets[2], &aTestSets[9], &err);
+        1:  392:  CHECK_ERR(err);
+        1:  393:  vCheckBoolOpResult(instance, aTestSets[9], false, aTestSets+1, 2, aTestEnts+3, 7);
+        -:  394:
+        5:  395:  for ( i=6; i<10; i++ ) {
+        4:  396:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        4:  397:    CHECK_ERR(err);
+        -:  398:  }
+        1:  399:  cout << "DONE\n";
+        -:  400:
+        1:  401:  cout << "Testing methods with the root set... may take a while...\n";
+        -:  402:
+        1:  403:  cout << "Testing intersect with the root set...                    ";
+        -:  404:
+        -:  405:  // E0 n R; expect a,b,c,d,e,E1,E2,E3,E4,E5 (unordered)
+        1:  406:  iMesh_intersect(instance,  aTestSets[0], pvRootSet, &aTestSets[6], &err);
+        1:  407:  CHECK_ERR(err);
+        1:  408:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets+1, 5, aTestEnts, 5);
+        -:  409:
+        -:  410:  // R n E0; expect a,b,c,d,e,E1,E2,E3,E4,E5 (unordered)
+        1:  411:  iMesh_intersect(instance,  pvRootSet, aTestSets[0], &aTestSets[7], &err);
+        1:  412:  CHECK_ERR(err);
+        1:  413:  vCheckBoolOpResult(instance, aTestSets[7], false, aTestSets+1, 5, aTestEnts, 5);
+        -:  414:
+        3:  415:  for ( i=6; i<8; i++ ) {
+        2:  416:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        2:  417:    CHECK_ERR(err);
+        -:  418:  }
+        1:  419:  cout << "DONE\n";
+        -:  420:
+        1:  421:  cout << "Testing subtract with the root set...                     ";
+        -:  422:
+        -:  423:  // E0 - R; expect empty set
+        1:  424:  iMesh_subtract(instance,  aTestSets[0], pvRootSet, &aTestSets[6], &err);
+        1:  425:  CHECK_ERR(err);
+        1:  426:  vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets, 0, aTestEnts, 0);
+        -:  427:
+        -:  428:  // R - E0; expect the complement of E0 (unordered; includes E0 and E6)
+        1:  429:  iMesh_subtract(instance,  pvRootSet, aTestSets[0], &aTestSets[7], &err);
+        1:  430:  CHECK_ERR(err);
+        -:  431:
+        -:  432:  {
+        -:  433:    int iIsList;
+        1:  434:    iMesh_isList(instance, aTestSets[7], &iIsList, &err);
+        1:  435:    CHECK_ERR(err);
+        -:  436:
+        1:  437:    iBase_EntitySetHandle *aGotSets = NULL;
+        -:  438:    int iNumSets;
+        1:  439:    int iGotSetsAlloc = 0;
+        -:  440:    iMesh_getEntSets(instance,  aTestSets[7], 0,
+        1:  441:		     &aGotSets, &iGotSetsAlloc, &iNumSets, &err);
+        1:  442:    CHECK_ERR(err);
+        1:  443:    bool qGotAllItems = false;
+        1:  444:    if ( iNumSets == 2 ) {
+        1:  445:      qGotAllItems = ( (aGotSets[0] == aTestSets[0] ||
+    #####:  446:			aGotSets[1] == aTestSets[0]) &&
+        1:  447:		       (aGotSets[0] == aTestSets[6] ||
+        2:  448:			aGotSets[1] == aTestSets[6]) );
+        -:  449:    }
+        1:  450:    UT_FREE(aGotSets);
+        -:  451:    
+        -:  452:    int iNumEnts;
+        1:  453:    iBase_EntityHandle * aGotEnts = NULL;
+        1:  454:    int iGotEntsAlloc = 0;
+        -:  455:    iMesh_getEntities(instance, aTestSets[7], iBase_ALL_TYPES,
+        -:  456:		      iMesh_ALL_TOPOLOGIES,
+        1:  457:		      &aGotEnts, &iGotEntsAlloc, &iNumEnts, &err);
+        1:  458:    CHECK_ERR(err);
+        -:  459:    int iNumAllEnts;
+        1:  460:    iMesh_getNumOfType(instance,pvRootSet, iBase_ALL_TYPES, &iNumAllEnts, &err);
+        1:  461:    CHECK_ERR(err);
+        -:  462:
+        1:  463:    bool qIsEmpty = false;
+        1:  464:    if ( iNumEnts == iNumAllEnts-5 ) {
+        -:  465:      // Size is right; check each entry in the result to make sure it's
+        -:  466:      // not in the original set.
+        1:  467:      qIsEmpty = true;
+     5769:  468:      for ( i = 0; i < iNumEnts; i++ ) {
+        -:  469:	int iIsCont;
+     5768:  470:	iMesh_isEntContained(instance, aTestSets[0], aGotEnts[i], &iIsCont, &err);
+     5768:  471:	CHECK_ERR(err);
+     5768:  472:	qIsEmpty = ( qIsEmpty && !iIsCont );
+        -:  473:      }
+        -:  474:    }
+        1:  475:    TEST ( qIsEmpty &&  qGotAllItems && !iIsList );
+        -:  476:
+        3:  477:    for ( i=6; i<8; i++ ) {
+        2:  478:      iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        2:  479:      CHECK_ERR(err);
+        -:  480:    }
+        1:  481:    UT_FREE(aGotEnts);
+        -:  482:  }
+        1:  483:  cout << "DONE\n";
+        -:  484:
+        1:  485:  cout << "Testing unite with the root set...                        ";
+        -:  486:  // E0 U R; expect a copy of R (unordered)
+        1:  487:  iMesh_unite(instance,  aTestSets[0], pvRootSet, &aTestSets[6], &err);
+        1:  488:  CHECK_ERR(err);
+        -:  489:  {
+        1:  490:    iBase_EntityHandle *aAllEnts = NULL;
+        1:  491:    int iAllEntsAlloc = 0, iNumAllEnts;
+        -:  492:    iMesh_getEntities(instance, pvRootSet, iBase_ALL_TYPES,
+        -:  493:		      iMesh_ALL_TOPOLOGIES,
+        1:  494:		      &aAllEnts, &iAllEntsAlloc, &iNumAllEnts, &err);
+        1:  495:    CHECK_ERR(err);
+        -:  496:    vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets, 6,
+        1:  497:		       aAllEnts, iNumAllEnts);
+        1:  498:    UT_FREE(aAllEnts);
+        -:  499:  }
+        -:  500:
+        -:  501:  // R U E0; expect a copy of R (unordered)
+        1:  502:  iMesh_unite(instance,  pvRootSet, aTestSets[0], &aTestSets[7], &err);
+        1:  503:  CHECK_ERR(err);
+        -:  504:  {
+        1:  505:    iBase_EntityHandle *aAllEnts = NULL;
+        1:  506:    int iAllEntsAlloc = 0, iNumAllEnts;
+        -:  507:    iMesh_getEntities(instance, pvRootSet, iBase_ALL_TYPES,
+        -:  508:		      iMesh_ALL_TOPOLOGIES,
+        1:  509:		      &aAllEnts, &iAllEntsAlloc, &iNumAllEnts, &err);
+        1:  510:    CHECK_ERR(err);
+        -:  511:    vCheckBoolOpResult(instance, aTestSets[6], false, aTestSets, 6,
+        1:  512:		       aAllEnts, iNumAllEnts);
+        1:  513:    UT_FREE(aAllEnts);
+        -:  514:  }
+        1:  515:  cout << "DONE\n";
+        -:  516:
+        -:  517:  // Clean up the sets
+        7:  518:  for ( i=0; i<6; i++ ) {
+        6:  519:    iMesh_destroyEntSet(instance,  aTestSets[i], &err);
+        6:  520:    CHECK_ERR(err);
+        -:  521:  }
+        3:  522:}

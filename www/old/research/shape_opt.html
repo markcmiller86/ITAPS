@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head><title>Geometry and Meshing Support for Shape Optimization</title>
+
+
+
+
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" /></head><body>
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" /> <br /></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>Geometry and Meshing Support for Shape Optimization</h1>Geometric
+shape optimization is a powerful capability with applications in
+accelerator cavity design and other areas.&nbsp; Shape optimization
+requires a diverse set of supporting services involving both geometric
+(CAD) models and mesh handling.&nbsp; These services must be automated,
+to enable the optimization process to iterate without human
+intervention.<br />
+<br />
+A service supporting CAD-based shape optimization has been developed
+under ITAPS.&nbsp; The approach taken is shown below.&nbsp; In
+iteration 0, the tool starts with a parameter vector p0, and generates
+a geometric model G(p0); generates a mesh m(p0) using the CUBIT mesh
+generation tool based on that geometric model; and generates a
+sensitivity or derivative vector d(x)/dp. The resulting mesh and
+sensitivities are input to the physics and optimization procedure,
+which generate a new parameter vector vk.&nbsp; In subsequent
+iterations, the new parameter vector is used to generate a new
+geometric model G(pk), and a mesh for that model is derived from the
+original mesh, m(p0), by projecting boundary vertices to the new
+geometry and smoothing.&nbsp; Geometry and mesh models are represented
+using the CGM and MOAB libraries, respectively.&nbsp; Mesh generation
+is performed using the mesh generation toolkit, and mesh smoothing
+using the Mesquite mesh improvement library.&nbsp; Generation of a
+geometric model given a parameter vector, computing the sensitivities
+with respect to parameters, and coordination of the mesh projection
+process is performed by the DDRIV
+code library and executable driver.&nbsp; DDRIV is available as open
+source software from Argonne National Laboratory.<br />
+<img style="width: 800px; height: 518px;" alt="shape optimization process" src="../graphics/shapeopt_process.jpg" /><br />
+<br />
+Steps in this process are shown with an actual model below. <br />
+
+<p>
+</p><p>
+</p><table border="0" cellspacing="10"> 
+<caption><i>
+  </i></caption>
+<tbody><tr> 
+<th> <img src="../graphics/shape_opt.jpg" alt="Shape Optimization" height="160" /></th>
+</tr>
+</tbody>
+</table> 
+<p>In the approach above, a finite difference method is used to compute
+the change in vertex positions with respect to parameters.&nbsp; The
+convergence of this method has been tested by varying both the number
+of mesh elements and the size of parameter variations.&nbsp; The
+derivative converged quickly in both cases, verifying that a finite
+difference-based method is appropriate.</p>
+<p>In the
+longer term, methods for treating larger parameter variations, leading
+to topological changes to the underlying geometric model, should be
+investigated. This may require the introduction of re-meshing and/or
+local mesh topological changes to the process to improve mesh quality.
+This research could use the dynamic mesh services,
+parallel mesh generation,
+and parallel deforming mesh
+capabilities developed under ITAPS. DDRIV is available as open source
+software; contact Tim Tautges (tautges at mcs.anl.gov) for details. </p>
+</div>
+</div>
+
+</body></html>

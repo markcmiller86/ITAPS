@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Mesh and Geometry Services</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>Mesh and Geometry Services</h1>
+
+During SciDAC-1, several mesh and geometry component services were
+developed that are useful to applications in their own right and also
+used as building blocks by integrated services.  In this section, we
+describe the component services that will continue to see development
+in SciDAC-2.
+
+<h3>Support for Distributed Meshes.</h3>
+
+Many of the SciDAC applications require ITAPS services operate on
+meshes that are distributed over the processors of a parallel
+computer. To meet these needs, the ITAPS team has developed two tools
+that support distributed mesh operations. The first is a parallel mesh
+generation process that distributes a
+CAD model over multiple processors allowing each processor to mesh
+surfaces and volumes in parallel yielding a valid
+conforming mesh of the entire domain. The second tool is the addition
+of a partition model and parallel mesh migration procedures to our
+flexible mesh database (FMDB) to support
+dynamic load balancing in the parallel adaptive loops service.  Both
+of the distributed mesh support tools have been used on the SLAC
+accelerator modeling project. The parallel partitioning and migration
+are part of FMDB which is available for download.
+
+<h3>Geometry Services</h3>
+The geometry interface, developed in the first phase of this project,
+provides functions for reading, querying, and modifying geometric
+models.  This interface is used by various ITAPS mesh services
+discussed in this proposal, including mesh improvement and r-adaptivity, 
+parallel mesh 
+generation, and shape optimization.  Several newly proposed SciDAC
+efforts have also indicated a need for geometry services, including
+embedded boundary mesh generation for fusion and accelerator
+applications and adaptive mesh refinement in fusion
+device modeling.  Fully capable but heavy-weight
+implementations of the geometry 
+interface were initiated in SciDAC-1.  In
+addition, we propose to develop
+focused, light-weight tools to meet specific application needs.  These
+include: (i) inside-outside queries on geometric models (this
+functionality is used to perform fast ray-tracing to support fusion
+applications, and
+to support generation of embedded boundary grids for accelerator
+modeling) (ii) discrete (facet-based) geometric evaluation, including
+queries of the distance to a surface, and determination of the normal
+and curvature (efficiency of the lightweight tools will be achieved
+by using fast ADT searches for first evaluations, local stencil walks
+for evolving queries, and fast Newton solves, and
+(iii) efficient methods for tracking many particles through a
+geometry, to support particle-in-cell applications.  This work will
+extend the current capabilities in the Rapsodi, Eleven, and CGM
+libraries.
+
+<h3> Mesh, geometry sorting and searching </h3>
+<p>
+Many applications require sorting and searching algorithms 
+that operate on mesh and geometry data.
+For example, these algorithms are used to (i) locate the element or
+vertex closest to, or containing, a given spatial position (e.g. for
+PIC codes, the interpolation of a field on one mesh onto another mesh,
+or interface tracking), (ii) compute the overlap between mesh and
+geometry ( e.g. for embedded boundary grid generation), and (iii) sort
+and search field data (e.g. for locating the solution maximum over a
+mesh
+or to smooth a mesh based on the minimum value of a given quality
+metric).
+<p>
+
+There is a trade off between the storage and execution time for
+algorithms supporting these services.  Sorting the data makes
+subsequent searches on these data faster, at the expense of the
+required storage space to cache the sorted data.  The choice of
+sorting container and searching algorithm depends on storage
+constraints, and the potential for future reuse of cached data, both
+of which are controlled by or known by applications and which
+potentially evolve over the course of a simulation.
+<p>
+
+We will develop data sorting and searching services functionality
+based on the geometry, mesh and tag data.  Sorting structures such as
+octrees, K-d trees,  range trees,
+and alternating digital trees will be
+provided by this service.  Point locations between meshes on curved
+domains will handle the case where the point in one mesh is exterior
+to the other mesh.  These services will be provided in both 
+high-level (implemented on top of the ITAPS interfaces), for flexibility, and
+low-level (implemented inside the interface implementations
+themselves) implementations, for efficiency.  These services will
+build on existing software developed at various institutions
+participating in ITAPS.
+
+<p>
+
+	</div>
+</div>
+
+</body>
+</html>

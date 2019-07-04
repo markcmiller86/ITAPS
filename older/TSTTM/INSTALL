@@ -1,0 +1,26 @@
+To build the UBC compliance testing code, you must first have built a
+TSTTM implementation.  Then:
+
+1.  Run configure.  Often, no options will be needed, although this will
+    depend on whether your Babel implementation is in your path and on
+    the relative location of the TSTTM and TSTTB implementations you
+    want to use.  If the standard guesses don't behave as you'd like
+    them to, you can specify:
+
+      --with-babel=PATH    for a babel executable installed as
+                               PATH/bin/babel
+      --with-tsttb=PATH    where PATH/TSTTB-Defs.inc must exist, to
+                               provide make variables
+      --with-tsttm=PATH    where PATH/TSTTM-Defs.inc must exist, to
+                               provide make variables
+
+2.  Run make.  If the implementation under test requires a file name
+    extension for output file, specify this with make SAVE_EXT=.ext,
+    where .ext is the extension.  Once make is done, you can choose to
+    'make clean' to get rid of object files.
+
+3.  Run TSTTM_unitTest, with a mesh file that the TSTTM implementation
+    can read.  Small to moderate meshes are preferable here, because
+    large meshes can lead to long runtimes.
+
+

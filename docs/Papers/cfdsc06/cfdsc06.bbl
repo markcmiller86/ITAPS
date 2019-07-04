@@ -1,0 +1,114 @@
+\begin{thebibliography}{10}
+
+\bibitem{petsc}
+S.~Balay, K.~Buschelman, D.~Gropp, W.D.~Kaushik, M.~Knepley, B.~McInnes,
+  L.C.~Smith, and H.~Zhang.
+\newblock {PETSc} home page.
+\newblock \url{http://www.mcs.anl.gov/petsc}, 2004.
+
+\bibitem{Mesquite03}
+M.~Brewer, L.~F. Diachin, P.~Knupp, T.~Leurent, and D.~Melander.
+\newblock The {M}esquite mesh quality improvement toolkit.
+\newblock In {\em 12th International Meshing Roundtable}, pages 239--250.
+  Sandia National Laboratories, 2003.
+
+\bibitem{overtureTR}
+D.~L. Brown, W.~D. Henshaw, and D.~J. Quinlan.
+\newblock Overture: Object-oriented tools for overset grid applications.
+\newblock Technical report, Lawrence Livermore National Laboratory, 1999.
+\newblock UCRL-JC-134018.
+
+\bibitem{femlab}
+Femlab webpage.
+\newblock \url{http://www.comsol.com/}, 2004.
+
+\bibitem{FixGlimm}
+B.~Fix, J.~Glimm, X.~Li, Y.~Li, X.~Liu, R.~Samulyak, and Z.~Xu.
+\newblock {A TSTT integrated FronTier code and its applications in
+  computational fluid physics}.
+\newblock {\em Journal of Physics: Conf. Series}, 16:471 -- 475, 2005.
+
+\bibitem{fluent:http}
+Fluent webpage.
+\newblock \url{http://www.fluent.com}, 2005.
+
+\bibitem{overture:http}
+W.~D. Henshaw and K.~K. Chand.
+\newblock Object-oriented tools for solving {PDE}s in complex geometries.
+\newblock \url{http://www.llnl.gov/casc/Overture}, 2005.
+
+\bibitem{KrOr01}
+P.~Krysl and M.~Ortiz.
+\newblock Extraction of boundary representation from surface triangulations.
+\newblock {\em International Journal of Numerical Methods in Engineering},
+  50:1737--1758, 2001.
+
+\bibitem{lapack}
+LAPACK.
+\newblock Lapack webpage.
+\newblock \url{http://www.netlib.org/lapack/}, 2004.
+
+\bibitem{LiSh05}
+X.~Li, M.~Shephard, and M.~Beall.
+\newblock {3D} anisotropic mesh adaptation by mesh modifications.
+\newblock {\em Comp. Meth. Appl. Mech. Engng.}, 194(48--49):4915--4950, 2005.
+
+\bibitem{TSTT-swap-tool}
+C.~Ollivier-Gooch.
+\newblock A mesh-database-independent edge- and face-swapping tool.
+\newblock AIAA Paper 2006-0533. Presented at the 44th AIAA Aerospace Sciences
+  Meeting, Jan. 2006.
+
+\bibitem{GRUMMP:http}
+C.~F. Ollivier-Gooch.
+\newblock {GRUMMP} --- {G}eneration and {R}efinement of {U}nstructured,
+  {M}ixed-element {M}eshes in {P}arallel.
+\newblock \url{http://tetra.mech.ubc.ca/GRUMMP}, 1998--2005.
+
+\bibitem{PaOr02}
+A.~Pandofi and M.~Ortiz.
+\newblock An efficient procedure for fragmentation simulations.
+\newblock {\em Engineering With Computers}, 18(2):148--159, 2002.
+
+\bibitem{ReSh03}
+J.-F. Remacle and M.~Shephard.
+\newblock An algorithm oriented mesh database.
+\newblock {\em International Journal for Numerical Methods in Engineering},
+  58:349--374, 2003.
+
+\bibitem{Ta00}
+T.~Tautges.
+\newblock The common geometry module {(CGM)}: A generic, extensible geometry
+  interface.
+\newblock In {\em Proceedings of the 9th International Meshing Roundtable,
+  Sandia report {SAND 2000-2207}}, pages 337--359. Sandia National
+  Laboratories, 2000.
+
+\bibitem{Tau01}
+T.~J. Tautges.
+\newblock {CGM}: A geometry interface for mesh generation, analysis and other
+  applications.
+\newblock {\em Engineering with Computers}, 17(3):299--314, 2001.
+
+\bibitem{moab:http}
+T.~J. Tautges.
+\newblock {MOAB}: {A} {M}esh-{O}riented dat{AB}ase.
+\newblock \url{http://cubit.sandia.gov/MOAB}, 2004.
+
+\bibitem{moab}
+T.~J. Tautges, R.~E. Meyers, K.~Merkley, C.~Stimpson, and C.~Ernst.
+\newblock {MOAB}: A mesh-oriented data base.
+\newblock In {\em Sandia report SAND 2004-1592}. Sandia National Laboratories,
+  2004.
+
+\bibitem{nwgrid:http}
+H.~Trease and L.~Trease.
+\newblock {N}orth{W}est {G}rid {G}eneration {C}ode.
+\newblock \url{http://www.emsl.pnl.gov/nwgrid/index_nwgrid.html}, 2004.
+
+\bibitem{WaKo04}
+J.~Wan, S.~Kocak, and M.~Shephard.
+\newblock Automated adaptive 3-d forming simulation process.
+\newblock {\em to appear Engineering with Computers}, 2004.
+
+\end{thebibliography}

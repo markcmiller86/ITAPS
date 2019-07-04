@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_software.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageSoftware pageData_model" -->
+</head>
+
+<body class="pageSoftware pageData_model">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Download Software</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Download software</a><span class="hide"> | </span>
+<a class="nav sub" href="getting_started.html" id="linkGetting_started">Getting Started</a><span class="hide"> | </span>
+<a class="nav sub" href="data_model.html" id="linkData_model">ITAPS Data Model</a><span class="hide"> | </span>
+<a class="nav sub" href="download_interfaces.html" id="linkDownload_interfaces">Interface Software </a><span class="hide"> | </span>
+<a class="nav sub" href="download_components.html" id="linkDownload_components">Services Software</a><span class="hide"> | </span>
+<a class="nav sub" href="tutorial.html" id="linkTutorial">Tutorial Materials</a><span class="hide"> | </span>
+<a class="nav sub" href="usage_strategies.html" id="linkUsage_strategies">Usage Strategies</a>
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+ 
+        <h1>The ITAPS Data Model</h1>
+        <p>We use the information flow through a mesh-based simulation as the framework for developing interoperable geometry, mesh and solution field components.  A simulation's information flow begins with a problem definition which consists of a description of the geometric and temporal domain annotated by  attributes   designating mathematical model details and parameters.  The geometric domain is then often decomposed into a set of piecewise components,  the mesh, and the continuous PDEs is then approximated on that mesh using, for example, finite difference or finite  element techniques.  Simulation automation and reliability often imply feedback of the PDE discretization information back to the domain discretization (i.e. in adaptive methods) or even modification of the physical domain or attributes (e.g., design optimization). </p>
+
+<p>Based on this model of information flow, ITAPS researchers have defined an abstract data model that supports a wide array of supporting technologies and encompasses a broad spectrum of usage scenarios.  The data model divides the data required by a simulation into three core data types: the geometric data, the mesh data, and the field data.  These core data types  are associated with each other through  data relation managers. The data relation managers control the relationships among two or more of the core data types, resolve cross references between entities in different groups, and can provide additional functionality that depends on multiple core data types.  The building blocks within these data models are the concepts of entities, entity sets,  and  tags.</p>
+        <ul>
+          <li> Entities are used to represent atomic pieces of information such as a vertices in a mesh or edges in a geometric model. Entity adjacency relationships define how the entities connect to each other and both first-order and second-order adjacencies are supported.</li>
+
+          <li> Entity sets are arbitrary collections of entities that may be unordered or an ordered list.  The two primary supported relationships among entity sets are  contained in and  parent/child to allow for subsetting and hierarchical applications. In addition, entity sets also have ''set operation'' capabilities such as set subtraction, intersection, or union. </li>
+
+          <li> Tags are used as containers to attach user-defined data to ITAPS entities and entity sets.  Tags can be multi-valued which implies that a given tag handle can be associated with many different entities.  We support specialized tag types for improved performance as well as the more general opaque case that allows any type of data to be attached. </li>
+     </ul>
+
+<p>As a particular example, consider the discrete representation of the computational domain, or the mesh.  ITAPS  mesh entities correspond to the individual pieces of the mesh, namely, vertices, edges, faces and regions.  Specific examples include a hexahedron, edge, triangle or vertex.  Mesh entities are classified by their entity type (topological dimension) and entity topology (shape). Higher-dimensional entities are defined by lower-dimensional entities with shape and orientation defined using canonical ordering relationships.  To determine which adjacencies are supported by an underlying implementation, an adjacency table is defined which can be returned by a query through the interface.  The implementation can report that adjacency information is always, sometimes, or never available; and to be available at a cost that is constant, logarithmic (i.e., tree search), or linear (i.e., search over all entities) in the size of the mesh.  ITAPS  mesh entity sets are extensively used to collect mesh entities together in meaningful ways, for example, to represent the set of all faces classified on a geometric face, or the set of regions in a domain decomposition for parallel computing. </p>
+          <p>To support many of the services that applications desire, such as adaptive mesh refinement, it is important that the data model include the concept of modification to allow changes to geometry, topology, or set structure.  In the case of the mesh, capabilities include changing vertex coordinates and adding or deleting entities. Modification often requires interactions between the mesh, geometry and field data models and is one of the primary uses for the data relations manager. For example, when refining a mesh, it is often critical to associate or classify the mesh entity with one or more specific entities in the underlying geometric model to ensure accuracy, particlarly on curved or complex geometries. </p>
+          <p>&nbsp;</p>
+          <p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

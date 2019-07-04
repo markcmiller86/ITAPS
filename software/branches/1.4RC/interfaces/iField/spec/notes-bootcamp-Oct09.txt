@@ -1,0 +1,184 @@
+Notes from Fields discussion
+----------------------------
+
+Issues
+ - Units/dimensions
+ - coordinate fields
+ - fields on subsets of a mesh
+ - basis/distribution functions (specify order and form)
+ - change of basis
+ - analytic fields
+ - integral/differential constraints
+ - memory management
+ - mesh/field/operator relationship
+ - mapping domain to range
+ - parallelism
+ - operations of fields (iField or a service)
+ - intrinsic/extrinsic data
+ - vectors/tensors/coordinate systems
+ - level of interoperability
+ - implementation as tags
+ - usability in linear solvers
+ - splitting coupled problems/composit fields
+ - known relations among fields - derived fields is an issue to consider
+ - capturing experimental data
+
+------------------------------------------------------------
+
+Use Cases/Requirements
+
+ - Mesh to mesh transfer (includes changing basis - e.g., FEM to FVM, see below)
+  - local evaluation of distribution functions - forward and reverse
+  - distribution functions are written in some coordinate system
+  - local integration and differentiation
+  - may need to extrapolate to a point outside the mesh
+  - may need to do some evaluation off processor
+  - integral and differential constraints
+
+ - Local change of basis
+  - assumes the mesh is the same
+  - want to take advantage of this to do truly local operations
+
+ - Multiple representations of the same field
+  - e.g. simulation data, experimental data, etc
+  - domain may have multiple realizations
+  - call these multiple 'instances' of the same field
+  - same physical quantity - will have some common characteristics
+    such as dimension
+  - there will be a hierarchy of data - some high level representation
+    information will be inherited downward
+
+ - Interactions with solvers/preconditioners
+  - need to deal with multiple tensors in a "composed" field
+     - e.g., velocity, pressure, energy, etc.
+     - need to recognize that different rules may apply to different
+       components
+     - application may want the ability to set the order
+
+ - Interactions with post-processing tools
+  - Derived quantities are common
+    - Should think about how to support operations on fields (eg div, grad, +, *)
+  - Need to know domain, intrinsic/extrinsic - should include this in set of
+    characteristics of a field
+  - memory management - selective load of a field to visualize only it -
+    don't load everything
+  - time series must be captured
+    - more generally need to deal with relationships among fields, nested
+      subspaces, snapshots of the same field, parameter series, etc
+       - useful for uncertainty quantification as well
+
+ - Fundamental operations (manipulation of fields)
+  - pointwise evaluations (smart - take advantage of knowledge that is known)
+  - convolution, norms, algebra
+  - coordinate conversions (e.g, coordinate to polar)
+  - unit conversions (e.g, meters to inches) - low on the priority list?
+  - given a point, get the parametric coordinates associated with it (reverse)
+     - for searches it would be nice to have the following information
+       - it's in the element, it's in the neighborhood, no idea where it is
+  - initialize, save, re-initialize (assignment),
+     - load for principle field components (minimal set such that you can
+       reconstruct the other data from it) - application specific
+  - bounds over collections of sets
+  - integration over sets
+  - conversion between precisions (double to single, etc)
+  - mapping fields from lower to higher dimensional data
+  - projections/slicing, etc from higher to lower dimensional data
+
+ - Differential operators
+  - order of operations is important
+  - if there are multiple ways to do this - provide this as service; not
+    part of the interface
+
+ - Need to support analytic functions
+
+Would like to capture the basic operations that allow us to do most of
+the services - what are these canonical operations and data that we
+need to know about the field?
+
+
+-------------------------------
+Scope of fields interface
+-------------------------------
+
+Field Representation
+ - Units/dimensions
+ - basis/distribution functions (specify order and form)
+ - memory management
+ - mesh/field/operator relationship
+ - mapping domain to range
+ - what data types do we need - float, double? int? byte? boolean?
+ - can we use tags?
+
+Data Model
+-----------------
+
+Definition: Note that there is a high level description of a field
+that is somewhat abstract - call this a "field template".  A
+particular instance that is derived from the field template and
+associated with a specific domain is called the "field".
+
+Field templates are associated with a domain template (e.g. a
+space/time domain) and specific domain is a discretization of the
+abstract domain
+
+The domain "has a" coordinate field (special, priviledged field)
+
+Construction operations
+ - create
+ - load
+    - given a string, instantiate or read from file
+    - separate header information from other data
+    - read coefficients separately from header and other instances?
+    - read distribution function information if non-standard (app must support)?
+ - save
+ - set
+    - Distribution function coefficients (specify a value for it)
+    - Distribution functions (common ones we all support through keywords?,
+        more sophisticated through other mechanisms - callbacks?)
+       - includes specific characterization of interpolation scheme
+         (e.g. at what points are the dofs defined?  vertices, mid-edges,
+         bezier points?)
+       - optional, but very commmonly used, distribution function association
+         with mesh entity type
+       - may need call backs for advanced functions - e.g. analytic functions
+       - abstract domain that the field is defined on - optional (want to carry
+         it if you have it)
+    - units (measurement: furlong/fortnight^squared, part of field
+             dimensional analysis: (length/time^squared), part of field template)
+       - make it easy to do standards
+    - precision
+    - dimension
+    - tensor order
+    - data type
+    - unique name
+    - isCoordField ?  does this need to be special
+ - get all of the above
+    - get field instance by name or some other identifier
+    - get all the fields
+ - associate the distribution functions with a mesh or subset (through iRel?)
+ - copy
+ - extract a list of numbers/values in some order for the user
+
+Manipulation operations
+  - pointwise evaluations (smart - take advantage of knowledge that is known)
+  - convolution, norms, algebra
+  - coordinate conversions (e.g, coordinate to polar)
+  - unit conversions (e.g, meters to inches) - low on the priority list?
+  - given a point, get the parametric coordinates associated with it (reverse)
+     - for searches it would be nice to have the following information
+       - it's in the element, it's in the neighborhood, no idea where it is
+  - initialize, save, re-initialize (assignment),
+     - load for principle field components (minimal set such that you can
+       reconstruct the other data from it) - application specific
+  - bounds over collections of sets
+  - integration over sets
+  - conversion between precisions (double to single, etc)
+  - mapping fields from lower to higher dimensional data
+  - projections/slicing, etc from higher to lower dimensional data
+  - should we be able to collect fields into sets - that is a container
+    of fields?
+
+Advanced Operations
+
+
+

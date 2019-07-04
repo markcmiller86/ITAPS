@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-research_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS - Predictive Load Balance</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResearch pagePredictiveLoad" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResearch pagePredictiveLoad">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="index.html" id="linkIndex">Research</a><span class="hide"> | </span>
+<a class="nav sub" href="partition.html" id="linkPartition">Partition Improvement</a><span class="hide"> | </span>
+<a class="nav sub" href="predictiveLoad.html" id="linkPredictiveLoad">Predictive Load Balance</a><span class="hide"> | </span>
+<a class="nav sub" href="commLib.html" id="linkCommLib">Communication Libraries</a><span class="hide"> | </span>
+<a class="nav sub" href="mapReduce.html" id="linkMapReduce">MapReduce Experiments</a><span class="hide"> | </span>
+<a class="nav" href="../results/index.html">Scaling Results</a>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Predictive Load Balance</h1>
+  <p>Without predictive load balancing during mesh modification, it is possible that some processors will have nearly all their elements scheduled for mesh modification which may exceed the physical memory limit of the processors and could slow down or even kill the process. By using predictive load balancing procedures and migrating smaller numbers of mesh entities before mesh modification occurs, it is possible to achieve roughly equal number of elements on each processor in the final adapted mesh. To achieve this, weights are specified on graph nodes and a weighted graph-based repartitioning is carried out. The weight used to estimate the physical memory usage is proportional to the number of elements to be generated. Pain, et. al. [46] use the ratio of the element volume of the initial coarse mesh to the volume of desired element in the adapted mesh to estimate the number of elements to be generated in the mesh refinement. A similar idea combined with the concept of the mesh size metic field specifies the weights on the graph nodes was developed in the ITAPS algorithm.</p>
+   <div class="imgContainer fLeft" style="width: 400px;">
+       <a href="../../assets/images/MeshAdaptation_full.jpg" rel="lightbox">
+	<img src="../../assets/images/MeshAdaptation_mini.jpg" width="400" height="154" alt="Vertex imbalance" />
+    </a>
+	<p>Figure: Mesh adaptation along with predictive load balance.</p>
+</div>
+
+<p>The mesh adaptation tool along with the predictive load balance algorithm is performed on a 17,179,836 element uniform mesh (Figure (a)) of a straight pipe model to achieve a 1,064,284,042 region adapted mesh on 16,384 Blue Gene/L cores. The adapted mesh displayed in Figure (b) is zoomed for a "bubble", which is colored by the magnitude to show mesh size field. The adapted 1.06 billion region mesh has 160 such "air bubbles" distributing in the model as Figure (c). The number of mesh regions on each part of the initial and adapted meshes is shown in Figure (d). Before adaptation there are few regions per processor (as shown by the red marks) and after adaptation there are roughly equal numbers of regions on each processor.</p>
+  
+
+  
+
+    
+  
+
+ <p>&nbsp;</p>
+
+
+  
+  <p class="clear">&nbsp;</p>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p><!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

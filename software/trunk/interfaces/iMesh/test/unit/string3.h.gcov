@@ -1,0 +1,157 @@
+        -:    0:Source:/usr/include/bits/string3.h
+        -:    0:Programs:15
+        -:    1:/* Copyright (C) 2004, 2005, 2007, 2009 Free Software Foundation, Inc.
+        -:    2:   This file is part of the GNU C Library.
+        -:    3:
+        -:    4:   The GNU C Library is free software; you can redistribute it and/or
+        -:    5:   modify it under the terms of the GNU Lesser General Public
+        -:    6:   License as published by the Free Software Foundation; either
+        -:    7:   version 2.1 of the License, or (at your option) any later version.
+        -:    8:
+        -:    9:   The GNU C Library is distributed in the hope that it will be useful,
+        -:   10:   but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   11:   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+        -:   12:   Lesser General Public License for more details.
+        -:   13:
+        -:   14:   You should have received a copy of the GNU Lesser General Public
+        -:   15:   License along with the GNU C Library; if not, write to the Free
+        -:   16:   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+        -:   17:   02111-1307 USA.  */
+        -:   18:
+        -:   19:#ifndef _STRING_H
+        -:   20:# error "Never use <bits/string3.h> directly; include <string.h> instead."
+        -:   21:#endif
+        -:   22:
+        -:   23:__warndecl (__warn_memset_zero_len,
+        -:   24:	    "memset used with constant zero length parameter; this could be due to transposed parameters");
+        -:   25:
+        -:   26:#ifndef __cplusplus
+        -:   27:/* XXX This is temporarily.  We should not redefine any of the symbols
+        -:   28:   and instead integrate the error checking into the original
+        -:   29:   definitions.  */
+        -:   30:# undef memcpy
+        -:   31:# undef memmove
+        -:   32:# undef memset
+        -:   33:# undef strcat
+        -:   34:# undef strcpy
+        -:   35:# undef strncat
+        -:   36:# undef strncpy
+        -:   37:# ifdef __USE_GNU
+        -:   38:#  undef mempcpy
+        -:   39:#  undef stpcpy
+        -:   40:# endif
+        -:   41:# ifdef __USE_BSD
+        -:   42:#  undef bcopy
+        -:   43:#  undef bzero
+        -:   44:# endif
+        -:   45:#endif
+        -:   46:
+        -:   47:
+        -:   48:__extern_always_inline void *
+        -:   49:__NTH (memcpy (void *__restrict __dest, __const void *__restrict __src,
+        -:   50:	       size_t __len))
+        -:   51:{
+        -:   52:  return __builtin___memcpy_chk (__dest, __src, __len, __bos0 (__dest));
+        -:   53:}
+        -:   54:
+        -:   55:__extern_always_inline void *
+        -:   56:__NTH (memmove (void *__restrict __dest, __const void *__restrict __src,
+        -:   57:		size_t __len))
+        -:   58:{
+        -:   59:  return __builtin___memmove_chk (__dest, __src, __len, __bos0 (__dest));
+        -:   60:}
+        -:   61:
+        -:   62:#ifdef __USE_GNU
+        -:   63:__extern_always_inline void *
+        -:   64:__NTH (mempcpy (void *__restrict __dest, __const void *__restrict __src,
+        -:   65:		size_t __len))
+        -:   66:{
+        -:   67:  return __builtin___mempcpy_chk (__dest, __src, __len, __bos0 (__dest));
+        -:   68:}
+        -:   69:#endif
+        -:   70:
+        -:   71:
+        -:   72:/* The first two tests here help to catch a somewhat common problem
+        -:   73:   where the second and third parameter are transposed.  This is
+        -:   74:   especially problematic if the intended fill value is zero.  In this
+        -:   75:   case no work is done at all.  We detect these problems by referring
+        -:   76:   non-existing functions.  */
+        -:   77:__extern_always_inline void *
+    #####:   78:__NTH (memset (void *__dest, int __ch, size_t __len))
+        -:   79:{
+      390:   80:  if (__builtin_constant_p (__len) && __len == 0
+        -:   81:      && (!__builtin_constant_p (__ch) || __ch != 0))
+        -:   82:    {
+    #####:   83:      __warn_memset_zero_len ();
+    #####:   84:      return __dest;
+        -:   85:    }
+      390:   86:  return __builtin___memset_chk (__dest, __ch, __len, __bos0 (__dest));
+        -:   87:}
+        -:   88:
+        -:   89:#ifdef __USE_BSD
+        -:   90:__extern_always_inline void
+        -:   91:__NTH (bcopy (__const void *__restrict __src, void *__restrict __dest,
+        -:   92:	      size_t __len))
+        -:   93:{
+        -:   94:  (void) __builtin___memmove_chk (__dest, __src, __len, __bos0 (__dest));
+        -:   95:}
+        -:   96:
+        -:   97:__extern_always_inline void
+        -:   98:__NTH (bzero (void *__dest, size_t __len))
+        -:   99:{
+        -:  100:  (void) __builtin___memset_chk (__dest, '\0', __len, __bos0 (__dest));
+        -:  101:}
+        -:  102:#endif
+        -:  103:
+        -:  104:__extern_always_inline char *
+        -:  105:__NTH (strcpy (char *__restrict __dest, __const char *__restrict __src))
+        -:  106:{
+        -:  107:  return __builtin___strcpy_chk (__dest, __src, __bos (__dest));
+        -:  108:}
+        -:  109:
+        -:  110:#ifdef __USE_GNU
+        -:  111:__extern_always_inline char *
+        -:  112:__NTH (stpcpy (char *__restrict __dest, __const char *__restrict __src))
+        -:  113:{
+        -:  114:  return __builtin___stpcpy_chk (__dest, __src, __bos (__dest));
+        -:  115:}
+        -:  116:#endif
+        -:  117:
+        -:  118:
+        -:  119:__extern_always_inline char *
+        -:  120:__NTH (strncpy (char *__restrict __dest, __const char *__restrict __src,
+        -:  121:		size_t __len))
+        -:  122:{
+        -:  123:  return __builtin___strncpy_chk (__dest, __src, __len, __bos (__dest));
+        -:  124:}
+        -:  125:
+        -:  126:// XXX We have no corresponding builtin yet.
+        -:  127:extern char *__stpncpy_chk (char *__dest, __const char *__src, size_t __n,
+        -:  128:			    size_t __destlen) __THROW;
+        -:  129:extern char *__REDIRECT_NTH (__stpncpy_alias, (char *__dest,
+        -:  130:					       __const char *__src,
+        -:  131:					       size_t __n), stpncpy);
+        -:  132:
+        -:  133:__extern_always_inline char *
+        -:  134:__NTH (stpncpy (char *__dest, __const char *__src, size_t __n))
+        -:  135:{
+        -:  136:  if (__bos (__dest) != (size_t) -1
+        -:  137:      && (!__builtin_constant_p (__n) || __n <= __bos (__dest)))
+        -:  138:    return __stpncpy_chk (__dest, __src, __n, __bos (__dest));
+        -:  139:  return __stpncpy_alias (__dest, __src, __n);
+        -:  140:}
+        -:  141:
+        -:  142:
+        -:  143:__extern_always_inline char *
+        -:  144:__NTH (strcat (char *__restrict __dest, __const char *__restrict __src))
+        -:  145:{
+        -:  146:  return __builtin___strcat_chk (__dest, __src, __bos (__dest));
+        -:  147:}
+        -:  148:
+        -:  149:
+        -:  150:__extern_always_inline char *
+        -:  151:__NTH (strncat (char *__restrict __dest, __const char *__restrict __src,
+        -:  152:		size_t __len))
+        -:  153:{
+        -:  154:  return __builtin___strncat_chk (__dest, __src, __len, __bos (__dest));
+        -:  155:}

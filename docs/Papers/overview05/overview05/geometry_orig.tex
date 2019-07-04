@@ -1,0 +1,134 @@
+\subsection{Geometry Interface}
+
+The goal of the geometry interface is to provide access to the
+entities defining the geometric domain, the ability to determine
+required geometric shape information associated with those entities
+and, possibly, the ability to modify the geometric domain. The
+geometry interface must account for the fact that the software modules
+that provide geometry information are typically independent of the
+simulation modules that employ the supplied geometry information to
+make the mesh, and solve PDE’s over it.
+
+An examination of the geometry needs of mesh-based simulation
+applications indicates a large fraction of their needs can be
+satisfied through interface functions keyed by the primary
+topological entities of regions, faces, edges and vertices. A few
+situations, particularly those dealing with evolving geometry, will
+have need for the additional topological constructs of loops and
+shells. It is therefore, useful to have the geometry interface functions placed in groups at different levels of interface. It is also
+useful to group the interface functions based on if they deal with
+topological entities and their adjacencies only, provide the geometric
+shape information associated with the topological entities, provide
+control information, etc.
+
+Three types of geometric model API's will be supported in this
+manner. These include:
+
+\begin{itemize}
+\item Commercial modeler API's (e.g., Parasolid, ACIS, Granite).
+
+\item Geometric modelers that operate off of a utility that reads and operates on models that 
+have been written to standard files like IGES and STEP (e.g.,
+Overture’s geometry interface, an ACIS model read into Parasolid via a
+STEP file, etc.).
+
+\item Geometric models constructed from an input mesh.
+\end{itemize}
+
+The first two API types have no difficulty up-loading the model
+topology and linking to the shape information since in the first case
+the modeler already has it and in the second case the model structure
+is defined within the standard file. In the last case the input is a
+mesh and algorithms must be applied to define the geometric model
+topological entities in terms of the sets of appropriate mesh
+entities. Such algorithms are not unique and depend on both the level
+of information available with the mesh and knowledge of the analysis
+process. The mesh functions can be used to load a mesh from which the
+set of mesh entities classified on each geometric model topological
+entities can be constructed using algorithms like that in reference
+[5,6,9]. The shape of the geometric model topological model entities
+can be defined directly by the mesh geometry of the entities
+classified on it, or that information can be enhanced [4,9].
+
+It should be possible to employ the most effective means possible to
+determine any geometric parameters that have to be calculated. The
+primary complexity that arises in meeting this is that not all
+geometric model forms support the same methods and using the least
+common dominator can introduce huge computation penalty over
+alternatives that are supported in most cases. The primary example of
+this is the use of parametric coordinates for model faces and
+edges. The vast majority of the CAD systems employ parametric
+coordinates and algorithms such as snapping a vertex to a model face
+using parametric values can be make two orders of magnitude faster
+that using the alternative of closest point to a point in
+space. Therefore, it is critical that the geometry interface functions
+support the use of parametric values while having the ability to deal
+with those cases when they are not available. This can be done by
+having functions for when one does and does not have parameterization.
+
+The geometric interface functions **** INSERT A REFERENCE TO THE
+GEOMETRY INTERFACE DOCUMENT ON THE TSTT WEB PAGE - WE NEED TO PUT IT
+THERE IF IT IS NOT THERE ALREADY *****are grouped by the level of
+geometric model information needed to support them and the type of
+information they provide. The groups defined as the base level
+includes:
+
+\begin{itemize}
+\item Model loading which must load the model. and initiate any supporting processes. Although the functions are the same for all sources of geometric
+models, the implementation of them is a strong function of the model
+source. If the source is a CAD API (e.g., ACIS or Parasolid API) the
+appropriate API must be initiated and functions mapping to the
+geometry interface functions defined. If it is a standard file
+structure (e.g., STEP or IGES) the model must be loaded into an
+appropriate geometric modeling functionality.  If the source is a mesh
+model it must be loaded, processed and linkage to the mesh geometry
+constructed.
+
+\item Topological queries based on the primary topological entities of regions, faces, edges and vertices. The functions in this group include determining of
+topological adjacencies and entity iterators.
+
+\item Pointwise interrogations which request geometric shape information with respect to a point in a single global coordinate system. Typical functions include returning the closest point on a model entity, getting coordinates, normals, tangents
+and curvatures, and requesting bounding boxes of entities.
+
+\item Entity level tags for associating information with entities. 
+\end{itemize}
+
+Other groups of functions increase the functionality and/or the efficiency of the interface. 
+Some of these are commonly used while others are not. Functions of this type that have 
+been defined for the geometry interface include:
+
+\begin{itemize}
+\item Geometric sense information that indicates how face normals and edge tangents are oriented.
+
+\item Support of parametric coordinates systems for edges and faces. The functions in this 
+group include conversion between global and parametric coordinates,
+conversion between parametric coordinates of points on the closure of
+multiple entities, and the full set of pointwise geometric
+interrogations for a point given its classification and parametric
+coordinates.
+
+\item Support of geometric model tolerance information. The functions here provide access 
+to the geometric modeling tolerances used by the modeling system in
+the determination of how closely adjacent entities must be
+matched. This information is used to ensure that consistent decisions
+are made by mesh-based operations using geometric shape information.
+\end{itemize}
+
+Additional functions that of value to specific mesh-based applications that have not yet 
+been defined include:
+\begin{itemize}
+\item Support of more complete topological models including shells and loops as well and complete non-manifold interactions.
+
+\item Model topology and shape modification functions.
+
+\item Entity geometric shape information that defines the complete shape of model entities.
+\end{itemize}
+
+Functional geometry interfaces for mesh-based applications has been under development 
+and have been in use for a number of years for automatic mesh generators [1,8]. They have 
+also been used in the support of specific finite elements applications such as determining 
+exact Jacobian information to support p-version element stiffness matrix evaluation [2]. 
+The current interoperable geometry interface is being defined and implemented building 
+on these previous efforts. 
+
+

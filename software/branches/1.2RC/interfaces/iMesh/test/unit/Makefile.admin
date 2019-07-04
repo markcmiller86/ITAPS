@@ -1,0 +1,17 @@
+VERSION=1.1
+
+IMESH_TEST_FILES=iMesh_unitTest.cc iMesh_unitTest.hh iMesh_unitTest_config.h.in
+ 
+BUILD_FILES=configure Makefile.in README
+CONF_FILES=conf/config.guess conf/config.sub conf/install-sh
+TEST_INPUTS=brick.vtk globe_mats.vtk rand1.vtk
+
+DIST_DIR=iMesh-test-$(VERSION)
+
+distrib:
+	mkdir $(DIST_DIR)
+	mkdir $(DIST_DIR)/conf
+	cp $(BUILD_FILES) $(IMESH_TEST_FILES) $(TEST_INPUTS) $(DIST_DIR)
+	cp $(CONF_FILES) $(DIST_DIR)/conf
+	tar -zcvf iMesh-test-$(VERSION).tar.gz $(DIST_DIR)
+	rm -rf $(DIST_DIR)

@@ -1,0 +1,17 @@
+This tree gives the outline of the new build structure.  Here's how to
+use it:
+
+1.  Edit configure.in as appropriate for your implementation.  This
+    should be pretty simple, as most of the stuff that needs doing is
+    macro-ized.  The template is from the GRUMMP tree and demonstrates
+    many (most?)  of the things your top-level configure will need to
+    do.  To create a new configure script, run 'autoconf -I conf'.
+
+2.  Edit Makefile.in as needed by your implementation.
+
+3.  Edit i*-Defs.inc.in to set up the include and library variables that
+    clients will need.
+
+Now run configure and make at the top level, and "I think we should be
+all right"  (Quote courtesy of Harold Trease at Argonne boot camp,
+October 2005, and taken out of context.)

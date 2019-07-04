@@ -1,0 +1,24 @@
+getErrorType:  WTH?  We just had the error type returned to us.  Why ask
+for it again?  Is this a SIDL holdover?  Regardless, nuke it!
+
+getDescription:  Is this supposed to be generic and standard or
+implementation and context specific?  Regardless, how should one test
+it?  And shouldn't that be int err, not int* err?  (That is, shouldn't
+the error code be -input- from the caller?)
+
+iBase_BAD_ARRAY_DIMENSION is redundant with iBase_BAD_ARRAY_SIZE (since
+we no longer have 2D SIDL arrays).  Only used in Jason's implementation
+of getEntAdjIndices, which has gone viral. :-)
+
+Should iMesh_newMesh (and other functions taking string options return
+an error code when an unrecognized option is passed (i.e.,
+prefix:asdf).  If so, how does one test this, considering that the
+prefix is unknown to the app except by the programmer reading the docs?
+
+Should NIL_ARRAY be returned for input arrays that have non-zero size
+and null pointer?  (Yes, almost certainly.)  What if the size is zero,
+too?  In this case it's less clear, because an implementation can return
+no data and never have to de-reference the null pointer.
+
+
+

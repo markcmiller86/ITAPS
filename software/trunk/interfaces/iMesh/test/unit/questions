@@ -1,0 +1,23 @@
+o Function specifying how ents can be created (like adjacency table).
+
+o Function specifying min connectivity to store (like adjacency table).
+
+o Should have an ENTITY_IN_USE error type, for situations where an entity
+can't be deleted.
+
+o IMO, the various errors that get returned (as per spec) should be
+checked for in debug code, but not necessarily in production code.  That
+is, if your implementation is configured with --enable-debugging and/or
+--enable-assertions or similar, then all the errors should be returned
+properly.  But for production code, presumably all the silly mistakes
+that can invoke these errors will be fixed, so these tests aren't
+strictly necessary (and may be expensive).
+
+o Error handling still wildly different in MOAB.
+
+o 2D vs 3D coords:  return xyxy or xy0xy0?  Ditto for set.
+
+o Iterators for impossible type/topo combinations: should return an
+iterator that iterates over nothing, IMO.
+
+

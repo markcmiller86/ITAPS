@@ -1,0 +1,429 @@
+        -:    0:Source:vTestMeshInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        -:    3://@@ Test the core Mesh interface.
+        -:    4:
+        -:    5:// Test stuff specific to interface iMesh_  Those functions are:
+        -:    6://    load, save, getRootSet, getGeometricDim, getDfltStorage,
+        -:    7://    getAdjTable, getNumOfType, getNumOfTopo, getAllVtxCoords,
+        -:    8://    getVtxCoordIndex, getEntities, getVtxArrCoords, and
+        -:    9://    getAdjEntities
+        -:   10://
+        -:   11://    Mark C. Miller, Mon Dec  6 10:39:08 PST 2010
+        -:   12://    Added logic to fail asap if input mesh doesn't appear to 
+        -:   13://    have appropriate structure that the test assumes.
+        -:   14:
+        3:   15:static void setMinAdjTable3D(int aiAdjTable[16])
+        -:   16:{
+        -:   17:  // Minimal adjacency table for 3D: all major implementations can
+        -:   18:  // support the entities requested here.
+        3:   19:  aiAdjTable[ 0] = iBase_AVAILABLE;
+        3:   20:  aiAdjTable[ 1] = iBase_UNAVAILABLE; // Don't care about any actual
+        -:   21:                                      // adjacencies for this purpose.  
+        3:   22:  aiAdjTable[ 2] = iBase_UNAVAILABLE; 
+        3:   23:  aiAdjTable[ 3] = iBase_UNAVAILABLE; 
+        3:   24:  aiAdjTable[ 4] = iBase_UNAVAILABLE; 
+        3:   25:  aiAdjTable[ 5] = iBase_UNAVAILABLE; 
+        3:   26:  aiAdjTable[ 6] = iBase_UNAVAILABLE; 
+        3:   27:  aiAdjTable[ 7] = iBase_UNAVAILABLE; 
+        3:   28:  aiAdjTable[ 8] = iBase_UNAVAILABLE; 
+        3:   29:  aiAdjTable[ 9] = iBase_UNAVAILABLE; 
+        3:   30:  aiAdjTable[10] = iBase_AVAILABLE; 
+        3:   31:  aiAdjTable[11] = iBase_UNAVAILABLE; 
+        3:   32:  aiAdjTable[12] = iBase_UNAVAILABLE; 
+        3:   33:  aiAdjTable[13] = iBase_UNAVAILABLE; 
+        3:   34:  aiAdjTable[14] = iBase_UNAVAILABLE; 
+        3:   35:  aiAdjTable[15] = iBase_AVAILABLE; 
+        3:   36:}
+        -:   37:
+        1:   38:void vTestSetAdjTable(string strFilename, int dim)
+        -:   39:{
+        -:   40:  int err;
+        -:   41:  int aiAdjTable[16];
+        -:   42:
+        1:   43:  cout << " Testing setAdjTable" << endl;
+        -:   44:  // Test 1: Call setGeomDim first, then setAdjTable
+        -:   45:  {
+        1:   46:    cout << "  setGeomDim, then setAdjTable... " << endl;
+        -:   47:    iMesh_Instance instance;
+        1:   48:    iMesh_newMesh("", &instance, &err, 0);
+        1:   49:    setMinAdjTable3D(aiAdjTable);
+        1:   50:    iMesh_setGeometricDimension(instance, 3, &err);
+        1:   51:    CHECK_ERR(err);
+        1:   52:    iMesh_setAdjTable(instance, aiAdjTable, 16, &err);
+        1:   53:    CHECK_ERR(err);
+        1:   54:    iMesh_dtor(instance, &err);
+        1:   55:    CHECK_ERR(err);
+        -:   56:  }
+        -:   57:
+        -:   58:  // Test 2: Call setAdjTable, then setGeomDim.
+        -:   59:  {
+        1:   60:    cout << "  setAdjTable, then setGeomDim... " << endl;
+        -:   61:    iMesh_Instance instance;
+        1:   62:    iMesh_newMesh("", &instance, &err, 0);
+        1:   63:    setMinAdjTable3D(aiAdjTable);
+        1:   64:    iMesh_setAdjTable(instance, aiAdjTable, 16, &err);
+        1:   65:    CHECK_ERR(err);
+        1:   66:    iMesh_setGeometricDimension(instance, 3, &err);
+        1:   67:    CHECK_ERR(err);
+        -:   68:
+        -:   69:    // Check whether the output is the same with no change to dimension.
+        1:   70:    int *newTable, newTable_alloc=0, newTable_size;
+        -:   71:    iMesh_getAdjTable(instance, &newTable, &newTable_alloc, &newTable_size, 
+        1:   72:		      &err);
+        -:   73:    
+        1:   74:    bool qAdjTableUnchanged = true;
+       17:   75:    for (int i = 0; i < 16; i++) {
+       16:   76:      if (newTable[i] != aiAdjTable[i]) qAdjTableUnchanged = false;
+        -:   77:    }
+        1:   78:    TEST(qAdjTableUnchanged);
+        1:   79:    iMesh_dtor(instance, &err);
+        1:   80:    CHECK_ERR(err);
+        1:   81:    UT_FREE(newTable);
+        -:   82:  }
+        -:   83:
+        -:   84:  // Test 3: Load a mesh, then call setAdjTable.
+        1:   85:  if (dim == 3) {
+        1:   86:    cout << "  load, then setAdjTable... " << endl;
+        -:   87:    iMesh_Instance instance;
+        1:   88:    iMesh_newMesh("", &instance, &err, 0);
+        -:   89:    iBase_EntitySetHandle tmpRootSet;
+        1:   90:    iMesh_getRootSet(instance, &tmpRootSet, &err);
+        -:   91:    iMesh_load(instance, tmpRootSet, strFilename.c_str(), "", &err,
+        2:   92:	       strFilename.length(), 0);
+        2:   93:    qIssueLoadMessage(strFilename.c_str(), err);
+        -:   94:
+        1:   95:    CHECK_ERR_CRITICAL(err);
+        1:   96:    setMinAdjTable3D(aiAdjTable);
+        1:   97:    iMesh_setAdjTable(instance, aiAdjTable, 16, &err);
+        1:   98:    CHECK_ERR(err);
+        1:   99:    bool qSetEntitiesProperly = true;
+        3:  100:    if (aiAdjTable[0] != iBase_AVAILABLE || 
+        1:  101:	aiAdjTable[10] != iBase_AVAILABLE ||
+        1:  102:	aiAdjTable[15] != iBase_AVAILABLE)
+    #####:  103:      qSetEntitiesProperly = false;
+        1:  104:    TEST(qSetEntitiesProperly);
+        1:  105:    iMesh_dtor(instance, &err);
+        1:  106:    CHECK_ERR(err);
+        -:  107:  }
+        1:  108:}
+        -:  109:
+        1:  110:void vTestMeshInterface(iMesh_Instance& instance,
+        -:  111:			       string strFilename)
+        -:  112:{
+        -:  113:  int err;
+        -:  114:  // Modular: getRootSet must succeed
+        1:  115:  iMesh_getRootSet(instance, &pvRootSet, &err);
+        1:  116:  CHECK_ERR_CRITICAL(err);
+        -:  117:
+        -:  118:  // Modular: load must succeed, or we're dead in the water.
+        -:  119:  iMesh_load(instance, pvRootSet, strFilename.c_str(), "", &err,
+        2:  120:	     strFilename.length(), 0);
+        2:  121:  qIssueLoadMessage(strFilename.c_str(), err);
+        1:  122:  CHECK_ERR_CRITICAL(err);
+        -:  123:
+        -:  124:  // Modular: save is tested only to the extent that it shouldn't throw
+        -:  125:  // an error.
+        -:  126://   iMesh_save(instance, pvRootSet, SAVE_NAME, "", &err, strlen(SAVE_NAME), 0);
+        -:  127://   CHECK_ERR(err);
+        -:  128:
+        -:  129:  // Verify that the implementation returns a dimension.
+        -:  130:
+        -:  131:  // Modular: getGeometricDim can be tested in isolation; with known
+        -:  132:  // data, the answer can be tested specifically.
+        1:  133:  cout << " Getting geometric dimension... ";
+        -:  134:  int iGeomDim;
+        1:  135:  iMesh_getGeometricDimension(instance, &iGeomDim, &err); CHECK_ERR(err);
+        1:  136:  cout << iGeomDim << endl;
+        1:  137:  TEST(iGeomDim > 0);
+        1:  138:  if (iGeomDim < 2) {
+    #####:  139:      qIssueLoadMessage(strFilename.c_str(), iBase_FAILURE);
+    #####:  140:      CHECK_ERR_CRITICAL(iBase_FAILURE);
+        -:  141:  }
+        -:  142:
+        -:  143:  // Verify that the implementation returns a storage order preference.
+        -:  144:  // Modular: getDfltStorage can be tested in isolation.
+        1:  145:  cout << "Getting default storage order..." << endl;
+        -:  146:  int SODef;
+        1:  147:  iMesh_getDfltStorage(instance, &SODef, &err); CHECK_ERR(err);
+        1:  148:  TEST(SODef == iBase_BLOCKED || SODef == iBase_INTERLEAVED);
+        -:  149:
+        -:  150:  // Verify that the implementation returns a valid adjacency table.
+        -:  151:  // Modular: getAdjTable can be tested in isolation.
+        1:  152:  cout << " Getting adjacency table." << endl;
+        -:  153:  int* aAdjTable;
+        -:  154:  int iSize;
+        1:  155:  int adj_table_allocated = 0;
+        1:  156:  iMesh_getAdjTable(instance, &aAdjTable, &adj_table_allocated, &iSize, &err);
+        1:  157:  CHECK_ERR(err);
+        1:  158:  TESTEQ(iSize,16);
+        -:  159:  // Keep a copy for later reference.
+        1:  160:  a2iAdjTable[0][0] = aAdjTable[0];
+        1:  161:  a2iAdjTable[0][1] = aAdjTable[1];
+        1:  162:  a2iAdjTable[0][2] = aAdjTable[2];
+        1:  163:  a2iAdjTable[0][3] = aAdjTable[3];
+        -:  164:
+        1:  165:  a2iAdjTable[1][0] = aAdjTable[4];
+        1:  166:  a2iAdjTable[1][1] = aAdjTable[5];
+        1:  167:  a2iAdjTable[1][2] = aAdjTable[6];
+        1:  168:  a2iAdjTable[1][3] = aAdjTable[7];
+        -:  169:
+        1:  170:  a2iAdjTable[2][0] = aAdjTable[8];
+        1:  171:  a2iAdjTable[2][1] = aAdjTable[9];
+        1:  172:  a2iAdjTable[2][2] = aAdjTable[10];
+        1:  173:  a2iAdjTable[2][3] = aAdjTable[11];
+        -:  174:
+        1:  175:  a2iAdjTable[3][0] = aAdjTable[12];
+        1:  176:  a2iAdjTable[3][1] = aAdjTable[13];
+        1:  177:  a2iAdjTable[3][2] = aAdjTable[14];
+        1:  178:  a2iAdjTable[3][3] = aAdjTable[15];
+        -:  179:
+        -:  180:  // Simple test for setAdjTable. Call it with whatever getAdjTable gave us.
+        1:  181:  cout << " Setting adjacency table." << endl;
+        1:  182:  iMesh_setAdjTable(instance, aAdjTable, iSize, &err);
+        1:  183:  CHECK_ERR(err);
+        -:  184:
+        -:  185:  // Check that impl. returned same values as in getAdjTable call
+        -:  186:  // and that diagonal terms for verts and 2D/3D mesh ents are
+        -:  187:  // properly set.
+        1:  188:  bool qAdjTableOk = true;
+       17:  189:  for (int i = 0; i < iSize && qAdjTableOk; i++)
+        -:  190:  {
+        -:  191:    // Should see only available/unavailable on diagonal
+        -:  192:    // Should only see available for verts and highest dim entities.
+       16:  193:    if (i==0 || i==5 || i==10 || i==15)
+        -:  194:    {
+        4:  195:        if ((i==0 || (i==iGeomDim*5)) && aAdjTable[i] != iBase_AVAILABLE)
+    #####:  196:            qAdjTableOk = false;
+        4:  197:        else if (aAdjTable[i] != iBase_AVAILABLE &&
+        -:  198:                 aAdjTable[i] != iBase_UNAVAILABLE)
+    #####:  199:            qAdjTableOk = false;
+        -:  200:    }
+       16:  201:    if (aAdjTable[i] != a2iAdjTable[i/4][i%4])
+    #####:  202:        qAdjTableOk = false;
+        -:  203:  }
+        1:  204:  TEST(qAdjTableOk);
+        -:  205:
+        1:  206:  UT_FREE(aAdjTable);
+        -:  207:
+        1:  208:  vTestSetAdjTable(strFilename, iGeomDim);
+        -:  209:
+        -:  210:  //@@ getEntities; entity type, topo
+        -:  211:  bool qOK;
+        -:  212:  int eEType;
+        -:  213:  int eETopo;
+        -:  214:
+        -:  215:  //@@@ Setup of legal argument combinations and expected return sizes.
+       13:  216:  for (eETopo = iMesh_POINT;
+        -:  217:       eETopo <= iMesh_ALL_TOPOLOGIES;
+        -:  218:       eETopo++) {
+       72:  219:    for (eEType = iBase_VERTEX;
+        -:  220:	 eEType <= iBase_ALL_TYPES;
+        -:  221:	 eEType++) {
+       60:  222:      a2iEntCount[eEType][eETopo] = 0;
+        -:  223:    }
+        -:  224:  }
+        -:  225:
+        -:  226:  //Modular: With known data, getNumOfTopo can be tested independently.
+        1:  227:  int iVal, num2DElems=0, num3DElems=0;
+        1:  228:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_POINT, &iVal, &err);
+        1:  229:  CHECK_ERR(err);
+        1:  230:  if (iVal < 55) {
+    #####:  231:      qIssueLoadMessage(strFilename.c_str(), iBase_FAILURE);
+    #####:  232:      CHECK_ERR_CRITICAL(iBase_FAILURE);
+        -:  233:  }
+        -:  234:  a2iEntCount[iBase_VERTEX][iMesh_POINT] =
+        1:  235:    a2iEntCount[iBase_VERTEX][iMesh_ALL_TOPOLOGIES] =
+        2:  236:    a2iEntCount[iBase_ALL_TYPES][iMesh_POINT] = iVal;
+        -:  237:
+        1:  238:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_LINE_SEGMENT, &iVal, &err);
+        1:  239:  CHECK_ERR(err);
+        -:  240:  a2iEntCount[iBase_EDGE][iMesh_LINE_SEGMENT] =
+        -:  241:    a2iEntCount[iBase_ALL_TYPES]
+        1:  242:      [iMesh_LINE_SEGMENT] =
+        -:  243:    a2iEntCount[iBase_EDGE]
+        2:  244:    [iMesh_ALL_TOPOLOGIES] = iVal;
+        -:  245:
+        1:  246:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_TRIANGLE, &iVal, &err);
+        1:  247:  CHECK_ERR(err);
+        1:  248:  num2DElems += iVal;
+        -:  249:  a2iEntCount[iBase_FACE][iMesh_TRIANGLE] =
+        1:  250:    a2iEntCount[iBase_ALL_TYPES][iMesh_TRIANGLE] = iVal;
+        -:  251:
+        1:  252:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_QUADRILATERAL, &iVal, &err);
+        1:  253:  CHECK_ERR(err);
+        1:  254:  num2DElems += iVal;
+        -:  255:  a2iEntCount[iBase_FACE][iMesh_QUADRILATERAL] =
+        1:  256:    a2iEntCount[iBase_ALL_TYPES][iMesh_QUADRILATERAL] = iVal;
+        -:  257:
+        1:  258:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_POLYGON, &iVal, &err);
+        1:  259:  CHECK_ERR(err);
+        -:  260:  a2iEntCount[iBase_ALL_TYPES][iMesh_POLYGON] =
+        1:  261:    a2iEntCount[iBase_FACE][iMesh_POLYGON] = iVal;
+        -:  262:
+        1:  263:  if (iGeomDim == 2 && num2DElems < 10) {
+    #####:  264:      qIssueLoadMessage(strFilename.c_str(), iBase_FAILURE);
+    #####:  265:      CHECK_ERR_CRITICAL(iBase_FAILURE);
+        -:  266:  }
+        -:  267:
+        -:  268:  // Total for faces
+        -:  269:  a2iEntCount[iBase_FACE][iMesh_ALL_TOPOLOGIES] =
+        1:  270:    a2iEntCount[iBase_FACE][iMesh_TRIANGLE] +
+        1:  271:    a2iEntCount[iBase_FACE][iMesh_QUADRILATERAL] +
+        1:  272:    a2iEntCount[iBase_FACE][iMesh_POLYGON];
+        -:  273:
+        1:  274:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_TETRAHEDRON, &iVal, &err);
+        1:  275:  CHECK_ERR(err);
+        1:  276:  num3DElems += iVal;
+        -:  277:  a2iEntCount[iBase_ALL_TYPES][iMesh_TETRAHEDRON] =
+        1:  278:    a2iEntCount[iBase_REGION][iMesh_TETRAHEDRON] = iVal;
+        -:  279:
+        1:  280:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_PYRAMID, &iVal, &err);
+        1:  281:  CHECK_ERR(err);
+        1:  282:  num3DElems += iVal;
+        -:  283:  a2iEntCount[iBase_ALL_TYPES][iMesh_PYRAMID] =
+        1:  284:    a2iEntCount[iBase_REGION][iMesh_PYRAMID] = iVal;
+        -:  285:
+        1:  286:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_PRISM, &iVal, &err);
+        1:  287:  CHECK_ERR(err);
+        1:  288:  num3DElems += iVal;
+        -:  289:  a2iEntCount[iBase_ALL_TYPES][iMesh_PRISM] =
+        1:  290:    a2iEntCount[iBase_REGION][iMesh_PRISM] = iVal;
+        -:  291:
+        1:  292:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_HEXAHEDRON, &iVal, &err);
+        1:  293:  CHECK_ERR(err);
+        1:  294:  num3DElems += iVal;
+        -:  295:  a2iEntCount[iBase_ALL_TYPES][iMesh_HEXAHEDRON] =
+        1:  296:    a2iEntCount[iBase_REGION][iMesh_HEXAHEDRON] = iVal;
+        -:  297:
+        1:  298:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_SEPTAHEDRON, &iVal, &err);
+        1:  299:  CHECK_ERR(err);
+        -:  300:  a2iEntCount[iBase_ALL_TYPES][iMesh_SEPTAHEDRON] =
+        1:  301:    a2iEntCount[iBase_REGION][iMesh_SEPTAHEDRON] = iVal;
+        -:  302:
+        1:  303:  iMesh_getNumOfTopo(instance, pvRootSet, iMesh_POLYHEDRON, &iVal, &err);
+        1:  304:  CHECK_ERR(err);
+        -:  305:  a2iEntCount[iBase_ALL_TYPES][iMesh_POLYHEDRON] =
+        1:  306:    a2iEntCount[iBase_REGION][iMesh_POLYHEDRON] = iVal;
+        -:  307:
+        1:  308:  if (iGeomDim == 3 && num3DElems < 10) {
+    #####:  309:      qIssueLoadMessage(strFilename.c_str(), iBase_FAILURE);
+    #####:  310:      CHECK_ERR_CRITICAL(iBase_FAILURE);
+        -:  311:  }
+        -:  312:
+        -:  313:  // Total for regions
+        -:  314:  a2iEntCount[iBase_REGION][iMesh_ALL_TOPOLOGIES] =
+        1:  315:    a2iEntCount[iBase_REGION][iMesh_TETRAHEDRON] +
+        1:  316:    a2iEntCount[iBase_REGION][iMesh_PYRAMID] +
+        1:  317:    a2iEntCount[iBase_REGION][iMesh_PRISM] +
+        1:  318:    a2iEntCount[iBase_REGION][iMesh_HEXAHEDRON] +
+        1:  319:    a2iEntCount[iBase_REGION][iMesh_SEPTAHEDRON] +
+        4:  320:    a2iEntCount[iBase_REGION][iMesh_POLYHEDRON];
+        -:  321:
+        -:  322:  // Overall total
+        -:  323:  a2iEntCount[iBase_ALL_TYPES][iMesh_ALL_TOPOLOGIES] =
+        1:  324:    a2iEntCount[iBase_VERTEX][iMesh_ALL_TOPOLOGIES] +
+        1:  325:    a2iEntCount[iBase_EDGE][iMesh_ALL_TOPOLOGIES] +
+        1:  326:    a2iEntCount[iBase_FACE][iMesh_ALL_TOPOLOGIES] +
+        2:  327:    a2iEntCount[iBase_REGION][iMesh_ALL_TOPOLOGIES];
+        -:  328:
+        -:  329:  // Modular: Can also test those totals directly when there's data
+        -:  330:  // available.
+        -:  331:
+        -:  332:  // Modular: With data, can test getNumOfType directly.
+        -:  333:
+        -:  334:  //@@@ Test loop
+        -:  335:  // Modular: This loop can be done in isolation, because we'll know how
+        -:  336:  // many to expect in advance.
+        1:  337:  cout << " Global entity query tests" << endl;
+        6:  338:  for (eEType = iBase_VERTEX;
+        -:  339:       eEType <= iBase_ALL_TYPES;
+        -:  340:       eEType++) {
+       65:  341:    for (eETopo = iMesh_POINT;
+        -:  342:	 eETopo <= iMesh_ALL_TOPOLOGIES;
+        -:  343:	 eETopo++) {
+       60:  344:      cout << "  Type: ";
+        -:  345:      cout.width(9);
+       60:  346:      cout << astrTypes[eEType] << " Topology: ";
+        -:  347:      cout.width(14);
+       60:  348:      cout << astrTopologies[eETopo];
+        -:  349:      //@@@@ Get entities, type, topo, dim
+       60:  350:      iBase_EntityHandle* aEntHandles = NULL;
+       60:  351:      int iNumEnt, entity_handles_allocated = 0;
+        -:  352:      iMesh_getEntities(instance, pvRootSet, static_cast<iBase_EntityType>(eEType),
+        -:  353:			static_cast<iMesh_EntityTopology>(eETopo),
+       60:  354:			&aEntHandles, &entity_handles_allocated, &iNumEnt, &err);
+       60:  355:      switch (err) {
+        -:  356:      case iBase_SUCCESS:
+       27:  357:	if (a2qLegalTypeAndTopo[eEType][eETopo]) {
+       27:  358:	  qOK = (iNumEnt == a2iEntCount[eEType][eETopo]);
+       27:  359:	  cout << " OK" << endl;
+       27:  360:	  iNPassed++;
+        -:  361:	}
+        -:  362:	else {
+    #####:  363:	  cout << " succeeded when it should have thrown an error." << endl;
+    #####:  364:	  iNFailed++;
+        -:  365:	}	  
+        -:  366:	break;
+        -:  367:      case iBase_BAD_TYPE_AND_TOPO:
+       33:  368:	if (a2qLegalTypeAndTopo[eEType][eETopo]) {
+        -:  369:	  // This should only occur if a precondition test failed.
+        -:  370:	  cout << endl;
+    #####:  371:	  cout << "Threw an error instead of returning! " << endl;
+    #####:  372:	  writeErrorDescr(err);
+    #####:  373:	  iNFailed++;
+        -:  374:	}
+        -:  375:	else {
+       33:  376:	  cout << " threw an error, as expected." << endl;
+       33:  377:	  iNPassed++;
+        -:  378:	}
+        -:  379:	break;
+        -:  380:      case iBase_NOT_SUPPORTED:
+        -:  381:	// This should never occur, according to the spec.
+    #####:  382:	cout << "; feasible though unsupported combination" << endl;
+    #####:  383:	writeErrorDescr(err);
+    #####:  384:	iNFailed++;
+    #####:  385:	break;
+        -:  386:      default:
+        -:  387:	cout << endl;
+    #####:  388:	cout << "Unexpected error! " << endl;
+    #####:  389:	writeErrorDescr(err);
+    #####:  390:	iNFailed++;
+        -:  391:      }
+       60:  392:      UT_FREE(aEntHandles);
+        -:  393:    }
+        -:  394:  } // Done with double loop to verify consistency of number of entities
+        -:  395:    // fetched and number of entities that the mesh claims to have.
+        -:  396:
+        -:  397:  //@@ getVtxArrCoords should insist on vertex handles
+        -:  398:  cout << " Verifying that getVtxArrCoords requires vertex handles as input..."
+        1:  399:       << endl;
+        -:  400:
+        1:  401:  iBase_EntityHandle *aEntHandles = NULL;
+        1:  402:  int iNumEnt, iEntHandles_allocated = 0;
+        -:  403:  iMesh_getEntities(instance, pvRootSet, iBase_ALL_TYPES,
+        -:  404:		    iMesh_ALL_TOPOLOGIES,
+        1:  405:		    &aEntHandles, &iEntHandles_allocated, &iNumEnt, &err);
+        1:  406:  CHECK_ERR(err);
+        -:  407:
+        -:  408:  double *adCoords;
+        1:  409:  int SO = iBase_BLOCKED;
+        1:  410:  int coords_size, coords_allocated = 0;
+        -:  411:  iMesh_getVtxArrCoords(instance, aEntHandles, iNumEnt, SO, &adCoords,
+        1:  412:			&coords_allocated, &coords_size, &err);
+        1:  413:  CHECK_ERR2(err, iBase_INVALID_ENTITY_TYPE);
+        -:  414:  // The following should cause a break, unless the mesh happens to
+        -:  415:  // contain only vertices.
+        1:  416:  if (!err) {
+        -:  417:    // Should only get here if all the entities in the entire mesh
+        -:  418:    // happened to be vertices.
+        -:  419:    int iNumVerts;
+    #####:  420:    iMesh_getNumOfType(instance, pvRootSet, iBase_VERTEX, &iNumVerts, &err);
+    #####:  421:    CHECK_ERR(err);
+    #####:  422:    TESTEQ(iNumVerts,iNumEnt);
+    #####:  423:    TEST(coords_size == iNumVerts * 3);
+        -:  424:  }
+        1:  425:  UT_FREE(aEntHandles);
+        1:  426:  UT_FREE(adCoords);
+        3:  427:}

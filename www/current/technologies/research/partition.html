@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-research_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResearch pagePartition" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResearch pagePartition">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="index.html" id="linkIndex">Research</a><span class="hide"> | </span>
+<a class="nav sub" href="partition.html" id="linkPartition">Partition Improvement</a><span class="hide"> | </span>
+<a class="nav sub" href="predictiveLoad.html" id="linkPredictiveLoad">Predictive Load Balance</a><span class="hide"> | </span>
+<a class="nav sub" href="commLib.html" id="linkCommLib">Communication Libraries</a><span class="hide"> | </span>
+<a class="nav sub" href="mapReduce.html" id="linkMapReduce">MapReduce Experiments</a><span class="hide"> | </span>
+<a class="nav" href="../results/index.html">Scaling Results</a>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Partition Improvement</h1>
+  <p>The ability to scale implicit finite element and other implicit mesh-based computations on massively parallel computers requires ensuring both the system formulation and solution are effectively load balanced. Graph-based partitioners are well known to produce a partitioning of the mesh into parts that are well balanced, in terms of the specified partition object type, while also minimizing inter-part communications. However, traditional graph-partitioners consider a single objective optimization subject to a single balance constraint.</p>
+  
+  <p>In the case of mesh-based analysis, the defined graph nodes are often mesh regions. This selection does an excellent job of balancing the number of regions (elements) and therefore the workload for the construction of the part-level finite element system. However, the workload balance for the iterative solution (e.g. matrix vector product and vector norms) of the resulting system is proportional to the number of mesh vertices. Since mesh vertices are not the objects in the original partitioning, the balance may not be optimal, particularly when the numbers of mesh entities per part is relatively low (e.g., a few thousand). </p>
+  <p>We are developing two multiple compute-object based partitioning improvement algorithms to reduce the vertex imbalance thereby improving the overall balance of two mesh entities as required by a scalable implicit solve. They are referred to as local iterative inter-part boundary modification (LIIPBMod) and heavy part split (HPS).</p>
+  
+  <p><em>The LIIPBMod Algorithm. </em>LIIPBMod locally migrates small numbers of mesh regions from parts that are relatively heavily loaded with respect to mesh vertices to neighboring parts which are relatively lightly loaded with respect to mesh entities. On the heavily loaded part, the mesh vertices on the part boundary are traversed and the ones bounding a small number of elements are identified. If the neighboring part is lightly loaded, the whole &ldquo;cavity&rdquo; (all the adjacent elements of the picked vertex) is migrated to the neighboring part. By this minor inter-part boundary adjustment, the vertex imbalance is improved while only modestly perturbing the good element balance. This procedure may need to be repeated for several iterations to achieve desired vertex balance.</p>
+  
+  <p><em>The HPS Algorithm, </em>Our studies of the mesh partitions given by a graph-based partitioner show that the percentage of heavily loaded parts (more than 10% imbalance) is usually less than 1%. The idea of HPS is that, if the desired number of parts is numP, first distribute the mesh to 99%*numP parts by a graph-based<br />
+    partitioner and leave the other 1%*numP parts empty. Then, select the 1%*numP parts with the highest vertex load and split them into two parts (i.e. migrate roughly half of the mesh entities from them to one of the empty parts). The splitting makes the heavily loaded parts become lightly loaded. Since the peak of the imbalance determines the scalability, HPS lowers the peak and hence improves the performance. </p>
+    
+  
+ <div class="imgContainer fLeft" style="width: 350px;">
+     <a href="../../assets/images/vertex_Imbalance_full.jpg" rel="lightbox">
+	<img src="../../assets/images/vertex_Imbalance_mini.jpg" width="350" height="124" alt="Vertex imbalance" />
+    </a>
+	<p>Figure: Vertex imbalance before and after HPS for a 16 part example. The partitions on parts 1 and 7 are split and given to parts 15 and 16 to improve overall performance.</p>
+</div>
+
+
+ <div class="imgContainer fRight" style="width: 350px;">
+     <a href="../../assets/images/LIPBMod_full.jpg" rel="lightbox">
+	<img src="../../assets/images/LIPBMod_mini.jpg" width="350" height="100" alt="LIIPBMod" />
+    </a>
+	<p>Figure: Vertex imbalance before and after applying LIIPBMod and HPS to a 16.7M element anisotropically adapted mesh used in the simulation of an abdominal aorta aneurism (left image). The two graphs (center for LIIPBmod and right graph for HPS) indicate the average number of vertices per part divided by the average per part before (red dots) and after (blue dots) application of the algorithms. Note in both cases the spikes (red dots in the upper parts of the graphs) that reduce scalability are dramatically lowered after the algorithms have been applied.</p>
+</div>
+
+  
+  <p>&nbsp;</p>
+
+
+  
+  <p class="clear">Using these techniques on a 1 billion element element mesh, we are able to achieve 88% efficiency on a strong scaling study using the PHASTA unstructured mesh element solver on Intrepid (BG/P system).  </p>
+
+
+
+
+<div class="imgContainer center" style="width: 480px;">
+	<table cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="160" valign="top"><p align="center"># of cores</p></td>
+        <td width="160" valign="top"><p align="center">Rgn imb</p></td>
+        <td width="160" valign="top"><p align="center">Vtx imb</p></td>
+        <td width="160" valign="top"><p align="center">Time (s)</p></td>
+        <td width="160" valign="top"><p align="center">Scaling</p></td>
+      </tr>
+      <tr>
+        <td width="160" valign="top"><p>16k</p></td>
+        <td width="160" valign="top"><p>2.03&#37;</p></td>
+        <td width="160" valign="top"><p>7.13&#37;</p></td>
+        <td width="160" valign="top"><p>222.02</p></td>
+        <td width="160" valign="top"><p>1</p></td>
+      </tr>
+      <tr>
+        <td width="160" valign="top"><p>32k</p></td>
+        <td width="160" valign="top"><p>1.72&#37;</p></td>
+        <td width="160" valign="top"><p>8.11&#37;</p></td>
+        <td width="160" valign="top"><p>112.43</p></td>
+        <td width="160" valign="top"><p>0.987</p></td>
+      </tr>
+      <tr>
+        <td width="160" valign="top"><p>64k</p></td>
+        <td width="160" valign="top"><p>1.6&#37;</p></td>
+        <td width="160" valign="top"><p>11.18&#37;</p></td>
+        <td width="160" valign="top"><p>57.09</p></td>
+        <td width="160" valign="top"><p>0.972</p></td>
+      </tr>
+      <tr>
+        <td width="160" valign="top"><p>128k</p></td>
+        <td width="160" valign="top"><p>5.49&#37;</p></td>
+        <td width="160" valign="top"><p>17.85&#37;</p></td>
+        <td width="160" valign="top"><p>31.35</p></td>
+        <td width="160" valign="top"><p>0.885</p></td>
+      </tr>
+    </table>
+    <p>Table 1. One billion element anisotropic mesh on Intrepid Blue Gene/P</p>
+</div>
+
+
+<h3 class="clear">&nbsp;</h3>
+<p>&nbsp;</p>
+<p>&nbsp;</p><!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>The ITAPS Data Model</title>
+  <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+
+<h1>The ITAPS Data Model</h1>
+
+We use the information flow through a mesh-based simulation as the
+framework for developing interoperable geometry, mesh and solution
+field components.  A simulation's information flow begins with a
+problem definition which consists of a description of the geometric
+and temporal domain annotated by <italics> attributes </italics> designating
+mathematical model details and parameters.  The geometric domain is
+then often decomposed into a set of piecewise components, <it> the
+mesh</it>, and the continuous PDEs is then approximated on that mesh
+using, for example, finite difference or finite 
+element techniques.  Simulation automation and reliability often imply
+feedback of the PDE discretization information back to the domain
+discretization (i.e. in adaptive methods) or even modification of the
+physical domain or attributes (e.g., design optimization). <br>
+<br>
+
+Based on this model of information flow, ITAPS researchers have
+defined an abstract data model that supports a wide array of
+supporting technologies and encompasses a broad spectrum of usage
+scenarios.  The data model divides the data required by a
+simulation into three core data types: the <it>geometric data</it>, the
+<it>mesh data</it>, and the <it>field data</it>.  These core data types are associated
+with each other through <it> data relation managers</it>. The data
+relation managers control the relationships among two or more of the
+core data types, resolve cross references between entities in
+different groups, and can provide additional functionality that
+depends on multiple core data types.  The building blocks within these
+data models are the concepts of <it>entities</it>, <it>entity sets</it>, and
+<it> tags</it>.  <br>
+
+<ul type="disc">
+
+<li>
+<it> Entities</it> are used to represent atomic pieces of information
+such as a vertices in a mesh or edges in a geometric model.
+Entity adjacency relationships define how the entities connect to
+each other and both first-order and second-order adjacencies are
+supported.</li> <br>
+
+<li>
+<it> Entity sets</it> are arbitrary collections of entities that may
+be unordered or an ordered list.  The two primary supported
+relationships among entity sets are <it> contained in</it> and <it>
+parent/child</it> to allow for subsetting and hierarchical
+applications. In addition, entity sets also have ''set operation''
+capabilities such as set subtraction, intersection, or union. </li> <br>
+
+<li>
+<it> Tags</it> are used as containers to attach user-defined data to
+ITAPS entities and entity sets.  Tags can be multi-valued which
+implies that a given tag handle can be associated with many different
+entities.  We support specialized tag types for improved performance
+as well as the more general opaque case that allows any type of data
+to be attached. </li> <br>
+</ul>
+
+As a particular example, consider the discrete representation of the
+computational domain, or the mesh.  ITAPS <it> mesh entities</it>
+correspond to the individual pieces of the mesh, namely, vertices,
+edges, faces and regions.  Specific examples include a hexahedron,
+edge, triangle or vertex.  Mesh entities are classified by their
+entity type (topological dimension) and entity topology (shape).
+Higher-dimensional entities are defined by lower-dimensional entities
+with shape and orientation defined using canonical ordering
+relationships.  To determine which adjacencies are supported by an
+underlying implementation, an adjacency table is defined which can be
+returned by a query through the interface.  The implementation can
+report that adjacency information is always, sometimes, or never
+available; and to be available at a cost that is constant, logarithmic
+(i.e., tree search), or linear (i.e., search over all entities) in the
+size of the mesh.  ITAPS <it> mesh entity sets</it> are extensively used
+to collect mesh entities together in meaningful ways, for example, to
+represent the set of all faces classified on a geometric face, or the
+set of regions in a domain decomposition for parallel computing.
+<br><br>
+
+To support many of the services that applications desire, such as
+adaptive mesh refinement, it is important that the data model include
+the concept of modification to allow changes to geometry, topology, or
+set structure.  In the case of the mesh, capabilities include changing
+vertex coordinates and adding or deleting entities. Modification often
+requires interactions between the mesh, geometry and field data models
+and is one of the primary uses for the data relations manager. For
+example, when refining a mesh, it is often critical to associate or
+classify the mesh entity with one or more specific entities in the
+underlying geometric model to ensure accuracy, particlarly on curved
+or complex geometries.
+
+
+</div>
+</div>
+</body>
+</html>

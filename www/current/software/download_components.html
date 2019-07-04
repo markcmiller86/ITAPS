@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_software.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageSoftware pageDownload_components" -->
+</head>
+
+<body class="pageSoftware pageDownload_components">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Download Software</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Download software</a><span class="hide"> | </span>
+<a class="nav sub" href="getting_started.html" id="linkGetting_started">Getting Started</a><span class="hide"> | </span>
+<a class="nav sub" href="data_model.html" id="linkData_model">ITAPS Data Model</a><span class="hide"> | </span>
+<a class="nav sub" href="download_interfaces.html" id="linkDownload_interfaces">Interface Software </a><span class="hide"> | </span>
+<a class="nav sub" href="download_components.html" id="linkDownload_components">Services Software</a><span class="hide"> | </span>
+<a class="nav sub" href="tutorial.html" id="linkTutorial">Tutorial Materials</a><span class="hide"> | </span>
+<a class="nav sub" href="usage_strategies.html" id="linkUsage_strategies">Usage Strategies</a>
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>ITAPS Component Services Software</h1>
+
+<p>ITAPS researchers are working to develop a number of component
+services that are of direct use to application scientists that access
+the necessary mesh and geometry informaiton through the <a
+href="download_interfaces.html">ITAPS interfaces</a>.  To use these
+services, you must implement at least a subset of the common
+interfaces defined by the ITAPS team to provide access to your mesh,
+and if necessary, geometry data.  In many cases, only a partial
+implementation of the interface is required and this is described on a
+service-by-service basis.  Furthermore, you may quickly try these
+services to determine if they are suitable for your long term use by
+taking advantage of one of the <a
+href="download_interfaces.html">IITAPS reference implementations</a>.
+This will likely require a data copy, which can give less than ideal
+performance, but will allow rapid prototyping experiments.  In
+addition to providing access to your mesh and geometry data through
+the ITAPS interfaces, you will also need to call the service-specific
+APIs to invoke the functionality provided by each service.  See the <a
+href="usage_strategies.html"> usage strategies page </a> for a
+schematic and fuller description.</p>
+
+
+<p>ITAPS currently provides a number of services based primarily on the
+iMesh interface specification.  As SciDAC-2 continues, we expect to add
+more services both at the component level and at the integrated services
+level.</p>
+
+
+<p>We believe that the software provided here is compliant with the most recent
+release of the ITAPS iMesh, iGeom, and iRel interfaces. All are believed to compile under
+the most recent Linux GCC.  If you have any problems with the software downloads build
+or use process, please do not hesitate to contact us.</p>
+
+
+
+<h2>Available ITAPS Component Services</h2>
+
+<table
+ style="margin-left: auto; margin-right: auto; width: 75%; text-align: left;"
+ border="1" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td style="width: 10%; vertical-align: top;">Name<br />
+      </td>
+      <td style="width: 15%; vertical-align: top;">POC<br />
+      </td>
+
+      <td style="width: 30%; vertical-align: top; text-align: center;">Description<br />
+      </td>
+      <td style="width: 30%; vertical-align: top;">Interface Requirements<br />
+      </td>
+      <td style="width: 15%; vertical-align: top;">More Info/Download<br />
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">iMesh Compliance test</td>
+      <td style="vertical-align: top;"><a href="mailto:cfog@mech.ubc.ca">Carl Ollivier-Gooch</a>, UBC</td>
+      <td style="vertical-align: top;">Compliance test for the iMesh interface</td>
+      <td style="vertical-align: top;">iMesh implementation, e.g. FMDB, GRUMMP, and MOAB</td>
+      <td style="vertical-align: top;"><a href="download_interfaces.html">More Information</a> / <a href="http://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/interfaces/iMesh/test/unit">Download</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">iMeshP Compliance test</td>
+      <td style="vertical-align: top;">Misbah Mubarak and <a href="mailto:shephard@rpi.edu">Mark S. Shephard</a>, RPI</td>
+      <td style="vertical-align: top;">Compliance test for the iMeshP interface</td>
+      <td style="vertical-align: top;">iMesh and iMeshP implementation, e.g. FMDB, and MOAB</td>
+      <td style="vertical-align: top;"><a href="download_interfaces.html">More Information</a> / <a href="http://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/interfaces/iMeshP/test/unit">Download</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Mesquite<br />
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:pknupp@sandia.gov">Patrick Knupp</a>, SNL<br />
+      </td>
+      <td style="vertical-align: top;">Mesh quality improvment via node repositioning, many mesh types and improvement goals, 2D/3D <br />
+
+      </td>
+      <td style="vertical-align: top;">iMesh for access to vertex coordinates, adjacency information, number of elements, tags for some advanced functionality, iRel and iGeom for surface smoothing <br />
+      </td>
+      <td style="vertical-align: top;"><a href="http://www.cs.sandia.gov/optimization/knupp/Mesquite.html">More Information</a> / <br />
+      <a href="http://www.cs.sandia.gov/web1400/1400_download.html">Download (v2.1.4)</a><br />
+      </td>
+
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">Swap<br />
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:cfog@mech.ubc.ca">Carl Ollivier-Gooch</a>, UBC<br />
+      </td>
+      <td style="vertical-align: top;">Mesh quality improvment for simplicial meshes via edge and face swapping, 2D/3D<br />
+
+      </td>
+      <td style="vertical-align: top;">Partial iMesh to set up single entity iterators, obtain, vertex coordinates, adjacency information <br />
+      </td>
+      <td style="vertical-align: top;"><a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/release_distros/ITAPS-Swap-1.4.0.tar.gz">Download (v1.4)</a><br />
+      </td>
+    </tr> 
+
+    <tr>
+
+      <td style="vertical-align: top;">FronTier<br />
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:linli@ams.sunysb.edu">Xiaolin Li</a>, SUNY SB<br />
+      </td>
+      <td style="vertical-align: top;">Front tracking for surfaces of discontinuity<br />
+      </td>
+      <td style="vertical-align: top;">Partial iMesh implementation <br />
+
+      </td>
+      <td style="vertical-align: top;"><a href="http://sitsec.ams.sunysb.edu/trac/wiki/FronTier">More Information</a> / <br /> <a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/Distributions/iMesh_Distributions/FronTier/FronTier.Lite.06_28_07.tar.gz"> Download (v0.7)</a><br />
+      </td>
+    </tr>
+
+    <tr>
+
+      <td style="vertical-align: top;">iZoltan<br />
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:vjleung@sandia.gov">Vitus Leung</a>, SNL<br />
+      </td>
+      <td style="vertical-align: top;">Dynamic Load Balancing for parallel computing <br />
+      </td>
+      <td style="vertical-align: top;">Partial iMesh or iMeshP implementation <br />
+
+      </td>
+      <td style="vertical-align: top;"><a href="http://www.cs.sandia.gov/Zoltan">More Information</a> / <br />
+Download<br /><a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/release_distros/izoltanparallel-0.8.tar.gz">Parallel</a> / <a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/release_distros/izoltanserial-0.9.tar.gz">Serial</a><br />
+      </td>
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">VisIt Plugin<br />
+
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:miller86@llnl.gov">Mark Miller</a>, LLNL<br />
+      </td>
+      <td style="vertical-align: top;">ITAPS interface for the VisIt scientific computing software<br />
+      </td>
+      <td style="vertical-align: top;">Partial iMesh implementation <br />
+      </td>
+
+      <td style="vertical-align: top;"><a href="http://www.llnl.gov/visit">More Information</a> / <br />
+        <a href="http://www.llnl.gov/visit">Download</a></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">MeshKit<br />
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:tautges@mcs.anl.gov">Tim Tautges</a>, ANL<br />
+      </td>
+      <td style="vertical-align: top;">Open-source mesh generation library, supporting tri, quad, tet, hex, and mixed-element mesh generation.  Can interface with other open- and non-open-source libraries.<br />
+      </td>
+      <td style="vertical-align: top;">iGeom, iMesh, MOAB, iRel<br />
+
+      </td>
+      <td style="vertical-align: top;"><a href="http://http://trac.mcs.anl.gov/projects/fathom/wiki/MeshKit">More Information</a> / <br />
+        <a href="http://www.mcs.anl.gov/~tautges/downloads/meshkit-0.9RC0.tar.gz">Download (v0.9RC0)</a></td>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">&nbsp;</td>
+      <td style="vertical-align: top;">      </td>
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">LIIPBMod</td>
+      <td style="vertical-align: top;">Min Zhou &amp; <a href="mailto:shephard@rpi.edu">Mark S. Shephard</a>, RPI</td>
+      <td style="vertical-align: top;">Partition improvement software</td>
+      <td style="vertical-align: top;">FMDB, IPComMan</td>
+      <td style="vertical-align: top;"><a href="../technologies/research/partition.html">More Information</a> / <a href="http://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/release_distros/LIIPBMod.tar.gz">Download</a></td></tr>
+    <tr>
+      <td style="vertical-align: top;">Mesh Curving</td>
+      <td style="vertical-align: top;">Qiukai Lu, <a href="mailto:shephard@rpi.edu">Mark S. Shephard</a>, RPI</td>
+      <td style="vertical-align: top;">Construction of valid second-order  tetrahedral meshes in 3D. Functionality includes curved mesh generation,  element invalidity correction and shape quality optimization</td>
+      <td style="vertical-align: top;">GMI - iGeom implementation for geometric interrogations, and FMDB - iMesh and iMeshP interface implementation, IPComMan</td>
+      <td style="vertical-align: top;"><a href="../tools/services/curve.html">More Information</a> / <a href="http://redmine.scorec.rpi.edu/anonsvn/meshadapt/trunk">Download</a></td></tr>
+    <tr>
+      <td style="vertical-align: top;">Mesh Adapt</td>
+      <td style="vertical-align: top;">Aleksandr Ovcharenko and <a href="mailto:shephard@rpi.edu">Mark S. Shephard</a>, RPI</td>
+      <td style="vertical-align: top;">Generates parallel unstructured  anisotropic meshes using local mesh modification that satisfy a  prescribed anisotropic size field. Functionality includes intelligent  parallel refinement, coarsening, swapping and node repositioning</td>
+      <td style="vertical-align: top;">GMI - iGeom implementation for geometric interrogations, and FMDB - iMesh and iMeshP interface implementation, IPComMan</td>
+      <td style="vertical-align: top;"><a href="../tools/services/adaptServ.html">More Information</a> / <a href="http://redmine.scorec.rpi.edu/anonsvn/meshadapt/trunk">Download</a></td></tr>
+    <tr>
+      <td style="vertical-align: top;">IPComMan</td>
+      <td style="vertical-align: top;">Aleksandr Ovcharenko and <a href="mailto:shephard@rpi.edu">Mark S. Shephard</a>, RPI</td>
+      <td style="vertical-align: top;">Inter-processor communication manager</td>
+      <td style="vertical-align: top;">None</td>
+      <td style="vertical-align: top;"><a href="../technologies/research/IPComMan.html">More Information</a> / 
+      <a href="http://www.scorec.rpi.edu/FMDB/source/ipcomman-1.0.tar.gz">Download</a></td></tr>
+
+  </tbody>
+</table>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,190 @@
+\appendix
+
+\section{Enumerations Defined in the iMesh
+Interface}\label{app:ITAPS-enum} 
+
+The iMesh interface uses enumerated types
+for variables that have a specific, restricted range of values. These
+enumerations, and their possible values, are given in
+Table~\ref{table:Enums}; in both C and Fortran usage, these enumerations
+are actually stored as integer variables with pre-assigned, constant
+values. Note that the enumerated values with iBase prepended to their
+names are part of the ITAPS base interface, because they are expected to
+be useful also for the geometry (iGeom), field (iField), and relations
+(iRel) interfaces.
+
+These enumerations are largely self-explanatory, with the exception of
+AdjacencyInfo. The values of AdjacencyInfo reflect that an
+implementation may be able to supply a particular piece of adjacency
+information never, always, or only sometimes (for example, an
+implementation might choose to store boundary faces but not interior
+faces for memory reasons, making it impossible to return the
+latter). Also, if adjacency information is available, the cost of
+retrieving may be constant time (example: stored data); logarithmic time
+(example: tree search); or linear time (example: searching the entire
+list of entities). %
+\begin{table}[htp]
+
+\caption{iMesh Enumerated Types}
+
+\label{table:Enums} {\small }\begin{tabular}{|l|p{5in}|}
+\hline 
+{\small Enum Name}&
+{\small Values}\tabularnewline
+\hline
+\hline 
+{\small ErrorType}&
+{\small \raggedright iBase\_SUCCESS, iBase\_MESH\_ALREADY\_LOADED,
+iBase\_NO\_MESH, iBase\_FILE\_NOT\_FOUND, iBase\_FILE\_WRITE\_ERROR,
+iBase\_NIL\_ARRAY, iBase\_BAD\_ARRAY\_SIZE, iBase\_BAD\_ARRAY\_DIMENSION,
+iBase\_INVALID\_ENTITY\_HANDLE, iBase\_INVALID\_ENTITY\_COUNT, iBase\_INVALID\_ENTITY\_TYPE,
+iBase\_INVALID\_ENTITY\_TOPOLOGY, iBase\_BAD\_TYPE\_AND\_TOPO, iBase\_ENTITY\_CREATION\_ERROR,
+iBase\_INVALID\_TAG\_HANDLE, iBase\_TAG\_NOT\_FOUND, iBase\_TAG\_ALREADY\_EXISTS,
+iBase\_TAG\_IN\_USE, iBase\_INVALID\_ENTITYSET\_HANDLE, iBase\_INVALID\_ITERATOR\_HANDLE,
+iBase\_INVALID\_ARGUMENT, iBase\_MEMORY\_ALLOCATION\_FAILED, iBase\_NOT\_SUPPORTED,
+iBase\_FAILURE }\tabularnewline
+\hline 
+{\small TagValueType}&
+{\small \raggedright iBase\_INTEGER, iBase\_DOUBLE, iBase\_ENTITY\_HANDLE,
+iBase\_BYTES}\tabularnewline
+\hline 
+{\small EntityType}&
+{\small \raggedright iBase\_VERTEX, iBase\_EDGE, iBase\_FACE, iBase\_REGION,
+iBase\_ALL\_TYPES}\tabularnewline
+\hline 
+{\small EntityTopology}&
+{\small \raggedright iMesh\_POINT, iMesh\_LINE\_SEGMENT, iMesh\_POLYGON,
+iMesh\_TRIANGLE, iMesh\_QUADRILATERAL, iMesh\_POLYHEDRON, iMesh\_TETRAHEDRON,
+iMesh\_HEXAHEDRON, iMesh\_PRISM, iMesh\_PYRAMID, iMesh\_SEPTAHEDRON,
+iMesh\_ALL\_TOPOLOGIES}\tabularnewline
+\hline 
+{\small StorageOrder}&
+{\small \raggedright iBase\_BLOCKED, iBase\_INTERLEAVED, iBase\_UNDETERMINED}\tabularnewline
+\hline 
+{\small AdjacencyInfo}&
+{\small \raggedright iBase\_UNAVAILABLE, iBase\_ALL\_ORDER\_1, iBase\_ALL\_ORDER\_LOGN,
+iBase\_ALL\_ORDER\_N, iBase\_SOME\_ORDER\_1, iBase\_SOME\_ORDER\_LOGN,
+iBase\_SOME\_ORDER\_N}\tabularnewline
+\hline 
+{\small CreationStatus}&
+{\small \raggedright iBase\_NEW, iBase\_ALREADY\_EXISTED, iBase\_CREATED\_DUPLICATE,
+iBase\_CREATION\_FAILED}\tabularnewline
+\hline
+\end{tabular} 
+\end{table}
+
+
+\begin{lyxcode}
+
+\end{lyxcode}
+
+\section{Examples of Full iMesh Function Usage}\label{app:ITAPS-examples}
+
+The iMesh interface is designed to support both C and Fortran clients
+without modification; several design compromises were necessary to
+accomplish this, as discussed in the main text. This appendix will give
+examples of the declaration and usage of these functions in both C and
+Fortran.
+
+
+\subsection{Function Name Mangling}
+
+Many Fortran compilers produce object code with modified function
+names. Many compilers convert all text to uppercase (or to lowercase),
+and some also append one or more underscores to function names. While
+this is not a problem for pure Fortran programs, for mixed C-Fortran
+programming, some care must be taken to ensure that the C and Fortran
+object code uses the same function names. To achieve this, we take
+advantage of the standard GNU \texttt{autoconf} macro
+\texttt{AC\_F77\_WRAPPERS} to create C pre-processor macros that replace
+the C function names given in this paper (and in the documentation) with
+the names that the local Fortran compiler produces by name mangling. In
+this way, both the C and Fortran source code use the function names as
+given, and the mixed-language function name issues are handled
+automatically.
+
+
+\subsection{Functions with String Arguments}
+
+For string arguments, Fortran compilers add a hidden integer argument
+specifying the length of the string. For iMesh functions, we explicitly
+include the length argument in the C function declaration. For example,
+the full C declaration for \texttt{getTagName} is
+
+\begin{lyxcode}
+void~iMesh\_getTagName(iMesh\_Instance~instance,~
+
+~~~~~~~~~~~~~~~~~~~~~~/{*}in{*}/~const~iBase\_TagHandle~tag\_handle,~
+
+~~~~~~~~~~~~~~~~~~~~~~/{*}inout{*}/~char~{*}name,~
+
+~~~~~~~~~~~~~~~~~~~~~~/{*}out{*}/~int~{*}err,~
+
+~~~~~~~~~~~~~~~~~~~~~~/{*}in{*}/~int~name\_len);
+\end{lyxcode}
+From this declaration, it is clear that the storage for the tag name
+must be declared externally. Note that Fortran usage for this function
+would be
+
+\begin{lyxcode}
+call~iMesh\_getTagName(instance,~tag\_handle,~name,~err)
+\end{lyxcode}
+and that the handles are stored as integers whose size matches the
+size of pointers on the machine.
+
+
+\subsection{Functions with Array Arguments}
+
+The iMesh interface supports flexibility in array memory management.
+Arrays can be allocated externally (by the application) or internally
+(by the implementation). This approach also enables re-use of arrays,
+because an existing array whose data in no longer needed can be used in
+a later call. To avoid array access problems, the callee must know the
+size of incoming arrays, and the caller must be informed of the
+allocated size of implementation-allocated arrays. Also, re-use of
+arrays opens the possibility of an arrays \emph{allocated} and
+\emph{used} sizes being different. Consequently, arrays in iMesh
+functions require accompanying size arguments. For instance, when
+retrieving the entities adjacent to an array of entities, the full
+function declaration in C is
+
+\begin{lyxcode}
+~void~iMesh\_getAdjEntities(iMesh\_Instance~instance,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}in{*}/~const~iBase\_EntityHandle{*}~entity\_handles,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}in{*}/~const~int~entity\_handles\_size,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}in{*}/~const~int~entity\_type\_requested,~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}inout{*}/~iBase\_EntityHandle{*}{*}~adj\_entity\_handles,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}inout{*}/~int{*}~adj\_entity\_handles\_allocated,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}out{*}/~int{*}~adj\_entity\_handles\_size,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}inout{*}/~int{*}{*}~offset,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}inout{*}/~int{*}~offset\_allocated,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}out{*}/~int{*}~offset\_size,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~/{*}out{*}/~int~{*}err);
+\end{lyxcode}
+Note that the array \texttt{entity\_handles} is strictly an input array;
+its used size is required, but not its allocated size. The output array,
+\texttt{adj\_entity\_handles}, is a one-dimensional array, with
+\texttt{offset} indicating where the list of entities adjacent to a
+given entity in the input begins. Both of these arrays are having their
+values set by the call, so both the allocated size and the used size are
+required. If the allocated size is zero, the function must calculate the
+required size and allocate it.
+
+If the allocated size is non-zero, the function must calculate the
+required size and ensure that the data will not overflow the given
+array. If the actual data will not fit within the allocated size, the
+function must return an error code of iBase\_BAD\_ARRAY\_SIZE.
+Otherwise, the data are written into the array. The used size of the
+array must be returned, as this is not necessarily equal to the
+allocated size.
+\end{document}

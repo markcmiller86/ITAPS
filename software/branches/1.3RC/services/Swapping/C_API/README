@@ -1,0 +1,21 @@
+This package contains a preliminary release of the swapping service,
+written to use the ITAPS C API.
+
+To build, you'll need to:
+
+1.  Run configure.  Use the --with-iMesh=path argument to specify the
+location of your iMesh implementation.  For iMesh implementations that
+can't build tetrahedra from faces (this includes MOAB), you'll also need
+to use --enable-tets-from-verts.
+
+2.  Run make.
+
+3.  Run make test to build a 3D swapping executable and test it on an
+included mesh file.  You should expect a total of roughly 11,000 swaps
+(add up the "Performed XXXX swaps" lines in the program output).
+
+To build your app with the swapping libraries, you'll need to add the
+appropriate -I, -L, and -lSwapping to your Makefile, and include
+ITAPS_Swap.hh in your source file.  At this point, even though the
+swapping code uses the ITAPS C API, the swapping code itself is written
+in C++, so from C or Fortran you'll need a wrapper layer of some sort.

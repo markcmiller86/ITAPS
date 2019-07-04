@@ -1,0 +1,2425 @@
+.TH "/home/miller/itaps/tmp/iMesh.h" 3 "26 Jun 2007" "iMesh" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+/home/miller/itaps/tmp/iMesh.h \- 
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'iBase.h'\fP
+.br
+\fC#include 'iMesh_protos.h'\fP
+.br
+
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "typedef void * \fBiMesh_Instance\fP"
+.br
+.RI "\fIType used to store iMesh interface handle. \fP"
+.ti -1c
+.RI "typedef void * \fBiMesh_EntityIterator\fP"
+.br
+.RI "\fIType used to store an iterator returned by iMesh. \fP"
+.ti -1c
+.RI "typedef void * \fBiMesh_EntityArrIterator\fP"
+.br
+.RI "\fIType used to store an array iterator returned by iMesh. \fP"
+.in -1c
+.SS "Enumerations"
+
+.in +1c
+.ti -1c
+.RI "enum \fBiMesh_EntityTopology\fP { \fBiMesh_POINT\fP =  0, \fBiMesh_LINE_SEGMENT\fP, \fBiMesh_POLYGON\fP, \fBiMesh_TRIANGLE\fP, \fBiMesh_QUADRILATERAL\fP, \fBiMesh_POLYHEDRON\fP, \fBiMesh_TETRAHEDRON\fP, \fBiMesh_HEXAHEDRON\fP, \fBiMesh_PRISM\fP, \fBiMesh_PYRAMID\fP, \fBiMesh_SEPTAHEDRON\fP, \fBiMesh_ALL_TOPOLOGIES\fP }"
+.br
+.RI "\fIEnumerator specifying entity topology. \fP"
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBiMesh_getErrorType\fP (\fBiMesh_Instance\fP instance, int *error_type, int *err)"
+.br
+.RI "\fIGet the error type returned from the last iMesh function. \fP"
+.ti -1c
+.RI "void \fBiMesh_getDescription\fP (\fBiMesh_Instance\fP instance, char *descr, int *err, int descr_len)"
+.br
+.RI "\fIGet a description of the error returned from the last iMesh function. \fP"
+.ti -1c
+.RI "void \fBiMesh_newMesh\fP (const char *options, \fBiMesh_Instance\fP *instance, int *err, int options_len)"
+.br
+.RI "\fIConstruct a new iMesh instance. \fP"
+.ti -1c
+.RI "void \fBiMesh_dtor\fP (\fBiMesh_Instance\fP instance, int *err)"
+.br
+.RI "\fIDestroy an iMesh instance. \fP"
+.ti -1c
+.RI "void \fBiMesh_load\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const char *name, const char *options, int *err, int name_len, int options_len)"
+.br
+.RI "\fILoad a mesh from a file. \fP"
+.ti -1c
+.RI "void \fBiMesh_save\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const char *name, const char *options, int *err, const int name_len, int options_len)"
+.br
+.RI "\fISave a mesh to a file. \fP"
+.ti -1c
+.RI "void \fBiMesh_getRootSet\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle *root_set, int *err)"
+.br
+.RI "\fIGet handle of the root set for this instance. \fP"
+.ti -1c
+.RI "void \fBiMesh_getGeometricDimension\fP (\fBiMesh_Instance\fP instance, int *geom_dim, int *err)"
+.br
+.RI "\fIGet the geometric dimension of mesh represented in this instance. \fP"
+.ti -1c
+.RI "void \fBiMesh_getDfltStorage\fP (\fBiMesh_Instance\fP instance, int *order, int *err)"
+.br
+.RI "\fIGet the default storage order used by this implementation. \fP"
+.ti -1c
+.RI "void \fBiMesh_getAdjTable\fP (\fBiMesh_Instance\fP instance, int **adjacency_table, int *adjacency_table_allocated, int *adjacency_table_size, int *err)"
+.br
+.RI "\fIGet the adjacency table for this implementation. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNumOfType\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int entity_type, int *num_type, int *err)"
+.br
+.RI "\fIGet the number of entities with the specified type in the instance or set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNumOfTopo\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int entity_topology, int *num_topo, int *err)"
+.br
+.RI "\fIGet the number of entities with the specified topology in the instance or set. \fP"
+.ti -1c
+.RI "void \fBiMesh_areEHValid\fP (\fBiMesh_Instance\fP instance, int doReset, int *areHandlesInvariant, int *err)"
+.br
+.RI "\fIReturn whether entity handles have changed since last reset or since instance construction. \fP"
+.ti -1c
+.RI "void \fBiMesh_getAllVtxCoords\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, double **coordinates, int *coordinates_allocated, int *coordinates_size, int **in_entity_set, int *in_entity_set_allocated, int *in_entity_set_size, int *storage_order, int *err)"
+.br
+.RI "\fIReturn coordinates of all vertices defined in this instance or set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getVtxCoordIndex\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int requested_entity_type, const int requested_entity_topology, const int entity_adjacency_type, int **offset, int *offset_allocated, int *offset_size, int **index, int *index_allocated, int *index_size, int **entity_topologies, int *entity_topologies_allocated, int *entity_topologies_size, int *err)"
+.br
+.RI "\fIGet adjacent entities as connectivity lists. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntities\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int entity_type, const int entity_topology, iBase_EntityHandle **entity_handles, int *entity_handles_allocated, int *entity_handles_size, int *err)"
+.br
+.RI "\fIGet entities of specific type and/or topology in set or instance. \fP"
+.ti -1c
+.RI "void \fBiMesh_getVtxArrCoords\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *vertex_handles, const int vertex_handles_size, int *storage_order, double **coords, int *coords_allocated, int *coords_size, int *err)"
+.br
+.RI "\fIGet coordinates of specified vertices. \fP"
+.ti -1c
+.RI "void \fBiMesh_getAdjEntities\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_set_handle, const int entity_type_requestor, const int entity_topology_requestor, const int entity_type_requested, iBase_EntityHandle **adj_entity_handles, int *adj_entity_handles_allocated, int *adj_entity_handles_size, int **offset, int *offset_allocated, int *offset_size, int **in_entity_set, int *in_entity_set_allocated, int *in_entity_set_size, int *err)"
+.br
+.RI "\fIGet entities adjacent to those of requested type/topology in set or instance. \fP"
+.ti -1c
+.RI "void \fBiMesh_initEntArrIter\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int requested_entity_type, const int requested_entity_topology, const int requested_array_size, \fBiMesh_EntityArrIterator\fP *entArr_iterator, int *err)"
+.br
+.RI "\fIInitialize an array iterator over specified entity type, topology, and size. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNextEntArrIter\fP (\fBiMesh_Instance\fP instance, \fBiMesh_EntityArrIterator\fP entArr_iterator, iBase_EntityHandle **entity_handles, int *entity_handles_allocated, int *entity_handles_size, int *has_data, int *err)"
+.br
+.RI "\fIGet entities contained in array iterator and increment iterator. \fP"
+.ti -1c
+.RI "void \fBiMesh_resetEntArrIter\fP (\fBiMesh_Instance\fP instance, \fBiMesh_EntityArrIterator\fP entArr_iterator, int *err)"
+.br
+.RI "\fIReset the array iterator. \fP"
+.ti -1c
+.RI "void \fBiMesh_endEntArrIter\fP (\fBiMesh_Instance\fP instance, \fBiMesh_EntityArrIterator\fP entArr_iterator, int *err)"
+.br
+.RI "\fIDestroy the specified array iterator. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntArrTopo\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, int **topology, int *topology_allocated, int *topology_size, int *err)"
+.br
+.RI "\fIGet the entity topology for the specified entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntArrType\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, int **type, int *type_allocated, int *type_size, int *err)"
+.br
+.RI "\fIGet the entity type for the specified entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntArrAdj\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, const int entity_type_requested, iBase_EntityHandle **adjacentEntityHandles, int *adjacentEntityHandles_allocated, int *adj_entity_handles_size, int **offset, int *offset_allocated, int *offset_size, int *err)"
+.br
+.RI "\fIGet entities of specified type adjacent to entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_createEntSet\fP (\fBiMesh_Instance\fP instance, const int isList, iBase_EntitySetHandle *entity_set_created, int *err)"
+.br
+.RI "\fICreate an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_destroyEntSet\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, int *err)"
+.br
+.RI "\fIDestroy an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_isList\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, int *is_list, int *err)"
+.br
+.RI "\fIReturn whether a specified set is ordered or unordered. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNumEntSets\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int num_hops, int *num_sets, int *err)"
+.br
+.RI "\fIGet the number of entity sets contained in a set or interface. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntSets\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int num_hops, iBase_EntitySetHandle **contained_set_handles, int *contained_set_handles_allocated, int *contained_set_handles_size, int *err)"
+.br
+.RI "\fIGet the entity sets contained in a set or interface. \fP"
+.ti -1c
+.RI "void \fBiMesh_addEntToSet\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, iBase_EntitySetHandle *entity_set, int *err)"
+.br
+.RI "\fIAdd an entity to a set. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvEntFromSet\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, iBase_EntitySetHandle *entity_set, int *err)"
+.br
+.RI "\fIRemove an entity from a set. \fP"
+.ti -1c
+.RI "void \fBiMesh_addEntArrToSet\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, iBase_EntitySetHandle *entity_set, int *err)"
+.br
+.RI "\fIAdd an array of entities to a set. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvEntArrFromSet\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, iBase_EntitySetHandle *entity_set, int *err)"
+.br
+.RI "\fIRemove an array of entities from a set. \fP"
+.ti -1c
+.RI "void \fBiMesh_addEntSet\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_set_to_add, iBase_EntitySetHandle *entity_set_handle, int *err)"
+.br
+.RI "\fIAdd an entity set to a set. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvEntSet\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_to_remove, iBase_EntitySetHandle *entity_set_handle, int *err)"
+.br
+.RI "\fIRemove an entity set from a set. \fP"
+.ti -1c
+.RI "void \fBiMesh_isEntContained\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle containing_entity_set, const iBase_EntitySetHandle contained_entity, int *is_contained, int *err)"
+.br
+.RI "\fIReturn whether an entity is contained in another set. \fP"
+.ti -1c
+.RI "void \fBiMesh_isEntSetContained\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle containing_entity_set, const iBase_EntitySetHandle contained_entity_set, int *is_contained, int *err)"
+.br
+.RI "\fIReturn whether an entity set is contained in another set. \fP"
+.ti -1c
+.RI "void \fBiMesh_addPrntChld\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle *parent_entity_set, iBase_EntitySetHandle *child_entity_set, int *err)"
+.br
+.RI "\fIAdd parent/child links between two sets. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvPrntChld\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle *parent_entity_set, iBase_EntitySetHandle *child_entity_set, int *err)"
+.br
+.RI "\fIRemove parent/child links between two sets. \fP"
+.ti -1c
+.RI "void \fBiMesh_isChildOf\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle parent_entity_set, const iBase_EntitySetHandle child_entity_set, int *is_child, int *err)"
+.br
+.RI "\fIReturn whether two sets are related by parent/child links. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNumChld\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const int num_hops, int *num_child, int *err)"
+.br
+.RI "\fIGet the number of child sets linked from a specified set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNumPrnt\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const int num_hops, int *num_parent, int *err)"
+.br
+.RI "\fIGet the number of parent sets linked from a specified set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getChldn\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle from_entity_set, const int num_hops, iBase_EntitySetHandle **entity_set_handles, int *entity_set_handles_allocated, int *entity_set_handles_size, int *err)"
+.br
+.RI "\fIGet the child sets linked from a specified set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getPrnts\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle from_entity_set, const int num_hops, iBase_EntitySetHandle **entity_set_handles, int *entity_set_handles_allocated, int *entity_set_handles_size, int *err)"
+.br
+.RI "\fIGet the parent sets linked from a specified set. \fP"
+.ti -1c
+.RI "void \fBiMesh_setVtxArrCoords\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *vertex_handles, const int vertex_handles_size, const int storage_order, const double *new_coords, const int new_coords_size, int *err)"
+.br
+.RI "\fISet coordinates for an array of vertices. \fP"
+.ti -1c
+.RI "void \fBiMesh_createVtxArr\fP (\fBiMesh_Instance\fP instance, const int num_verts, const int storage_order, const double *new_coords, const int new_coords_size, iBase_EntityHandle **new_vertex_handles, int *new_vertex_handles_allocated, int *new_vertex_handles_size, int *err)"
+.br
+.RI "\fICreate an array of new vertices at specified coordinates. \fP"
+.ti -1c
+.RI "void \fBiMesh_createEntArr\fP (\fBiMesh_Instance\fP instance, const int new_entity_topology, const iBase_EntityHandle *lower_order_entity_handles, const int lower_order_entity_handles_size, iBase_EntityHandle **new_entity_handles, int *new_entity_handles_allocated, int *new_entity_handles_size, int **status, int *status_allocated, int *status_size, int *err)"
+.br
+.RI "\fICreate an array of new entities with specified lower-order topology. \fP"
+.ti -1c
+.RI "void \fBiMesh_deleteEntArr\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *entity_handles, const int entity_handles_size, int *err)"
+.br
+.RI "\fIDelete specified entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_createTag\fP (\fBiMesh_Instance\fP instance, const char *tag_name, const int tag_size, const int tag_type, iBase_TagHandle *tag_handle, int *err, const int tag_name_len)"
+.br
+.RI "\fICreate a tag with specified name, size, and type. \fP"
+.ti -1c
+.RI "void \fBiMesh_destroyTag\fP (\fBiMesh_Instance\fP instance, iBase_TagHandle tag_handle, const int forced, int *err)"
+.br
+.RI "\fIDestroy a tag. \fP"
+.ti -1c
+.RI "void \fBiMesh_getTagName\fP (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, char *name, int *err, int name_len)"
+.br
+.RI "\fIGet the name for a given tag handle. \fP"
+.ti -1c
+.RI "void \fBiMesh_getTagSizeValues\fP (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, int *tag_size, int *err)"
+.br
+.RI "\fIGet size of a tag in units of numbers of tag data type. \fP"
+.ti -1c
+.RI "void \fBiMesh_getTagSizeBytes\fP (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, int *tag_size, int *err)"
+.br
+.RI "\fIGet size of a tag in units of bytes. \fP"
+.ti -1c
+.RI "void \fBiMesh_getTagHandle\fP (\fBiMesh_Instance\fP instance, const char *tag_name, iBase_TagHandle *tag_handle, int *err, int tag_name_len)"
+.br
+.RI "\fIGet a the handle of an existing tag with the specified name. \fP"
+.ti -1c
+.RI "void \fBiMesh_getTagType\fP (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, int *tag_type, int *err)"
+.br
+.RI "\fIGet the data type of the specified tag handle. \fP"
+.ti -1c
+.RI "void \fBiMesh_setEntSetData\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set_handle, const iBase_TagHandle tag_handle, const char *tag_value, const int tag_value_size, int *err)"
+.br
+.RI "\fISet a tag value of arbitrary type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_setEntSetIntData\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, const int tag_value, int *err)"
+.br
+.RI "\fISet a tag value of integer type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_setEntSetDblData\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, const double tag_value, int *err)"
+.br
+.RI "\fISet a tag value of double type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_setEntSetEHData\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, const iBase_EntityHandle tag_value, int *err)"
+.br
+.RI "\fISet a tag value of entity handle type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntSetData\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const iBase_TagHandle tag_handle, char **tag_value, int *tag_value_allocated, int *tag_value_size, int *err)"
+.br
+.RI "\fIGet the value of a tag of arbitrary type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntSetIntData\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, int *out_data, int *err)"
+.br
+.RI "\fIGet the value of a tag of integer type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntSetDblData\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, double *out_data, int *err)"
+.br
+.RI "\fIGet the value of a tag of double type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntSetEHData\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, iBase_EntityHandle *out_data, int *err)"
+.br
+.RI "\fIGet the value of a tag of entity handle type on an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_getAllEntSetTags\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, iBase_TagHandle **tag_handles, int *tag_handles_allocated, int *tag_handles_size, int *err)"
+.br
+.RI "\fIGet all the tags associated with a specified entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvEntSetTag\fP (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set_handle, const iBase_TagHandle tag_handle, int *err)"
+.br
+.RI "\fIRemove a tag value from an entity set. \fP"
+.ti -1c
+.RI "void \fBiMesh_setVtxCoords\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle vertex_handle, const double x, const double y, const double z, int *err)"
+.br
+.RI "\fISet coordinates for a vertex. \fP"
+.ti -1c
+.RI "void \fBiMesh_createVtx\fP (\fBiMesh_Instance\fP instance, const double x, const double y, const double z, iBase_EntityHandle *new_vertex_handle, int *err)"
+.br
+.RI "\fICreate a new vertex at specified coordinates. \fP"
+.ti -1c
+.RI "void \fBiMesh_createEnt\fP (\fBiMesh_Instance\fP instance, const int new_entity_topology, const iBase_EntityHandle *lower_order_entity_handles, const int lower_order_entity_handles_size, iBase_EntityHandle *new_entity_handle, int *status, int *err)"
+.br
+.RI "\fICreate a new entity with specified lower-order topology. \fP"
+.ti -1c
+.RI "void \fBiMesh_deleteEnt\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, int *err)"
+.br
+.RI "\fIDelete specified entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getArrData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, char **tag_values, int *tag_values_allocated, int *tag_values_size, int *err)"
+.br
+.RI "\fIGet tag values of arbitrary type for an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_getIntArrData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, int **tag_values, int *tag_values_allocated, int *tag_values_size, int *err)"
+.br
+.RI "\fIGet tag values of integer type for an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_getDblArrData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, double **tag_values, int *tag_values_allocated, int *tag_values_size, int *err)"
+.br
+.RI "\fIGet tag values of double type for an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEHArrData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, iBase_EntityHandle **tag_value, int *tag_value_allocated, int *tag_value_size, int *err)"
+.br
+.RI "\fIGet tag values of entity handle type for an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_setArrData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const char *tag_values, const int tag_values_size, int *err)"
+.br
+.RI "\fISet tag values of arbitrary type on an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_setIntArrData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const int *tag_values, const int tag_values_size, int *err)"
+.br
+.RI "\fISet tag values of integer type on an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_setDblArrData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const double *tag_values, const int tag_values_size, int *err)"
+.br
+.RI "\fISet tag values of double type on an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_setEHArrData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const iBase_EntityHandle *tag_values, const int tag_values_size, int *err)"
+.br
+.RI "\fISet tag values of entity handle type on an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvArrTag\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle *entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, int *err)"
+.br
+.RI "\fIRemove a tag value from an array of entities. \fP"
+.ti -1c
+.RI "void \fBiMesh_getData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, char **tag_value, int *tag_value_allocated, int *tag_value_size, int *err)"
+.br
+.RI "\fIGet the value of a tag of arbitrary type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getIntData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, int *out_data, int *err)"
+.br
+.RI "\fIGet the value of a tag of integer type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getDblData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, double *out_data, int *err)"
+.br
+.RI "\fIGet the value of a tag of double type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEHData\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, iBase_EntityHandle *out_data, int *err)"
+.br
+.RI "\fIGet the value of a tag of entity handle type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_setData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const char *tag_value, const int tag_value_size, int *err)"
+.br
+.RI "\fISet a tag value of arbitrary type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_setIntData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const int tag_value, int *err)"
+.br
+.RI "\fISet a tag value of integer type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_setDblData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const double tag_value, int *err)"
+.br
+.RI "\fISet a tag value of double type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_setEHData\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const iBase_EntityHandle tag_value, int *err)"
+.br
+.RI "\fISet a tag value of entity handle type on an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getAllTags\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, iBase_TagHandle **tag_handles, int *tag_handles_allocated, int *tag_handles_size, int *err)"
+.br
+.RI "\fIGet all the tags associated with a specified entity handle. \fP"
+.ti -1c
+.RI "void \fBiMesh_rmvTag\fP (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, int *err)"
+.br
+.RI "\fIRemove a tag value from an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_initEntIter\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int requested_entity_type, const int requested_entity_topology, \fBiMesh_EntityIterator\fP *entity_iterator, int *err)"
+.br
+.RI "\fIInitialize an iterator over specified entity type, topology, and size. \fP"
+.ti -1c
+.RI "void \fBiMesh_getNextEntIter\fP (\fBiMesh_Instance\fP instance, \fBiMesh_EntityIterator\fP entity_iterator, iBase_EntityHandle *entity_handle, int *has_data, int *err)"
+.br
+.RI "\fIGet entity corresponding to an iterator and increment iterator. \fP"
+.ti -1c
+.RI "void \fBiMesh_resetEntIter\fP (\fBiMesh_Instance\fP instance, \fBiMesh_EntityIterator\fP entity_iterator, int *err)"
+.br
+.RI "\fIReset the iterator. \fP"
+.ti -1c
+.RI "void \fBiMesh_endEntIter\fP (\fBiMesh_Instance\fP instance, \fBiMesh_EntityIterator\fP entity_iterator, int *err)"
+.br
+.RI "\fIDestroy the specified iterator. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntTopo\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, int *out_topo, int *err)"
+.br
+.RI "\fIGet the entity topology for the specified entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntType\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, int *out_type, int *err)"
+.br
+.RI "\fIGet the entity type for the specified entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_getVtxCoord\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle vertex_handle, double *x, double *y, double *z, int *err)"
+.br
+.RI "\fIGet coordinates of specified vertex. \fP"
+.ti -1c
+.RI "void \fBiMesh_getEntAdj\fP (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const int entity_type_requested, iBase_EntityHandle **adj_entity_handles, int *adj_entity_handles_allocated, int *adj_entity_handles_size, int *err)"
+.br
+.RI "\fIGet entities of specified type adjacent to an entity. \fP"
+.ti -1c
+.RI "void \fBiMesh_subtract\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_1, const iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle *result_entity_set, int *err)"
+.br
+.RI "\fISubtract contents of one entity set from another. \fP"
+.ti -1c
+.RI "void \fBiMesh_intersect\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_1, const iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle *result_entity_set, int *err)"
+.br
+.RI "\fIIntersect contents of one entity set with another. \fP"
+.ti -1c
+.RI "void \fBiMesh_unite\fP (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_1, const iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle *result_entity_set, int *err)"
+.br
+.RI "\fIUnite contents of one entity set with another. \fP"
+.in -1c
+.SH "Typedef Documentation"
+.PP 
+.SS "typedef void* \fBiMesh_Instance\fP"
+.PP
+Type used to store iMesh interface handle 
+.SS "typedef void* \fBiMesh_EntityIterator\fP"
+.PP
+Type used to store an iterator returned by iMesh 
+.SS "typedef void* \fBiMesh_EntityArrIterator\fP"
+.PP
+Type used to store an array iterator returned by iMesh 
+.SH "Enumeration Type Documentation"
+.PP 
+.SS "enum \fBiMesh_EntityTopology\fP"
+.PP
+Enumerator specifying entity topology. 
+.PP
+\fBEnumeration values: \fP
+.in +1c
+.TP
+\fB\fIiMesh_POINT \fP\fP
+a general zero-dimensional entity 
+.TP
+\fB\fIiMesh_LINE_SEGMENT \fP\fP
+a general one-dimensional entity 
+.TP
+\fB\fIiMesh_POLYGON \fP\fP
+a general two-dimensional element 
+.TP
+\fB\fIiMesh_TRIANGLE \fP\fP
+a three-sided, two-dimensional element 
+.TP
+\fB\fIiMesh_QUADRILATERAL \fP\fP
+a four-sided, two-dimensional element 
+.TP
+\fB\fIiMesh_POLYHEDRON \fP\fP
+a general three-dimensional element 
+.TP
+\fB\fIiMesh_TETRAHEDRON \fP\fP
+a four-sided, three-dimensional element whose faces are triangles 
+.TP
+\fB\fIiMesh_HEXAHEDRON \fP\fP
+a six-sided, three-dimensional element whose faces are quadrilaterals 
+.TP
+\fB\fIiMesh_PRISM \fP\fP
+a five-sided, three-dimensional element which has three quadrilateral faces and two triangular faces 
+.TP
+\fB\fIiMesh_PYRAMID \fP\fP
+a five-sided, three-dimensional element which has one quadrilateral face and four triangular faces 
+.TP
+\fB\fIiMesh_SEPTAHEDRON \fP\fP
+a hexahedral entity with one collapsed edge 
+.TP
+\fB\fIiMesh_ALL_TOPOLOGIES \fP\fP
+allows the user to request information about all the topology types 
+.SH "Function Documentation"
+.PP 
+.SS "void iMesh_getErrorType (\fBiMesh_Instance\fP instance, int * error_type, int * err)"
+.PP
+Get the error type returned from the last iMesh function. Value returned is a member of the iBase_ErrorType enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fI*error_type\fP Error type returned from last iMesh function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getDescription (\fBiMesh_Instance\fP instance, char * descr, int * err, int descr_len)"
+.PP
+Get a description of the error returned from the last iMesh function 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIdescr\fP Pointer to a character string to be filled with a description of the error from the last iMesh function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fIdescr_len\fP Length of the character string pointed to by descr 
+.RE
+.PP
+
+.SS "void iMesh_newMesh (const char * options, \fBiMesh_Instance\fP * instance, int * err, int options_len)"
+.PP
+Construct a new iMesh instance, using implementation-specific options 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIoptions\fP Pointer to implementation-specific options string 
+.br
+\fIinstance\fP Pointer to iMesh instance handle returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fIoptions_len\fP Length of the character string pointed to by options 
+.RE
+.PP
+
+.SS "void iMesh_dtor (\fBiMesh_Instance\fP instance, int * err)"
+.PP
+Destroy an iMesh instance 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance to be destroyed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_load (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const char * name, const char * options, int * err, int name_len, int options_len)"
+.PP
+Load a mesh from a file. If entity set is specified, loaded mesh is added to that set; specify zero if that is not desired. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Set to which loaded mesh will be added, zero if not desired 
+.br
+\fIname\fP File name from which mesh is to be loaded 
+.br
+\fIoptions\fP Pointer to implementation-specific options string 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fIname_len\fP Length of the file name character string 
+.br
+\fIoptions_len\fP Length of the options character string 
+.RE
+.PP
+
+.SS "void iMesh_save (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const char * name, const char * options, int * err, const int name_len, int options_len)"
+.PP
+Save a mesh to a file. If entity set is specified, save only the mesh contained in that set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being saved 
+.br
+\fIname\fP File name to which mesh is to be saved 
+.br
+\fIoptions\fP Pointer to implementation-specific options string 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fIname_len\fP Length of the file name character string 
+.br
+\fIoptions_len\fP Length of the options character string 
+.RE
+.PP
+
+.SS "void iMesh_getRootSet (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle * root_set, int * err)"
+.PP
+Get handle of the root set for this instance. All mesh in this instance can be accessed from this set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIroot_set\fP Pointer to set handle returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getGeometricDimension (\fBiMesh_Instance\fP instance, int * geom_dim, int * err)"
+.PP
+Get the geometric dimension of mesh represented in this instance 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIgeom_dim\fP Pointer to dimension returned from this function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getDfltStorage (\fBiMesh_Instance\fP instance, int * order, int * err)"
+.PP
+Get the default storage order used by this implementation. Value returned is a member of the iBase_StorageOrder enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIorder\fP Pointer to storage order returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getAdjTable (\fBiMesh_Instance\fP instance, int ** adjacency_table, int * adjacency_table_allocated, int * adjacency_table_size, int * err)"
+.PP
+Get the adjacency table for this implementation. This table is a 4x4 array, with indices 0-based, where A(i,j) (i=row, j=column) represents the relative cost of retrieving adjacencies between entities of dimension i to entities of dimension j 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fI*adjacency_table\fP Pointer to array representing adjacency table returned from function 
+.br
+\fIadjacency_table_allocated\fP Pointer to allocated size of adjacency table 
+.br
+\fIadjacency_table_size\fP Pointer to occupied size of adjacency table 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNumOfType (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int entity_type, int * num_type, int * err)"
+.PP
+Get the number of entities with the specified type in the instance or set. If entity set handle is zero, return information for instance, otherwise for set. Value of entity type must be from the iBase_EntityType enumeration. If iBase_ALL_TYPES is specified, total number of entities (excluding entity sets) is returned. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being queried 
+.br
+\fIentity_type\fP Type of entity requested 
+.br
+\fInum_type\fP Pointer to number of entities, returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNumOfTopo (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int entity_topology, int * num_topo, int * err)"
+.PP
+Get the number of entities with the specified topology in the instance or set. If entity set handle is zero, return information for instance, otherwise for set. Value of entity topology must be from the iMesh_EntityTopology enumeration. If iMesh_ALL_TOPOLOGIES is specified, total number of entities (excluding entity sets) is returned. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being queried 
+.br
+\fIentity_topology\fP Topology of entity requested 
+.br
+\fInum_topo\fP Pointer to number of entities, returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_areEHValid (\fBiMesh_Instance\fP instance, int doReset, int * areHandlesInvariant, int * err)"
+.PP
+Return whether entity handles have changed since last reset or since instance construction. If non-zero value is returned, it is not guaranteed that a handle from before the last call to this function represents the same entity as the same handle value does now. If doReset is non-zero, resets the starting point for this function. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIdoReset\fP Perform a reset on the starting point after which handles are invariant. 
+.br
+\fIareHandlesInvariant\fP Pointer to invariant flag returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getAllVtxCoords (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, double ** coordinates, int * coordinates_allocated, int * coordinates_size, int ** in_entity_set, int * in_entity_set_allocated, int * in_entity_set_size, int * storage_order, int * err)"
+.PP
+Return coordinates of all vertices defined in this instance or set. If non-zero set is input, return coordinates for vertices either in the set or contained by entities in the set. If storage order is a value other than iBase_UNDETERMINED, coordinates are returned with that storage order; otherwise storage order is in native order with respect to the implementation. On return, storage order contains order of the returned coordinates. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set for which vertex coordinates are requested 
+.br
+\fI*coordinates\fP Pointer to array holding coordinates 
+.br
+\fI*coordinates_allocated\fP Pointer to allocated size of coordinates array 
+.br
+\fI*coordinates_size\fP Pointer to occupied size of coordinates array 
+.br
+\fI*in_entity_set\fP Pointer to array of flags; if entity set was input, (*in_entity_set)[i]=1 indicates that vertex i was in the entity set, zero otherwise. 
+.br
+\fI*in_entity_set_allocated\fP Pointer to allocated size of in_entity_set array 
+.br
+\fI*in_entity_set_size\fP Pointer to occupied size of in_entity_set array 
+.br
+\fI*storage_order\fP Pointer to storage order requested/returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getVtxCoordIndex (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int requested_entity_type, const int requested_entity_topology, const int entity_adjacency_type, int ** offset, int * offset_allocated, int * offset_size, int ** index, int * index_allocated, int * index_size, int ** entity_topologies, int * entity_topologies_allocated, int * entity_topologies_size, int * err)"
+.PP
+For a specified set handle, entity type and/or entity topology, return connectivity of adjacent entities of specified dimension. Connectivity is expressed as index into array of vertices returned by getEntities function. \fIoffset\fP[i] is the index of the first vertex of the first entity adjacent to entity \fIi\fP in the entity set or the mesh. The topology of entities whose connectivity is returned is given in the entity_topologies array. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being queried 
+.br
+\fIrequested_entity_type\fP Type of entity requested 
+.br
+\fIrequested_entity_topology\fP Topology of entity requested 
+.br
+\fIentity_adjacency_type\fP Adjacency type 
+.br
+\fI*offset\fP Pointer to array of offsets returned from function 
+.br
+\fI*offset_allocated\fP Pointer to allocated size of offset array 
+.br
+\fI*offset_size\fP Pointer to occupied size of offset array 
+.br
+\fI*index\fP Pointer to array of indices returned from function 
+.br
+\fI*index_allocated\fP Pointer to allocated size of index array 
+.br
+\fI*index_size\fP Pointer to occupied size of index array 
+.br
+\fI*entity_topologies\fP Pointer to array of entity topologies returned from function 
+.br
+\fI*entity_topologies_allocated\fP Pointer to allocated size of entity_topologies array 
+.br
+\fI*entity_topologies_size\fP Pointer to occupied size of entity_topologies array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntities (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int entity_type, const int entity_topology, iBase_EntityHandle ** entity_handles, int * entity_handles_allocated, int * entity_handles_size, int * err)"
+.PP
+Get entities of specific type and/or topology in set or instance. All entities of a given type or topology are requested by specifying iBase_ALL_TOPOLOGIES or iBase_ALL_TYPES, respectively. Specified type or topology must be a value in the iBase_EntityType or iBase_EntityTopology enumeration, respectively. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being queried 
+.br
+\fIentity_type\fP Type of entities being requested 
+.br
+\fIentity_topology\fP Topology of entities being requested 
+.br
+\fI*entity_handles\fP Pointer to array of entity handles returned from function 
+.br
+\fI*entity_handles_allocated\fP Pointer to allocated size of entity_handles array 
+.br
+\fI*entity_handles_size\fP Pointer to occupied size of entity_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getVtxArrCoords (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * vertex_handles, const int vertex_handles_size, int * storage_order, double ** coords, int * coords_allocated, int * coords_size, int * err)"
+.PP
+Get coordinates of specified vertices. If storage order is passed in with a value other than iBase_UNDETERMINED, coordinates are returned in the specified storage order, otherwise storage order is that native to the implementation. Storage order of returned coordinates is also returned. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIvertex_handles\fP Array of mesh vertex handles whose coordinates are being requested 
+.br
+\fIvertex_handles_size\fP Number of vertices in vertex_handles array 
+.br
+\fIstorage_order\fP Pointer to storage order requested/returned from function 
+.br
+\fI*coords\fP Pointer to array of coordinates returned from function 
+.br
+\fI*coords_allocated\fP Pointer to allocated size of coords array 
+.br
+\fI*coords_size\fP Pointer to occupied size of coords array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getAdjEntities (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_set_handle, const int entity_type_requestor, const int entity_topology_requestor, const int entity_type_requested, iBase_EntityHandle ** adj_entity_handles, int * adj_entity_handles_allocated, int * adj_entity_handles_size, int ** offset, int * offset_allocated, int * offset_size, int ** in_entity_set, int * in_entity_set_allocated, int * in_entity_set_size, int * err)"
+.PP
+Get entities adjacent to those of requested type/topology in set or instance. If set is specified, also returns whether each adjacent entity is in the set ((*in_entity_set)[i]=1 indicates that adjacent entity (*adj_entity_handles)[i] is in the specified set). If adjacencies for all entities of specified type or topology are desired, specify iMesh_ALL_TOPOLOGIES or iBase_ALL_TYPES, respectively. Types and topologies input to this function must be values in the iBase_EntityType or iBase_EntityTopology enumerations, respectively. \fIoffset\fP[i] stores index of first adjacent entity to entity \fIi\fP from mesh or set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set whose adjacent entities are requested (zero indicates whole mesh) 
+.br
+\fIentity_type_requestor\fP Return entities adjacent to entities of this type 
+.br
+\fIentity_topology_requestor\fP Return entities adjacent to entities of this topology 
+.br
+\fIentity_type_requested\fP Return adjacent entities of this type 
+.br
+\fI*adj_entity_handles\fP Pointer to array of adjacent entity handles returned from function 
+.br
+\fI*adj_entity_handles_allocated\fP Pointer to allocated size of adj_entity_handles array 
+.br
+\fI*adj_entity_handles_size\fP Pointer to occupied size of adj_entity_handles array 
+.br
+\fI*offset\fP Pointer to array of offsets returned from function 
+.br
+\fI*offset_allocated\fP Pointer to allocated size of offset array 
+.br
+\fI*offset_size\fP Pointer to occupied size of offset array 
+.br
+\fI*in_entity_set\fP Pointer to array of in_entity_set returned from function 
+.br
+\fI*in_entity_set_allocated\fP Pointer to allocated size of in_entity_set array 
+.br
+\fI*in_entity_set_size\fP Pointer to occupied size of in_entity_set array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_initEntArrIter (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int requested_entity_type, const int requested_entity_topology, const int requested_array_size, \fBiMesh_EntityArrIterator\fP * entArr_iterator, int * err)"
+.PP
+Initialize an array iterator over specified entity type, topology, and size, for a specified set or instance. Iterator returned can be used as input to functions returning entities for the iterator. If all entities of a specified type and/or topology are to be iterated, specify iBase_ALL_TYPES or iMesh_ALL_TOPOLOGIES, respectively. Specified type or topology must be a value in the iBase_EntityType or iMesh_EntityTopology enumerations, respectively. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being iterated 
+.br
+\fIrequested_entity_type\fP Type of entity to iterate 
+.br
+\fIrequested_entity_topology\fP Topology of entity to iterate 
+.br
+\fIrequested_array_size\fP Size of chunks of handles returned for each value of the iterator 
+.br
+\fIentArr_iterator\fP Pointer to iterator returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNextEntArrIter (\fBiMesh_Instance\fP instance, \fBiMesh_EntityArrIterator\fP entArr_iterator, iBase_EntityHandle ** entity_handles, int * entity_handles_allocated, int * entity_handles_size, int * has_data, int * err)"
+.PP
+Get the entities contained in an array iterator, and increment the iterator. Also return whether the next value of the iterator has any entities (if non-zero, next iterator value is the end of the iteration). 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentArr_iterator\fP Iterator being queried 
+.br
+\fI*entity_handles\fP Pointer to array of entity handles contained in current value of iterator 
+.br
+\fI*entity_handles_allocated\fP Pointer to allocated size of entity_handles array 
+.br
+\fI*entity_handles_size\fP Pointer to occupied size of entity_handles array 
+.br
+\fIhas_data\fP Pointer to flag; if returned non-zero, next iterator has a non-zero number of entities 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_resetEntArrIter (\fBiMesh_Instance\fP instance, \fBiMesh_EntityArrIterator\fP entArr_iterator, int * err)"
+.PP
+Reset the array iterator 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentArr_iterator\fP Iterator to reset 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_endEntArrIter (\fBiMesh_Instance\fP instance, \fBiMesh_EntityArrIterator\fP entArr_iterator, int * err)"
+.PP
+Destroy the specified array iterator 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentArr_iterator\fP Iterator which gets destroyed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntArrTopo (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, int ** topology, int * topology_allocated, int * topology_size, int * err)"
+.PP
+Get the entity topology for the specified entities. Topologies returned are values in the iMesh_EntityTopology enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Array of entity handles being queried 
+.br
+\fIentity_handles_size\fP Number of entities in entity_handles array 
+.br
+\fI*topology\fP Pointer to array of entity topologies returned from function 
+.br
+\fI*topology_allocated\fP Pointer to allocated size of topology array 
+.br
+\fI*topology_size\fP Pointer to occupied size of topology array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntArrType (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, int ** type, int * type_allocated, int * type_size, int * err)"
+.PP
+Get the entity type for the specified entities. Types returned are values in the iBase_EntityType enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Array of entity handles being queried 
+.br
+\fIentity_handles_size\fP Number of entities in entity_handles array 
+.br
+\fI*type\fP Pointer to array of types returned from function 
+.br
+\fI*type_allocated\fP Pointer to allocated size of type array 
+.br
+\fI*type_size\fP Pointer to occupied size of type array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntArrAdj (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, const int entity_type_requested, iBase_EntityHandle ** adjacentEntityHandles, int * adjacentEntityHandles_allocated, int * adj_entity_handles_size, int ** offset, int * offset_allocated, int * offset_size, int * err)"
+.PP
+Get entities of specified type adjacent to entities. Specified type must be value in the iBase_EntityType enumeration. \fIoffset(i)\fP is index of first entity in adjacentEntityHandles array adjacent to entity_handles[i]. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Array of entity handles being queried 
+.br
+\fIentity_handles_size\fP Number of entities in entity_handles array 
+.br
+\fIentity_type_requested\fP Type of adjacent entities requested 
+.br
+\fI*adjacentEntityHandles\fP Pointer to array of adjacentEntityHandles returned from function 
+.br
+\fI*adjacentEntityHandles_allocated\fP Pointer to allocated size of adjacentEntityHandles array 
+.br
+\fI*adj_entity_handles_size\fP Pointer to occupied size of adjacentEntityHandles array 
+.br
+\fI*offset\fP Pointer to array of offsets returned from function 
+.br
+\fI*offset_allocated\fP Pointer to allocated size of offset array 
+.br
+\fI*offset_size\fP Pointer to occupied size of offset array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_createEntSet (\fBiMesh_Instance\fP instance, const int isList, iBase_EntitySetHandle * entity_set_created, int * err)"
+.PP
+Create an entity set, either ordered (isList=1) or unordered (isList=0). Unordered entity sets can contain a given entity or set only once. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIisList\fP If non-zero, an ordered list is created, otherwise an unordered set is created. 
+.br
+\fIentity_set_created\fP Entity set created by function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_destroyEntSet (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, int * err)"
+.PP
+Destroy an entity set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set to be destroyed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_isList (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, int * is_list, int * err)"
+.PP
+Return whether a specified set is ordered (*is_list=1) or unordered (*is_list=0) 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set being queried 
+.br
+\fIis_list\fP Pointer to flag returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNumEntSets (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int num_hops, int * num_sets, int * err)"
+.PP
+Get the number of entity sets contained in a set or interface. If a set is input which is not the root set, num_hops indicates the maximum number of contained sets from entity_set_handle to one of the contained sets, inclusive of the contained set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being queried 
+.br
+\fInum_hops\fP Maximum hops from entity_set_handle to contained set, inclusive of the contained set 
+.br
+\fInum_sets\fP Pointer to the number of sets returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntSets (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int num_hops, iBase_EntitySetHandle ** contained_set_handles, int * contained_set_handles_allocated, int * contained_set_handles_size, int * err)"
+.PP
+Get the entity sets contained in a set or interface. If a set is input which is not the root set, num_hops indicates the maximum number of contained sets from entity_set_handle to one of the contained sets, inclusive of the contained set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being queried 
+.br
+\fInum_hops\fP Maximum hops from entity_set_handle to contained set, inclusive of the contained set 
+.br
+\fI*contained_set_handles\fP Pointer to array of set handles returned from function 
+.br
+\fIcontained_set_handles_allocated\fP Pointer to allocated length of contained_set_handles array 
+.br
+\fIcontained_set_handles_size\fP Pointer to occupied length of contained_set_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_addEntToSet (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, iBase_EntitySetHandle * entity_set, int * err)"
+.PP
+Add an entity to a set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP The entity being added 
+.br
+\fIentity_set\fP Pointer to the set being added to 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvEntFromSet (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, iBase_EntitySetHandle * entity_set, int * err)"
+.PP
+Remove an entity from a set
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP The entity being removed 
+.br
+\fIentity_set\fP Pointer to the set being removed from 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_addEntArrToSet (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, iBase_EntitySetHandle * entity_set, int * err)"
+.PP
+Add an array of entities to a set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Array of entities being added 
+.br
+\fIentity_handles_size\fP Number of entities in entity_handles array 
+.br
+\fIentity_set\fP Pointer to the set being added to 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvEntArrFromSet (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, iBase_EntitySetHandle * entity_set, int * err)"
+.PP
+Remove an array of entities from a set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Array of entities being remove 
+.br
+\fIentity_handles_size\fP Number of entities in entity_handles array 
+.br
+\fIentity_set\fP Pointer to the set being removed from 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_addEntSet (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_set_to_add, iBase_EntitySetHandle * entity_set_handle, int * err)"
+.PP
+Add an entity set to a set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_to_add\fP The entity set being added 
+.br
+\fIentity_set_handle\fP Pointer to the set being added to 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvEntSet (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_to_remove, iBase_EntitySetHandle * entity_set_handle, int * err)"
+.PP
+Remove an entity set from a set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_to_remove\fP The entity set being removed 
+.br
+\fIentity_set_handle\fP Pointer to the set being removed from 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_isEntContained (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle containing_entity_set, const iBase_EntitySetHandle contained_entity, int * is_contained, int * err)"
+.PP
+Return whether an entity is contained (*is_contained=1) or not contained (*is_contained=0) in another set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIcontaining_entity_set\fP Entity set being queried 
+.br
+\fIcontained_entity\fP Entity potentially contained in containing_entity_set 
+.br
+\fIis_contained\fP Pointer to flag returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_isEntSetContained (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle containing_entity_set, const iBase_EntitySetHandle contained_entity_set, int * is_contained, int * err)"
+.PP
+Return whether a set is contained (*is_contained=1) or not contained (*is_contained=0) in another set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIcontaining_entity_set\fP Entity set being queried 
+.br
+\fIcontained_entity_set\fP Entity set potentially contained in containing_entity_set 
+.br
+\fIis_contained\fP Pointer to flag returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_addPrntChld (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle * parent_entity_set, iBase_EntitySetHandle * child_entity_set, int * err)"
+.PP
+Add parent/child links between two sets. Makes parent point to child and child point to parent. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIparent_entity_set\fP Pointer to parent set 
+.br
+\fIchild_entity_set\fP Pointer to child set 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvPrntChld (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle * parent_entity_set, iBase_EntitySetHandle * child_entity_set, int * err)"
+.PP
+Remove parent/child links between two sets. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIparent_entity_set\fP Pointer to parent set 
+.br
+\fIchild_entity_set\fP Pointer to child set 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_isChildOf (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle parent_entity_set, const iBase_EntitySetHandle child_entity_set, int * is_child, int * err)"
+.PP
+Return whether two sets are related (*is_child=1) or not (*is_child=0) by parent/child links 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIparent_entity_set\fP Pointer to parent set 
+.br
+\fIchild_entity_set\fP Pointer to child set 
+.br
+\fIis_child\fP Pointer to flag returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNumChld (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const int num_hops, int * num_child, int * err)"
+.PP
+Get the number of child sets linked from a specified set. If num_hops is non-zero, this represents the maximum hops from entity_set to any child in the count. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set being queried 
+.br
+\fInum_hops\fP Maximum hops from entity_set_handle to child set, inclusive of the child set 
+.br
+\fInum_child\fP Pointer to number of children returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNumPrnt (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const int num_hops, int * num_parent, int * err)"
+.PP
+Get the number of parent sets linked from a specified set. If num_hops is non-zero, this represents the maximum hops from entity_set to any parent in the count. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set being queried 
+.br
+\fInum_hops\fP Maximum hops from entity_set_handle to parent set, inclusive of the parent set 
+.br
+\fInum_parent\fP Pointer to number of parents returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getChldn (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle from_entity_set, const int num_hops, iBase_EntitySetHandle ** entity_set_handles, int * entity_set_handles_allocated, int * entity_set_handles_size, int * err)"
+.PP
+Get the child sets linked from a specified set. If num_hops is non-zero, this represents the maximum hops from entity_set to any child. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIfrom_entity_set\fP Entity set being queried 
+.br
+\fInum_hops\fP Maximum hops from entity_set_handle to child set, inclusive of the child set 
+.br
+\fI*entity_set_handles\fP Pointer to array of child sets returned from function 
+.br
+\fI*entity_set_handles_allocated\fP Pointer to allocated size of entity_set_handles array 
+.br
+\fI*entity_set_handles_size\fP Pointer to occupied size of entity_set_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getPrnts (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle from_entity_set, const int num_hops, iBase_EntitySetHandle ** entity_set_handles, int * entity_set_handles_allocated, int * entity_set_handles_size, int * err)"
+.PP
+Get the parent sets linked from a specified set. If num_hops is non-zero, this represents the maximum hops from entity_set to any parent. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIfrom_entity_set\fP Entity set being queried 
+.br
+\fInum_hops\fP Maximum hops from entity_set_handle to parent set, inclusive of the parent set 
+.br
+\fI*entity_set_handles\fP Pointer to array of parent sets returned from function 
+.br
+\fI*entity_set_handles_allocated\fP Pointer to allocated size of entity_set_handles array 
+.br
+\fI*entity_set_handles_size\fP Pointer to occupied size of entity_set_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setVtxArrCoords (\fBiMesh_Instance\fP instance, iBase_EntityHandle * vertex_handles, const int vertex_handles_size, const int storage_order, const double * new_coords, const int new_coords_size, int * err)"
+.PP
+Set coordinates for an array of vertices. Specified storage order must be either iBase_INTERLEAVED or iBase_BLOCKED, and indicates order of x, y, and z coordinates in coordinate array. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIvertex_handles\fP Array of vertex handles 
+.br
+\fIvertex_handles_size\fP Number of vertex handles in array 
+.br
+\fIstorage_order\fP Storage order of coordinates in coordinate array 
+.br
+\fInew_coords\fP Coordinate array 
+.br
+\fInew_coords_size\fP Size of coordinate array; should be 3*vertex_handles_size 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_createVtxArr (\fBiMesh_Instance\fP instance, const int num_verts, const int storage_order, const double * new_coords, const int new_coords_size, iBase_EntityHandle ** new_vertex_handles, int * new_vertex_handles_allocated, int * new_vertex_handles_size, int * err)"
+.PP
+Create an array of new vertices at specified coordinates. Value of storage_order must be either iBase_INTERLEAVED or iBase_BLOCKED. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fInum_verts\fP Number of new vertices to be created 
+.br
+\fIstorage_order\fP Storage order of coordinates in new_coords array 
+.br
+\fInew_coords\fP Array of coordinates of new vertices 
+.br
+\fInew_coords_size\fP Number of coordinates in new_coords array, should be 3*num_verts 
+.br
+\fI*new_vertex_handles\fP Pointer to array of new vertex handles returned from function 
+.br
+\fI*new_vertex_handles_allocated\fP Pointer to allocated size of new_vertex_handles array 
+.br
+\fI*new_vertex_handles_size\fP Pointer to occupied size of new_vertex_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_createEntArr (\fBiMesh_Instance\fP instance, const int new_entity_topology, const iBase_EntityHandle * lower_order_entity_handles, const int lower_order_entity_handles_size, iBase_EntityHandle ** new_entity_handles, int * new_entity_handles_allocated, int * new_entity_handles_size, int ** status, int * status_allocated, int * status_size, int * err)"
+.PP
+Create an array of new entities with specified lower-order topology. Specified new_entity_topology must be value in iMesh_EntityTopology enumeration. Values return in status array must be values in the iBase_CreationStatus enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fInew_entity_topology\fP Topology of created entity 
+.br
+\fIlower_order_entity_handles\fP Array of lower order entity handles used to construct new entities 
+.br
+\fIlower_order_entity_handles_size\fP Number of entities in array of lower order entity handles 
+.br
+\fI*new_entity_handles\fP Pointer to array of new_entity_handles returned from function 
+.br
+\fI*new_entity_handles_allocated\fP Pointer to allocated size of new_entity_handles array 
+.br
+\fI*new_entity_handles_size\fP Pointer to occupied size of new_entity_handles array 
+.br
+\fI*status\fP Pointer to array of creation status returned from function 
+.br
+\fI*status_allocated\fP Pointer to allocated size of status array 
+.br
+\fI*status_size\fP Pointer to occupied size of status array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_deleteEntArr (\fBiMesh_Instance\fP instance, iBase_EntityHandle * entity_handles, const int entity_handles_size, int * err)"
+.PP
+Delete specified entities 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Array of entity handles to be deleted 
+.br
+\fIentity_handles_size\fP Number of entities in array to be deleted 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_createTag (\fBiMesh_Instance\fP instance, const char * tag_name, const int tag_size, const int tag_type, iBase_TagHandle * tag_handle, int * err, const int tag_name_len)"
+.PP
+Create a tag with specified name, size, and type. Tag size is in units of size of tag_type data types. Value input for tag type must be value in iBase_TagType enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_name\fP Character string indicating tag name 
+.br
+\fItag_size\fP Size of each tag value, in units of number of tag_type entities 
+.br
+\fItag_type\fP Data type for data stored in this tag 
+.br
+\fItag_handle\fP Pointer to tag handle returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fItag_name_len\fP Length of tag name string 
+.RE
+.PP
+
+.SS "void iMesh_destroyTag (\fBiMesh_Instance\fP instance, iBase_TagHandle tag_handle, const int forced, int * err)"
+.PP
+Destroy a tag. If forced is non-zero and entities still have values set for this tag, tag is deleted anyway and those values disappear, otherwise tag is not deleted. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_handle\fP Handle of tag to be deleted 
+.br
+\fIforced\fP If non-zero, delete the tag even if entities have values set for that tag 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getTagName (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, char * name, int * err, int name_len)"
+.PP
+Get the name for a given tag handle 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_handle\fP Tag handle being queried 
+.br
+\fIname\fP Pointer to character string to store name returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fIname_len\fP Length of character string input to function 
+.RE
+.PP
+
+.SS "void iMesh_getTagSizeValues (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, int * tag_size, int * err)"
+.PP
+Get size of a tag in units of numbers of tag data type 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_handle\fP Handle of tag being queried 
+.br
+\fItag_size\fP Pointer to tag size returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getTagSizeBytes (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, int * tag_size, int * err)"
+.PP
+Get size of a tag in units of bytes 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_handle\fP Handle of tag being queried 
+.br
+\fItag_size\fP Pointer to tag size returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getTagHandle (\fBiMesh_Instance\fP instance, const char * tag_name, iBase_TagHandle * tag_handle, int * err, int tag_name_len)"
+.PP
+Get a the handle of an existing tag with the specified name 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_name\fP Name of tag being queried 
+.br
+\fItag_handle\fP Pointer to tag handle returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.br
+\fItag_name_len\fP Length of tag name string 
+.RE
+.PP
+
+.SS "void iMesh_getTagType (\fBiMesh_Instance\fP instance, const iBase_TagHandle tag_handle, int * tag_type, int * err)"
+.PP
+Get the data type of the specified tag handle. Tag type is a value in the iBase_TagType enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fItag_handle\fP Handle for the tag being queried 
+.br
+\fItag_type\fP Pointer to tag type returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setEntSetData (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set_handle, const iBase_TagHandle tag_handle, const char * tag_value, const int tag_value_size, int * err)"
+.PP
+Set a tag value of arbitrary type on an entity set. Tag data is passed as char* type, but really represents pointer to arbitrary data. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fItag_value\fP Pointer to tag data being set on entity set 
+.br
+\fItag_value_size\fP Size in bytes of tag data 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setEntSetIntData (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, const int tag_value, int * err)"
+.PP
+Set a tag value of integer type on an entity set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fItag_value\fP Tag value being set on entity set 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setEntSetDblData (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, const double tag_value, int * err)"
+.PP
+Set a tag value of double type on an entity set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fItag_value\fP Tag value being set on entity set 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setEntSetEHData (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, const iBase_EntityHandle tag_value, int * err)"
+.PP
+Set a tag value of entity handle type on an entity set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fItag_value\fP Tag value being set on entity set 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntSetData (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const iBase_TagHandle tag_handle, char ** tag_value, int * tag_value_allocated, int * tag_value_size, int * err)"
+.PP
+Get the value of a tag of arbitrary type on an entity set. Tag data is passed back as char* type, but really represents arbitrary data. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fI*tag_value\fP Pointer to tag data array being queried 
+.br
+\fI*tag_value_allocated\fP Pointer to tag data array allocated size 
+.br
+\fI*tag_value_size\fP Pointer to tag data array occupied size 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntSetIntData (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, int * out_data, int * err)"
+.PP
+Get the value of a tag of integer type on an entity set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fI*out_data\fP Pointer to tag value returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntSetDblData (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, double * out_data, int * err)"
+.PP
+Get the value of a tag of double type on an entity set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fI*out_data\fP Pointer to tag value returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntSetEHData (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set, const iBase_TagHandle tag_handle, iBase_EntityHandle * out_data, int * err)"
+.PP
+Get the value of a tag of entity handle type on an entity set. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set\fP Entity set on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity set 
+.br
+\fI*out_data\fP Pointer to tag value returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getAllEntSetTags (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, iBase_TagHandle ** tag_handles, int * tag_handles_allocated, int * tag_handles_size, int * err)"
+.PP
+Get all the tags associated with a specified entity set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity being queried 
+.br
+\fI*tag_handles\fP Pointer to array of tag_handles returned from function 
+.br
+\fI*tag_handles_allocated\fP Pointer to allocated size of tag_handles array 
+.br
+\fI*tag_handles_size\fP Pointer to occupied size of tag_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvEntSetTag (\fBiMesh_Instance\fP instance, iBase_EntitySetHandle entity_set_handle, const iBase_TagHandle tag_handle, int * err)"
+.PP
+Remove a tag value from an entity set 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set from which tag is being removed 
+.br
+\fItag_handle\fP Tag handle of tag being removed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setVtxCoords (\fBiMesh_Instance\fP instance, iBase_EntityHandle vertex_handle, const double x, const double y, const double z, int * err)"
+.PP
+Set coordinates for a vertex. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIvertex_handle\fP vertex handle being set 
+.br
+\fIx\fP x coordinate being set 
+.br
+\fIy\fP y coordinate being set 
+.br
+\fIz\fP z coordinate being set 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_createVtx (\fBiMesh_Instance\fP instance, const double x, const double y, const double z, iBase_EntityHandle * new_vertex_handle, int * err)"
+.PP
+Create a new vertex at specified coordinates. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIx\fP x coordinate of new vertex 
+.br
+\fIy\fP y coordinate of new vertex 
+.br
+\fIz\fP z coordinate of new vertex 
+.br
+\fInew_vertex_handle\fP Pointer to new vertex handles returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_createEnt (\fBiMesh_Instance\fP instance, const int new_entity_topology, const iBase_EntityHandle * lower_order_entity_handles, const int lower_order_entity_handles_size, iBase_EntityHandle * new_entity_handle, int * status, int * err)"
+.PP
+Create a new entity with specified lower-order topology. Specified new_entity_topology must be value in iMesh_EntityTopology enumeration. Value returned as status must be a value in the iBase_CreationStatus enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fInew_entity_topology\fP Topology of created entity 
+.br
+\fIlower_order_entity_handles\fP Array of lower order entity handles used to construct new entity 
+.br
+\fIlower_order_entity_handles_size\fP Number of entities in array of lower order entity handles 
+.br
+\fInew_entity_handle\fP Pointer to new entity handle returned from function 
+.br
+\fIstatus\fP Pointer to creation status returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_deleteEnt (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, int * err)"
+.PP
+Delete specified entity 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity to be deleted 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getArrData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, char ** tag_values, int * tag_values_allocated, int * tag_values_size, int * err)"
+.PP
+Get tag values of arbitrary type for an array of entities. Tag data is returned as char* type, but really represents arbitrary data. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*tag_values\fP Pointer to tag data array being returned from function 
+.br
+\fItag_values_allocated\fP Pointer to allocated size of tag data array 
+.br
+\fItag_values_size\fP Pointer to occupied size of tag data array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getIntArrData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, int ** tag_values, int * tag_values_allocated, int * tag_values_size, int * err)"
+.PP
+Get tag values of integer type for an array of entities. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*tag_values\fP Pointer to tag data array being returned from function 
+.br
+\fItag_values_allocated\fP Pointer to allocated size of tag data array 
+.br
+\fItag_values_size\fP Pointer to occupied size of tag data array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getDblArrData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, double ** tag_values, int * tag_values_allocated, int * tag_values_size, int * err)"
+.PP
+Get tag values of double type for an array of entities. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*tag_values\fP Pointer to tag data array being returned from function 
+.br
+\fItag_values_allocated\fP Pointer to allocated size of tag data array 
+.br
+\fItag_values_size\fP Pointer to occupied size of tag data array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEHArrData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, iBase_EntityHandle ** tag_value, int * tag_value_allocated, int * tag_value_size, int * err)"
+.PP
+Get tag values of entity handle type for an array of entities. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*tag_value\fP Pointer to tag data array being returned from function 
+.br
+\fItag_value_allocated\fP Pointer to allocated size of tag data array 
+.br
+\fItag_value_size\fP Pointer to occupied size of tag data array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setArrData (\fBiMesh_Instance\fP instance, iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const char * tag_values, const int tag_values_size, int * err)"
+.PP
+Set tag values of arbitrary type on an array of entities. Tag data is passed as char* type, but really represents pointer to arbitrary data. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_values\fP Pointer to tag data being set on entity 
+.br
+\fItag_values_size\fP Size in total bytes of tag data 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setIntArrData (\fBiMesh_Instance\fP instance, iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const int * tag_values, const int tag_values_size, int * err)"
+.PP
+Set tag values of integer type on an array of entities. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_values\fP Pointer to tag data being set on entities 
+.br
+\fItag_values_size\fP Size in total number of integers of tag data 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setDblArrData (\fBiMesh_Instance\fP instance, iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const double * tag_values, const int tag_values_size, int * err)"
+.PP
+Set tag values of double type on an array of entities. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_values\fP Pointer to tag data being set on entities 
+.br
+\fItag_values_size\fP Size in total number of doubles of tag data 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setEHArrData (\fBiMesh_Instance\fP instance, iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, const iBase_EntityHandle * tag_values, const int tag_values_size, int * err)"
+.PP
+Set tag values of entity handle type on an array of entities. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity array on which tag is being set 
+.br
+\fIentity_handles_size\fP Number of entities in array 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_values\fP Pointer to tag data being set on entities 
+.br
+\fItag_values_size\fP Size in total number of entity handles of tag data 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvArrTag (\fBiMesh_Instance\fP instance, iBase_EntityHandle * entity_handles, const int entity_handles_size, const iBase_TagHandle tag_handle, int * err)"
+.PP
+Remove a tag value from an array of entities 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handles\fP Entity from which tag is being removed 
+.br
+\fIentity_handles_size\fP Number of entities in entity array 
+.br
+\fItag_handle\fP Tag handle of tag being removed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, char ** tag_value, int * tag_value_allocated, int * tag_value_size, int * err)"
+.PP
+Get the value of a tag of arbitrary type on an entity. Tag data is passed back as char* type, but really represents arbitrary data. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*tag_value\fP Pointer to tag data array being queried 
+.br
+\fI*tag_value_allocated\fP Pointer to tag data array allocated size 
+.br
+\fI*tag_value_size\fP Pointer to tag data array occupied size 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getIntData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, int * out_data, int * err)"
+.PP
+Get the value of a tag of integer type on an entity. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*out_data\fP Pointer to tag value returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getDblData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, double * out_data, int * err)"
+.PP
+Get the value of a tag of double type on an entity. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*out_data\fP Pointer to tag value returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEHData (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, iBase_EntityHandle * out_data, int * err)"
+.PP
+Get the value of a tag of entity handle type on an entity. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fI*out_data\fP Pointer to tag value returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setData (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const char * tag_value, const int tag_value_size, int * err)"
+.PP
+Set a tag value of arbitrary type on an entity. Tag data is passed as char* type, but really represents pointer to arbitrary data. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_value\fP Pointer to tag data being set on entity 
+.br
+\fItag_value_size\fP Size in bytes of tag data 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setIntData (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const int tag_value, int * err)"
+.PP
+Set a tag value of integer type on an entity. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_value\fP Tag value being set on entity 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setDblData (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const double tag_value, int * err)"
+.PP
+Set a tag value of double type on an entity. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_value\fP Tag value being set on entity 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_setEHData (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, const iBase_EntityHandle tag_value, int * err)"
+.PP
+Set a tag value of entity handle type on an entity. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity on which tag is being set 
+.br
+\fItag_handle\fP Tag being set on an entity 
+.br
+\fItag_value\fP Tag value being set on entity 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getAllTags (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, iBase_TagHandle ** tag_handles, int * tag_handles_allocated, int * tag_handles_size, int * err)"
+.PP
+Get all the tags associated with a specified entity handle 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity being queried 
+.br
+\fI*tag_handles\fP Pointer to array of tag_handles returned from function 
+.br
+\fI*tag_handles_allocated\fP Pointer to allocated size of tag_handles array 
+.br
+\fI*tag_handles_size\fP Pointer to occupied size of tag_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_rmvTag (\fBiMesh_Instance\fP instance, iBase_EntityHandle entity_handle, const iBase_TagHandle tag_handle, int * err)"
+.PP
+Remove a tag value from an entity 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity from which tag is being removed 
+.br
+\fItag_handle\fP Tag handle of tag being removed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_initEntIter (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_handle, const int requested_entity_type, const int requested_entity_topology, \fBiMesh_EntityIterator\fP * entity_iterator, int * err)"
+.PP
+Initialize an iterator over specified entity type, topology, and size, for a specified set or instance. Iterator returned can be used as input to functions returning the entity for the iterator. If all entities of a specified type and/or topology are to be iterated, specify iBase_ALL_TYPES or iMesh_ALL_TOPOLOGIES, respectively. Specified type or topology must be a value in the iBase_EntityType or iMesh_EntityTopology enumerations, respectively. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_handle\fP Entity set being iterated 
+.br
+\fIrequested_entity_type\fP Type of entity to iterate 
+.br
+\fIrequested_entity_topology\fP Topology of entity to iterate 
+.br
+\fIentity_iterator\fP Pointer to iterator returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getNextEntIter (\fBiMesh_Instance\fP instance, \fBiMesh_EntityIterator\fP entity_iterator, iBase_EntityHandle * entity_handle, int * has_data, int * err)"
+.PP
+Get the entity corresponding to an array iterator, and increment the iterator. Also return whether the next value of the iterator has an entity (if non-zero, next iterator value is the end of the iteration). 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_iterator\fP Iterator being queried 
+.br
+\fIentity_handle\fP Pointer to an entity handle corresponding to the current value of iterator 
+.br
+\fIhas_data\fP Pointer to flag; if returned non-zero, next iterator has an entity 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_resetEntIter (\fBiMesh_Instance\fP instance, \fBiMesh_EntityIterator\fP entity_iterator, int * err)"
+.PP
+Reset the iterator 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_iterator\fP Iterator to reset 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_endEntIter (\fBiMesh_Instance\fP instance, \fBiMesh_EntityIterator\fP entity_iterator, int * err)"
+.PP
+Destroy the specified iterator 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_iterator\fP Iterator which gets destroyed 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntTopo (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, int * out_topo, int * err)"
+.PP
+Get the entity topology for the specified entity. Topology returned is a value in the iMesh_EntityTopology enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity handle being queried 
+.br
+\fI*out_topo\fP Pointer to entity topology returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntType (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, int * out_type, int * err)"
+.PP
+Get the entity type for the specified entity. Type returned is a value in the iBase_EntityType enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity handle being queried 
+.br
+\fI*out_type\fP Pointer to entity type returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getVtxCoord (\fBiMesh_Instance\fP instance, const iBase_EntityHandle vertex_handle, double * x, double * y, double * z, int * err)"
+.PP
+Get coordinates of specified vertex. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIvertex_handle\fP Mesh vertex being queried 
+.br
+\fI*x\fP Pointer to x coordinate returned from function 
+.br
+\fI*y\fP Pointer to y coordinate returned from function 
+.br
+\fI*z\fP Pointer to z coordinate returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_getEntAdj (\fBiMesh_Instance\fP instance, const iBase_EntityHandle entity_handle, const int entity_type_requested, iBase_EntityHandle ** adj_entity_handles, int * adj_entity_handles_allocated, int * adj_entity_handles_size, int * err)"
+.PP
+Get entities of specified type adjacent to an entity. Specified type must be value in the iBase_EntityType enumeration. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_handle\fP Entity handle being queried 
+.br
+\fIentity_type_requested\fP Type of adjacent entities requested 
+.br
+\fI*adj_entity_handles\fP Pointer to array of adjacent entities returned from function 
+.br
+\fI*adj_entity_handles_allocated\fP Pointer to allocated size of adj_entity_handles array 
+.br
+\fI*adj_entity_handles_size\fP Pointer to occupied size of adj_entity_handles array 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_subtract (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_1, const iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle * result_entity_set, int * err)"
+.PP
+Subtract contents of one entity set from another 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_1\fP Entity set from which other set is being subtracted 
+.br
+\fIentity_set_2\fP Entity set being subtracted from other set 
+.br
+\fIresult_entity_set\fP Pointer to entity set returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_intersect (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_1, const iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle * result_entity_set, int * err)"
+.PP
+Intersect contents of one entity set with another 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_1\fP Entity set being intersected with another 
+.br
+\fIentity_set_2\fP Entity set being intersected with another 
+.br
+\fIresult_entity_set\fP Pointer to entity set returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SS "void iMesh_unite (\fBiMesh_Instance\fP instance, const iBase_EntitySetHandle entity_set_1, const iBase_EntitySetHandle entity_set_2, iBase_EntitySetHandle * result_entity_set, int * err)"
+.PP
+Unite contents of one entity set with another 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinstance\fP iMesh instance handle 
+.br
+\fIentity_set_1\fP Entity set being united with another 
+.br
+\fIentity_set_2\fP Entity set being united with another 
+.br
+\fIresult_entity_set\fP Pointer to entity set returned from function 
+.br
+\fI*err\fP Pointer to error type returned from function 
+.RE
+.PP
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for iMesh from the source code.

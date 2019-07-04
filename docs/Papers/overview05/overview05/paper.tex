@@ -1,0 +1,147 @@
+%\documentclass[12pt,letterpaper]{article}
+% JOURNAL STUFF
+\documentclass[global]{svjour}
+\journalname{Engineering with Computers}
+
+%\usepackage{imr}
+%\usepackage{amssymb}
+\usepackage{epsfig}
+\usepackage{url}
+\usepackage{float}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}
+\floatname{algorithm}{Algorithm}
+
+%\def\thepage {}
+%\bibliographystyle{imr}
+%\newtheorem{Pseudo}{Pseudo-Code}[section]
+\begin{document}
+
+\title{Toward Interoperable Mesh, Geometry and Field Components for PDE Simulation Development}
+
+%% \author{Kyle K. Chand \and 
+%%   Lori Freitag Diachin \and 
+%%   Xiaolin Li \and
+%%   Carl Ollivier-Gooch\and
+%%   Mark Shephard \and
+%%   Timothy Tautges \and
+%%   Harold Trease}
+% JOURNAL STUFF
+\titlerunning{Interoperable Components for Simulation Development}
+\author{Kyle K. Chand\inst{1} \and 
+  Lori Freitag Diachin\inst{1} \and 
+  Xiaolin Li\inst{2} \and
+  Carl Ollivier-Gooch\inst{3}\and
+  E. Seegyoung Seol \inst{4}\and
+  Mark S. Shephard\inst{4} \and
+  Timothy Tautges\inst{5} \and
+  Harold Trease\inst{6}}
+\institute{Center for Applied Scientific Computing, Lawrence Livermore National Laboratory \and
+  Dept. of Applied Mathematics and Statistics, SUNY Stonybrook \and
+  Advanced Numerical Simulation Laboratory, University of British Columbia \and
+  Scientific Computation Research Center, Rensselaer Polytechnic Institute \and
+  Mathematics and Computer Science Division, Argonne National Laboratory \and
+  Pacific Northwest National Laboratory}
+
+\maketitle
+
+\begin{abstract}
+Mesh-based PDE simulation codes are becoming increasingly
+sophisticated and rely on advanced meshing and discretization tools.
+Unfortunately, it is still difficult to interchange or interoperate
+tools developed by different communities to experiment with various
+technologies or to develop new capabilities.  To address these
+difficulties, we have developed component interfaces designed to
+support the information flow of mesh-based PDE simulations.  We
+describe this information flow and discuss typical roles and services
+provided by the geometry, mesh, and field components of the
+simulation.  Based on this delineation for the roles of each
+component, we give a high-level description of the abstract data model
+and set of interfaces developed by the Department of Energy's
+Interoperable Tools for Advanced Petascale Simulation (ITAPS)
+center.  These common interfaces are critical to our interoperability
+goal, and we give examples of several services based upon these
+interfaces including mesh adaptation and mesh improvement.
+\end{abstract}
+
+\section{Introduction}
+\input{intro}
+
+\section{Information Flow in Mesh-based Simulation}\label{sec:infoFlow}
+\input{simulation}
+
+\section{The ITAPS Interface Definition efforts}\label{sec:tsttdef}
+\input{interface}
+
+\section{ITAPS interface use cases}\label{sec:apps}
+
+The ITAPS data model and interfaces have been defined and
+implementations are underway at many different institutions.
+In particular, the mesh interface is the most mature and in this
+section we give several examples of its use in adaptive loop
+construction for two different applications and in mesh quality improvement
+tools.  The appendix provides code for two elementary examples illustrating 
+some simple uses of the mesh interface.
+
+\input{adapt_loop}
+\input{improve}
+
+\section{Concluding Remarks}
+A simulation's information flow provides a conceptual framework for
+designing interoperable tools for geometry management, mesh generation
+and discretization.  Using this framework, the Interoperable Tools for
+Advanced Petascale Simulation center has developed a set of language
+independent interfaces to geometry, mesh, and solution field
+information.  Several groups have successfully implemented the ITAPS
+mesh interface with a diverse range of technologies ranging from
+structured composite grids to fully unstructured infrastructures.
+These implementations have provided mesh services for ITAPS-based
+interoperable components providing technologies such as mesh
+adaptation, design optimization and mesh improvement.  In principle,
+any implementation of the the ITAPS mesh interface now has access to
+these advanced technologies without requiring new source code
+development.
+
+While the utility of these interfaces has been demonstrated in a
+number of applications, the current work remains a proof of principle.
+Advancing the interface definition to a reliable standard requires
+further investigation and demonstration.  For example, the nascent
+solution field and operator interfaces have yet to be completed and
+implemented.  In addition, more implementations of the interfaces need
+to be created and exercised to make extensive interoperability and
+interchangeability a possibility.  Furthermore, the performance
+ramifications of using these interfaces must be carefully examined in
+order to assure that applications built upon this infrastructure are
+not plagued by low performance.  Collaborations with the Common
+Component Architecture group~\cite{cca-forum} will lead to the
+development of higher level components that advanced services to
+simulation code developers.
+
+More information on the ITAPS center can be found at
+http://www.itaps-scidac.org/.
+
+%\section*{Acknowledgments} 
+% JOURNAL STUFF
+\begin{acknowledgement}
+
+We would like to thank Tamara Dahlgren of LLNL for her insightful
+comments on the ITAPS interface design.  
+
+This work was performed under the auspices of the U.S. Department of
+Energy by the University of California Lawrence Livermore National
+Laboratory under contract No. W-7405-Eng-48 (UCRL-JRNL-213577); 
+the Canadian Natural Sciences and Engineering Research 
+Council under Special Research Opportunities Grant SRO-299160;
+and by Rensselaer Polytechnic Institute under DOE grant 
+number DE-FC02-01ER25460. 
+
+%WE NEED auspices for SANDIA, STONYBROOK, RPI , and PNNL
+
+% JOURNAL STUFF
+\end{acknowledgement}
+
+\bibliographystyle{plain}
+\bibliography{../../biblio/tstt.bib}
+
+\input{examples}
+\end{document} 

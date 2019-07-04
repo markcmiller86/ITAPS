@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageMesquite" -->
+</head>
+
+<body class="pageTools pageToolsServices pageMesquite">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Mesh Smoothing</h1>
+  <img src="../../assets/images/Mesquite.jpg" alt="Mesquite" />
+  
+ <p>It has long been known that achieving accurate and efficient numerical solutions to PDE-based applications depends heavily on mesh quality. To improve the meshes generated as part of the ITAPS project, we are developing a mesh quality improvement toolkit called Mesquite. The primary aim of this project is to provide a freely available, comprehensive software package that would accommodate a number of different mesh element types, quality metrics, high-level solution strategies, and mesh optimization algorithms. We designed Mesquite from the ground up in SciDAC-1, based on mesh quality improvement algorithms and software developed previously at SNL and ANL. </p>
+        <p>Mesquite Version 1.0 was released in mid-2005. We have assembled a team of ITAPS/Mesquite researchers &amp; developers including  Lori Diachin (LLNL), Martin Isenburg (LLNL), Patrick Knupp (SNL), and  Jason Kraftcheck (UW). Mesquite was designed to be easily extensible in order to support new research in mesh quality improvement and to allow rapid delivery of prototype mesh optimization algorithms to applications. The use of classes such as MeshQualityMetric, ObjectiveFunction, QualityAssessor, TerminationCriterion, VertexMover, and InstructionQueue help us achieve an object-oriented, flexible design. Embedded within the various classes are member functions which perform the computationally intensive numerical calculations. These member functions avoid objects, use pointers, arrays, and other low-level data structures to ensure that the computations are as efficient as possible.</p>
+        <p>Mesquite Version 1.0 does mesh untangling, element shape improvement, and deforming meshes on local mesh patches consisting of either triangular, tetrahedral, quadrilateral, hexahedral, or hybrid (including wedge and pyramid elements) unstructured meshes. The prototype has a number of state-of-the-art algorithms for optimization-based node point movement including steepest descent, conjugate gradient, feasible Newton, and active set solvers. In addition, considerable attention was given to the development of a flat mesh data structure for the internal representation of unstructured mesh data that is both highly efficient and convenient. To obtain our mesh data from the application and to provide interoperability, we use the iMesh common mesh interface specification, upon which two important implementations, FMDB (RPI) and MOAB (ANL), are based.</p>
+        <p>In SciDAC-1, Mesquite was (i) incorporated into the ITAPS Shape Optimization service developed for the accelerator appplication, (ii) used to generate different geodesic meshes used to test various discretization methods for the CSU climate appliction, (iii) used in ITAPS mesh generation programs in support of accelerators, biology, and other applications. </p>
+        <p>During SciDAC-2, several significant new capabilities have been added to Mesquite.  To improve the overall speed, we have added new quasi-Newton and trust-region solvers in collaboration with the TOPS SciDAC center. We have parallelized Mesquite and implemented the distributed memory algorithm using the iMesh and iMeshP interfaces.  Initial testing of the parallel algorithm has demonstrated good scaling with 95% efficiency on up to 256 processors; testing on larger numbers of processors is underway.  New capabilities developed for SLAC include the ability to smooth meshes containing high-order nodes. For fusion applications, we have developed a ``mesh boundary smoothing'' capability to move nodes constrained to external boundaries and internal interfaces such as magnetic field lines. Finally, we have developed a prototype combined smoothing/swapping service using Mesquite and the Swap service developed at UBC. Early results show that cumulative benefits can be accrued from alternating use of smoothing and swapping.  The Mesquite library has been downloaded over 660 times over the past four years and has been used in diverse applications such as accelerator modeling, fusion, biology, climate, rocket propellant burn, and ALE </p>
+        <p>For a list of applications that have used Mesquite, plus  additional information, see the <a href="http://www.cs.sandia.gov/optimization/knupp/Mesquite.html" target="_blank">Mesquite  website</a>.</p>
+<p>&nbsp;</p>
+
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

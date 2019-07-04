@@ -1,0 +1,22 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_PREREQ(2.59)
+AC_INIT(TSTTM unit test, 0.7, cfog@mech.ubc.ca)
+AC_CONFIG_SRCDIR([TSTTM_unitTest.cc])
+AC_CONFIG_HEADER([TSTTM_unitTest-config.h iMesh-SIDL_unitTest-config.h])
+
+AC_CONFIG_AUX_DIR(conf)
+
+AC_PROG_CXX
+TSTT_PROG_BABEL
+
+TSTT_PATH_TSTTM
+TSTT_PATH_TSTTB
+
+dnl Checks for header files.
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+AC_FUNC_SETVBUF_REVERSED
+
+AC_OUTPUT(Makefile)

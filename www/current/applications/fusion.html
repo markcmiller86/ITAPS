@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS - Fusion</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageFusion" -->
+</head>
+
+<body class="pageApplications pageFusion">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+ <h1>Fusion</h1>
+
+<h3>Application</h3>
+
+<p>The DOE Princeton Plasma Physics Laboratory (PPPL), part of the Center for Extended Magnetohydrodynamics Modeling (CEMM), the Scientific Computation Research Center (SCOREC, RPI), part of the Interoperable Tools for Advanced Petascale Simulations (ITAPS) center and the Argonne National Laboratory, part of the Toward Optimal Petscale Simulation (TOPS) project, are jointly working on developing tools and methods to provide a realistic assessment of the mechanisms leading to disruptive and other stability limits in present and next generation of fusion devices.</p>
+
+<p>This joint work, which has to aim to provide new insights into some of the most critical and complex phenomena in plasma and fusion science, requires the development of:</p>
+
+<ul>
+   <li>3D nonlinear magneto-fluid based models of hot, magnetized fusion plasma.</li>
+   <li>Tools and methods to support the adaptive discretization, partitioning and parallel management of computational domain that could include several billion degrees of freedom.</li>
+   <li>Efficient parallel linear algebraic solvers to be used on petascale machines</li>
+</ul>
+
+
+<h3>Description of ITAPS tools</h3>
+<p>The implementation of such complex modeling to be solved on petascale machines requires the team developing new capabilities that include:</p>
+
+<p>ITAPS (SCOREC):</p>
+
+<ul>
+	<li>Construction of 3D computational domains encountered in plasma fusion (Figure 1) supported by the development of GMI (iGeom implementation) which supports queries on the geometric model, FMDB (iMesh/iMeshP implementation) which supports the parallel management of the domain discretization and IPComMan [1] service which improves the efficiency of parallel communications.</li>
+	<li>Development and implementation of specific domain interfaces using iMesh/iMeshP/iGeom to support specific queries of the mesh during the construction of the local FEA matrices.</li>
+	<li>Development and implementation of numbering mechanisms to store the defined degrees of freedom to support the construction of local FEA matrices in a parallel environment.</li>
+	<li>Development and implementation of matrix/vector container interfaces to support the efficient construction and compact storage of local matrices.</li>
+	<li>Development of parallel assembly algorithms to support the construction and storage of distributed global matrices.</li>
+	<li>Development of AMSI software [3] that integrates (Figure 2) standalone components (parallel mesh, geometry, FEA analysis (CEMM), linear algebraic solver (TOPS)) within a efficient parallel analysis framework (M3D-C1) (Figures 3).</li>
+	<li>Construction of an adaptive loop (Figure 4) aiming at better capturing physical phenomenon using the following four additional software components:</li>
+	
+	<ul>
+	  <li>ErrorEstim which supports the estimation of the discretization error based on the calculation of hessian matrix (second derivative).</li>
+	  <li>AdapMapGen which supports the calculation of both isotropic and anisotropic size fields based on calculation of the discretization error</li>
+	  <li>MeshAdapt service which supports the parallel anisotropic mesh adaptation of unstructured mesh</li>
+	  <li>MeshCurving service which supports the parallel higher order mesh adaptation of unstructured mesh</li>
+	</ul>
+</ul>
+<div class="imgGroup">
+  <div class="imgContainer fLeft" style="width: 200px;margin-left: 20px">
+    <a href="../assets/images/fusion_Fig1.png" rel="lightbox">
+    	<img src="../assets/images/fusion_Fig1.png" alt="computational domains" width="200" height="189" />
+    </a>
+    <p>Figure 1. 3D Domain made of 2D planes deployed along the toroidal direction</p>
+  </div>
+
+  <div class="imgContainer fLeft" style="width: 328px; margin-left: 50px">
+	<a href="../assets/images/fusion_Fig2.png" rel="lightbox">
+    	<img src="../assets/images/fusion_Fig2.png" alt="M3D-C1 framework" width="328" height="236" class="img2" />
+    </a>
+	<p>Figure 2. Integration of standalone components into M3D-C1 framework.</p>
+  </div>
+  
+
+  <div class="imgContainer center" style="width: 407px;">
+	<a href="../assets/images/fusion_Fig3.png" rel="lightbox">
+    	<img src="../assets/images/fusion_Fig3.png" width="407" height="198" alt="equi-pressure surface" />
+    </a>
+	<p>Figure 3. (a) Initial equi-pressure surface at the boundary and some field lines. (b) NSTX sawtooth, showing pressure contours and surface with some B-lines.</p>
+  </div>
+
+  <div class="imgContainer center" style="width: 285px;">
+	<a href="../assets/images/fusion_Fig4.png" rel="lightbox">
+    	<img src="../assets/images/fusion_Fig4.png" width="285" height="144" alt="adaptive loop" />
+    </a>
+	<p>Figure 4. Adaptive loop applied to fusion application</p>
+  </div>
+</div>
+<p>CEMM (PPPL):  </p>
+<ul>
+  <li>Development of a high-order triangular element with continuous first derivatives (C<sup>1</sup> continuity) which allows the Galerkin method to be applied without introduction of new auxiliary variables and reach an order of accuracy of h<sup>4</sup> [2].  </li>
+  <li>The extension of the 2D C<sup>1</sup> element used in (r, z) planes to a full 3D spatial configuration where 1D cubic Hermite basis functions are used along the toroidal direction (Figure 1). </li>
+  <li>Development of a resistive wall boundary condition to allow both two-dimensional and three-dimensional magnetic perturbations to penetrate the wall. </li>
+</ul>
+<p>TOPS (PETSc): </p>
+<ul>
+  <li>The extension of PETSc software package to support the efficient parallel resolution of block diagonal matrices to be formed within the resolution of 3D plasma fusion models. </li>
+</ul>
+
+
+
+
+<h3>Results</h3>
+<p><strong>Adaptive loop</strong>: Adaptive methods reduce the total number of degrees of freedom (Figures 5, 6 and 7) by refining the mesh only in domain of interest and modeling general curved reactor domains (Figure 8). </p>
+
+<div class="imgGroup">
+<div class="imgContainer center" style="width: 400px">
+	<a href="../assets/images/anisotropicMeshAdaptation.jpg" rel="lightbox">
+    	<img src="../assets/images/anisotropicMeshAdaptation.jpg" width="400" height="266" alt="anisotropic mesh adaptation" />
+    </a>
+	<p>Figure 5. Anisotropic mesh adaptation to better capture fusion phenomenon.</p>
+</div>
+
+<div class="imgContainer center" style="width: 420px">
+	<a href="../assets/images/density.jpg" rel="lightbox">
+    	<img src="../assets/images/density.jpg" width="420" height="240" alt="density of unstable tearing mode" />
+    </a>
+	<p>Figure 6. (a) Linear perturbed current density of unstable tearing mode, (b) close-up of linear perturbed current density with mesh superimposed.</p>
+</div>
+
+<div class="imgContainer center" style="width: 327px">
+	<a href="../assets/images/Tokamak.gif" rel="lightbox">
+    	<img src="../assets/images/Tokamak.gif" width="327" height="241" alt="Tokamat peeling-ballooning eigenmode" />
+    </a>
+	<p>Figure 7. Tokamak peeling-ballooning eigenmode.</p>
+</div>  
+  
+<div class="imgContainer center" style="width: 400px">
+	<a href="../assets/images/TokamakEquilibriumFlux.jpg" rel="lightbox">
+    	<img src="../assets/images/TokamakEquilibriumFlux.jpg" width="400" height="239" alt="Tokamak euilibrium flux surfaces" />
+    </a>
+	<p>Figure 8. (a) Tokamak equilibrium flux surfaces, (b) flux surfaces with adaptive mesh superimposed.</p>
+</div>
+</div>
+
+<div class="imgContainer fRight" style="width: 320px">
+	<a href="../assets/images/M3DstrongScalingStudy.jpg" rel="lightbox">
+    	<img width="320" height="255" src="../assets/images/M3DstrongScalingStudy.jpg" />
+    </a>
+	<p>Figure 9. M3D strong scaling study on Jaguar (2008)</p>
+</div>
+<p><strong>M3D-C1 Solver scalability</strong>: has been improved by using SuperLU_dist to factor the large sparse matrix associated with the M3D-C1 implicit formulation for the 2F MHD equations every 5-20 time-steps instead of every time-step as in the original software. In the intervening time steps, the last factored matrix is used as a very effective preconditioner for a GMRES-based iterative solve in PETSc, which then requires only a few iterations to converge. In the initial application, this resulted in a net speed increase of about 70% for a 2D &quot;approach to 2F equilibrium with flow in NSTX&quot; application.</p>
+
+
+<p>As can be seen from Figure 9, the solvers are scaling even better than ideal, but the data copy is bringing the entire scaling down, confirming the need for efficient parallel IO.</p>
+
+
+<h3 class="clear">Additional funding</h3>
+<p>PPPL funding: Center for Extended Magnetohydrodynamics Modeling (CEMM)</p>
+
+
+<h3>References</h3>
+<p>[1] A. Ovcharenko, O. Sahni, K.E. Jansen, C.D. Carothers and M.S. Shephard, Neighborhood communication paradigm to increase scalability in large-scale dynamic scientific applications. Parallel Comput., under review, 2010.</p>
+<p>[2] S.C. Jardin, J. Breslau, N. Ferraro, A high-order implicit finite element method for integrating the two-fluid magnetohydrodynamic equations in two dimensions, J. Comp. Phys. 226 (2) (2007) 2146&ndash;2174].</p>
+<p>[3] F. Delalondre, C. Smith, M.S. Shephard, Collaborative software infrastructure to support adaptive multiple model simulation, Computer Methods in Applied Mechanics and Engineering, <a href="http://www.sciencedirect.com/science/journal/00457825">Computer Methods in Applied Mechanics and Engineering</a>, <a href="http://www.sciencedirect.com/science?_ob=PublicationURL&amp;_tockey=%23TOC%235697%232010%23998009978%231722091%23FLA%23&amp;_cdi=5697&amp;_pubType=J&amp;view=c&amp;_auth=y&amp;_acct=C000050221&amp;_version=1&amp;_urlVersion=0&amp;_userid=10&amp;md5=ac504c0d5466a05126741f012d8bed3b">Volume 199, Issues 21-22</a>, 1 April 2010, Pages 1352-1370. </p>
+        <p>&nbsp;</p>
+        
+        
+<h2>FonTier Front Tracking: Simulation of Formation and Implosion of Plasma Liners for Magneto-Inertial Fusion</h2>
+
+
+  <p>ITAPS Personnel: Roman Samulyak (SBU / BNL), Lingling Wu (SBU)<br />
+      Fusion Personnel: Scott Hsu (LANL), Paul Parks (General Atomics)<br />
+      Project Status: Active </p>
+  <div class="imgContainer fRight" style="width: 200px;">
+    <a href="../../assets/images/FronTier_simulation_full.png" rel="lightbox">
+	<img src="../../assets/images/FronTier_simulation_mini.png" width="200" height="200" alt="Web Accelerator" />
+    </a>
+    <p>FronTier simulation of the implosion of plasma liner formed by the merger of 625 jets</p>
+</div>
+<p>ITAPS front tracking technologies have been used in computational studies of the plasma jet driven magneto-inertial fusion (PJMIF). In the PJMIF concept, a plasma liner, formed by merging of a large number of radial, highly supersonic plasma jets, implodes on the target in the form of two compact plasma toroids, and compresses it to conditions of the fusion ignition. By avoiding major difficulties associated with both the traditional laser driven inertial confinement fusion and solid liner driven MIF, the plasma liner driven magneto-inertial fusion potentially provides a low-cost and fast R&D path towards the demonstration of practical fusion energy. The goal of PJMIF simulations is to evaluate the method by estimating the fusion energy gain and to provide guidance for the plasma liner experiment being built at Los Alamos.  In the first phase of research, we optimized the nuclear fusion gain in the liner – target parameter space via spherically symmetric simulations. Single and double-layer deuterium and xenon liners have been investigated as well as liners to be used in the PLX experiment.  By varying target and liner parameters, the implosion process was optimized for maximum fusion energy gain and compared with theoretical predictions and scaling laws. In the most optimal setup, fusion ignition and energy gain of 10 was achieved with energy release of 10 GJ.  Current work focuses on large scale 3D simulations of the propagation and merger of high Mach number plasma jets, the formation and implosion of liners, and compression of targets. The merger of 125, 144 and 625 jets have been simulated and the uniformity and Mach number reduction of the corresponding liners have been investigated. During late stages of the implosion, the Mach number of 3D liners was about half of that of spherically symmetric liners. The uniformity of the liner is critical for the reduction of Rayleigh-Taylor instabilities in the target while maintaining a  high Mach number in the liner is necessary to achieve high target compression rates. </p>
+
+<p>Simulations support DOE program in High Energy Density Laboratory Plasmas, in particular the Plasma Liner Experiment at LANL.</p>
+
+
+
+<h3>Publications</h3>
+<blockquote>
+
+<p>R. Samulyak, P. Parks, L. Wu, Spherically symmetric simulation of plasma liner driven magnetoinertial fusion, 17 (2010), No 9</p>
+
+<p>R. Samulyak, L. Wu, P. Parks,  On the structure of plasma liners for plasma jet induced  magneto inertial fusion, Physics of Plasmas, 2010. Submitted to Physics of Plasmas</p>
+
+
+
+
+</blockquote>        
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

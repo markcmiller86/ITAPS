@@ -1,0 +1,65 @@
+#
+# This makefile can be used without using autoconf,
+# as long as you have IMESH_DIR set to the location
+# of the IMESH implementation you're using and 
+# F77, FC, CC, and CXX point to the appropriate compilers
+#
+
+include ${IMESH_DEFS}
+IMESH_INSTALL_DIR=`echo $(IMESH_DEFS) | rev | cut -d'/' -f3- | rev`
+IMESH_RPATH_FLAGS=`echo $(IMESH_LIBS) | tr ' ' '\n' | grep -e -L | sed -e 's|-L|-Wl,-rpath,|'`
+
+EXECS = HelloMeshC HelloMeshCXX HelloMeshF77 HelloMeshF90
+EXECSOBJ = ${EXECS:=.o}
+EXECSOUT = ${EXECS:=.out}
+EXECSERR = ${EXECS:=.err}
+
+##  temporary fix until all codes use IMESH_CPPFLAGS
+IMESH_INCS=${IMESH_INCLUDES} ${IMESH_CPPFLAGS}
+
+default: ${EXECS}
+
+HelloMeshF77: HelloMeshF77.o
+	${F77} -o $@ $< ${IMESH_LIBS} ${EXTRA_F77_LIBS} ${IMESH_RPATH_FLAGS}
+
+HelloMeshF90: HelloMeshF90.o
+	${FC} -o $@ $< ${IMESH_LIBS} ${EXTRA_FC_LIBS} ${IMESH_RPATH_FLAGS}
+
+HelloMeshC: HelloMeshC.o
+	${CC} -o $@ $< ${IMESH_LIBS} ${EXTRA_CC_LIBS} ${IMESH_RPATH_FLAGS}
+
+HelloMeshCXX: HelloMeshCXX.o
+	${CXX} -o $@ $< ${IMESH_LIBS} ${EXTRA_CXX_LIBS} ${IMESH_RPATH_FLAGS}
+
+.SUFFIXES: .F90 .F .c .cpp
+
+.F90.o:
+	${FC} -c -fcray-pointer ${IMESH_FCFLAGS} ${IMESH_INCS} ${FCFLAGS} $<
+
+.F.o:
+	${F77} -c -fcray-pointer ${IMESH_FFLAGS} ${IMESH_INCS} ${FFLAGS} $<
+
+.c.o:
+	${CC} -c ${IMESH_CFLAGS} ${IMESH_INCS} ${CFLAGS} $<
+
+.cpp.o:
+	${CXX} -c ${IMESH_CXXFLAGS} ${IMESH_INCS} ${CXXFLAGS} $<
+
+clean:
+	rm -f ${EXECS} ${EXECSOBJ} ${EXECSOUT} ${EXECSERR}
+
+check: default
+	./HelloMeshF77 1>HelloMeshF77.out 2>HelloMeshF77.err
+	!(test -s HelloMeshF77.err && cat HelloMeshF77.err )
+	./HelloMeshF90 1>HelloMeshF90.out 2>HelloMeshF90.err
+	!(test -s HelloMeshF90.err && cat HelloMeshF90.err)
+	./HelloMeshC 1>HelloMeshC.out 2> HelloMeshC.err
+	!(test -s HelloMeshC.err && cat HelloMeshC.err)
+	./HelloMeshCXX 1>HelloMeshCXX.out 2>HelloMeshCXX.err
+	!(test -s HelloMeshCXX.err && cat HelloMeshCXX.err)
+	diff -w HelloMeshF90.out HelloMeshF77.out
+	diff -w HelloMeshC.out HelloMeshF77.out
+	diff -w HelloMeshCXX.out HelloMeshF77.out
+
+install:
+	-install ${EXECS} ${IMESH_INSTALL_DIR}/bin

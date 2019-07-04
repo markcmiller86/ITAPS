@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS -  Fluid structure interaction and wind energy</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageWindEnergy" -->
+</head>
+
+<body class="pageApplications pageWindEnergy">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+
+<h1>FonTier Front Tracking: Fluid structure interaction and wind energy</h1>
+
+
+  <div class="imgContainer fRight" style="width: 300px;">
+    <a href="../../assets/images/gifs/windmill-2.gif" rel="lightbox">
+	<img src="../../assets/images/windEnergy_mini.png" alt="Wind generator simulation" width="300" height="279"  />
+    </a>
+    <p>Wind generator simulation movie (movie may take a few seconds to load).</p>
+</div>
+
+<p>Fluid structure interaction is a natural extension of the capabilities
+of FronTier. Supported by ARO, we started the implementation of these
+extensions by including the interaction between fluid and rigid body
+and the interaction between fluid and deformable fabric surface. Our
+objective if to apply these extensions on two interesting and important
+applications to the ARO as well as the DOE mission. These two applications
+are parachute inflation and windmill power generator simulations. <a href="http://www.ams.sunysb.edu/~linli/FTtest/windmill-2.gif" title="wind power generator" target="_blank">Movie 1 (right)</a> shows simulation of of wind power generator.</p>
+ 
+<p>Our front tracking code can simulate interactive motions between the
+wind flow and the rotor of the wind power generator. Our incompressible
+fluid solver, using high order coupling method, can accurately
+track the motion of the rotor blades and calculate the torque the wind
+exerted on the rotor blades. Our grid-free tracking method preserved
+the geometry of the wind rotor blade.</p>
+ 
+<p>Through the simulations, we are able to predict the rotor speed on
+varying wind speed, rotor geometry, and rotor load. In particular, we
+are able to simulate both transient state and steady state motion
+of the rotor. Using different geometry of the wind rotor
+blades, we can optimize the shape of the rotor blade and therefore
+maximize the power capacity.</p>
+ 
+<p>We will be able to calculate the torque and force on the wind generator
+under different wind speed and rotor geometry and therefore to predict
+the material strength needed in different environment and minimize the
+demage to the rotor. We can simulate multi-rotor and complex flow and
+provide accurate near-field model. Such model can then be used as the
+accurate source for the simulation of far-field simulations.</p>
+
+
+
+<p class="clear">&nbsp;</p>
+
+
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

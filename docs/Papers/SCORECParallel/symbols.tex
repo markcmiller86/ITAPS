@@ -1,0 +1,66 @@
+% This is section of {List of Symbols}
+
+\begin{itemize}
+
+\item{V}  The model, $V\in\{G,P,M\}$ where G signifies the
+  geometric model, P signifies the partition model, and M signifies
+  the mesh model. 
+
+\item{$\{V\{V^d\}\}$} a set of topological entities of dimension d in
+  model V. 
+
+\item{$V^d_i$} the $i^{th}$ entity of dimension d in model V. Shorthand
+  for $V\{V^d\}_i$, d=0 for a vertex, d=1 for an edge, d=2 for a face,
+  and d=3 for a region. In topologry, edges, faces, and regions are
+  bounded by the lower order entities. 
+
+\item{$\theta(V^d_i)$} a set of entities on the boundary of $V^d_i$. 
+
+\item{$\{V^d_i\{V^q\}\}$} the set of entities of dimension q in model
+  V that are adjacent to $V^d_i$.
+
+\item{$V^d_i\{V^q\}_i$} the $i^{th}$ entity in the set of entities of
+  dimension q in model V that are adjacent to $V^d_i$. 
+
+\item{$V^d_{B\_i}$} the $i^{th}$ part boundary entity of dimension d in
+  model V within model P.                                               % part boundary entity
+ 
+\item{$V^d_{P\_i}$} the $i^{th}$ part entity of dimension d in model
+  V within model P. It does not bound any entity of higher dimension.   % part entity
+
+\item{$V^d_{G\_i}$} the $i^{th}$ entity group of dimension d in model
+  V, in which d is the highest dimension of the dimensions of entities
+  in the group.              % entity group 
+ 
+% part object
+\item{$PO_i$} the $i^{th}$ part object in model V within model
+  P. It can be a part entity {$V^d_{P\_j}$}, or an entity group
+  {$V^d_{G\_j}$}. \footnote{Do we really need the implementation of
+  part object?} 
+
+\item{$\theta(V^d_{G\_i})$} a set of entities on the boundary of
+  $V^d_{G\_i}$.        % boundary of an entity group
+
+\item{$P_{r\_i}$} the $i^{th}$ process within model P. 
+
+\item{$P_i$} the $i^{th}$ part within model P. 
+
+\item{$U^{d_i}_i\sqsubset V^{d_j}_j$} classification indicating the
+  unique association of entity $U^{d_i}_i$ with entity $V^{d_j}_j$,
+  $d_i\leq d_j$, where $U,V\in\{G,P,M\}$ and U is lower than V in
+  terms of a hierarchy of domain decomposition. 
+
+\item{$\mathcal{P}[PO_i]$} a set of part id(s) where part object
+  $PO_i$ exists. 
+
+\item{$\mathcal{P}[V^d_{P\_i}]$} a set of part id(s) where part
+  entity $V^d_{P\_i}$ exists. 
+
+\item{$\mathcal{P}[V^d_{G\_i}]$} a set of part id(s) where entity
+  group $V^d_{G\_i}$ exists. 
+
+\item{$\mathcal{P}[V^d_{B\_i}]$} a set of part id(s) where part
+  boundary entity $V^d_{B\_i}$ exists. 
+
+
+\end{itemize}

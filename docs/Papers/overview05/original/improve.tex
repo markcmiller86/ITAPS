@@ -1,0 +1,71 @@
+\subsection{Mesh Quality Improvement}\label{sec:quality-improvement}
+
+Mesh quality improvement techniques can be applied based on \em{a
+priori} geometric quality metrics or \em{a posteriori} solution-based
+metrics improvements.  Low-level mesh improvement operations include
+vertex relocation, topology modification, vertex insertion, and vertex
+deletion.  The relationship of the latter two with the TSTT interface is
+discussed in Section~\ref{sec:adaptive-loop} of this paper.
+
+The TSTT center is supporting the development of a stand-alone mesh
+quality improvement toolkit, called Mesquite.  Mesquite currently
+provides state-of-the-art algorithms for vertex relocation, and the
+addition of topology modification is planned for the near future.
+Mesquite is designed to be flexible enough to work on a wide array of
+mesh types ranging from structured meshes to unstructured and hybrid
+meshes and a number of different two and three dimensional element
+types.
+
+% Question for Lori:  Why does Mesquite need to know the number of
+% elements of a given type or topology?
+
+Vertex relocation schemes must operate on the surface of the geometric
+domain as well as in the interior of the domain to fully optimize the
+mesh.  As such, the software must have functional access to both the
+high level description of the geometric domain and to individual mesh
+entities such as element vertices.  In particular, to operate on
+interior vertices, Mesquite queries a TSTT implementation for vertex
+coordinate information, adjacency information, and the number of
+elements of a given type or topology.  After determining the optimal
+location for a vertex, Mesquite requests that the TSTT implementation
+update vertex coordinate information.
+
+To operate on the surface mesh, Mesquite must also use TSTT geometric
+queries to determine the surface normal and the closest point on the
+surface.  Explicit classification of the mesh vertex against a geometric
+surface is required, as there are some cases for which the closest point
+query will return a point on the wrong surface, resulting in inverted or
+invalid meshes.
+
+The TSTT center is also currently working to develop an interface for
+simplicial mesh topology modification.  The topology modifications
+planned for this interface are face and edge swapping operators.  A
+reference implementation for this service based on the TSTT mesh
+interface is also in progress, with the goal of enabling swapping in any
+TSTT implementation supporting triangles (2D) or tetrahedra (3D).  
+
+In gathering enough information to determine whether a swap is
+desirable, any mesh topology modification scheme must make extensive use
+of the TSTT entity adjacency and vertex coordinate retrieval functions.
+Reconfiguring the mesh, when this is appropriate, requires deletion of
+old entities and creation of new entities through the TSTT interface.
+In addition, classification operators are again essential.  For
+instance, reconfiguring tetrahedra that classify on different geometric
+regions results in tetrahedra that do not classify on either region, so
+this case must be avoided.  Likewise, classification checks make it easy
+to identify and disallow mesh reconfigurations that would remove a mesh
+edge classified on a geometric edge.
+
+In addition to basic geometry, topology and classification information,
+a TSTT implementation must provide additional information for mesh
+improvement schemes to operate effectively and efficiently.  For
+example, even for simple mesh improvement schemes, the implementation
+must be able to indicate which entities may be modified and which may
+not.  For mesh improvement schemes to operate on an entire mesh rather
+than simply accepting requests entity by entity, a TSTT implementation
+must support some form of iterator.  Furthermore, advanced schemes may
+allow the user to input a desired size, orientation, degree of
+anisotropy, or even an initial reference mesh; exploiting such features
+will require the implementation to associate information of many
+different types with mesh entities and pass that information to the mesh
+improvement scheme when requested.

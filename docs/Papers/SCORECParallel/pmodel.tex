@@ -1,0 +1,57 @@
+% This is section{ partition model}. 
+
+A partition model is a separate data model created in FMDB to represent
+a mesh partition. It can be viewed as a part of hierarchical domain
+decomposition, and is developed between the mesh and the geometric
+model. Its purpose is to represent mesh partition in topology and
+support mesh-level parallel operations through part boundary links
+with ease [2]. 
+
+\textbf{Definition: Partition Model Entity} \footnote{Is the
+  dimension necessary for the partition model entity? It is
+  implemented as 0 in FMDB, but it can be kept
+  for later use, and is different from part denotation $P_i$. }  
+
+A topological entity in the partition model, $P^d_i$, which represents a set of part boundary entities that have the
+  same $\mathcal{P}$. Each partition model entity is uniquely
+  determined by $\mathcal{P}$.   
+
+\textbf{Definition: Partition Classification}
+
+The unique association of part boundary entity, $M^{d_i}_i$, to the topological
+entity of the partition model entity of dimension $d_j$, $P^{d_j}_j$ where
+$d_i\leq d_j$, on which it lies is termed partition classification and
+is denoted $M^{d_i}_i \subset P^{d_j}_j$.
+
+
+Each partition model entity stores its id, residence
+part(s), and all part boundry mesh entities that are
+classified on it.\footnote{I am not sure if partition model entity
+  needs owner part.}
+
+\textbf{Definition: Reverse Partition Classification}
+
+For each partition model entity, $P^d_i$, the set of part boundary entities
+that are classified on that entity defines the
+reverse partition classification for the partition model entity. The
+reverse partition classification is denoted as $RC(P^{d_i}_i)=\{M^{d_j}_j|M^{d_j}_j
+\sqsubset P^{d_i}_i,{d_j} \leq {d_i}\}$.
+
+
+\textbf{Definition: Partitioned Object}
+
+A partitioned object is a list of parts on a process. Whenever the
+application program needs to access a part, it should access the
+partitioned object first.  
+
+A partitioned mesh on one process is a container of sub-meshes of all
+parts on the process. It is local to the process. Each part is treated
+as a serial sub-mesh, adding the information of part
+boundary entities. A process can have multiple parts, i.e. multiple
+sub-meshes at one time. The application
+program accesses a part mesh through the partitioned mesh on the proper process.   
+
+A common partition model exists on each process, which is shared by
+all parts on the process\footnote{Should the partition model only
+  store the partition model entity local to that process or all
+  partition model entities?}. Each process has a local partitioned mesh.      

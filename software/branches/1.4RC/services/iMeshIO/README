@@ -1,0 +1,81 @@
+                                Introduction
+=============================================================================
+    This is a beta release of a tool and library for reading ANY file
+format that VisIt currently reads and creating an iMesh instance of it.
+
+    In this beta release, all the tool does is read one file format (e.g.
+Silo, VTK, PDB, etc.) and write a file using iMesh_save() to a specified iMesh
+implementation (MOAB, FMDB or GRUMMP as these implementations existed on or
+about June, 2010).  It does not use iMeshP. It does not handle iMesh sets
+and tags in any specific way.
+
+    This first release is still somewhat inadequate regarding dependencies
+on other libraries like VTK/cmake. Those dependencies will be removed in
+later releases. VTK/cmake are planned to be removed by creating a VTK-lite,
+proxy, sufficient to bootstrap all of VisIt's database plugins. Other parts
+of VisIt are also included here that can probaly be removed as well.
+
+                          Contents of this release 
+=============================================================================
+This release contains the following files...
+
+Adminstrative...
+    build_imeshio*			Shell script for building everything
+    README				This README file
+
+Sample data...
+    data.tar.bz2			Sample data files
+
+                            Building Everything 
+=============================================================================
+The build_imeshio script builds everything. To run it, invoke it as follows...
+
+./build_imeshio
+
+Invoking ./build_imeshio will start a length process of downloading and then
+building a number of dependent libraries necessary to build iMeshIO. 
+
+Total build time for everything is going to be 1-3 hours.
+
+After the build completes, it should have created an executable,
+imeshioconvert.
+
+That executable can read any of the sample data files and write the result
+to any iMesh implementation you choose.
+
+                            Running imeshioconvert  
+=============================================================================
+The arguments to imeshioconvert are
+$1 = input file name
+$2 = output file (base) name
+$3 = output format type (e.g. ITAPS_MOAB, ITAPS_FMDB, ITAPS_GRUMMP)
+... other options
+
+For example, the command...
+
+imeshioconvert globe.silo foo ITAPS_MOAB -no_options
+
+will read the silo file, globe.silo, instantiate the mesh from globle.silo
+in the MOAB implementation of iMesh and then write it to the file foo
+(MOAB will add its own extentsion), using iMesh_save() call.
+
+If you run imeshioconvert with no arguments, it will print a somewhat helpful
+usage message.
+
+If you do NOT include '-no_options' on the command line, imeshioconvert will
+prompt you for options. Some options are important for GRUMMP output to work
+correctly.
+
+You may get error messages from dynamic linker/loader regarding undefined
+symbols for libSim. You can ignore these.
+
+                            Planned future work
+=============================================================================
+1. Qt dependence will be eliminated by other VisIt work unrelated to ITAPS.
+   [ This has been done ]
+2. VTK/CMake depencence can be eliminated by creating a VTK-lite proxy that is
+   sufficient to bootstrap all the database plugins. That is a 1+ week job!
+3. We need to make this a linkable library and not just a stand-alone tool.
+6. Provide more controls for selecting which mesh in a database containing
+   multiple meshes to instantiate in iMesh. Likewise for variable(s) defined
+   on the input mesh(es).

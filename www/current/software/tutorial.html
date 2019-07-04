@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_software.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageSoftware pageTutorial" -->
+</head>
+
+<body class="pageSoftware pageTutorial">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Download Software</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Download software</a><span class="hide"> | </span>
+<a class="nav sub" href="getting_started.html" id="linkGetting_started">Getting Started</a><span class="hide"> | </span>
+<a class="nav sub" href="data_model.html" id="linkData_model">ITAPS Data Model</a><span class="hide"> | </span>
+<a class="nav sub" href="download_interfaces.html" id="linkDownload_interfaces">Interface Software </a><span class="hide"> | </span>
+<a class="nav sub" href="download_components.html" id="linkDownload_components">Services Software</a><span class="hide"> | </span>
+<a class="nav sub" href="tutorial.html" id="linkTutorial">Tutorial Materials</a><span class="hide"> | </span>
+<a class="nav sub" href="usage_strategies.html" id="linkUsage_strategies">Usage Strategies</a>
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>ITAPS Tutorial Materials</h1>
+        
+        <p>To aid new users of the ITAPS interfaces and software, we provide the tutorial materials presented at recent conferences.  In particular, the pdf presentation from the SC08 full day tutorial is available  here.</p>
+        <h3> <a href="../assets/documents/ITAPS_SC08_Tutorial.pdf">SC08  Tutorial Presentation</a></h3>
+        <p> In addition, we provided hands-on exercises to the participants to familiarize them with the use of the interfaces.  These started with a simple &quot;Hello iMesh&quot; exercise and move on to show the use of different services such as Mesquite (mesh smoothing), Zoltan (mesh partitioning) and FronTier (front tracking).  At the tutorial, we provided access to prebuilt libraries, to build and test these exercises you will need to download and build the appropriate software in your environment.  In particular, you will need at least one <a href="download_interfaces.html">iMesh  implementation</a> for &quot;Hello iMesh&quot; and that implementation and the appropriate <a href="download_components.html">service</a> for the remaining exercises. These should all build with simple configure and make commands on most linux systems using gcc. These exercises have been extensively tested with gcc 4.2.4.  We recommend that you perform the exercises in the  order given as each builds upon the knowledge gained in the previous ones.</p>
+        <p> There are four exercises, each of which focuses on different aspects of using the ITAPS mesh interface, both in serial and in parallel.  A short overview description is provided here.  In each exercise, start with the HandsOn_Session.txt file, which will tell you what you need to know about setting environment variables, building and running each example.  It also provides some background information on the functions and services used.   The <a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/tools/doxygen/html/group__iMesh.html">iMesh.h</a>,   and <a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/software/tags/1.4/tools/doxygen/html/group__imeshp.html">iMeshP.h</a> documentation will be useful to you in completing the exercises. </p>
+
+        <h3><a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/!svn/bc/2614/Distributions/Tutorial_Exercises/Hello_iMesh-1.0.tar.gz"> Hello iMesh </a></h3>
+        <ul>
+          <li> Your first exposure to iMesh and iMeshP functions </li>
+          <li> Explore the differences between serial and parallel set up </li>
+          <li> Simple examples of retrieving data </li>
+        </ul>
+
+        <h3><a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/!svn/bc/2614/Distributions/Tutorial_Exercises/iZoltanTutorial.tar.gz"> Load Balance</a></h3>
+        <ul>
+          <li> Use Zoltan to partition a mesh and visualize the results </li>
+          <li> Build on what you learned in Hello iMesh to create a Mesh instance, retrieve a root set, partition handle and load a mesh </li>
+          <li> First use of Parts function </li>
+          <li> Save the mesh and perform general house cleaning </li>
+          <li> Shows basic skeleton of application level use of Zoltan libraries </li>
+        </ul>
+
+        <h3>Front Tracking</h3>
+        <ul>
+          <li> Use FronTier to propagate a mesh according to velocities set at  vertices </li>
+          <li> Use Tags and Entity iterators to set velocity parameters </li>
+          <li> Shows basic skeleton of application use of Frontier </li>
+        </ul>
+
+        <h3>Smooth Mesh</h3>
+        <ul>
+          <li> Use Mesquite to smooth a mesh in serial and in parallel </li>
+          <li> Create a layer of ghost data in parallel and use tags to set IDs on mesh vertices </li>
+          <li> Save the improved mesh back to disk </li>
+          <li> Shows some of the set up and basic functionality needed by the  Mesquite service</li>
+        </ul>
+        <h2>Language Compability Example</h2>
+        <p>This simple, self-contained <a href="https://redmine.scorec.rpi.edu/anonsvn/itaps/software/trunk/interfaces/iMesh/examples/FindAdjacency">example</a> reads a mesh and does some simple data retrieval.  The example is given in five dialects:  C, C++, Fortran77, Fortran90, and Fortran 2003.  As with the tutorial examples, at least one iMesh implementation is required. </p>
+        <p>Contact <a href="mailto:diachin2@llnl.gov">Lori Diachin</a> if you have any questions</p>
+        <p>&nbsp;</p>
+        
+        
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

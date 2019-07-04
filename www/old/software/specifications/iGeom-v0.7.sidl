@@ -1,0 +1,682 @@
+//==========================================================
+// ITAPS GEOMETRY MODEL INTERFACE
+//==========================================================
+
+package iGeom version 0.7
+{
+  
+   //====================================================
+   //  Core Model Interface
+   //====================================================
+
+   interface Model {
+
+      // input/output
+      void load( in string gname, in array<string> information,
+                 in int information_size) throws iBase.Error;
+		 
+      void save( in string gname, in array<string> information,
+                 in int information_size) throws iBase.Error;
+
+      // global info  
+      opaque getRootSet() throws iBase.Error;
+           
+      /**
+        The returned integer has the following meaning:
+	  0 - no parameterized entities
+	  1 - all entities parameterized and faces can be trimmed
+	  2 - all entities parameterized and no faces are trimmed
+	  3 - some entities parameterized and faces can be trimmed
+	  4 - some entities parameterized and no faces are trimmed
+      */
+      int getParametric() throws iBase.Error;
+      
+      void getTolerance( out int form, 
+                         out double tolerance) throws iBase.Error;
+
+      /** 
+        The returned value is 0 for primary entities only (the default), 1 for
+        manifold, and 2 for non-manifold.
+      */      
+      int getTopoLevel() throws iBase.Error;
+   
+      void getBoundBox( out double min_x, out double min_y, out double min_z,
+       		        out double max_x, out double max_y, out double max_z
+		      ) throws iBase.Error;
+
+      // check the status of the handles
+      int  getNumOfType( in opaque entity_set_handle,
+                         in iBase.EntityType entity_type
+		        ) throws iBase.Error;
+            
+   };
+
+
+   //====================================================
+   //  SINGLE ENTITY TRAVERSAL, QUERY
+   //====================================================
+
+   interface Entity extends Model {
+
+      // traverse
+      bool initEntIter( in opaque entity_set_handle,
+                        in iBase.EntityType requested_entity_type, 
+                        out opaque entity_iterator ) throws iBase.Error;
+			
+      bool getNextEntIter( in opaque entity_iterator,
+                           out opaque entity_handle ) throws iBase.Error;
+
+      void resetEntIter( in opaque entity_iterator) throws iBase.Error;
+
+      void endEntIter( in opaque entity_iterator) throws iBase.Error;
+    
+      // query
+      int getEntTopoDim( in opaque entity_handle) throws iBase.Error;
+      
+      iBase.EntityType getEntType( in opaque entity_handle
+                                 ) throws iBase.Error;
+      
+      void getEntAdj( in opaque entity_handle, 
+                      in iBase.EntityType requested_entity_type, 
+                      inout array<opaque> adj_entity_handles, 
+                      out int adj_entity_handles_size) throws iBase.Error;
+		      
+      void getEnt2ndAdj( in opaque entity_handle, 
+                         in iBase.EntityType order_adjacent_key,
+                         in iBase.EntityType requested_entity_type, 
+                         inout array<opaque> adj_entity_handles, 
+                         out int adj_entity_handles_size) throws iBase.Error;		    
+
+      bool isEntAdj( in opaque entity_handle_1, 
+      	             in opaque entity_handle_2) throws iBase.Error;
+
+   };
+
+
+
+   //====================================================
+   //  ENTITY ARRAY TRAVERSAL, QUERY
+   //====================================================
+
+   interface Arr extends Model {
+
+      // traverse
+      bool initEntArrIter( in opaque entity_set_handle,
+                           in iBase.EntityType requested_entity_type, 
+                           in int requested_array_size,
+                           out opaque entArr_iterator ) throws iBase.Error;
+			   
+      bool getNextEntArrIter( in opaque entArr_iterator,
+                              inout array<opaque> entity_handles,
+                              out int entity_handles_size) throws iBase.Error;
+			      
+      void resetEntArrIter( in opaque entArr_iterator) throws iBase.Error;
+      
+      void endEntArrIter( in opaque entArr_iterator) throws iBase.Error;
+
+      // query 
+      void getArrTopoDim( in array<opaque> entity_handles, 
+                          in int entity_handles_size,
+	   	          inout array<int> topo_dim,
+			  out int topo_dim_size) throws iBase.Error;
+      
+      void getArrType( in array<opaque> entity_handles, 
+                       in int entity_handles_size,
+                       inout array<iBase.EntityType> entity_type,
+                       out int entity_type_size) throws iBase.Error;
+			  
+      void getArrAdj( in array<opaque> entity_handles, 
+                      in int entity_handles_size,
+                      in iBase.EntityType requested_entity_type, 
+                      inout array<opaque> adj_entity_handles, 
+                      out int adj_entity_handles_size,
+                      inout array<int> offset,
+                      out int offset_size) throws iBase.Error;
+
+      void getArr2ndAdj( in array<opaque> entity_handles, 
+                         in int entity_handles_size,
+                         in iBase.EntityType order_adjacent_key,
+                         in iBase.EntityType requested_entity_type, 
+                         inout array<opaque> adj_entity_handles, 
+                         out int adj_entity_handles_size, 
+			 inout array<int> offset,
+                         out int offset_size) throws iBase.Error;		     
+
+      void isArrAdj( in array<opaque> entity_handles_1, 
+      		     in int entity_handles_1_size,
+      	             in array<opaque> entity_handles_2, 
+      		     in int entity_handles_2_size,
+		     inout array<bool> is_adjacent_info,
+		     out int is_adjacent_info_size) throws iBase.Error;
+
+   };
+
+
+
+   //============================================
+   //  POINTWISE GEOMETRIC INTERROGATION INTERFACE
+   //============================================
+
+
+   interface Shape extends Model {
+
+      void getEntClosestPt( in opaque entity_handle, 
+                            in double near_x, in double near_y, in double near_z,
+			    out double on_x, out double on_y, out double on_z
+			  ) throws iBase.Error;
+
+      void getEntNrmlXYZ( in opaque entity_handle, 
+                          in double x, in double y, in double z,
+			  out double nrml_i, out double nrml_j, out double nrml_k
+			) throws iBase.Error;
+
+      void getEntTgntXYZ( in opaque entity_handle, 
+                          in double x, in double y, in double z,
+			  out double tgnt_i, out double tgnt_j, out double tgnt_k
+			) throws iBase.Error;
+
+      void getEntNrmlPlXYZ( in opaque entity_handle, 
+                            in double x, in double y, in double z,
+                            out double pt_x, out double pt_y, out double pt_z,
+                            out double nrml_i, out double nrml_j, out double nrml_k
+                          ) throws iBase.Error;			
+
+      void getFcCvtrXYZ( in opaque face_handle,
+                         in double x, in double y, in double z,
+			 out double cvtr1_i, out double cvtr1_j, out double cvtr1_k,
+			 out double cvtr2_i, out double cvtr2_j, out double cvtr2_k
+		       ) throws iBase.Error;	     
+    			     
+      void getEgCvtrXYZ( in opaque edge_handle,
+                         in double x, in double y, in double z,
+			 out double cvtr_i, out double cvtr_j, out double cvtr_k
+		       ) throws iBase.Error;	     
+
+      void getEgEvalXYZ( in opaque edge_handle, 
+                         in double x, in double y, in double z,
+                         out double on_x, out double on_y, out double on_z,
+                         out double tgnt_i, out double tgnt_j, out double tgnt_k,
+                         out double cvtr_i, out double cvtr_j, out double cvtr_k
+                       ) throws iBase.Error;			
+
+      void getFcEvalXYZ( in opaque face_handle, 
+                         in double x, in double y, in double z,
+                         out double on_x, out double on_y, out double on_z,
+                         out double nrml_i, out double nrml_j, out double nrml_k,
+                         out double cvtr1_i, out double cvtr1_j, out double cvtr1_k,
+                         out double cvtr2_i, out double cvtr2_j, out double cvtr2_k
+                       ) throws iBase.Error;			
+
+      void getEntBoundBox( in opaque entity_handle,
+                           out double min_x, out double min_y, out double min_z,
+       		           out double max_x, out double max_y, out double max_z
+			 ) throws iBase.Error;
+
+      void getVtxCoord( in opaque vertex_handle, 
+                        out double x, out double y, out double z
+                      ) throws iBase.Error;
+
+      void getPntRayIntsct( in double x, in double y, in double z,
+                            in double i, in double j, in double k,
+			    inout array<opaque> intersect_entity_handles,
+			    out int intersect_entity_handles_size,
+			    inout iBase.StorageOrder storage_order,
+			    inout array<double> intersect_coords,
+			    out int intersect_coords_size,
+			    inout array<int> param_coords,
+			    out int param_coords_size) throws iBase.Error;				           
+
+      void getPntClsf( in double x, in double y, in double z,
+                       out opaque entity_handle) throws iBase.Error;
+   };
+
+
+   interface ShapeArr extends Model {
+   
+      void getArrClosestPt( in array<opaque> entity_handles, 
+                            in int entity_handles_size,
+			    in iBase.StorageOrder storage_order,
+                            in array<double> near_coords,
+			    in int near_coords_size,
+			    inout array<double> on_coords,
+			    out int on_coords_size) throws iBase.Error;
+
+      void getArrNrmlXYZ( in array<opaque> entity_handles, 
+                          in int entity_handles_size,
+			  in iBase.StorageOrder storage_order,
+			  in array<double> coords,
+			  in int coords_size,
+		          inout array<double> normal,
+		          out int normal_size) throws iBase.Error;
+
+      void getArrTgntXYZ( in array<opaque> entity_handles, 
+                          in int entity_handles_size,
+			  in iBase.StorageOrder storage_order,
+			  in array<double> coords,
+	 		  in int coords_size,
+		 	  inout array<double> tangent,
+			  out int tangent_size) throws iBase.Error;
+
+      void getArrNrmlPlXYZ( in array<opaque> entity_handles,
+                            in int entity_handles_size,
+                            in iBase.StorageOrder storage_order,
+                            in array<double> coords, in int coords_size,
+                            inout array<double> pt_coords, out int pt_coords_size,
+                            inout array<double> normals, out int normals_size,
+                          ) throws iBase.Error;
+
+      void getArrCvtrXYZ( in array<opaque> entity_handles,
+                             in int entity_handles_size,
+			     in iBase.StorageOrder storage_order,
+			     in array<double> coords,
+ 			     in int coords_size,
+			     inout array<double> cvtr_1,
+  			     out int cvtr_1_size,
+			     inout array<double> cvtr_2,
+			     out int cvtr_2_size) throws iBase.Error;	     
+
+      void getArrEgEvalXYZ( in array<opaque> edge_handles,
+                            in int edge_handles_size,
+                            in iBase.StorageOrder storage_order,
+                            in array<double> coords, in int coords_size,
+                            inout array<double> on_coords, out int on_coords_size,
+                            inout array<double> tangent, out int tangent_size,
+                            inout array<double> cvtr, out int cvtr_size
+                          ) throws iBase.Error;
+
+      void getArrFcEvalXYZ( in array<opaque> face_handles,
+                            in int face_handles_size,
+                            in iBase.StorageOrder storage_order,
+                            in array<double> coords, in int coords_size,
+                            inout array<double> on_coords, out int on_coords_size,
+                            inout array<double> normal, out int normal_size,
+                            inout array<double> cvtr_1, out int cvtr_1_size,
+                            inout array<double> cvtr_2, out int cvtr_2_size
+                          ) throws iBase.Error;
+ 
+      void getArrBoundBox( in array<opaque> entity_handles, 
+                           in int entity_handles_size,
+			   inout iBase.StorageOrder storage_order,
+			   inout array<double> min_corner_coords,
+	 		   out int min_corner_coords_size,
+		 	   inout array<double> max_corner_coords,
+			   out int max_corner_coords_size
+                         ) throws iBase.Error;
+
+       void getVtxArrCoords( in array<opaque> vertex_handles, 
+                             in int vertex_handles_size,
+                             inout iBase.StorageOrder storage_order,
+                             inout array<double> coords,
+                             out int coords_size) throws iBase.Error;
+
+      void getPntArrRayIntsct( in iBase.StorageOrder storage_order,
+      			       in array<double> coords, in int coords_size,
+			       in array<double> directions, in int directions_size,
+			       inout array<opaque> intersect_entity_handles,
+			       out int intersect_entity_handles_size,
+			       inout array<int> offset, out int offset_size,
+			       inout array<double> intersect_coords,
+			       out int intersect_coords_size, 
+			       inout array<int> param_coords,
+			       out int param_coords_size
+			     ) throws iBase.Error;				           
+
+      void getPntArrClsf( in iBase.StorageOrder storage_order,
+      			  in array<double> coords, in int coords_size,
+			  inout array<opaque> on_entity_handles,
+			  out int on_entity_handles_size
+			) throws iBase.Error;
+			       
+   };
+
+
+
+   //============================================
+   //  SENCE INFORMATION INTERFACE
+   //============================================
+
+   interface Sense extends Model {
+
+      int getEntNrmlSense( in opaque face_handle, 
+                          in opaque region_handle) throws iBase.Error;
+ 
+      int getEgFcSense( in opaque edge_handle, 
+                        in opaque face_handle) throws iBase.Error;
+
+      int getEgVtxSense( in opaque edge_handle, 			
+                         in opaque vertex_handle_1, 
+		         in opaque vertex_handle_2) throws iBase.Error;
+
+   };
+
+
+   interface SenseArr extends Model {
+
+      void getArrNrmlSense( in array<opaque> face_handles,
+                            in int face_handles_size, 
+			    in array<opaque> region_handles,
+                            in int region_handles_size, 
+			    inout array<int> sense,
+			    out int sense_size) throws iBase.Error;
+ 
+      void getEgFcArrSense( in array<opaque> edge_handles,
+			    in int edge_handles_size, 
+			    in array<opaque> face_handles,
+			    in int face_handles_size,
+			    inout array<int> sense,
+			    out int sense_size) throws iBase.Error;
+
+      void getEgVtxArrSense( in array<opaque> edge_handles,
+                             in int edge_handles_size, 
+			     in array<opaque> vertex_handles_1,
+                             in int vertex_handles_1_size, 
+			     in array<opaque> vertex_handles_2,
+                             in int vertex_handles_2_size, 
+			     inout array<int> sense,
+			     out int sense_size) throws iBase.Error;
+   
+   };
+
+
+
+   //============================================
+   //  PARAMETRIC COORDINAMTES SYSTEM INTERFACE
+   //============================================
+
+
+   interface Param extends Model {
+
+      /**
+        the returned integer is 1 if the entity has a parametric coordinate
+	system and 0 if does not.
+      */
+      int isEntParametric( in opaque entity_handle) throws iBase.Error;
+      
+      void getEntUVtoXYZ( in opaque entity_handle,
+                          in double u, in double v,
+			  out double x, out double y, out double z
+			) throws iBase.Error;
+
+      void getEntUtoXYZ( in opaque entity_handle,
+                         in double u,
+  		         out double x, out double y, out double z
+		       ) throws iBase.Error;			    
+
+      void getEntXYZtoUV( in opaque entity_handle,
+                          in double x, in double y, in double z,
+			  inout double u, inout double v) throws iBase.Error;
+
+      void getEntXYZtoU( in opaque entity_handle,
+                         in double x, in double y, in double z,
+		         out double u) throws iBase.Error;
+
+      void getEntXYZtoUVHint( in opaque entity_handle,
+                              in double x, in double y, in double z,
+			      inout double u, inout double v) throws iBase.Error;
+			       
+      void getEntUVRange( in opaque entity_handle,
+                          out double u_min,
+			  out double v_min,
+			  out double u_max,
+			  out double v_max) throws iBase.Error;
+			    
+      void getEntURange( in opaque entity_handle,
+                         out double u_min,
+		         out double u_max) throws iBase.Error;  		   
+  			   
+      void getEntUtoUV( in opaque edge_handle,
+                        in opaque face_handle,
+			in double in_u, 
+			out double u, out double v) throws iBase.Error;
+			     
+      void getVtxToUV( in opaque vertex_handle,
+                       in opaque face_handle,
+		       out double u, out double v) throws iBase.Error;
+
+      void getVtxToU( in opaque vertex_handle,
+                      in opaque edge_handle,
+		      out double u) throws iBase.Error;
+			    
+      /** 
+        normal has the three components of a unit normal on each face
+      */
+      void getEntNrmlUV( in opaque entity_handle,
+                         in double u, in double v,
+			 out double nrml_i, out double nrml_j, out double nrml_k
+		       ) throws iBase.Error;
+
+      void getEntTgntU( in opaque entity_handle,
+                        in double param_coord,
+			out double tngt_i, out double tngt_j, out double tngt_k
+	              ) throws iBase.Error;
+			    			    			     
+      void getEnt1stDrvt( in opaque entity_handle, 
+                           in double u, in double v,
+			   inout array<double> drvt_u,
+			   out int drvt_u_size,
+			   inout array<double> drvt_v,
+			   out int drvt_v_size) throws iBase.Error;
+			 
+      void getEnt2ndDrvt ( in opaque entity_handle, 
+                           in double u, in double v,
+			   inout array<double> drvt_uu,
+			   out int drvt_uu_size,
+			   inout array<double> drvt_vv,
+			   out int drvt_vv_size,
+			   inout array<double> drvt_uv,
+			   out int drvt_uv_size) throws iBase.Error;
+
+      void getFcCvtrUV ( in opaque entity_handle,
+                         in double u, in double v,
+			 out double cvtr1_i, out double cvtr1_j, out double cvtr1_k,
+			 out double cvtr2_i, out double cvtr2_j, out double cvtr2_k
+		       ) throws iBase.Error; 
+			 			 
+     /**
+       The returned value 0 for in_u means the geometric entity is 
+       not periodic in u, otherwise 1.
+       
+       The returned value 1 for in_v means the geometric entity is 
+       not periodic in v, otherwise 1 (not used with geometric edge).
+     */
+     void isEntPeriodic( in opaque entity_handle,
+                         out int in_u, out int in_v) throws iBase.Error;
+			 			    
+     /**
+       The number returned is the number of degenerate locations with 0 
+       meaning there are no degenerate location.
+     */     
+     int isFcDegenerate( in opaque face_handle) throws iBase.Error;
+
+   };
+
+   
+   interface ParamArr extends Model {
+   
+      /**
+        the returned integer is 1 if the entity has a parametric coordinate
+	system and 0 if does not.
+      */
+      void isArrParametric( in array<opaque> entity_handles,
+                            in int entity_handles_size,
+			    inout array<int> is_parametric,
+			    out int is_parametric_size) throws iBase.Error;
+           
+      void getArrUVtoXYZ( in array<opaque> entity_handles,
+                          in int entity_handles_size,
+			  in iBase.StorageOrder storage_order,
+			  in array<double> uv,
+			  in int uv_size,
+			  inout array<double> on_coords,
+			  out int on_coords_size) throws iBase.Error;
+
+      void getArrUtoXYZ( in array<opaque> entity_handles,
+         	         in int entity_handles_size, 
+                         in array<double> u,
+		         in int u_size,
+  		         inout iBase.StorageOrder storage_order,
+		         inout array<double> on_coords,
+   		         out int on_coords_size) throws iBase.Error;			   
+
+      void getArrXYZtoUV( in array<opaque> entity_handles,
+                          in int entity_handles_size,
+			  in iBase.StorageOrder storage_order,
+			  in array<double> coords,
+			  in int coords_size,
+                          inout array<double> uv,
+			  inout int uv_size) throws iBase.Error;
+
+      void getArrXYZtoU( in array<opaque> entity_handles,
+                         in int entity_handles_size,
+		         in iBase.StorageOrder storage_order,
+			 in array<double> coords,
+		         in int coords_size,
+		         inout array<double> u,
+		         out int u_size) throws iBase.Error;
+
+      void getArrXYZtoUVHint( in array<opaque> face_handles,
+                              in int face_handles_size,
+     			      in iBase.StorageOrder storage_order,
+			      in array<double> coords,
+			      in int coords_size,
+                              inout array<double> uv,
+			      inout int uv_size) throws iBase.Error;
+
+      void getArrUVRange( in array<opaque> entity_handles,
+                          in int entity_handles_size,
+			  inout iBase.StorageOrder storage_order,
+			  inout array<double> uv_min,
+                          out int uv_min_size,
+			  inout array<double> uv_max,
+                          out int uv_max_size) throws iBase.Error;
+			    
+      void getArrURange( in array<opaque> entity_handles,
+                         in int entity_handles_size,
+		         inout array<double> u_min,
+		         out int u_min_size,
+		         inout array<double> u_max,
+		         out int u_max_size) throws iBase.Error;			   
+  			   
+      void getArrUtoUV( in array<opaque> edge_handles,
+                        in int edge_handles_size,
+		        in array<opaque> face_handles,
+		        in int face_handles_size,
+		        in array<double> u_in, 
+		        in int u_in_size,
+		        inout iBase.StorageOrder storage_order,
+		        inout array<double> uv,
+		        out int uv_size) throws iBase.Error;
+			     
+      void getVtxArrToUV( in array<opaque> vertex_handles,
+      	                  in int vertex_handles_size,
+                          in array<opaque> face_handles,
+			  in int face_handles_size,
+			  inout iBase.StorageOrder storage_order,
+			  inout array<double> uv, 
+			  out int uv_size) throws iBase.Error;
+
+      void getVtxArrToU( in array<opaque> vertex_handles,
+                         in int vertex_handles_size,
+                         in array<opaque> edge_handles,
+		         in int edge_handles_size,
+		         inout array<double> u,
+		         out int u_size) throws iBase.Error;
+			    
+      void getArrNrmlUV( in array<opaque> entity_handles,
+                         in int entity_handles_size,
+                         in iBase.StorageOrder storage_order,
+		         in array<double> uv, 
+		         in int uv_size,
+		         inout array<double> normal,
+		         out int normal_size) throws iBase.Error;
+
+      void getArrTgntU( in array<opaque> entity_handles,
+                        in int entity_handles_size,
+                        in iBase.StorageOrder storage_order,
+		        in array<double> coords,
+		        in int coords_size,
+		        inout array<double> tangent,
+		        out int tangent_size) throws iBase.Error;
+			    			    			     
+      void getArr1stDrvt( in array<opaque> entity_handles, 
+                          in int entity_handles_size,
+                          in iBase.StorageOrder storage_order,
+			  in array<double> uv, in int uv_size,
+			  inout array<double> drvt_u,
+			  out int drvt_u_size,
+			  inout array<int> u_offset,
+			  out int u_offset_size,
+			  inout array<double> drvt_v,
+			  out int drvt_v_size,
+			  inout array<int> v_offset,
+			  out int v_offset_size) throws iBase.Error;
+			 
+      void getArr2ndDrvt( in array<opaque> entity_handles, 
+                          in int entity_handles_size,
+                          in iBase.StorageOrder storage_order,
+			  in array<double> uv, in int uv_size,
+			  inout array<double> drvt_uu,
+			  out int drvt_uu_size,
+			  inout array<int> uu_offset,
+			  out int uu_offset_size,
+			  inout array<double> drvt_vv,
+			  out int drvt_vv_size,
+			  inout array<int> vv_offset,
+			  out int vv_offset_size,
+			  inout array<double> drvt_uv,
+			  out int drvt_uv_size,
+			  inout array<int> uv_offset,
+			  out int uv_offset_size) throws iBase.Error;
+
+      void getFcArrCvtrUV( in array<opaque> face_handles,
+                           in int face_handles_size,
+                           in iBase.StorageOrder storage_order,
+			   in array<double> uv, in int uv_size,
+			   inout array<double> cvtr_1,
+			   out int cvtr_1_size,
+			   inout array<double> cvtr_2,
+			   out int cvtr_2_size) throws iBase.Error; 
+			 			 
+     /**
+       The returned value 0 for in_uv means the geometric entity is 
+       not periodic in u or v, otherwise 1 (not used with geometric edge).
+     */
+     void isArrPeriodic( in array<opaque> entity_handles,
+                         in int entity_handles_size,
+                         inout array<int> in_uv, 
+			 out int in_uv_size) throws iBase.Error;
+			 			    
+     /**
+       The number returned is the number of degenerate locations with 0 
+       meaning there are no degenerate location.
+     */     
+     void isFcArrDegenerate( in array<opaque> face_handles,
+                             in int face_handles_size,
+			     inout array<int> degenerate,
+			     out int degenerate_size) throws iBase.Error;
+
+   };
+
+
+
+   //============================================
+   //  TOLERANCE INFORMATION INTERFACE
+   //============================================
+
+
+   interface Tolerance extends Model {
+
+      double getEntTolerance( in opaque entity_handle) throws iBase.Error;
+
+   };
+
+   interface ToleranceArr extends Model {
+
+     void getArrTolerance( in array<opaque> entity_handles,
+     		           in int entity_handles_size,
+			   inout array<double> tolerance,
+			   out int tolerance_size) throws iBase.Error;
+   
+   };
+
+} // END iGeom

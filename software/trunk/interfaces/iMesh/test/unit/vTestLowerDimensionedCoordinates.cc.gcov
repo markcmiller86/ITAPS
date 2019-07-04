@@ -1,0 +1,260 @@
+        -:    0:Source:vTestLowerDimensionedCoordinates.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:#include <limits>
+        -:    3:
+        -:    4://
+        -:    5:// Test that both 1 and 2D mesh's coordinates are 'handled'
+        -:    6:// correctly in that nulls may be passed to set/get them,
+        -:    7:// and arrays of them returned return correct number.
+        -:    8://
+        1:    9:void vTestLowerDimensionedCoordinates()
+        -:   10:{
+        1:   11:    bool supports1D = false;
+        1:   12:    bool supports2D = false;
+        3:   13:    for (int gdim = 1; gdim < 3; gdim++)
+        -:   14:    {
+        -:   15:        iMesh_Instance instance;
+        -:   16:        int err;
+        -:   17:
+        -:   18:        // Setup a mesh of the desired geometric dimension
+        2:   19:        iMesh_newMesh("", &instance, &err, 0);
+        2:   20:        iMesh_setGeometricDimension(instance, gdim, &err);
+        2:   21:        if (err != iBase_SUCCESS)
+        -:   22:        {
+        -:   23:            cout << "Skipping geometric dimension " << gdim
+        1:   24:                 <<  " no support in impl." << endl;
+        1:   25:	    iMesh_dtor(instance, &err);
+        1:   26:            continue;
+        -:   27:        }
+        1:   28:	if (gdim == 1) supports1D = true;
+        1:   29:	if (gdim == 2) supports2D = true;
+        -:   30:
+        -:   31:        //
+        -:   32:        // We test setting bogus coordinate data via the 
+        -:   33:	// individual Vtx calls using two different bogus values.
+        -:   34:        // If we wind up getting the same bogus values back from
+        -:   35:	// the implementation both times, it means the implementation
+        -:   36:	// actually did attempt to read and use the values that were
+        -:   37:	// passed to it and that is considered an error.
+        -:   38:        //
+        1:   39:        bool createReadBadCoords[2] = {false, false};
+        1:   40:        bool setReadBadCoords[2] = {false, false};
+        3:   41:        for (int pass = 0; pass < 2; pass++)
+        -:   42:        {
+        -:   43:            // Create a vtx with specific values in 'extra' coords'
+        -:   44:            double oneCoordA[3];
+        -:   45:            double badVal = (pass == 0) ?
+        -:   46:                std::numeric_limits<double>::quiet_NaN() :
+        4:   47:                std::numeric_limits<double>::infinity();
+        2:   48:            for (int i = 0; i < gdim; i++) oneCoordA[i] = 0.0;
+        2:   49:            for (int i = gdim; i < 3; i++) oneCoordA[i] = badVal;
+        -:   50:            iBase_EntityHandle oneVert;
+        -:   51:            iMesh_createVtx(instance, oneCoordA[0], oneCoordA[1], oneCoordA[2],
+        2:   52:                &oneVert, &err);
+        2:   53:            CHECK_ERR(err);
+        -:   54:
+        -:   55:            // Read back the values created
+        -:   56:            double oneCoordB[3];
+        -:   57:            iMesh_getVtxCoord(instance, oneVert, &oneCoordB[0], &oneCoordB[1],
+        2:   58:                &oneCoordB[2], &err);
+        2:   59:            CHECK_ERR(err);
+        4:   60:            for (int i = gdim; i < 3; i++)
+        -:   61:            {
+        2:   62:                if (oneCoordB[i] == badVal)
+    #####:   63:                    createReadBadCoords[pass] = true;
+        -:   64:            }
+        -:   65:
+        -:   66:            // Ok now set all to zero and confirm they are all zero.
+        2:   67:            iMesh_setVtxCoord(instance, oneVert, 0.0, 0.0, 0.0, &err);
+        2:   68:            CHECK_ERR(err);
+        -:   69:            iMesh_getVtxCoord(instance, oneVert, &oneCoordB[0], &oneCoordB[1],
+        2:   70:                &oneCoordB[2], &err);
+        2:   71:            CHECK_ERR(err);
+        2:   72:            TEST(oneCoordB[0]==0&&oneCoordB[1]==0&&oneCoordB[2]==0);
+        -:   73:            
+        -:   74:            // Now, use setVtx to set bad values
+        -:   75:            iMesh_setVtxCoord(instance, oneVert, oneCoordA[0], oneCoordA[1],
+        2:   76:                oneCoordA[2], &err);
+        2:   77:            CHECK_ERR(err);
+        -:   78:
+        -:   79:            // Read back values set
+        -:   80:            iMesh_getVtxCoord(instance, oneVert, &oneCoordB[0], &oneCoordB[1],
+        2:   81:                &oneCoordB[2], &err);
+        2:   82:            CHECK_ERR(err);
+        4:   83:            for (int i = gdim; i < 3; i++)
+        -:   84:            {
+        2:   85:                if (oneCoordB[i] == badVal)
+    #####:   86:                    setReadBadCoords[pass] = true;
+        -:   87:            }
+        -:   88:        }
+        1:   89:        TEST(!(createReadBadCoords[0] && createReadBadCoords[1]));
+        1:   90:        TEST(!(setReadBadCoords[0] && setReadBadCoords[1]));
+        -:   91:
+        -:   92:        //
+        -:   93:        // Now test VtxArr calls in similar manner.
+        -:   94:        // 4 passes. 2 for Nan/infinity garbage times 2 for blocked/interleave
+        -:   95:        //
+        5:   96:        for (int pass = 0; pass < 4; pass++)
+        -:   97:        {
+        -:   98:            double badVal = (pass%2) ?
+        -:   99:                std::numeric_limits<double>::quiet_NaN() :
+        8:  100:                std::numeric_limits<double>::infinity();
+        4:  101:            int storage_order = (pass/2) ? iBase_BLOCKED : iBase_INTERLEAVED;
+        4:  102:            int other_order = (pass/2) ? iBase_INTERLEAVED: iBase_BLOCKED;
+        -:  103:
+        -:  104:	    // Always allocate as for 3D so we can test impl. to
+        -:  105:	    // see if it wound up visiting the 'extra' data
+        4:  106:            double *tenCoordsA = new double[10*3];
+       84:  107:            for (int i = 0; i < 10*gdim; i++)
+       80:  108:                tenCoordsA[i] = (double) (i / gdim);
+       44:  109:            for (int i = 10*gdim; i < 10*3; i++)
+       40:  110:                tenCoordsA[i] = badVal;
+        -:  111:
+        4:  112:            iBase_EntityHandle *tenVerts = 0;
+        4:  113:            int tenVertsAlloc = 0, tenVertsSize = 0;
+        -:  114:            iMesh_createVtxArr(instance, 10, storage_order, tenCoordsA, 10*gdim,
+        4:  115:                       &tenVerts, &tenVertsAlloc, &tenVertsSize, &err);
+        4:  116:            CHECK_ERR(err);
+        -:  117:
+        -:  118:            // Read back the values created in same storage order
+        4:  119:            double *tenCoordsB = 0;
+        4:  120:	    int tenCoordsBAlloc = 0, tenCoordsBSize = 0;
+        -:  121:            iMesh_getVtxArrCoords(instance, tenVerts, 10, storage_order, &tenCoordsB,
+        4:  122:                          &tenCoordsBAlloc, &tenCoordsBSize, &err);
+        4:  123:            CHECK_ERR(err);
+        4:  124:	    bool qCoordSizeOk = tenCoordsBSize == 10*gdim;
+        4:  125:	    TEST(qCoordSizeOk);
+        4:  126:	    bool qCoordValsOk = true;
+        -:  127:	    // All values should be equal to what we created
+       84:  128:	    for (int i = 0; i < tenCoordsBSize; i++)
+        -:  129:	    {
+       80:  130:	        if (tenCoordsB[i] != tenCoordsA[i])
+    #####:  131:		    qCoordValsOk = false;
+        -:  132:	    }
+        -:  133:	    // 'bad' values in 'extra' portion is also an error
+        4:  134:	    for (int i = tenCoordsBSize; i < 10*3 && i < tenCoordsBAlloc; i++)
+        -:  135:	    {
+    #####:  136:	        if (tenCoordsB[i] == badVal)
+    #####:  137:		    qCoordValsOk = false;
+        -:  138:	    }
+        4:  139:	    TEST(qCoordValsOk);
+        -:  140:
+        -:  141:            // Read back the values created in other storage order
+        4:  142:            free(tenCoordsB);
+        4:  143:	    tenCoordsB = 0;
+        4:  144:	    tenCoordsBAlloc = 0;
+        4:  145:	    tenCoordsBSize = 0;
+        -:  146:            iMesh_getVtxArrCoords(instance, tenVerts, 10, other_order, &tenCoordsB,
+        4:  147:                          &tenCoordsBAlloc, &tenCoordsBSize, &err);
+        4:  148:            CHECK_ERR(err);
+        4:  149:	    qCoordSizeOk = tenCoordsBSize == 10*gdim;
+        4:  150:	    TEST(qCoordSizeOk);
+        4:  151:	    qCoordValsOk = true;
+        4:  152:	    bool qCoordOrderOk = false;
+       84:  153:	    for (int i = 0; i < tenCoordsBSize; i++)
+        -:  154:	    {
+       80:  155:	        if (tenCoordsB[i] == badVal)
+    #####:  156:		    qCoordValsOk = false;
+       80:  157:                if (storage_order == iBase_BLOCKED) {
+       40:  158:		  if (tenCoordsB[i] != tenCoordsA[i/gdim+10*(i%gdim)])
+    #####:  159:		    qCoordValsOk = false;
+        -:  160:		}
+        -:  161:		else { // iBase_INTERLEAVED
+       40:  162:		  if (tenCoordsB[i/gdim] != tenCoordsA[i])
+    #####:  163:		    qCoordValsOk = false;
+        -:  164:		}
+        -:  165:	    }
+        4:  166:	    TEST(qCoordValsOk);
+        -:  167:
+        -:  168:	    // Ok, set them all to known, zero values, even in the 'extra'
+        -:  169:	    // values, if impl is handling them or not. Confirm they are all zero
+      124:  170:            for (int i = 0; i < 10*3; i++)
+      120:  171:	        tenCoordsA[i] = 0.0;
+        -:  172:            iMesh_setVtxArrCoords(instance, tenVerts, 10, storage_order, tenCoordsA,
+        4:  173:                          10*gdim, &err);
+        4:  174:            CHECK_ERR(err);
+        4:  175:            free(tenCoordsB);
+        4:  176:	    tenCoordsB = 0;
+        4:  177:	    tenCoordsBAlloc = 0;
+        4:  178:	    tenCoordsBSize = 0;
+        -:  179:            iMesh_getVtxArrCoords(instance, tenVerts, 10, other_order, &tenCoordsB,
+        4:  180:                          &tenCoordsBAlloc, &tenCoordsBSize, &err);
+        4:  181:            CHECK_ERR(err);
+        4:  182:	    qCoordValsOk = true;
+       84:  183:	    for (int i = 0; i < tenCoordsBSize; i++)
+        -:  184:	    {
+       80:  185:	        if (tenCoordsB[i] != 0.0)
+    #####:  186:		    qCoordValsOk = false;
+        -:  187:	    }
+        4:  188:	    TEST(qCoordValsOk);
+        -:  189:
+        -:  190:	    // Now use setVtxArr to set (possibly) bad values
+       84:  191:            for (int i = 0; i < 10*gdim; i++)
+       80:  192:                tenCoordsA[i] = (double) (i / gdim);
+       44:  193:            for (int i = 10*gdim; i < 10*3; i++)
+       40:  194:                tenCoordsA[i] = badVal;
+        -:  195:            // Now, use setVtx to set bad values
+        -:  196:            iMesh_setVtxArrCoords(instance, tenVerts, 10, storage_order, tenCoordsA,
+        4:  197:                          10*gdim, &err);
+        4:  198:            CHECK_ERR(err);
+        -:  199:
+        -:  200:            // Read back values just set (same storage order)
+        4:  201:            UT_FREE(tenCoordsB);
+        4:  202:	    tenCoordsBAlloc = 0;
+        4:  203:	    tenCoordsBSize = 0;
+        -:  204:            iMesh_getVtxArrCoords(instance, tenVerts, 10, storage_order, &tenCoordsB,
+        4:  205:                          &tenCoordsBAlloc, &tenCoordsBSize, &err);
+        4:  206:            CHECK_ERR(err);
+        4:  207:	    qCoordSizeOk = tenCoordsBSize == 10*gdim;
+        4:  208:	    TEST(qCoordSizeOk);
+        4:  209:	    qCoordValsOk = true;
+        -:  210:	    // All values should be equal to what we created
+       84:  211:	    for (int i = 0; i < tenCoordsBSize; i++)
+        -:  212:	    {
+       80:  213:	        if (tenCoordsB[i] != tenCoordsA[i])
+    #####:  214:		    qCoordValsOk = false;
+        -:  215:	    }
+        -:  216:	    // 'bad' values in 'extra' portion is also an error
+        4:  217:	    for (int i = tenCoordsBSize; i < 10*3 && i < tenCoordsBAlloc; i++)
+        -:  218:	    {
+    #####:  219:	        if (tenCoordsB[i] == badVal)
+    #####:  220:		    qCoordValsOk = false;
+        -:  221:	    }
+        4:  222:	    TEST(qCoordValsOk);
+        -:  223:
+        -:  224:	    // Now, read back again using 'other' storage order
+        4:  225:            free(tenCoordsB);
+        4:  226:	    tenCoordsB = 0;
+        4:  227:	    tenCoordsBAlloc = 0;
+        4:  228:	    tenCoordsBSize = 0;
+        -:  229:            iMesh_getVtxArrCoords(instance, tenVerts, 10, other_order, &tenCoordsB,
+        4:  230:                          &tenCoordsBAlloc, &tenCoordsBSize, &err);
+        4:  231:            CHECK_ERR(err);
+        4:  232:	    qCoordSizeOk = tenCoordsBSize == 10*gdim;
+        4:  233:	    TEST(qCoordSizeOk);
+        4:  234:	    qCoordValsOk = true;
+        4:  235:	    qCoordOrderOk = false;
+       84:  236:	    for (int i = 0; i < tenCoordsBSize; i++)
+        -:  237:	    {
+       80:  238:	        if (tenCoordsB[i] == badVal)
+    #####:  239:		    qCoordValsOk = false;
+       80:  240:                if (storage_order == iBase_BLOCKED) {
+       40:  241:		  if (tenCoordsB[i] != tenCoordsA[i/gdim+10*(i%gdim)])
+    #####:  242:		    qCoordValsOk = false;
+        -:  243:		}
+        -:  244:	        else { // iBase_INTERLEAVED
+       40:  245:		  if (tenCoordsB[i/gdim] != tenCoordsA[i])
+    #####:  246:		    qCoordValsOk = false;
+        -:  247:		}
+        -:  248:	    }
+        4:  249:	    TEST(qCoordValsOk);
+        4:  250:	    delete [] tenCoordsA;
+        4:  251:	    UT_FREE(tenVerts);
+        4:  252:	    UT_FREE(tenCoordsB);
+        -:  253:        }
+        1:  254:        iMesh_dtor(instance, &err);
+        1:  255:	CHECK_ERR(err);
+        -:  256:    }
+        1:  257:    TEST(supports2D);
+        3:  258:}

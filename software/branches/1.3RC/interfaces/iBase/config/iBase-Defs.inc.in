@@ -1,0 +1,23 @@
+# This file contains variables that are essential for building
+# applications on iBase implementations without having to hack
+# application Makefiles horribly each time.  Instead, one can simply
+# re-run configure in the application tree with a new -with-ITAPS-dir
+# argument, and the implementation-specific version of this file gets
+# included automatically.  The application programmer/user can also just
+# edit the pathname in their Makefile if they prefer.
+
+INSTALLED_MAKE_DEFS_PATH=@prefix@/share/ITAPS
+INSTALLED_INCLUDES=-I@prefix@/include/ITAPS
+INSTALLED_LIB_DIR=-L@prefix@/lib/ITAPS
+
+IBASE_LIB_DIR=-L@IMPL_ROOT@/iBase
+
+IBASE_LIBS=
+
+IBASE_INCLUDES=-I@IMPL_ROOT@/iBase
+IBASE_LIBFILE=
+
+IBASE_BACKEND_INCLUDES=
+IBASE_BACKEND_LIBS=
+IBASE_BACKEND_LIBFILE=
+

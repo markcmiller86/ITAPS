@@ -1,0 +1,78 @@
+Each of the following categories was rated on a scale from 1 to 7 with 1
+being on the low end and 7 being on the high end.
+
+Originality: 	4
+It is a known issue and the authors are not proposing a completely new
+solution.
+
+Significance: 	5
+It is an issue of importance to the whole grid generation community. But
+in this paper this issue is addressed with reference to a small group
+connected to the authors.
+
+Relevance to the IMR: 	6
+The paper is dealing with mesh interface that is very much relevant to IMR.
+
+Technical Quality: 	4
+The paper is verbose with not much of technical details.
+
+Presentation: 	4
+They can present more of the basic concepts and less of trivial details.
+For example, they can give lists of important entities and functions in
+terms of the SIDL langugae.
+
+Overall Rating: 	4
+The overall rating can be increased to 6 if they improve the technical
+quality and presentation of the paper.
+
+
+Reviewer's Expertise on Topic: 	high
+Amount of Rewriting Required: 	medium
+
+
+Comments to the Authors
+
+Main Contributions
+
+The main contribution of the paper is the attempt at describing a
+language- and data-structure-independent interface supporting query and
+modification of mesh data. It is an issue of importance to the whole
+grid generation community. But in this paper this issue is addressed
+with reference to a small group connected to the authors.
+
+Another important contribution is the use of SIDL language. But they
+have not given descriptions of the entities and functions using this
+language.
+
+Positive Aspects
+
+Positive aspect of the paper are (a) conceptualizing data model in terms
+of mesh entities, entity adjacencies, meshes, entity sets, and tags; (b)
+abstractions of some functionalities of the mesh interface, such as
+global queries and mesh modification.
+
+Negative Aspects
+
+1. The paper does not present the conceptual design of the interface. It
+does not explicitly mention the important entities that the interface is
+dealing with and does not contain a list of query and modification
+functions. Instead, the paper gives general descriptions that is verbose
+and does not contain technical details.
+
+2. Some of the functionalities, such as, grid quality and grid
+interpolation are not brought out.
+
+Further Comments
+
+1. The paper is addressing the issue of mesh interface for query and
+modification. It is not addressing the issue of standard interface for
+mesh generation. This point should be explicitly mentioned.
+
+2. It should compare/contrast with the work done by others related to
+grid generation standards such as unstructured grid consortium.
+
+3. Reduce some of the descriptions on Entity sets and tags.
+
+4. Explain why a new language SIDL is used instead of the existing
+languages like XML.
+

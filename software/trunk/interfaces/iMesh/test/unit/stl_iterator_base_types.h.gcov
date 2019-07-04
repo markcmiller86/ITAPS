@@ -1,0 +1,170 @@
+        -:    0:Source:/usr/include/c++/4.4/bits/stl_iterator_base_types.h
+        -:    0:Programs:15
+        -:    1:// Types used in iterator implementation -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009
+        -:    4:// Free Software Foundation, Inc.
+        -:    5://
+        -:    6:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    7:// software; you can redistribute it and/or modify it under the
+        -:    8:// terms of the GNU General Public License as published by the
+        -:    9:// Free Software Foundation; either version 3, or (at your option)
+        -:   10:// any later version.
+        -:   11:
+        -:   12:// This library is distributed in the hope that it will be useful,
+        -:   13:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   14:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   15:// GNU General Public License for more details.
+        -:   16:
+        -:   17:// Under Section 7 of GPL version 3, you are granted additional
+        -:   18:// permissions described in the GCC Runtime Library Exception, version
+        -:   19:// 3.1, as published by the Free Software Foundation.
+        -:   20:
+        -:   21:// You should have received a copy of the GNU General Public License and
+        -:   22:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   23:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   24:// <http://www.gnu.org/licenses/>.
+        -:   25:
+        -:   26:/*
+        -:   27: *
+        -:   28: * Copyright (c) 1994
+        -:   29: * Hewlett-Packard Company
+        -:   30: *
+        -:   31: * Permission to use, copy, modify, distribute and sell this software
+        -:   32: * and its documentation for any purpose is hereby granted without fee,
+        -:   33: * provided that the above copyright notice appear in all copies and
+        -:   34: * that both that copyright notice and this permission notice appear
+        -:   35: * in supporting documentation.  Hewlett-Packard Company makes no
+        -:   36: * representations about the suitability of this software for any
+        -:   37: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   38: *
+        -:   39: *
+        -:   40: * Copyright (c) 1996-1998
+        -:   41: * Silicon Graphics Computer Systems, Inc.
+        -:   42: *
+        -:   43: * Permission to use, copy, modify, distribute and sell this software
+        -:   44: * and its documentation for any purpose is hereby granted without fee,
+        -:   45: * provided that the above copyright notice appear in all copies and
+        -:   46: * that both that copyright notice and this permission notice appear
+        -:   47: * in supporting documentation.  Silicon Graphics makes no
+        -:   48: * representations about the suitability of this software for any
+        -:   49: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   50: */
+        -:   51:
+        -:   52:/** @file stl_iterator_base_types.h
+        -:   53: *  This is an internal header file, included by other library headers.
+        -:   54: *  You should not attempt to use it directly.
+        -:   55: *
+        -:   56: *  This file contains all of the general iterator-related utility types,
+        -:   57: *  such as iterator_traits and struct iterator.
+        -:   58: */
+        -:   59:
+        -:   60:#ifndef _STL_ITERATOR_BASE_TYPES_H
+        -:   61:#define _STL_ITERATOR_BASE_TYPES_H 1
+        -:   62:
+        -:   63:#pragma GCC system_header
+        -:   64:
+        -:   65:#include <bits/c++config.h>
+        -:   66:#include <cstddef>
+        -:   67:
+        -:   68:_GLIBCXX_BEGIN_NAMESPACE(std)
+        -:   69:
+        -:   70:  /**
+        -:   71:   *  @defgroup iterators Iterators
+        -:   72:   *  These are empty types, used to distinguish different iterators.  The
+        -:   73:   *  distinction is not made by what they contain, but simply by what they
+        -:   74:   *  are.  Different underlying algorithms can then be used based on the
+        -:   75:   *  different operations supported by different iterator types.
+        -:   76:  */
+        -:   77:  //@{ 
+        -:   78:  ///  Marking input iterators.
+        -:   79:  struct input_iterator_tag { };
+        -:   80:  ///  Marking output iterators.
+        -:   81:  struct output_iterator_tag { };
+        -:   82:  /// Forward iterators support a superset of input iterator operations.
+        -:   83:  struct forward_iterator_tag : public input_iterator_tag { };
+        -:   84:  /// Bidirectional iterators support a superset of forward iterator
+        -:   85:  /// operations.
+        -:   86:  struct bidirectional_iterator_tag : public forward_iterator_tag { };
+        -:   87:  /// Random-access iterators support a superset of bidirectional iterator
+        -:   88:  /// operations.
+        -:   89:  struct random_access_iterator_tag : public bidirectional_iterator_tag { };
+        -:   90:
+        -:   91:
+        -:   92:  /**
+        -:   93:   *  @brief  Common %iterator class.
+        -:   94:   *
+        -:   95:   *  This class does nothing but define nested typedefs.  %Iterator classes
+        -:   96:   *  can inherit from this class to save some work.  The typedefs are then
+        -:   97:   *  used in specializations and overloading.
+        -:   98:   *
+        -:   99:   *  In particular, there are no default implementations of requirements
+        -:  100:   *  such as @c operator++ and the like.  (How could there be?)
+        -:  101:  */
+        -:  102:  template<typename _Category, typename _Tp, typename _Distance = ptrdiff_t,
+        -:  103:           typename _Pointer = _Tp*, typename _Reference = _Tp&>
+        -:  104:    struct iterator
+        -:  105:    {
+        -:  106:      /// One of the @link iterator_tags tag types@endlink.
+        -:  107:      typedef _Category  iterator_category;
+        -:  108:      /// The type "pointed to" by the iterator.
+        -:  109:      typedef _Tp        value_type;
+        -:  110:      /// Distance between iterators is represented as this type.
+        -:  111:      typedef _Distance  difference_type;
+        -:  112:      /// This type represents a pointer-to-value_type.
+        -:  113:      typedef _Pointer   pointer;
+        -:  114:      /// This type represents a reference-to-value_type.
+        -:  115:      typedef _Reference reference;
+        -:  116:    };
+        -:  117:
+        -:  118:  /**
+        -:  119:   *  This class does nothing but define nested typedefs.  The general
+        -:  120:   *  version simply "forwards" the nested typedefs from the Iterator
+        -:  121:   *  argument.  Specialized versions for pointers and pointers-to-const
+        -:  122:   *  provide tighter, more correct semantics.
+        -:  123:  */
+        -:  124:  template<typename _Iterator>
+        -:  125:    struct iterator_traits
+        -:  126:    {
+        -:  127:      typedef typename _Iterator::iterator_category iterator_category;
+        -:  128:      typedef typename _Iterator::value_type        value_type;
+        -:  129:      typedef typename _Iterator::difference_type   difference_type;
+        -:  130:      typedef typename _Iterator::pointer           pointer;
+        -:  131:      typedef typename _Iterator::reference         reference;
+        -:  132:    };
+        -:  133:
+        -:  134:  template<typename _Tp>
+        -:  135:    struct iterator_traits<_Tp*>
+        -:  136:    {
+        -:  137:      typedef random_access_iterator_tag iterator_category;
+        -:  138:      typedef _Tp                         value_type;
+        -:  139:      typedef ptrdiff_t                   difference_type;
+        -:  140:      typedef _Tp*                        pointer;
+        -:  141:      typedef _Tp&                        reference;
+        -:  142:    };
+        -:  143:
+        -:  144:  template<typename _Tp>
+        -:  145:    struct iterator_traits<const _Tp*>
+        -:  146:    {
+        -:  147:      typedef random_access_iterator_tag iterator_category;
+        -:  148:      typedef _Tp                         value_type;
+        -:  149:      typedef ptrdiff_t                   difference_type;
+        -:  150:      typedef const _Tp*                  pointer;
+        -:  151:      typedef const _Tp&                  reference;
+        -:  152:    };
+        -:  153:
+        -:  154:  /**
+        -:  155:   *  This function is not a part of the C++ standard but is syntactic
+        -:  156:   *  sugar for internal library use only.
+        -:  157:  */
+        -:  158:  template<typename _Iter>
+        -:  159:    inline typename iterator_traits<_Iter>::iterator_category
+        -:  160:    __iterator_category(const _Iter&)
+        1:  161:    { return typename iterator_traits<_Iter>::iterator_category(); }
+        -:  162:
+        -:  163:  //@}
+        -:  164:
+        -:  165:_GLIBCXX_END_NAMESPACE
+        -:  166:
+        -:  167:#endif /* _STL_ITERATOR_BASE_TYPES_H */
+        -:  168:

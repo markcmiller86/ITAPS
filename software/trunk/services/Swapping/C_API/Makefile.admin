@@ -1,0 +1,30 @@
+VERSION=1.4.0
+
+SWAP_SERVICE_FILES=ITAPS_Delaunay3D.cc \
+ITAPS_InitCanon.cc \
+ITAPS_MaxMinSine3D.cc \
+ITAPS_MinMaxAngle3D.cc \
+ITAPS_QualMeasure.hh \
+ITAPS_Swap2D.cc \
+ITAPS_Swap3D.cc \
+ITAPS_Swap_config.hh.in \
+ITAPS_Swap.hh
+ 
+BUILD_FILES=configure Makefile.in README
+CONFIG_FILES=conf/config* conf/install-sh
+DOC_FILES=doxygen Doxyfile
+TEST_FILES=swap3d_test.cc rand1.vtk
+
+DIST_DIR=ITAPS-Swap-$(VERSION)
+
+distrib: doxygen
+	mkdir $(DIST_DIR)
+	mkdir $(DIST_DIR)/conf
+	cp $(BUILD_FILES) $(SWAP_SERVICE_FILES) $(TEST_FILES) $(DIST_DIR)
+	cp -r $(DOC_FILES) $(DIST_DIR)
+	cp $(CONFIG_FILES) $(DIST_DIR)/conf
+	tar -zcvf ITAPS-Swap-$(VERSION).tar.gz $(DIST_DIR)
+	rm -rf $(DIST_DIR)
+
+doxygen: ITAPS_QualMeasure.hh ITAPS_Swap.hh
+	doxygen

@@ -1,0 +1,13 @@
+dnl Process this file with autoconf to produce a configure script.
+
+dnl Args are: package name, version, bug report email
+AC_PREREQ(2.59)
+AC_INIT(ITAPS_UBC, 1.0, cfog@mech.ubc.ca)
+AC_CONFIG_AUX_DIR(conf)
+
+dnl ITAPS_CONFIGURE_SERVER(IMPL_NAME, SERVER_LANG, IMESH_BACKEND_DIR)
+dnl Note also that there's room for future expansion by adding
+dnl IGEOM_BACKEND_DIR, etc, at the end of the arg list. 
+ITAPS_CONFIGURE_SERVER(GRUMMP, C++, GRUMMP)
+
+AC_OUTPUT

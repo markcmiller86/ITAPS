@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Mesh Quality Improvement</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>Mesh Smoothing</h1>
+
+<p>
+It has long been known that achieving accurate and efficient numerical
+solutions to PDE-based applications depends heavily on mesh
+quality. To improve the meshes generated as part of the ITAPS project,
+we are developing a mesh quality improvement toolkit called
+Mesquite. The primary aim of this project is to provide a freely
+available, comprehensive software package that would accommodate a
+number of different mesh element types, quality metrics, high-level
+solution strategies, and mesh optimization algorithms. We designed
+Mesquite from the ground up in SciDAC-1, based on mesh quality
+improvement algorithms and software developed previously at SNL and
+ANL.  
+
+<p>Mesquite Version 1.0 was released in mid-2005. We have assembled
+a team of ITAPS/Mesquite researchers & developers including 
+Lori Diachin (LLNL), Martin Isenburg (LLNL), Patrick Knupp (SNL), and Jason
+Kraftcheck (UW). Mesquite was designed to be easily extensible in
+order to support new research in mesh quality improvement and to allow
+rapid delivery of prototype mesh optimization algorithms to
+applications. The use of classes such as MeshQualityMetric,
+ObjectiveFunction, QualityAssessor, TerminationCriterion, VertexMover,
+and InstructionQueue help us achieve an object-oriented, flexible
+design. Embedded within the various classes are member functions which
+perform the computationally intensive numerical calculations. These
+member functions avoid objects, use pointers, arrays, and other
+low-level data structures to ensure that the computations are as
+efficient as possible.</p>
+
+<p>Mesquite Version 1.0 does mesh untangling, element shape improvement,
+and deforming meshes on local mesh patches consisting of either
+triangular, tetrahedral, quadrilateral, hexahedral, or hybrid
+(including wedge and pyramid elements) unstructured meshes. The
+prototype has a number of state-of-the-art algorithms for
+optimization-based node point movement including steepest descent,
+conjugate gradient, feasible Newton, and active set solvers. In
+addition, considerable attention was given to the development of a
+flat mesh data structure for the internal representation of
+unstructured mesh data that is both highly efficient and
+convenient. To obtain our mesh data from the application and to
+provide interoperability, we use the iMesh common mesh interface
+specification, upon which two important implementations, FMDB (RPI)
+and MOAB (ANL), are based.</p>
+
+<p>In SciDAC-1, Mesquite was (i) incorporated into the ITAPS Shape
+Optimization service developed for the accelerator appplication, (ii)
+used to generate different geodesic meshes used to test various
+discretization methods for the CSU climate appliction, (iii) used in
+ITAPS mesh generation programs in support of accelerators, biology,
+and other applications. 
+
+<p> During SciDAC-2, several significant new
+capabilities have been added to Mesquite.  To improve the overall
+speed, we have added new quasi-Newton and trust-region solvers in
+collaboration with the TOPS SciDAC center. We have parallelized
+Mesquite and implemented the distributed memory algorithm using the
+iMesh and iMeshP interfaces.  Initial testing of the parallel
+algorithm has demonstrated good scaling with 95% efficiency on up
+to 256 processors; testing on larger numbers of processors is
+underway.  New capabilities developed for SLAC include the
+ability to smooth meshes containing high-order nodes. For fusion
+applications, we have developed a ``mesh boundary smoothing''
+capability to move nodes constrained to external boundaries and
+internal interfaces such as magnetic field lines. Finally, we have
+developed a prototype combined smoothing/swapping service using
+Mesquite and the Swap service developed at UBC. Early results show
+that cumulative benefits can be accrued from alternating use of
+smoothing and swapping.  The Mesquite library has been downloaded over
+660 times over the past four years and has been used in diverse
+applications such as accelerator modeling, fusion, biology, climate,
+rocket propellant burn, and ALE
+
+<p>For a list of applications that have used Mesquite, plus additional
+information, see the 
+<a href="http://www.cs.sandia.gov/optimization/knupp/Mesquite.html">Mesquite website</a>.</p>
+
+
+
+	</div>
+</div>
+
+</body>
+</html>

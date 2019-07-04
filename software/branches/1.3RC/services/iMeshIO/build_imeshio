@@ -1,0 +1,115 @@
+#!/bin/bash
+
+function check_wget
+{
+    WGET_CLIENT=$(which wget)
+    # check for wget
+    if [[ $WGET_CLIENT == "" ]] ; then
+        return 1
+    fi
+    return 0
+}
+
+function try_download_file
+{
+    if [[ "$OPSYS" == "Darwin" ]]; then
+        # MaxOS X comes with curl
+        /usr/bin/curl -ksfLO $1
+    else
+        check_wget
+        if [[ $? != 0 ]] ; then
+            error "Need to download $1, but \
+                   cannot locate the wget utility to do so."
+        fi
+        wget $WGET_OPTS -o /dev/null $1
+    fi
+
+    if [[ $? == 0 && -e `basename $1` ]] ; then
+        echo "Download succeeded: $1"
+        return 0
+    else
+        echo "Download attempt failed: $1"
+        rm -f `basename $1`
+        return 1
+    fi
+}
+
+VISIT_VERSION=2.1.0
+export OPSYS=${OPSYS:-$(uname -s)}
+
+# 
+# Determine the most recent version of VisIt
+#
+rm -f source.html
+try_download_file https://wci.llnl.gov/codes/visit/source.html
+if [[ ! -e source.html ]]; then
+    echo "Unable to determine current VisIt version number. Assuming $VISIT_VERSION"
+else
+    VISIT_VERSION=$(grep '^<center><h1>VisIt' source.html | tr '\n' ' ' | cut -d' ' -f2 | cut -d'<' -f1)
+    rm -f source.html
+fi
+#BUILD_VISIT_NAME=build_visit$(echo $VISIT_VERSION | tr '.' '_')
+
+BUILD_VISIT_NAME=build_visit
+rm -f build_visit
+svn cat http://portal.nersc.gov/svn/visit/trunk/src/svn_bin/build_visit > build_visit
+
+#
+# Ok, now obtain the build_visit script
+#
+#rm -f $BUILD_VISIT_NAME
+#try_download_file https://wci.llnl.gov/codes/visit/$VISIT_VERSION/$BUILD_VISIT_NAME
+#if [[ ! -e $BUILD_VISIT_NAME ]]; then
+#    echo "Unable to download build_visit script"
+#    exit 1
+#fi
+chmod 755 $BUILD_VISIT_NAME
+
+#
+# Tweek the script to handle some special cases
+#
+sed -i -e 's|DO_MDSPLUS="yes"|DO_MDSPLUS="no"|' -e 's|ON_MDSPLUS="on"|ON_MDSPLUS="off"|' $BUILD_VISIT_NAME
+
+#
+# Execute the build_visit script with relevant options
+#
+if [[ ! -x src/bin/visitconvert ]]; then
+    ./$BUILD_VISIT_NAME --svn-anonymous --dbio-only --makeflags -j4 --console
+fi
+
+#
+# Check that build completed as expected
+#
+if [[ ! -x src/bin/visitconvert ]]; then
+    echo "Unable to find 'src/bin/visitconvert' executable."
+    echo "It would appear the build of VisIt's database plugins failed."
+    exit 1
+fi
+
+pushd src/bin
+ln -s visitconvert imeshioconvert
+popd
+pushd src/exe
+ln -s visitconvert_ser_lite imeshioconvert
+popd
+
+#
+# Test that the converter is working correctly.
+#
+if [[ ! -d imeshio_test_data ]]; then
+    if [[ ! -e imeshio_test_data.tar.gz ]]; then
+        echo "Cannot find imeshio_test_data.tar.gz so will not test installation"
+        exit 0
+    else
+        gunzip < imeshio_test_data.tar.gz | tar xf -
+    fi
+    if [[ ! -d imeshio_test_data ]]; then
+        echo "Unable to find 'imeshio_test_data' directory with test data to test installation"
+        exit 0
+    fi
+fi
+echo "Testing the installation..."
+set -x
+./src/bin/imeshioconvert imeshio_test_data/globe.silo globe_grummp ITAPS_GRUMMP -variable dx -no_options
+./src/bin/imeshioconvert imeshio_test_data/jet.cgns jet_moab ITAPS_MOAB -variable Zone__1 -no_options
+./src/bin/imeshioconvert imeshio_test_data/flow5.tec flow_fmdb ITAPS_FMDB -variable U -no_options

@@ -1,0 +1,230 @@
+#!/bin/sh
+# Do a little magic to run perl from anywhere in your path.
+
+lines=`cat $0 | wc -l`
+lines=`expr $lines - 16`
+checksys=`uname -s`
+if [ "$checksys" != "SunOS" ]
+then
+  tail -n $lines $0 > /tmp/visitperl$$
+else
+  tail -$lines $0 > /tmp/visitperl$$
+fi
+echo "__END__" >> /tmp/visitperl$$
+echo "$0 $*" >> /tmp/visitperl$$
+exec perl /tmp/visitperl$$ $0 ${1+"$@"}
+
+unlink $0;
+$0 = shift @ARGV;
+
+#########################################################################
+# Taken from Silo and modified for ITAPS fortran header generation
+#
+# Purpose:  Build the `iXXX_f.h' Fortran include file from the iXXX.h
+#           C header file.
+#
+# Usage:    Run this script with input redirected from `iXXX.h'
+#           and output directed to `iXXX_f.h' as in:
+#
+#           mv iXXX_f.h iXXX_f.h~
+#           cat iXXX.h | mkforth > iXXX_f.h
+#
+# Programmer:   Robb Matzke, Wed Nov 30 10:44:43 PST 1994
+#
+# Modified:
+#
+#   Mark C. Miller, Wed Apr  6 21:13:21 PDT 2011
+#   Modified for use with ITAPS header files
+#
+#########################################################################
+
+sub print_fortran_friendly_line {
+    my ($line) = shift(@_);
+    $line =~ s/^\s*//;
+    if (substr($line,0,1) ne "#") {
+        $line =~ s/^(.)/       \1/;
+    }
+    if (length($line)>72) {
+        local $off=0;
+        while ($off < length($line)) {
+            if ($off == 0) {
+                $curline = substr($line, $off, $off+72);
+                print "$curline\n";
+                $off += 72;
+            } else {
+                $curline = substr($line, $off, $off+66);
+                print "     c$curline\n";
+                $off += 66;
+            }
+        }
+    } else {
+        print "$line\n";
+    }
+}
+
+local (@parameters);
+local (@typedefs);
+local (@defines);
+local (@includes);
+
+local($iface) = "";
+local($enum_body) = 0;
+local($brace_level) = 0;
+local(%vals) = () ;
+
+### Gather the info...
+local $value = 0;
+local $indefine = 0;
+while (<>) {
+    next if (/NO_FORTRAN_DEFINE/);
+    if ($indefine == 1) {
+        push (@defines, "$_");
+        if (/\\$/) {
+            $indefine = 1;
+        } else {
+            $indefine = 0;
+        } 
+    } elsif (/^\s*{?\s*i(Base|MeshP?|Geom|Rel|Field)_(\w*)\s*(,$|=)\s*(\w*)/) {
+        $iface=join('','i',$1);
+        local ($name, $valtxt) = (join('_',$iface,$2),$4);
+        if ($name =~ m/_MIN$/) {
+	    $value = 0;
+        } elsif ($valtxt =~ m/_MIN$/) {
+	    $value = 0;
+        } elsif ($name !~ m/_MAX$/) {
+            $value += 1;
+        }
+        push (@parameters, join(':',$name,$value));
+    } elsif (/^\s*#define\s*(I(BASE|MESHP?|GEOM|REL|FIELD))_(.*)\s*(.*)/) {
+        push (@defines, "#define I$2_$3 $4");
+        $indefine=1 if (/\\$/);
+    } elsif (/^\s*typedef\s*(struct|void\*)\s*(i(Base|MeshP?|Geom|Rel|Field)_(\w*))\*?\s*(\w*)/) {
+        if ($5 eq "") {
+            ($iface,)=split('_',$2);
+            push (@typedefs, $2);
+        } else {
+            ($iface,)=split('_',$5);
+            push (@typedefs, $5);
+        }
+    } elsif (/^\s*#include\s*(.*)$/) {
+        push (@includes, $1);
+    }
+}
+
+#
+# Write a Fortran comment describing this file.
+#
+$title = $iface;
+$defn = $iface;
+$defn =~ tr/[a-z]/[A-Z]/;
+$date = `date`;
+chop($date);
+$user = $ENV{USER};
+print <<"EOF";
+#ifndef $defn\_F_H
+#define $defn\_F_H
+EOF
+
+if ($#defines >= 0) { print "\n"; }
+foreach $def (@defines) {
+    chop($def);
+    print "$def\n";
+#    print_fortran_friendly_line($def);
+}
+
+# Note: Cannot use 'c' in first col. for comments because
+# its not compatible with Fortran 90 which uses '!' in first
+# col. However, most older Fortran compilers are 'ok' with
+# using a '!' in first col. for comments as well. So, we use
+# that here.
+if ("$defn" eq "IBASE") {
+print <<"EOF";
+
+#ifdef POINTER_SIZE
+!  user-defined override
+#  define IBASE_HANDLE_T integer*POINTER_SIZE
+#elif defined(__SIZEOF_SIZE_T__)
+!  gfortran
+#  define IBASE_HANDLE_T integer*__SIZEOF_SIZE_T__
+!  gfortran 4.2 and earlier
+#elif defined(__GNUC__) && defined(_LANGUAGE_FORTRAN)
+#  ifdef _LP64
+#    define IBASE_HANDLE_T integer*8
+#  else
+!    NOTE: not integer*4 (see meaning of _LP64 in GNU docs)
+#    define IBASE_HANDLE_T integer
+#  endif
+#elif defined(__INTEL_COMPILER)
+#  ifdef __X86_64
+#    define IBASE_HANDLE_T integer*8
+#  else
+#    define IBASE_HANDLE_T integer*4
+#  endif
+#elif defined(__XLCPP__) || defined(__bgp__) || defined(__bgq__)
+! __XLCPP doesn't work for IBM. At least make things work for BGP/Q
+#  define IBASE_HANDLE_T C_PTR
+#else
+#  error Unknown compiler. Please specify '-DPOINTER_SIZE=<4|8>' in FCFLAGS or F77FLAGS.
+#endif
+EOF
+}
+
+if ($#typedefs >= 0) { print "\n"; }
+foreach $var (@typedefs) {
+    print "#define $var IBASE_HANDLE_T\n";
+}
+if ($#typedefs >= 0) { print "\n"; }
+
+### Close out the #ifndef; this way the same file can be included
+### multiple times and still define parameters.
+print "#endif\n";
+
+#if ($#includes >= 0) { print "\n"; }
+#foreach $inc (@includes) {
+#    local($tmp) = $inc;
+#    $tmp =~ tr/"><//d;
+#    if ($tmp =~ /i(Base|MeshP?|Geom|Rel|Field).h$/) {
+#        $tmp =~ s/(.*)\.h$/$1_f.h/;
+#         print "#include \"$tmp\"\n";
+#    } elsif ($tmp !~ /i(Base|MeshP?|Geom|Rel|Field).*.h$/) {
+#         print "#include \"$tmp\"\n";
+#    }
+#}
+
+### Write `integer' statements for the constants...
+if ($#parameters >= 0) { print "\n"; }
+foreach $var (@parameters) {
+    local ($name, $value) = split (':', $var);
+    print "      integer  $name\n";
+    if ($name =~ m/_MAX$/) { print "\n"; }
+}
+
+### Write `parameter' statements for the constants...
+### Don't sort these, because some $value's may depend on
+### previous parameter statements.
+push(@temparray,@parameters);
+push(@temparray,@strings);
+foreach $var (@temparray) {
+    local ($name, $value) = split (':', $var);
+    # Why make the line human readable whereas it only needs be compiler compliant ?
+    # $line = sprintf("      parameter (%-25s = %-15s)", $name, $value);
+    # Written in a FORTRAN 77/Fortran 90 manner:
+    $line = sprintf("      parameter(%s=%s)", $name, $value);
+    if (length($line)>72) {
+        local $off=0;
+        while ($off < length($line)) {
+            $curline = substr($line, $off, $off+64);
+            if ($off == 0) {
+                printf "$curline\n";
+            } else {
+                printf "     c$curline\n";
+            }
+            $off += 64;
+        }
+    } else {
+        printf "$line\n";
+    }
+    if ($name =~ m/_MAX$/) { print "\n"; }
+}
+
+exit 0;

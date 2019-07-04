@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>ITAPS Component Services Software</title>
+  <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+
+<body>
+
+<div id="container">
+
+<div id="banner"><!--#include virtual="../templates/banner.html"--></div>
+
+<div id="menu"><!--#include virtual="../templates/menu.html"--></div>
+
+<div id="content">
+
+<h1>ITAPS Component Services Software</h1>
+<!--#include virtual="/templates/specification.html"-->
+
+ITAPS researchers are working to develop a number of component
+services that are of direct use to application scientists that access
+the necessary mesh and geometry informaiton through the <a
+href="download_interfaces.html">ITAPS interfaces</a>.  To use these
+services, you must implement at least a subset of the common
+interfaces defined by the ITAPS team to provide access to your mesh,
+and if necessary, geometry data.  In many cases, only a partial
+implementation of the interface is required and this is described on a
+service-by-service basis.  Furthermore, you may quickly try these
+services to determine if they are suitable for your long term use by
+taking advantage of one of the <a
+href="download_interfaces.html">IITAPS reference implementations</a>.
+This will likely require a data copy, which can give less than ideal
+performance, but will allow rapid prototyping experiments.  In
+addition to providing access to your mesh and geometry data through
+the ITAPS interfaces, you will also need to call the service-specific
+APIs to invoke the functionality provided by each service.  See the <a
+href="usage_strategies.html"> usage strategies page </a> for a
+schematic and fuller description.
+<br><br>
+ITAPS currently provides a number of services based primarily on the
+iMesh interface specification.  As SciDAC-2 continues, we expect to add
+more services both at the component level and at the integrated services
+level.
+<br><br>
+We believe that the software provided here is compliant with v0.7 of the
+ITAPS iMesh, iGeom, and iRel interfaces. All are believed to compile under
+Linux gcc/g++-3.2.3.  If you have any problems with the software downloads build
+or use process, please do not hesitate to contact us.
+<br><br>
+<div style="text-align: center;"><big><span style="font-weight: bold;">
+Available ITAPS Component Services<br>
+</span></big>
+<table
+ style="margin-left: auto; margin-right: auto; width: 75%; text-align: left;"
+ border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="width: 10%; vertical-align: top;">Name<br>
+      </td>
+      <td style="width: 15%; vertical-align: top;">POC<br>
+      </td>
+      <td style="width: 30%; vertical-align: top; text-align: center;">Description<br>
+      </td>
+      <td style="width: 30%; vertical-align: top;">Interface Requirements<br>
+      </td>
+      <td style="width: 15%; vertical-align: top;">More Info/Download<br>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">Mesquite<br>
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:pknupp@sandia.gov">Patrick Knupp</a>, SNL<br>
+      </td>
+      <td style="vertical-align: top;">Mesh quality improvment via node repositioning, many mesh types and improvement goals, 2D/3D <br>
+      </td>
+      <td style="vertical-align: top;">Partial iMesh to obtain vertex coordinates, adjacency information, number of elements, tags for some advanced functionality, iRel and iGeom for surface smoothing <br>
+      </td>
+      <td style="vertical-align: top;"><a href="http://www.cs.sandia.gov/optimization/knupp/Mesquite.html">More Information</a> / <br>
+      <a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/Mesquite/Mesquite-1.1b.tgz">Download (v0.7)</a><br>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">Swap<br>
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:cfog@mech.ubc.ca">Carl Ollivier-Gooch</a>, UBC<br>
+      </td>
+      <td style="vertical-align: top;">Mesh quality improvment for simplicial meshes via edge and face swapping, 2D/3D<br>
+      </td>
+      <td style="vertical-align: top;">Partial iMesh to set up single entity iterators, obtain, vertex coordinates, adjacency information <br>
+      </td>
+      <td style="vertical-align: top;"><a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/Swapping/ITAPS-Swap-1.0-p6.tar.gz">More Information</a> / <br>Download (v0.7)<br>
+      </td>
+    </tr> 
+
+    <tr>
+      <td style="vertical-align: top;">Frontier<br>
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:linli@ams.sunysb.edu">Xiaolin Li</a>, SUNY SB<br>
+      </td>
+      <td style="vertical-align: top;">Front tracking for surfaces of discontinuity<br>
+      </td>
+      <td style="vertical-align: top;">Partial iMesh implementation <br>
+      </td>
+      <td style="vertical-align: top;"><a href="http://sitsec.ams.sunysb.edu/trac/wiki/FronTier">More Information</a> / <br> <a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/iMesh_Distributions/FronTier/FronTier.Lite.06_28_07.tar.gz"> Download (v0.7)</a><br>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="vertical-align: top;">Zoltan<br>
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:kddevin@sandia.gov">Karen Devine</a>, SNL<br>
+      </td>
+      <td style="vertical-align: top;">Dynamic Load Balancing for parallel computing <br>
+      </td>
+      <td style="vertical-align: top;">Partial iMesh or iMeshP implementation <br>
+      </td>
+      <td style="vertical-align: top;"><a href="http://www.cs.sandia.gov/Zoltan">More Information</a> / <br>
+<a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/Zoltan/izoltanserial-0.9.tar.gz">Download Serial iZoltan (v0.7)</a><br>
+<a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/Zoltan/izoltanparallel-0.8.tar.gz">Download Parallel iZoltan (v0.7)</a><br>
+      </td>
+
+    <tr>
+      <td style="vertical-align: top;">VisIt Plugin<br>
+      </td>
+      <td style="vertical-align: top;"><a href="mailto:miller86@llnl.gov">Mark Miller</a>, LLNL<br>
+      </td>
+      <td style="vertical-align: top;">ITAPS interface for the VisIt scientific computing software<br>
+      </td>
+      <td style="vertical-align: top;">Partial iMesh implementation <br>
+      </td>
+
+      <td style="vertical-align: top;"><a href="http://www.llnl.gov/visit">More Information</a> / <br>Download (v0.7) (<a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/VisIt/VisIt_ITAPS_C_plugin.tar.gz">C</a>, <a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/VisIt/VisIt_ITAPS_sidl_plugin.tar.gz">SIDL</a>)
+
+    </tr>
+  </tbody>
+</table>
+<big><big><big><big><small><small><small><br>
+</small></small></small></big></big></big></big><br>
+</div>
+</div>
+
+</body>
+</html>

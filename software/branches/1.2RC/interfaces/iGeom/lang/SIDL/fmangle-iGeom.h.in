@@ -1,0 +1,7 @@
+#include "fmangle-iBase.h"
+
+/* Fortran mangling for function names without underscores */
+#undef iGeom_FC_FUNC
+
+/* Fortran mangling for function names with underscores */
+#undef iGeom_FC_FUNC_

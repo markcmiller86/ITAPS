@@ -1,0 +1,26 @@
+include @TSTTB_ROOT@/TSTTB-Defs.inc
+include @TSTTM_ROOT@/TSTTM-Defs.inc
+
+INCLUDES = $(TSTTB_CLIENT_F77_INCLUDES) $(TSTTM_CLIENT_F77_INCLUDES) \
+	$(SIDL_INCLUDES)
+LIBS = $(TSTTM_LIB_DIR) $(TSTTB_LIB_DIR)  $(TSTTM_ALL_F77_LIBS) $(TSTTM_BACKEND_LIBS) $(TSTTB_ALL_F77_LIBS) $(SIDL_LIBS)
+
+F77_OBJS = hello_mesh.o
+
+all: hello_mesh
+
+# Not so sure that the following rule will work properly for a Fortran
+# server, but it will definitely work for C++ servers and probably C
+# servers as well.
+hello_mesh: $(F77_OBJS)
+	@CXX@ $(F77_OBJS) -o $@ $(LIBS) @FLIBS@
+
+clean:
+	rm -rf *.o *~
+
+distclean:
+	rm -rf *.o *~ hello_mesh Makefile
+
+.c.o:
+	echo Compiling *.c
+	@F77@ $(INCLUDES) -c $<

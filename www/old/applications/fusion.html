@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Fusion</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+<h1>Fusion</h1>
+
+<h2>Pellet ablation for tokamak fueling</h2>
+
+<p><i>ITAPS Personnel</i>: Roman Samulyak (BNL)</p>
+
+<p><i>Fusion Personnel</i>: General Atomics</p>
+
+<p><i>Project Status:</i>  Active </p>
+
+In a recent collaboration with fusion scientists at General Atomics,
+we used the FronTier-Lite front tracking library to study the physics
+of pellet ablation for tokamak fueling. Obtaining a deep understanding
+of this phenomenon is necessary for the successful operation of ITER,
+an international research collaboration that aims to
+demonstrate the scientific and technical feasibility of fusion
+power. Plans call for fueling ITER by injection of frozen deuterium
+pellets which ablate when interacting with the hot fusion plasmas; the
+lower the quasi-steady state ablation rate, the higher the fueling
+efficiency. However the physical processes associated with this
+ablation are not clearly understood and advanced modeling and
+simulation tools are being used to shed light on these processes. </p>
+<br>
+<p>
+
+<table border="0" cellspacing="10"> 
+<caption><i>
+Figure: A schematic of ITER and of the physical processes associated with
+crygenic deuterium pellet ablation in a tokamak magnetic field.  Hot
+electrons traveling along the magnetic field lines hit the pellet
+surface causing a rapid ablation.  A cold, dense cloud forms around
+the pellet and shields it from incoming hot electrons.  The most
+important processes determining pellet ablation from that point
+forward occur in the cloud.
+</i></caption>
+<tbody> 
+<tr> 
+<th> <img src="../graphics/ITER.jpg" height="270" alt="ITER Geometry" /></th>
+<th> <img src="../graphics/microscale.jpg" height="135" alt="Microscale structure" /></th>
+</tr>
+</tbody>
+</table>
+<br>
+Using the front tracking technology developed by the ITAPS Center, we
+have developed novel mathematical models and computational software
+for the numerical simulation of the pellet ablation for tokamak
+fueling. Using this software, the pellet ablation rate and lifetime in
+magnetic fields were systematically studied for the first time and
+compared with theory and experimental databases. 
+Simulations revealed several new features of the pellet ablation such
+as, contrary to expectations, the ablation rate depends strongly on
+the magnetic field strength. This new feature implies that pellets
+traversing strong plasma gradients, as in the edge pedestal region of
+the ITER plasma, could have significantly lower ablation rates (higher
+fueling efficiency) if injected at higher velocity.</p>
+<p>
+
+<table border="0" cellspacing="10"> 
+<caption><i>
+Figure: The isosurfaces of pressure and rotational machnumber for the steady
+state ablation cloud.  Numerical simulations of these quantities
+revealed new properties for pellet ablation and led to key insights
+for ITER fueling techniques.
+</i></caption>
+<tbody> 
+<tr> 
+<th> <img src="../graphics/pellet_results.jpg" height="270" alt="Microscale Study Results" /></th>
+</tr>
+</tbody>
+</table>
+<br>
+
+<h2>Adaptive Loops for Extended Magnetohydrodynamics Modeling</h2>
+<p>
+<p><i>ITAPS Personnel</i>: Mark Shephard (RPI), Ken Jansen (RPI)</p>
+
+<p><i>Fusion Personnel</i>: Steve Jardin (PPPL), Jin Chen (PPPL)</p>
+
+<p><i>Project Status</i>: Acive </p>
+The
+SciDAC-funded ``Center for Extended MHD modeling (CEMM)'' has
+extensively used a 3D MHD code to simulate global instabilities in
+magnetic fusion devices.  The ITAPS team is working with CEMM fusion
+scientists to extend the MHD high-order finite element software
+(M3D-C1) to interface with unstructured mesh adaptation
+technologies. This enables them to gain the efficiencies of using
+adaptive meshes (see the figure below for isotropic and
+anisotropic adapted meshes) and allows them to
+model general curved reactor domains (see the rightmost image in the
+Figure). In a related effort, we are working to
+apply new interface smoothing capabilities in Mesquite to tokamak
+meshes from the Princeton Plasma Physics Lab (PPPL) with the goal of
+improving quality while preserving grid alignment with magnetic field
+lines.
+
+In a collaborative effort, ITAPS, CEMM, and TOPS researchers have also
+developed flexible data structures and interfaces to enable M3D-C1 to
+use advanced linear algebraic solvers. In the new extended software,
+SuperLU_dist is used to factor the large sparse matrix associated
+with the M3D-C1 implicit formulation for the 2F MHD equations every
+5-20 time-steps instead of every time-step as in the original
+software. In the intervening time steps, the last factored matrix is
+used as a very effective preconditioner for a GMRES-based iterative
+solve in PETSc, which then requires only a few iterations to
+converge. In the initial application, this resulted in a net speed
+increase of about 70% for a 2D "approach to 2F equilibrium with flow
+in NSTX" application. This accomplishment is regarded as a major
+milestone in transitioning M3D-C1 into an efficient and scalable 3D
+nonlinear 2F MHD code.
+<p>
+<table border="0" cellspacing="0"> 
+<caption><i>Figure 1: Isotropic and anisotropic mesh adaptation to
+increase computational efficiency in fusion applications.
+On the far right we show the vorticity contours in a 
+curved reactor domain</i></caption>
+<tbody> 
+<tr><th>Isotropic Mesh</th> <th>Anistropic Mesh</th> <th>Curved Mesh</th></tr>
+<tr> 
+<th> <img src="../graphics/fusion-adapted.jpg" height="270" alt="Isotropic Mesh Adaptation" /></th>
+<th> <img src="../graphics/fusion-anisotropic.jpg" height="270" alt="Anisotropic Mesh Adaptation" /></th>
+<th> <img src="../graphics/PPPL-CURVED.jpg" height="270" alt="Vorticity Contours in a Curved Reactor Domain" /></th>
+</tr>
+</tbody>
+</table>
+
+<p>The current ITAPS work is focused on an M3D-C<sup>1</sup> adaptive loop 
+simulation of a reconnection problem.  Major work includes:</p>
+<ul>
+<li>Proper definition of periodic boundary conditions such that they are consistently
+handled in iMesh, iGeom, and iMeshP.</li>
+<li>Transfer of field information to the adapted mesh such that conservation of energy
+and magnetic flux is satisfied</li>
+<li>Higher quality error indication routines.</li>
+<li>Spatial stabilization and variational multiscale models for Extended MHD simulations.</li>
+</ul>
+
+<h2> First wall shield design for ITER.</h2>
+
+<p><i>ITAPS Personnel</i>: Tim Tautges (ANL) </p>
+
+<p><i>Project Status</i>: Acive </p>
+
+<p>The success of ITER depends on the ability of components to withstand
+high fluences of 14MeV neutrons and the heat loads and other effects
+of this radiation exposure.  This is of particular importance in the
+diagnostic ports and plasma-facing components; the US is responsible
+for providing 20% of these components as part of its ITER commitment.
+Fast ray-tracing on facet-based models derived from CAD geometry
+enables 3D analysis of radiation transport in these components.  The
+ITAPS solution transfer service is used to provide radiation heating
+as a source term for fluid flow and heat transfer calculations.  These
+analyses are an integral part of the design process for these
+components, ensuring they can withstand radiation-induced heating
+and damage while maintaining structural integrity.  This work is
+funded by the US ITER project. </p>
+
+
+	</div>
+</div>
+
+</body>
+</html>

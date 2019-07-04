@@ -1,0 +1,13 @@
+.SILENT:
+include @IMPL_ROOT@/conf/Makefile-server-inc
+
+######################################################################
+# The following line should be changed for servers not written in C++
+AUTO_OBJS=${IMPLSRCS:.c=.o} ${IORSRCS:.c=.o} ${SKELSRCS:.c=.o} ${STUBSRCS:.c=.o}
+
+EXTRA_INCLUDES=$(TSTTM_BACKEND_INCLUDES) 
+
+INTERNAL_SRCS=NativeToTSTT.c
+
+INTERNAL_OBJS=${INTERNAL_SRCS:.c=.o}
+

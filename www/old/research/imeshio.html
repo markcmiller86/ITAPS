@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>iMeshIO Library</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>iMeshIO Library</h1>
+
+<p>
+While the iMesh implementations were previously interchangeable once
+the data was loaded into memory, the data load process itself was
+specific to each implementation implying that
+a file written by one implementation would not necessarily be
+accessible to a different implementation.  The iMeshIO service
+addresses this need by providing access to a wide variety of
+scientific data via the iMesh interface.  We are leveraging the VisIt
+database plugin readers which allow users to read scientific data from
+any of 100+ file formats and instantiate that data in an iMesh
+implementation.  The essential first step in developing iMeshIO was to
+develop a write capability for VisIt's ITAPS database plugin. This
+writer supports basic features of the iMesh interface including basic
+mesh topology and geometry as well as fields stored as dense tags. It
+does not yet support advanced set hierarchies, sparse tags or iMeshP.
+The ITAPS writer has been tested with the MOAB, GRUMMP, and FMDB
+implementations of iMesh.
+An early alpha release of iMeshIO was recently completed.
+With it, we recently demonstrated the ability to instantiate data from a
+previously unsupported file type in an iMesh implementation using
+iMeshIO, use an ITAPS service such as iZoltan to decompose the data
+for parallel computations, and visualize the results using VisIt.
+
+
+
+</div>
+</div>
+
+</body>
+</html>

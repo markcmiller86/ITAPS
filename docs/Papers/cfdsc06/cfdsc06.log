@@ -1,0 +1,419 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2012.8.30)  29 JUL 2013 16:12
+entering extended mode
+ %&-line parsing enabled.
+**cfdsc06
+(./cfdsc06.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+(./cfdsc.cls
+Document Class: cfdsc 03/01/23 v1.0\ Societe Canadienne de CFD Society of Canad
+a
+(/usr/share/texmf-texlive/tex/latex/base/article.cls
+Document Class: article 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/share/texmf-texlive/tex/latex/base/size10.clo
+File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/share/texmf-texlive/tex/latex/pslatex/pslatex.sty
+Package: pslatex 1996/07/24 v1.2 pslatex emulation (DPC)
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 65.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
+(Font)                  OT1/cmr/m/n --> OT1/ptmcm/m/n on input line 65.
+LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptmcm/m/n on input line 65.
+LaTeX Font Info:    Redeclaring symbol font `letters' on input line 66.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `normal'
+(Font)                  OML/cmm/m/it --> OML/ptmcm/m/it on input line 66.
+LaTeX Font Info:    Overwriting symbol font `letters' in version `bold'
+(Font)                  OML/cmm/b/it --> OML/ptmcm/m/it on input line 66.
+LaTeX Font Info:    Redeclaring symbol font `symbols' on input line 67.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `normal'
+(Font)                  OMS/cmsy/m/n --> OMS/pzccm/m/n on input line 67.
+LaTeX Font Info:    Overwriting symbol font `symbols' in version `bold'
+(Font)                  OMS/cmsy/b/n --> OMS/pzccm/m/n on input line 67.
+LaTeX Font Info:    Redeclaring symbol font `largesymbols' on input line 68.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `normal'
+(Font)                  OMX/cmex/m/n --> OMX/psycm/m/n on input line 68.
+LaTeX Font Info:    Overwriting symbol font `largesymbols' in version `bold'
+(Font)                  OMX/cmex/m/n --> OMX/psycm/m/n on input line 68.
+\symbold=\mathgroup4
+\symitalic=\mathgroup5
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 74.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 74.
+LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `bold'
+(Font)                  OT1/cmr/bx/n --> OT1/ptm/bx/n on input line 74.
+LaTeX Font Info:    Redeclaring math alphabet \mathit on input line 75.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
+(Font)                  OT1/cmr/m/it --> OT1/ptm/m/it on input line 75.
+LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
+(Font)                  OT1/cmr/bx/it --> OT1/ptm/m/it on input line 75.
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks14
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+Package graphics Info: Driver file: dvips.def on input line 91.
+
+(/usr/share/texmf-texlive/tex/latex/graphics/dvips.def
+File: dvips.def 1999/02/16 v3.0i Driver-dependant file (DPC,SPQR)
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+\c@inst=\count87
+\c@auth=\count88
+
+(/usr/share/texmf-texlive/tex/latex/geometry/geometry.sty
+Package: geometry 2008/12/21 v4.2 Page Geometry
+
+(/usr/share/texmf-texlive/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2009/04/10 v2.0 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in pdf mode not detected.
+)
+(/usr/share/texmf-texlive/tex/generic/oberdiek/ifvtex.sty
+Package: ifvtex 2008/11/04 v1.4 Switches for detecting VTeX and its modes (HO)
+Package ifvtex Info: VTeX not detected.
+)
+\Gm@cnth=\count89
+\Gm@cntv=\count90
+\c@Gm@tempcnt=\count91
+\Gm@bindingoffset=\dimen105
+\Gm@wd@mp=\dimen106
+\Gm@odd@mp=\dimen107
+\Gm@even@mp=\dimen108
+\Gm@dimlist=\toks15
+))
+(/usr/share/texmf-texlive/tex/latex/base/fontenc.sty
+Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
+
+(/usr/share/texmf-texlive/tex/latex/base/t1enc.def
+File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
+))
+(/usr/share/texmf-texlive/tex/latex/base/inputenc.sty
+Package: inputenc 2008/03/30 v1.1d Input encoding file
+\inpenc@prehook=\toks16
+\inpenc@posthook=\toks17
+
+(/usr/share/texmf-texlive/tex/latex/base/latin1.def
+File: latin1.def 2008/03/30 v1.1d Input encoding file
+))
+(/usr/share/texmf-texlive/tex/latex/subfigure/subfigure.sty
+Package: subfigure 2002/03/15 v2.1.5 subfigure package
+\subfigtopskip=\skip43
+\subfigcapskip=\skip44
+\subfigcaptopadj=\dimen109
+\subfigbottomskip=\skip45
+\subfigcapmargin=\dimen110
+\subfiglabelskip=\skip46
+\c@subfigure=\count92
+\c@lofdepth=\count93
+\c@subtable=\count94
+\c@lotdepth=\count95
+
+****************************************
+* Local config file subfigure.cfg used *
+****************************************
+(/usr/share/texmf-texlive/tex/latex/subfigure/subfigure.cfg)
+\subfig@top=\skip47
+\subfig@bottom=\skip48
+)
+(/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
+\Urlmuskip=\muskip10
+Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
+)
+(/usr/share/texmf-texlive/tex/generic/babel/babel.sty
+Package: babel 2008/07/06 v3.8l The Babel package
+
+(/usr/share/texmf-texlive/tex/generic/babel/english.ldf
+Language: english 2005/03/30 v3.3o English support from the babel system
+
+(/usr/share/texmf-texlive/tex/generic/babel/babel.def
+File: babel.def 2008/07/06 v3.8l Babel common definitions
+\babel@savecnt=\count96
+\U@D=\dimen111
+)
+\l@british = a dialect from \language\l@english 
+\l@UKenglish = a dialect from \language\l@english 
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+)) (./cfdsc06.aux)
+\openout1 = `cfdsc06.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OMS/pzccm/m/n on input line 30.
+LaTeX Font Info:    Try loading font information for OMS+pzccm on input line 30
+.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/omspzccm.fd
+File: omspzccm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/pzccm.
+)
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 30.
+LaTeX Font Info:    ... okay on input line 30.
+
+*geometry detected driver: dvips*
+-------------------- Geometry parameters
+paper: letterpaper
+landscape: --
+twocolumn: true
+twoside: --
+asymmetric: --
+h-parts: 90.3375pt, 451.68752pt, 72.26999pt
+v-parts: 72.26999pt, 650.43001pt, 72.26999pt
+hmarginratio: --
+vmarginratio: --
+lines: --
+heightrounded: --
+bindingoffset: 0.0pt
+truedimen: --
+includehead: --
+includefoot: --
+includemp: --
+driver: dvips
+-------------------- Page layout dimensions and switches
+\paperwidth  614.295pt
+\paperheight 794.96999pt
+\textwidth  451.68752pt
+\textheight 650.43001pt
+\oddsidemargin  18.0675pt
+\evensidemargin 18.0675pt
+\topmargin  0.0pt
+\headheight 0.0pt
+\headsep    0.0pt
+\footskip   0.0pt
+\marginparwidth 4.0pt
+\marginparsep   10.0pt
+\columnsep  18.06749pt
+\skip\footins  9.0pt plus 4.0pt minus 2.0pt
+\hoffset 0.0pt
+\voffset 0.0pt
+\mag 1000
+\@twocolumntrue 
+(1in=72.27pt, 1cm=28.45pt)
+-----------------------
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 52.
+
+LaTeX Warning: there is no bold Symbol font on input line 52.
+
+LaTeX Font Info:    Try loading font information for OT1+ptmcm on input line 52
+.
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptmcm.fd
+File: ot1ptmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ptmcm.
+)
+LaTeX Font Info:    Try loading font information for OML+ptmcm on input line 52
+.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/omlptmcm.fd
+File: omlptmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ptmcm.
+)
+LaTeX Font Info:    Try loading font information for OMX+psycm on input line 52
+.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/omxpsycm.fd
+File: omxpsycm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/psycm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 52.
+\instindent=\dimen112
+
+Overfull \hbox (9.2pt too wide) detected at line 52
+$[]$
+ []
+
+
+Overfull \hbox (9.2pt too wide) detected at line 52
+$[]$
+ []
+
+
+Overfull \hbox (9.2pt too wide) detected at line 52
+$[]$
+ []
+
+
+Overfull \hbox (9.2pt too wide) detected at line 52
+$[]$
+ []
+
+
+Overfull \hbox (9.2pt too wide) detected at line 52
+$[]$
+ []
+
+LaTeX Font Info:    Font shape `T1/ptm/bx/sc' in size <12> not available
+(Font)              Font shape `T1/ptm/b/sc' tried instead on input line 54.
+[1
+
+
+]
+File: non-component.eps Graphic file (type eps)
+ <non-component.eps>
+File: wrapper.eps Graphic file (type eps)
+ <wrapper.eps>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+File: implementation.eps Graphic file (type eps)
+
+<implementation.eps>
+File: service.eps Graphic file (type eps)
+ <service.eps>
+File: app-serv.eps Graphic file (type eps)
+ <app-serv.eps>
+File: app-serv-impl.eps Graphic file (type eps)
+ <app-serv-impl.eps>
+Underfull \hbox (badness 1072) in paragraph at lines 188--191
+\T1/ptm/m/n/10 ma-nip-u-la-tion and dis-cretiza-tion tasks, can be
+ []
+
+[2]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [3]
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 239.
+LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10> not available
+(Font)              Font shape `OMS/pzccm/m/n' tried instead on input line 257.
+
+
+[4]
+Underfull \hbox (badness 1253) in paragraph at lines 331--347
+\T1/ptm/m/n/10 TSTT \T1/ptm/m/it/10 mesh en-ti-ties \T1/ptm/m/n/10 are the fun-
+da-men-tal build-ing
+ []
+
+
+Underfull \vbox (badness 7099) has occurred while \output is active []
+
+ [5]
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 417.
+
+Underfull \hbox (badness 1337) in paragraph at lines 417--421
+\T1/ptm/m/n/10 pro-cesses (such as a CAD en-gine) and pre-
+ []
+
+
+Underfull \hbox (badness 3792) in paragraph at lines 424--427
+[]\T1/ptm/m/n/10 Typical func-tions
+ []
+
+
+Underfull \hbox (badness 3965) in paragraph at lines 434--436
+[]\T1/ptm/m/n/10 indicating how face
+ []
+
+[6]
+Underfull \hbox (badness 1215) in paragraph at lines 526--535
+\T1/ptm/m/n/10 sev-eral im-ple-men-ta-tions are also nearly com-plete,
+ []
+
+(./cfdsc06.bbl
+Underfull \hbox (badness 10000) in paragraph at lines 4--8
+[]\T1/ptm/m/n/10 S. Balay, K. Buschel-man, D. Gropp,
+ []
+
+
+Underfull \hbox (badness 6078) in paragraph at lines 4--8
+\T1/ptm/m/n/10 W.D. Kaushik, M. Kne-p-ley, B. McInnes,
+ []
+
+[7]
+Underfull \hbox (badness 2409) in paragraph at lines 26--30
+[]\T1/ptm/m/n/10 B. Fix, J. Glimm, X. Li, Y. Li, X. Liu,
+ []
+
+
+Underfull \hbox (badness 1590) in paragraph at lines 32--34
+[]\T1/ptm/m/n/10 Fluent web-page.  $\T1/pcr/m/n/10 http : / / www . fluent . co
+m$\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 1454) in paragraph at lines 36--39
+\T1/ptm/m/n/10 oriented tools for solv-ing PDEs in com-plex
+ []
+
+
+Underfull \hbox (badness 4981) in paragraph at lines 36--39
+\T1/ptm/m/n/10 ge-ome-tries.  $\T1/pcr/m/n/10 http : / / www . llnl . gov / cas
+c /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 57--61
+[]\T1/ptm/m/n/10 C. Ollivier-Gooch.  A mesh-database-
+ []
+
+
+Underfull \hbox (badness 5954) in paragraph at lines 57--61
+\T1/ptm/m/n/10 independent edge- and face-swapping tool.
+ []
+
+
+Underfull \hbox (badness 3049) in paragraph at lines 94--97
+[]\T1/ptm/m/n/10 T. J. Taut-ges.  MOAB: A Mesh-Oriented
+ []
+
+
+Underfull \hbox (badness 2903) in paragraph at lines 99--103
+[]\T1/ptm/m/n/10 T. J. Taut-ges, R. E. Mey-ers, K. Merkley,
+ []
+
+
+Underfull \hbox (badness 1412) in paragraph at lines 105--108
+[]\T1/ptm/m/n/10 H. Trease and L. Trease.  North-West Grid
+ []
+
+) [8] (./cfdsc06.aux) ) 
+Here is how much of TeX's memory you used:
+ 2045 strings out of 495062
+ 25460 string characters out of 1182644
+ 85188 words of memory out of 3000000
+ 5208 multiletter control sequences out of 15000+50000
+ 42200 words of font info for 62 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 32i,6n,24p,249b,292s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on cfdsc06.dvi (8 pages, 43704 bytes).

@@ -1,0 +1,58 @@
+<html><head><title>main</title></head><body background="source_bkg.jpg">
+<table border=0><tr valign=center>
+<td width="33%" align=left></td>
+<td width="33%" align=center><a href="main.html"><img src="source_up.jpg" alt="main"></a></td>
+<td align=right></td>
+</tr></table>
+<img src="bar.jpg" alt=""><code><pre><font color="green">     1 </font>int <code>main</code>(int argc, char **argv) 
+<font color="green">     2 </font>{
+<font color="green">     3 </font>  iMesh_Instance imesh;
+<font color="green">     4 </font>  iBase_EntitySetHandle root_set;
+<font color="green">     5 </font>  int err, dim, num_ent;
+<font color="green">     6 </font>  const char *fname = "125hex.vtk";
+<font color="green">     7 </font>
+<font color="green">     8 </font>  <font color="red">/**************************************************/</font>
+<font color="green">     9 </font>  <font color="red">/* create the imesh instance and get the root set */</font>
+<font color="green">    10 </font>  <font color="red">/**************************************************/</font>
+<font color="green">    11 </font>  <a href="../../spec/index.html#iMesh_newMesh"><code>iMesh_newMesh</code></a>("", &imesh, &err, 0);
+<font color="green">    12 </font>  <a href="CHECK.html"><code>CHECK</code></a>("Failed to create imesh instance.\n");
+<font color="green">    13 </font>
+<font color="green">    14 </font>  <a href="../../spec/index.html#iMesh_getRootSet"><code>iMesh_getRootSet</code></a>(imesh, &root_set, &err);
+<font color="green">    15 </font>  <a href="CHECK.html"><code>CHECK</code></a>("Failed to get root set.\n");
+<font color="green">    16 </font>
+<font color="green">    17 </font><font color="red">/* Load the vtk mesh from a file.  The only elements that are guaranteed
+<font color="green">    18 </font>     to be supported by all implementations are triangles.  Others may be
+<font color="green">    19 </font>     supported, but this is implementation dependent. */</font>
+<font color="green">    20 </font>  if (argc &gt; 1) fname = argv[1];
+<font color="green">    21 </font>  <a href="../../spec/index.html#iMesh_load"><code>iMesh_load</code></a>(imesh, root_set, fname, "", &err, <code>strlen</code>(fname), 0);
+<font color="green">    22 </font>  <a href="CHECK.html"><code>CHECK</code></a>("Failed to load mesh file.\n");
+<font color="green">    23 </font>
+<font color="green">    24 </font><font color="red">/* Get the geometric dimension of the mesh to show that the we have
+<font color="green">    25 </font>   actually loaded a mesh */</font>
+<font color="green">    26 </font>  <a href="../../spec/index.html#iMesh_getGeometricDimension"><code>iMesh_getGeometricDimension</code></a>(imesh, &dim, &err);
+<font color="green">    27 </font>  <a href="CHECK.html"><code>CHECK</code></a>("Failed in getGeometricDimension\n");
+<font color="green">    28 </font>  
+<font color="green">    29 </font>  <code>printf</code>("dimension = %d\n", dim);
+<font color="green">    30 </font>
+<font color="green">    31 </font><font color="red">/* Get the number of vertices and elements in the mesh to show the use of
+<font color="green">    32 </font>   enumerated types */</font>
+<font color="green">    33 </font>  for (dim = iBase_VERTEX; dim &lt;= iBase_REGION; dim++) {
+<font color="green">    34 </font>    <a href="../../spec/index.html#iMesh_getNumOfType"><code>iMesh_getNumOfType</code></a>(imesh, root_set, dim, &num_ent, &err);
+<font color="green">    35 </font>    <a href="CHECK.html"><code>CHECK</code></a>("Failed in getNumOfType.\n");
+<font color="green">    36 </font>    <code>printf</code>("number of %d-D entities = %d\n", dim, num_ent);
+<font color="green">    37 </font>  }
+<font color="green">    38 </font>
+<font color="green">    39 </font><font color="red">/* Call destructor on interface */</font>
+<font color="green">    40 </font>  <a href="../../spec/index.html#iMesh_dtor"><code>iMesh_dtor</code></a>(imesh, &err);
+<font color="green">    41 </font>  <a href="CHECK.html"><code>CHECK</code></a>("Failed to destruct imesh instance.\n");
+<font color="green">    42 </font>
+<font color="green">    43 </font>  return 0;
+<font color="green">    44 </font>}
+<font color="green">    45 </font>
+</pre></code><img src="bar.jpg" alt="">
+<table border=0><tr valign=center>
+<td width="33%" align=left></td>
+<td width="33%" align=center><a href="main.html"><img src="source_up.jpg" alt="main"></a></td>
+<td align=right></td>
+</tr></table>
+</body></html>

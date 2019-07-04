@@ -1,0 +1,128 @@
+The development of effective simulation codes for solving problems in
+mathematical physics using mesh-based techniques continues to require
+significant effort.  Because the governing equations can be
+non-linear, coupled and/or subject to continued refinement, a wide
+variety of functions must be addressed for each new problem area.
+These include, for example, mesh generation and adaptive mesh control,
+equation discretization, the solution of large systems of linear or
+non-linear equations, and, potentially, coupling results between
+different codes. The execution of many of these steps can be supported
+using existing technologies, but coupling technologies developed by
+different groups can be quite challenging.  This paper overviews an
+approach which addresses this challenge for the generation and control
+of meshes as well as the interactions of simulation information
+defined on those meshes through the development of interoperable
+components.
+
+A number of different approaches have been used to provide tools and
+technologies to mesh-based simulation code developers. Depending on
+the starting point and needs of the specific code development process,
+each has been found to be useful. These approaches can be categorized
+into the following four groups:
+
+\begin{enumerate}
+\item complete simulation codes that support the integration of specific
+      user-defined modules,
+\item simulation frameworks that support the overall development process,
+\item libraries that support specific aspects of the simulation
+      process, and
+\item components that encapsulate specific functionalities.
+\end{enumerate}
+
+There are many examples of complete simulation codes that provide a
+small set of predefined routines that allow users to add specific
+capabilities. One such well known example is ABAQUS \cite{abaqus}
+which supports a user-defined material routine and a user-defined
+finite element routine which allows users to include their own
+constitutive relationships and finite element type,
+respectively. Although predefined user routine interfaces place
+specific limits on the form that can be added, they are particularly
+useful if the missing functionality needed is covered by that
+routine. For example, the ABAQUS material routine has been
+successfully used to integrate hundreds of new material models ranging
+from simple curve fits through homogenized constitutive relations
+constructed from multiscale analysis.  The key disadvantages of this
+approach are that the new capabilities that can be added are quite
+limited and they can only be added through a specific interface. More
+recently programs such as FEMLAB \cite{femlab} have been introduced
+that increase the number of points of entry for new capabilities and
+provide a broader definition of the interface.  This brings it much
+closer to the simulation framework approach.
+
+Simulation frameworks provide an overall structure, building on
+particular data formats and other services, that support the effective
+development and extension of the framework to provide new capabilities
+\cite{BeSh99,BrLa97,DoLa96,De97,StEd04}. Efforts on simulation
+framework development have taken advantage of modern programming
+languages to provide developers a high degree of flexibility. However,
+the choices made on the interface methods, data and algorithmic
+services vary substantially among the various frameworks. The
+differences correspond to the trade-offs associated with the types and
+levels of generality supported and the computational efficiency that
+can be obtained.  The framework approach can be particularly effective
+when an entirely new simulation code is being developed and one of the
+available frameworks is a good match in terms of functionality
+supported and level of computational efficiency possible. However, for
+developers with an existing code that are focused on incorporating new
+capabilities, the framework approach is not ideal because moving
+existing capabilities into the framework will be time consuming at
+best.
+
+The use of numerical libraries to support the development of numerical
+simulation codes has a long history. The area where numerical
+libraries have been, and continue to be, most successful is for
+execution of computationally intensive core numerical algorithms like
+algebraic system solvers, ordinary differential equation and
+differential-algebraic solvers (e.g.,
+\cite{AsPe98,petsc,BaGr97,eispack,lapack,linpack}). These libraries
+provide capabilities for computationally intensive operations that are
+most efficiently executed by the careful selection and implementation
+of specific numerical algorithms. Although quite successful in their
+specific areas, numerical libraries do not support development of
+other portions of the code, nor do they support integration with
+higher level functionalities.
+
+Recently, the use of component technologies for the development of
+simulation codes has started to become more prevalent \cite{cca-app}.
+A component is defined to be a software object meant to interact with
+other components that encapsulates a specific functionality, employs a
+clearly defined interface and conforms to a prescribed behavior common
+to all components in an architecture. Typically, each interface is
+supported by multiple implementations which allows code developers to
+easily experiment with different approaches.  This approach is ideal
+in the case where there is already a substantial investment in the
+simulation engine and the developers are interested in incorporating
+advanced functionality or experimenting with several different,
+related approaches.  Several groups are developing component
+implementations for different aspects of the numerical solution
+process including numerical solvers \cite{petsc,BaGr97}), ODE
+integrators, and visualization tools \cite{cca-paper}.  However, more
+work is required to increase the number of tools and technologies that
+use a component-based approach.
+
+In this paper, we describe ongoing research in the Terascale
+Simulation Tools and Technologies (TSTT) center to develop geometry,
+mesh and solution field components.  The primary reason for focusing
+on this set of components is that it provides access to a broad set of
+funtionalities to support simulation automation, solution reliability
+in terms of discretization error control,
+and the ability to integrate tools to construct multi-physics
+simulations.  Simulation automation is supported through the geometry
+and mesh components because they provide ready access to CAD-based
+geometry definitions and automatic mesh generators. Solution
+reliability is supported because these are the components needed to
+support the effective creation and adaptive control of meshes. The
+fields and mesh components are key to the effective coupling of
+multiple simulation codes in the construction of multiphysics
+simulations.
+
+Section 2 provides a high level view of the functions and information
+flow associated with the execution of mesh-based simulations starting
+from a generalized problem definition and indicates the role of the
+geometry, mesh and fields components in supporting these processes
+which defined in more detail in Section 3. Section 4 provides example
+applications of the initial version of these procedures to support
+design optimization, adaptive mesh control, mesh quality improvement,
+and front tracking. ****** THIS PARAGRAPH WILL NEED UPDATING TO BE
+CONSISTENT WITH THE FINAL VERSION AND APPLICATIONS INCLUDED ********
+

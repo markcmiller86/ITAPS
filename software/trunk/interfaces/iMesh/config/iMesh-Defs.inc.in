@@ -1,0 +1,28 @@
+# This file contains the essential make variables to facilitate building
+# iMesh applications against an implementation as well as defines their
+# meaning. The user's makefile simply needs to include this file.
+#
+# Note to developers: To produce the equivalent file for CMake based
+# applications use the mkcmakedefs tool in the tools dir.
+#
+# As part of the ITAPS interface specifications, implementations are required
+# to export values for CPPFLAGS, LIBS and DEPENDENCIES variables.
+
+
+# The CPPFLAGS variable contains the -I compilation options needed to enable
+# the compiler to find the implementation's include files.
+IMESH_CPPFLAGS=
+
+# The LIBS variable contains both the -L as well as the -l linker options to
+# enable the linker to find the implementation's library files. Although it
+# is more common GNU standard practice to separate -L options into LDFLAGS
+# variable and -l options into LIBS variable, there can sometimes be problems
+# with this when a make command needs to control the order of -L and -l options
+# on the link line. So, we opt to compress both into a single LIBS variable and
+# no LDFLAGS.
+IMESH_LIBS=
+
+# The DEPENDENCIES variable contains a list of files upon which the ABI exported
+# by the implementation is dependent. If the files listed here change, then
+# the make rules to re-make the client need to get triggered.
+IMESH_DEPENDENCIES=

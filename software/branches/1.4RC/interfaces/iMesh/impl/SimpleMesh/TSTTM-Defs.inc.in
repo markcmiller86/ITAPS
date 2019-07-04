@@ -1,0 +1,57 @@
+# This file contains variables that are essential for building
+# applications on TSTTM implementations without having to hack
+# application Makefiles horribly each time.  Instead, one can simply
+# re-run configure in the application tree with a new -with-TSTT-dir
+# argument, and the implementation-specific version of this file gets
+# included automatically.  The application programmer/user can also just
+# edit the pathname in their Makefile if they prefer.
+
+INSTALLED_MAKE_DEFS_PATH=@prefix@/share/TSTT
+INSTALLED_INCLUDES=-I@prefix@/include/TSTT
+INSTALLED_LIB_DIR=-L@prefix@/lib
+
+TSTTM_LIB_DIR=-L@IMPL_ROOT@/TSTTM -L@IMPL_ROOT@/TSTTM_@IMPL_NAME@
+
+# The following odd-looking order is needed for static linkage
+TSTTM_SERVER_LIBS =-lTSTTM -lTSTTM_@IMPL_NAME@
+TSTTM_ALL_CXX_LIBS=-lTSTTM_@IMPL_NAME@_C++ -lTSTTM_C++ $(TSTTM_SERVER_LIBS)
+TSTTM_ALL_C_LIBS  =-lTSTTM_@IMPL_NAME@_C   -lTSTTM_C   $(TSTTM_SERVER_LIBS)
+TSTTM_ALL_F77_LIBS=-lTSTTM_@IMPL_NAME@_F77 -lTSTTM_F77 $(TSTTM_SERVER_LIBS)
+TSTTM_ALL_F90_LIBS=-lTSTTM_@IMPL_NAME@_F90 -lTSTTM_F90 $(TSTTM_SERVER_LIBS)
+
+TSTTM_SERVER_INCLUDES=-I@IMPL_ROOT@/TSTTM/server -I@IMPL_ROOT@/TSTTM_@IMPL_NAME@/server
+TSTTM_SERVER_LIBFILE=@IMPL_ROOT@/TSTTM/libTSTTM.so @IMPL_ROOT@/TSTTM_@IMPL_NAME@/libTSTTM_@IMPL_NAME@.so
+
+# C++ client stuff
+TSTTM_CLIENT_CXX_INCLUDES=-I@IMPL_ROOT@/TSTTM/client_C++/
+TSTTM_CLIENT_CXX_LIBFILE=@IMPL_ROOT@/TSTTM/libTSTTM_C++.so @IMPL_ROOT@/TSTTM_@IMPL_NAME@/libTSTTM_@IMPL_NAME@_C++.so
+
+# C client stuff
+TSTTM_CLIENT_C_INCLUDES=-I@IMPL_ROOT@/TSTTM/client_C/
+TSTTM_CLIENT_C_LIBFILE=@IMPL_ROOT@/TSTTM/libTSTTM_C.so @IMPL_ROOT@/TSTTM_@IMPL_NAME@/libTSTTM_@IMPL_NAME@_C.so
+
+# F77 client stuff
+TSTTM_CLIENT_F77_INCLUDES=-I@IMPL_ROOT@/TSTTM/client_F77/
+TSTTM_CLIENT_F77_LIBFILE=@IMPL_ROOT@/TSTTM/libTSTTM_F77.so @IMPL_ROOT@/TSTTM_@IMPL_NAME@/libTSTTM_@IMPL_NAME@_F77.so
+
+# F90 client stuff
+TSTTM_CLIENT_F90_INCLUDES=-I@IMPL_ROOT@/TSTTM/client_F90/
+TSTTM_CLIENT_F90_LIBFILE=@IMPL_ROOT@/TSTTM/libTSTTM_F90.so @IMPL_ROOT@/TSTTM_@IMPL_NAME@/libTSTTM_@IMPL_NAME@_F90.so
+
+# Java client stuff; who knows?
+
+# python client stuff; who knows?
+
+TSTTM_BACKEND_INCLUDES=-I@IMPL_ROOT@/GRUMMP/include
+TSTTM_BACKEND_LIBS=-L@IMPL_ROOT@/GRUMMP/lib/libO/@host_os@ -lGR_3D -lGR_surf -lGR_2D -lGR_base -lSUMAAlog_lite -lOptMS
+TSTTM_BACKEND_LIBFILE=@IMPL_ROOT@/GRUMMP/lib/libO/@host_os@/libGR_3D.so
+
+SIDL_LIBS=-L@BABEL_ROOT@/lib -lsidlstub_cxx -lsidl @SIDL_STATIC_LIBS@
+SIDL_INCLUDES=-I@BABEL_ROOT@/include -I@BABEL_ROOT@/include/cxx
+
+# These two can be used in application Makefiles to define pre-processor
+# variables, eliminating the need to touch source code when changing
+# implementations.
+TSTTM_CREATE_ARG_VOL=GRUMMP,3D
+TSTTM_CREATE_ARG_SURFACE=GRUMMP,SURFACE
+TSTTM_CREATE_ARG_2D=GRUMMP,2D

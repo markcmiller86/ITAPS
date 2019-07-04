@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageIPComMan" -->
+</head>
+
+<body class="pageTools pageToolsServices pageIPComMan">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+<h1>IPComMan Service</h1>
+<p>The Inter-Processor Communication Manager (IPComMan) [1] is a general-purpose communication package built on top of MPI that aims to reduce data exchange costs by exploiting communications of a local neighborhood for each processor. The neighborhood is the subset of processors exchanging messages with each other during a specific communication round, which in a number of applications is bounded by a constant, independent of the total number of processors. The communication package keeps the message-passing within subdomains, and eliminates, or reduces, the number of collective calls needed.</p>
+<p>The communication package takes care of the message flow with a subset of MPI functions. IPComMan takes advantage of non-blocking message-passing functions, allowing it to post send or receive requests in between computation steps, and automatically manages their completion and delivery. The package provides several useful features: i) automatic message packing, ii) management of sends and receives with non-blocking MPI functions, iii) communication pattern reusability, iv) asynchronous behavior unless the other is specified, and v) support of dynamically changing neighborhoods during communication steps.</p>
+<p>Each processor has its own neighborhood, which is different from that of its neighbor(s). While initializing an IPComMan object, each processor specifies the neighbors it is going to communicate with. From that point, the communication package is concentrated on delivering messages between the processor and its neighbors only, not touching other processors of the domain, when possible. There are no collective calls during each communication round. However, there could be situations when it is not possible to a priori define all the neighbors for processors, i.e., new neighbors may be encountered during a communication step. For example, mesh modification operations [2] may alter the neighborhood of specific processors. As new neighbors needing to communicate will be unaware of each other, one collective call at the end of communication round is performed to verify whether the global number of sends and receives match.</p>
+<p>IPComMan is currently used to support parallel communication in FMDB - ITAPS interface implementation, and Mesh Adapt ITAPS Service. To measure the performance of mesh migration [3], an essential part of parallel unstructured mesh adaptation, IPComMan was compared with the Autopack communication utility [4] in three examples. The first two examples consider mesh size fields that represent a planar shock on cube geometry (CUBE) and two spherical shocks on torus geometry (TORUS). The third example includes mesh size field that represents the motion of air bubbles in a steady uniform flow (BUBBLE). These tests involve substantial coarsening and swapping and associated with them mesh migration.</p>
+
+<div class="imgContainer fLeft" style="width: 320px;">
+	<img src="../../assets/images/figure7.gif" width="320" height="150" alt="parallel isotropic mesh" />
+    <p>Figure 1. Parallel isotropic mesh adaptation on cube geometry</p>
+</div>
+
+<div class="imgContainer fLeft" style="width: 320px;">
+	<img src="../../assets/images/figure8.gif" width="320" height="118" alt="TORUS test - initial uniform mesh" />
+	<p>Figure 2. Parallel anisotropic mesh adaptation on torus geometry. </p>
+</div>
+
+<div class="clear"></div>
+
+<div class="imgContainer fLeft" style="width: 280px; margin-bottom: 20px">
+	<img src="../../assets/images/anisotropicMesh.gif" width="280" height="209" alt="parallel mesh adaptation for moving air bubbles" />
+	<p>Figure 3. Parallel mesh adaptation for moving air bubbles. </p>
+</div>
+
+<p>Figure 1 shows the CUBE test with the initial uniform mesh of about 17 million tetrahedra, and the final mesh of 2 million tetrahedra. Figure 2 shows TORUS test where the initial uniform mesh consists of 68 million tetrahedra, and the final one contains 3 million tetrahedra. Figure 3 represents BUBBLE test, involving movement of five air bubbles by a distance of 1/5th of their radius, with the initial mesh having 165 million tetrahedra, and 188 million tetrahedra in the final mesh. Table 1 shows the communication time (on processor with maximum) needed for exchanging/migrating the entities during mesh adaptation routines. It also contains the ratio (labeled as Ratio) between communication time and overall time. The results on IBM Blue Gene/L show that IPComMan's ability to localize communication to neighborhoods to be independent of the total number of processors and its use of non-blocking functions allows it to continuously reduce the communication time as the number of processors increases. Even though the differences in communication times between Autopack and IPComMan are not substantial at 128 processors, IPComMan is from 3 to 7 times faster in the 4096 processor case. IPComMan was successfully run on up to 32k cores on IBM Blue Gene/P as a part of Mesh Adapt Service testing.</p>
+
+
+<div class="imgContainer center" style="width: 500px;">
+<table cellspacing="0" cellpadding="0" style="background-color:#FFF">
+  <tr>
+    <td width="59"><p align="center"><strong>Test case</strong></p></td>
+    <td width="67" valign="top"><p><strong>N/proc</strong></p></td>
+    <td width="59" valign="top"><p align="center"><strong>128</strong></p></td>
+    <td width="59" valign="top"><p align="center"><strong>256</strong></p></td>
+    <td width="59" valign="top"><p align="center"><strong>512</strong></p></td>
+    <td width="59" valign="top"><p align="center"><strong>1024</strong></p></td>
+    <td width="59" valign="top"><p align="center"><strong>2048</strong></p></td>
+    <td width="59" valign="top"><p align="center"><strong>4096</strong></p></td>
+  </tr>
+  <tr>
+    <td width="59" rowspan="6" class="rowspan"><p align="center">CUBE</p></td>
+    <td width="67" valign="top"><p>Autopack</p></td>
+    <td width="59" valign="top"><p align="center">90</p></td>
+    <td width="59" valign="top"><p align="center">75</p></td>
+    <td width="59" valign="top"><p align="center">73</p></td>
+    <td width="59" valign="top"><p align="center">82</p></td>
+    <td width="59" valign="top"><p align="center">96</p></td>
+    <td width="59" valign="top"><p align="center">142</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Scaling</p></td>
+    <td width="59" valign="top"><p align="center">1</p></td>
+    <td width="59" valign="top"><p align="center">0.60</p></td>
+    <td width="59" valign="top"><p align="center">0.31</p></td>
+    <td width="59" valign="top"><p align="center">0.14</p></td>
+    <td width="59" valign="top"><p align="center">0.06</p></td>
+    <td width="59" valign="top"><p align="center">0.02</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Ratio</p></td>
+    <td width="59" valign="top"><p align="center">0.32</p></td>
+    <td width="59" valign="top"><p align="center">0.39</p></td>
+    <td width="59" valign="top"><p align="center">0.46</p></td>
+    <td width="59" valign="top"><p align="center">0.55</p></td>
+    <td width="59" valign="top"><p align="center">0.63</p></td>
+    <td width="59" valign="top"><p align="center">0.71</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>IPComMan</p></td>
+    <td width="59" valign="top"><p align="center">75</p></td>
+    <td width="59" valign="top"><p align="center">41</p></td>
+    <td width="59" valign="top"><p align="center">34.5</p></td>
+    <td width="59" valign="top"><p align="center">32.5</p></td>
+    <td width="59" valign="top"><p align="center">26.5</p></td>
+    <td width="59" valign="top"><p align="center">21</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Scaling</p></td>
+    <td width="59" valign="top"><p align="center">1</p></td>
+    <td width="59" valign="top"><p align="center">0.91</p></td>
+    <td width="59" valign="top"><p align="center">0.54</p></td>
+    <td width="59" valign="top"><p align="center">0.29</p></td>
+    <td width="59" valign="top"><p align="center">0.18</p></td>
+    <td width="59" valign="top"><p align="center">0.11</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Ratio</p></td>
+    <td width="59" valign="top"><p align="center">0.29</p></td>
+    <td width="59" valign="top"><p align="center">0.26</p></td>
+    <td width="59" valign="top"><p align="center">0.30</p></td>
+    <td width="59" valign="top"><p align="center">0.33</p></td>
+    <td width="59" valign="top"><p align="center">0.34</p></td>
+    <td width="59" valign="top"><p align="center">0.31</p></td>
+  </tr>
+  <tr>
+    <td width="59" rowspan="6" class="rowspan"><p align="center">TORUS</p></td>
+    <td width="67" valign="top"><p>Autopack</p></td>
+    <td width="59" valign="top"><p align="center">385</p></td>
+    <td width="59" valign="top"><p align="center">291</p></td>
+    <td width="59" valign="top"><p align="center">197</p></td>
+    <td width="59" valign="top"><p align="center">117</p></td>
+    <td width="59" valign="top"><p align="center">125</p></td>
+    <td width="59" valign="top"><p align="center">146</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Scaling</p></td>
+    <td width="59" valign="top"><p align="center">1</p></td>
+    <td width="59" valign="top"><p align="center">0.66</p></td>
+    <td width="59" valign="top"><p align="center">0.49</p></td>
+    <td width="59" valign="top"><p align="center">0.41</p></td>
+    <td width="59" valign="top"><p align="center">0.19</p></td>
+    <td width="59" valign="top"><p align="center">0.08</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Ratio</p></td>
+    <td width="59" valign="top"><p align="center">0.39</p></td>
+    <td width="59" valign="top"><p align="center">0.40</p></td>
+    <td width="59" valign="top"><p align="center">0.49</p></td>
+    <td width="59" valign="top"><p align="center">0.51</p></td>
+    <td width="59" valign="top"><p align="center">0.62</p></td>
+    <td width="59" valign="top"><p align="center">0.73</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>IPComMan</p></td>
+    <td width="59" valign="top"><p align="center">310</p></td>
+    <td width="59" valign="top"><p align="center">166</p></td>
+    <td width="59" valign="top"><p align="center">93</p></td>
+    <td width="59" valign="top"><p align="center">50</p></td>
+    <td width="59" valign="top"><p align="center">37</p></td>
+    <td width="59" valign="top"><p align="center">25</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Scaling</p></td>
+    <td width="59" valign="top"><p align="center">1</p></td>
+    <td width="59" valign="top"><p align="center">0.93</p></td>
+    <td width="59" valign="top"><p align="center">0.83</p></td>
+    <td width="59" valign="top"><p align="center">0.78</p></td>
+    <td width="59" valign="top"><p align="center">0.52</p></td>
+    <td width="59" valign="top"><p align="center">0.39</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Ratio</p></td>
+    <td width="59" valign="top"><p align="center">0.34</p></td>
+    <td width="59" valign="top"><p align="center">0.28</p></td>
+    <td width="59" valign="top"><p align="center">0.3</p></td>
+    <td width="59" valign="top"><p align="center">0.31</p></td>
+    <td width="59" valign="top"><p align="center">0.34</p></td>
+    <td width="59" valign="top"><p align="center">0.34</p></td>
+  </tr>
+  <tr>
+    <td width="59" rowspan="6" class="rowspan"><p align="center">BUBBLE</p></td>
+    <td width="67" valign="top"><p>Autopack</p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">116</p></td>
+    <td width="59" valign="top"><p align="center">99</p></td>
+    <td width="59" valign="top"><p align="center">102</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Scaling</p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">1</p></td>
+    <td width="59" valign="top"><p align="center">0.59</p></td>
+    <td width="59" valign="top"><p align="center">0.28</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Ratio</p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">0.31</p></td>
+    <td width="59" valign="top"><p align="center">0.39</p></td>
+    <td width="59" valign="top"><p align="center">0.51</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>IPComMan</p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">75</p></td>
+    <td width="59" valign="top"><p align="center">64</p></td>
+    <td width="59" valign="top"><p align="center">41</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Scaling</p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">1</p></td>
+    <td width="59" valign="top"><p align="center">0.59</p></td>
+    <td width="59" valign="top"><p align="center">0.46</p></td>
+  </tr>
+  <tr>
+    <td width="67" valign="top"><p>Ratio</p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">&nbsp; </p></td>
+    <td width="59" valign="top"><p align="center">0.22</p></td>
+    <td width="59" valign="top"><p align="center">0.28</p></td>
+    <td width="59" valign="top"><p align="center">0.31</p></td>
+  </tr>
+</table>
+<p>Table 1. Communication time (maximum) spent on mesh migration routines during mesh adaptation for the same tests presented in Table 1.</p>
+</div>
+
+
+<h2 class="clear">References</h2>
+
+<p>[1] A. Ovcharenko, O. Sahni, K.E. Jansen, C.D. Carothers and M.S. Shephard, Neighborhood communication paradigm to increase scalability in large-scale dynamic scientific applications. Parallel Comput., under review, 2010.</p>
+<p>[2] F. Alauzet, X. Li, S. Seol, and M.S. Shephard, Parallel anisotropic 3D mesh adaptation by mesh modification, Engng. Comput., 21(3):247-258, 2006.</p>
+<p>[3] E.S. Seol, M.S. Shephard, Efficient distributed mesh data structure for parallel automated adaptive analysis, Eng. Comput., 22: 197-213, 2006.</p>
+<p>[4] R. Loy, Autopack user manual, Science Division Argonne National Laboratory,<br />
+  <a href="http://www.mcs.anl.gov/research/projects/autopack/autopack_manual.pdf">http://www.mcs.anl.gov/research/projects/autopack/autopack_manual.pdf</a>.</p>
+<p>&nbsp;</p>
+<h2>POC </h2>
+<p>Aleksandr Ovcharenko, Mark S. Shephard<br />
+Email: {<a href="mailto:shurik@scorec.rpi.edu">shurik@scorec.rpi.edu</a>, <a href="mailto:shephard@scorec.rpi.edu">shephard@scorec.rpi.edu</a>}</p>
+
+
+<h2>Funding sources</h2>
+
+<p>NSF Grant No. 0749152, DOE Grant No. DE-FC02-06ER25769, RPI CCNI</p>
+
+
+
+<h2>Download</h2>
+<p>The repository download is accessible at the following URL:<br />
+  <a href="http://redmine.scorec.rpi.edu/anonsvn/ipcomman/trunk/">http://redmine.scorec.rpi.edu/anonsvn/ipcomman/trunk/</a></p>
+
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

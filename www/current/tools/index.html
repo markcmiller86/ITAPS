@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/tools-L2_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="description" content="Your description goes here." />
+<meta name="keywords" content="your,keywords,goes,here" />
+<meta name="author" content="KEYWORD OPEN PARAGRAPH" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools" -->
+</head>
+
+<body class="pageTools">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+<a class="nav" href="interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+<a class="nav" href="services/index.html">Services</a><span class="hide"> | </span>
+
+</p>
+
+
+</div>
+
+<div id="rightside">
+  <!--#include virtual="/assets/inc/rCol_tools.html" -->
+</div>
+
+<div id="content"><!-- InstanceBeginEditable name="content" -->
+  <h1>ITAPS Research</h1>
+  
+  
+<p>Research in the ITAPS center focuses on providing tools and technologies to increase the levels of interoperability of mesh-based methods for the analysis of PDEs and to fill specific technology gaps needed to increase the level of automation and reliability of these simulations. </p>
+      <p>We are pursuing a balanced approach of developing (i) interfaces to mesh-related data, (ii) services operating on those data, and (iii) the development of higher-level combinations of these services for specific applications.  The research in SciDAC-2 is focused more toward the latter two areas, with a smaller effort on interfaces still evolving from SciDAC-1. In all cases we will work closely with the application teams to ensure that the services are relevant to their needs, are effectively deployed, and perform as expected. </p>
+      <p>The overall ITAPS research and development plan is summarized in the image below.  The ITAPS center impacts many different application areas through the development of integrated services that build on multiple component services and common interfaces for geometry, mesh and field information.  The application areas that we are collaborating with rely on interoperability among various tools and services delivered by ITAPS.  For example, consider accelerator modeling.  In this case, integrated services that supply shape optimization, petascale mesh generation and solution adaptive loops are required to advance the state-of-the-art in accelerator cavity modeling.  Each of these integrated services depends on multiple component services. For example, the parallel solution adaptive loop depends on the atomic operations for mesh refinement and coarsening in the mesh h-adapt service as well as dynamic load balancing tools. </p>
+      <p align="center"><img src="../assets/images/overview.jpg" width="550" height="294" alt="Overview" /></p>
+      <h3>Component Services</h3>
+      <p>To support application needs, a number of component services must be developed.  We will continue to develop critical tools for mesh quality improvement, deforming meshes, and adaptivity (both front tracking and h-refinement). In addition, we will develop new services that focus on geometry access and manipulation, parallel data services, interpolation, and r-adaptivity. </p>
+      <ul>
+  <li>
+    <p><a href="services/meshgeom.html">Interoperable  Mesh/Geometry Technologies</a> Our emphasis is the creation of common interfaces for existing ITAPS Center technologies that will allow them to interoperate with each other to provide fundamentally increased capabilities and to allow application scientists to easily switch among them. Our focus in the first year has been on low-level query operations for mesh access, the creation of CCA-compliant mesh components, and demonstrations of ITAPS tool interoperability on a one-to-one basis.</p>
+  </li>
+  <li>
+    <p><a href="services/curve.html">Mesh Curve Correction</a> Building on our existing higher order mesh generation and modification technologies, we have constructed a mesh curving service to construct valid and well shaped curved elements. </p>
+  </li>
+  <li>
+  	<p><a href="services/mesquite.html">Mesh  Smoothing</a> We are creating a new,stand alone mesh quality improvement toolkit that can be used with all ITAPS technologies. The primary aim of this project is to provide a freely available, comprehensive software package that would accommodate a number of different mesh element types, quality metrics, and state-of-the-art topology modification and node point movement algorithms.</p>
+  </li>
+  <li>
+    <p><a href="services/swapping.html">Mesh  Swapping</a> Mesh swapping improves the quality of unstructured simplicial meshes by changing the local topology of the mesh. We have created an interoperable mesh swapping tool that provides a full range of topological changes, in conjunction with a variety of quality metrics, including user-defined metrics.</p>
+  </li>
+  <li>
+    <p><a href="services/adaptive-loops.html">Adaptive Loops</a> Adaptive methods are central to ensuring the reliability of the simulations used for SciDAC applications. An area of emphasis of ITAPS has been the development of an adaptive loop service that can be directly integrated with SciDAC analysis procedures to provide adaptive simulations that can greatly increase the reliability of the results obtained. </p>
+  </li>
+  <li>
+    <p><a href="services/frontier.html">Front Tracking</a> We are developing a robust, accurate and efficient front tracking  toolkit library for computation of dynamically moving front. This library can be loaded into any scientific application program which has the need to track a moving interface. We provide functionality for mathematical calculations with respect to the moving interface and coupling tools to link the interface to the interior regions bounded by the moving front. <br />
+    </p>
+  </li>
+  <li>
+    <p> <a href="services/dynamic.html">Dynamic  Services</a> We are developing the dynamic parallel data services, such as parallel  partitioning, dynamic load balancing, data migration, unstructured  communication  maps, and geometrically-based processor searches, which are crucial  to petascale performance of mesh-based simulations. </p>
+  </li>
+  
+  
+  <li>
+    <p> <a href="services/search.html">Search and Sort</a> It is a common procedure to search a given mesh to determine the mesh entities that contain a set of points. Examples of this include synthetic diagnostics and field transfer during mesh adaptation.  </p>
+  </li>
+
+  
+  
+  <li>
+    <p> <a href="services/visit_plugin.html">Visit  Plugins</a> Applications require the ability to visualize the data supported by the ITAPS data model and interfaces.  We are developing plug-ins for the  primary delivery vehicle of the SciDAC VACET Center, Visit, that allows a user to visualization data from one or more ITAPS implementations. </p>
+  </li>
+  <li>
+    <p> <a href="services/imeshio.html">iMesh  IO</a> While the iMesh implementations have long been interchangeable once the data was loaded into memory, the data load process itself was specific to each implementation.   The iMeshIO service addresses this by providing access to a wide variety of scientific data via the iMesh interface. </p>
+  </li>
+  
+  
+    <li>
+    <p> <a href="services/IPComMan.html">IPComMan</a> The Inter-Processor Communication Manager (IPComMan) [1] is a general-purpose communication package built on top of MPI that aims to reduce data exchange costs by exploiting communications of a local neighborhood for each processor.  </p>
+  </li>
+</ul>
+
+
+
+
+<h3> Integrated Services</h3>
+<p>The component services described in the previous section can be used directly by applications, e.g. geometric evaluation tools in particle-in-cell applications and front tracking in fusion pellet injection simulations.  However, these services can also be integrated to form higher-level mesh-related services.  We propose to extend some of these services, and construct new ones, as described in the following links. </p>
+<ul>
+
+    <li>
+    <p> <a href="services/adaptServ.html">Mesh Adapt Service</a> The Mesh Adapt service creates unstructured anisotropic meshes using local mesh modification that satisfy a prescribed anisotropic size field. Parallel mesh adapt works with large scale problems and focuses on carefully selected local mesh operators, such as refinement, coarsening, swapping and node repositioning, to increase the quality of the mesh while satisfying the desired size field. </p>
+  </li>
+  
+  <li>
+    <p> <a href="services/petascale_meshing.html">Petascale  Meshing</a> We will develop parallel unstructured mesh generation has as a way of overcoming memory limitations of serial mesh generation for large meshes on petascale architectures.    </p>
+  </li>
+  <li>
+    <p> <a href="services/shape_opt.html">Shape  Optimization</a> We are working to develop the mesh and geometry services needed to for shape optimization simulations on deforming geometries. </p>
+  </li>
+
+  <li>
+    <p> <a href="services/amr_front_tracking.html">AMR  Front Tracking</a> We will continue to develop an adaptive front tracking technology and  apply it to applications in groundwater, astrophysics, and gas dynamics. </p>
+  </li>
+  <li>
+    <p> <a href="services/solution_transfer.html">Solution  Transfer</a> We will construct a parallel solution transfer service that transfers field data from one mesh to another by integrating ITAPS components for geometry and mesh sorting and searching, interpolation kernels, and implementations of the geometry, mesh, and fields interfaces. </p>
+  </li>  
+</ul>
+
+
+<h3>Common  Interfaces</h3>
+<p>PDE-based numerical simulation applications commonly use basic software infrastructure to manage mesh, geometry, and discretization data. The commonality of this infrastructure implies the software is theoretically amenable to re-use. However, the traditional reliance on library-based implementations of these functionalities hampers experimentation with different software instances that provide similar functionality. </p>
+<ul>
+<li>
+<b><a href="interfaces/index.html"> Common  Interfaces </a></b>&nbsp;
+</li>
+</ul>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+  <p></p>
+<!-- InstanceEndEditable -->
+
+
+
+
+</div>
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

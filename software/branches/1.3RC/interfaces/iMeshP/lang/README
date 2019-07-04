@@ -1,0 +1,4 @@
+Store language-tailored API specifications, if any, for an interface here.
+For example, the iMesh interface specification is currently defined in an
+language agnostic sort of way. It is possible to define more language-friendly
+C, C++ and Fortran interface specifications. Those would go here.

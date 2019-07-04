@@ -1,0 +1,50 @@
+Store small, sample data files, preferrably implementation-independent (such as VTK),
+for an ITAPS interface here.
+
+
+[CONTENT]
+
+24quad_p0.sms, ..., 24quad_p5.sms: 
+        FMDB-readable, 6 part distributed 24-quad mesh constructed by MOAB iMeshP compliance test
+        (/iMeshP/test/unit/MOAB_iMeshP_unitTest.cc)
+
+24quad.sms:
+	FMDB-readable serial mesh 
+
+
+[MESH]
+
+ Vertices will be enumerated as follows:
+ 1------6-----11-----16-----21-----26-----31
+ |      |      |      |      |      |      |
+ |      |      |      |      |      |      |
+ 2------7-----12-----17-----22-----27-----32
+ |      |      |      |      |      |      |
+ |      |      |      |      |      |      |
+ 3------8-----13-----18-----23-----28-----33
+ |      |      |      |      |      |      |
+ |      |      |      |      |      |      |
+ 4------9-----14-----19-----24-----29-----34
+ |      |      |      |      |      |      |
+ |      |      |      |      |      |      |
+ 5-----10-----15-----20-----25-----30-----35
+
+
+ Element IDs will be [4*rank+1,4*rank+5]
+
+ In the output mesh, groups of four quads will be arranged into parts as follows:
+ +------+------+------+------+------+------+
+ |             |             |             |
+ |             |             |             |
+ +    Part 0   +    Part 2   +    Part 4   |
+ |             |             |             |
+ |             |             |             |
+ +------+------+------+------+------+------|
+ |             |             |             |
+ |             |             |             |
+ +    Part 1   +    Part 3   +    Part 5   |
+ |             |             |             |
+ |             |             |             |
+ +------+------+------+------+------+------+
+
+

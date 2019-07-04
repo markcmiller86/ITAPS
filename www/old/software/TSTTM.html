@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>TSTTM Main page</title>
+  <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+	<link type="text/css" rel="stylesheet" href="/templates/software.css" />
+</head>
+<body>
+<div id="container">
+<div id="banner"><!--#include virtual="../templates/banner.html"--></div>
+<div id="nav"><!--#include virtual="/templates/nav.html"--> </div>
+<div id="content">
+<h1>TSTTM Main page</h1>
+<p>This page has information on the TSTT mesh (TSTTM) specification.</p>
+
+
+
+<ul>
+  <li><a href="https://gforge.scorec.rpi.edu/projects/tstt/">Software page</a>
+	    <ul>
+	      <li><a href="https://gforge.scorec.rpi.edu/docman/index.php?group_id=15&amp;selected_doc_group_id=9&amp;language_id=1">Documentation draft download page</a>
+	    </li>
+	    <li> <a href="https://gforge.scorec.rpi.edu/frs/?group_id=15">TSTTM.sidl download page</a>
+	      </li>
+	    </ul>
+  </li>
+  <li>Implementations<br/>
+<ul>
+  <li> FMDB (RPI): Mesh management infrastructure
+	      <ul>
+		  <li><a href="http://www.scorec.rpi.edu/FMDB">Main page</a><br/></li>
+		  <li><a href="https://svn.scorec.rpi.edu/svn/TSTT/Distributions/iMesh_Distributions/FMDB/FMDB-1.1.tar.gz">Software page</a><br/></li>
+	      </ul>
+  </li>
+  <li> FronTier (BNL/SB)): Front tracking for surfaces of discontinuity
+	      <ul>
+		  <li><a href="http://sitsec.ams.sunysb.edu/trac/wiki/FronTier">Main page</a><br/></li>
+		  <li><a href="http://sitsec.ams.sunysb.edu/trac/wiki/FronTier">Software page</a><br/></li>
+	      </ul>
+  </li>
+  <li> GRUMMP (UBC): Mesh management infrastructure
+	      <ul>
+		  <li><a href="http://tetra.mech.ubc.ca/GRUMMP/">Main page</a><br/></li>
+		  <li><a href="https://gforge.scorec.rpi.edu/projects/tstt-grummp/">Software page</a><br/></li>
+	      </ul>
+  </li>
+    <li> MOAB (SNL): Mesh management infrastructure
+	      <ul>
+		  <li><a href="http://cubit.sandia.gov/MOAB/">Main page</a><br/></li>
+		  <li>Software page<br/></li>
+	      </ul>
+  </li>
+  <li>NWGrid (PNL): Mesh generation and adaptive mesh management
+	      <ul>
+		  <li> <a href="http://www.emsl.pnl.gov:2080/nwgrid/">Main page</a> <br/></li>
+		  <li>Software page<br/></li>
+	      </ul>
+  </li>
+  <li>SimpleMesh (ANL): A simple example for 2D triangles
+	      <ul>
+		  <li>Main page <br/></li>
+		  <li>Software page<br/></li>
+	      </ul>
+  </li>
+  </ul>
+  </li>
+	<li>Examples<br/>
+	    <ul>
+		<li><a href="TSTTM_examples.html">Main page</a><br/></li>
+		<li><a href="https://gforge.scorec.rpi.edu/projects/tstt/">Software page</a><br/></li>
+	      </ul>
+	    </li>
+	<li>Compliance tests<br/>
+	    <ul>
+		<li><a href="TSTTM_compliance.html">Main page</a><br/></li>
+		<li><a href="https://gforge.scorec.rpi.edu/projects/tstt/">Software page</a><br/></li>
+	      </ul>
+	    </li>
+</ul>
+
+<p>A TSTTM implementation is not required to support all function operators listed in the TSTTM interface.  Below is a table of supported base and extension supported by each TSTTM implementation.<br/></p>
+<table border="1">
+<tr>
+     <td>TSTT Interface</td><td align="center" colspan="5">TSTTM</td><td align="center" colspan="8">TSTTB</td>
+</tr>
+<tr> 
+     <td>TSTTM Implementation </td> <td> Mesh </td> <td> Entity </td> <td> Arr </td> 
+     <td> Modify </td> <td> ArrMod </td> <td>Error </td> <td>Tag </td>
+     <td> EntTag </td> <td> ArrTag </td> <td> SetTag </td> <td>EntSet </td>
+     <td> SetRelation </td> <td> SetBoolOps </td>
+</tr>
+<tr> 
+     <td> FMDB </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td><td align="center"> X </td>
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td>
+</tr>
+<tr> 
+     <td> FronTier </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> </td><td align="center"> X </td>
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td>
+</tr>
+<tr> 
+     <td> GRUMMP </td> <td align="center"> X  </td><td align="center"> X </td> <td align="center"> X </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> </td><td align="center"> X </td>
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td>
+</tr>
+<tr> 
+     <td> MOAB </td> <td align="center">X </td> <td align="center"> X </td> <td align="center"> X </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td>  </td><td align="center"> X </td>
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td>  </td> <td align="center"> X </td> <td align="center"> X </td>
+</tr>
+<tr> 
+     <td> NWGrid </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td>  </td><td align="center">X  </td>
+     <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td>
+</tr>
+<tr> 
+     <td> SimpleMesh </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td>  </td><td align="center"> X </td>
+     <td align="center"> X</td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td> <td align="center"> X </td>
+</tr>
+</table>
+
+<p>Not all implementations can deal handle all of the mesh entity topology types listed in TSTTM.sidl.
+ The table below lists which implementations can handle the specific mesh entity topology types listed
+in TSTTM.sidl.<br/></p>
+<table border="1">
+<tr> 
+     <td>TSTTM Implementation </td> <td> POINT </td> <td> LINE </td> <td> POLYGON </td> 
+     <td> TRI </td> <td> QUAD </td> <td> POLYHEDRON </td><td> TET </td>
+     <td> HEX </td> <td> PRISM </td> <td> PYRAMID </td> <td> SEPTAHEDRON </td> 
+</tr>
+<tr> 
+     <td> FMDB </td> <td align="center"> X  </td> <td align="center"> X </td> <td>  </td> 
+     <td align="center"> X </td> <td align="center"> X </td> <td>  </td><td align="center"> X </td>
+     <td align="center">  </td> <td>  </td> <td>  </td> <td>  </td>
+</tr>
+<tr> 
+     <td> FronTier </td> <td> </td> <td>  </td> <td>  </td> 
+     <td>  </td> <td>  </td> <td>  </td><td>  </td>
+     <td>  </td> <td>  </td> <td>  </td> <td>  </td>
+</tr>
+<tr> 
+     <td> GRUMMP </td> <td> </td> <td>  </td> <td>  </td> 
+     <td>  </td> <td>  </td> <td>  </td><td>  </td>
+     <td>  </td> <td>  </td> <td>  </td> <td>  </td>
+</tr>
+<tr> 
+     <td> MOAB </td> <td> </td> <td>  </td> <td>  </td> 
+     <td>  </td> <td>  </td> <td>  </td><td>  </td>
+     <td>  </td> <td>  </td> <td>  </td> <td>  </td>
+</tr>
+<tr> 
+     <td> NWGrid </td> <td>  </td> <td>  </td> <td>  </td> 
+     <td>  </td> <td>  </td> <td>  </td><td>  </td>
+     <td>  </td> <td>  </td> <td>  </td> <td>  </td>
+</tr>
+<tr> 
+     <td> SimpleMesh </td> <td align="center"> X </td> <td align="center"> X </td> <td>  </td> 
+     <td align="center"> X </td> <td>  </td> <td>  </td><td>  </td>
+     <td>  </td> <td>  </td> <td>  </td> <td>  </td>
+</tr>
+</table>
+
+<!--#include virtual="/templates/specification.html"-->
+
+</div>
+<div id="footer"><!--#include virtual="/templates/footer.html"--> </div>
+</div>
+</body>
+</html>

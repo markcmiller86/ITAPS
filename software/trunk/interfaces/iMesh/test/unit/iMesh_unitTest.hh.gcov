@@ -1,0 +1,350 @@
+        -:    0:Source:iMesh_unitTest.hh
+        -:    0:Programs:15
+        -:    1://#include "iMesh_unitTest_config.h"
+        -:    2:
+        -:    3:#include "iBase.h"
+        -:    4:#include "iMesh.h"
+        -:    5:
+        -:    6://-------------------------------------------------------
+        -:    7:
+        -:    8://@@ Standard include files
+        -:    9:
+        -:   10:#include <algorithm>
+        -:   11:#include <set>
+        -:   12:#include <vector>
+        -:   13:#include <string>
+        -:   14:#include <iostream>
+        -:   15:#include <fstream>
+        -:   16:#include <sstream>
+        -:   17:#include <iomanip>
+        -:   18:#include <stdio.h>
+        -:   19:#include <stdlib.h>
+        -:   20:#include <string.h>
+        -:   21:#include <assert.h>
+        -:   22:
+        -:   23:using std::cerr;
+        -:   24:using std::cout;
+        -:   25:using std::endl;
+        -:   26:using std::string;
+        -:   27:
+        -:   28://@@ Macros and file static variables.
+        -:   29:
+        -:   30:#define TYPE_HELP do {				\
+        -:   31:    cout << endl;							\
+        -:   32:    cout << "This file is intended to test functionality of a TSTT implementation." << endl; \
+        -:   33:    cout << "Mesh query, modification, iterators, entity sets, and tags are all" << endl; \
+        -:   34:    cout << "tested.  In cases where it's practical to define a priori a correct" << endl; \
+        -:   35:    cout << "result for a query, that is done.  In other cases, consistency is the" << endl; \
+        -:   36:    cout << "only thing checked.  In still others, the only possible correctness" << endl; \
+        -:   37:    cout << "check is that the function took correct input and didn't choke" << endl; \
+        -:   38:    cout << "(things like getAdjTable or getGeometricDim, for instance)." << endl; \
+        -:   39:    cout << endl;							\
+        -:   40:    cout << "It is worth noting that, although efforts have been made to make each" << endl; \
+        -:   41:    cout << "test as independent as possible, it is unavoidable that a failure" << endl; \
+        -:   42:    cout << "during one test may cause failures in subsequent tests, sometimes" << endl; \
+        -:   43:    cout << "even across different interface tests.  In light of this, it is best" << endl; \
+        -:   44:    cout << "to try to correct errors in the order they occur, or at least to" << endl;	\
+        -:   45:    cout << "exclude interface tests that cause errors to see if later errors are" << endl; \
+        -:   46:    cout << "avoided." << endl;						\
+        -:   47:    cout << endl;							\
+        -:   48:    cout << "Correct argument handling, including both pre- and post-conditions," << endl; \
+        -:   49:    cout << "is checked elsewhere (iMesh_precondTest.cc and" << endl;	\
+        -:   50:    cout << "iMesh_postcondTest.cc)." << endl;				\
+        -:   51:  } while (0)
+        -:   52:
+        -:   53:#define TYPE_USAGE do {\
+        -:   54:    cerr << endl;							\
+        -:   55:    cerr << "Usage: " << argv[0] << " [ -h | --help ]" << endl;	\
+        -:   56:    cerr << "   or  " << argv[0] << " [arguments] <mesh_filename>" \
+        -:   57:	      << endl << endl;						\
+        -:   58:    cerr << "where help and arguments are:" << endl;		\
+        -:   59:    cerr << " -h       | --help            Display usage information and exit." << endl; \
+        -:   60:    cerr << " -s       | --silent          Display only final result." << endl; \
+        -:   61:    cerr << " -o<file> | --output=<file>   Output the results to the filename given." << endl; \
+        -:   62:    cerr << " --no-error                   Don't test all error throwing." << endl; \
+        -:   63:    cerr << " --no-save-load               Don't attempt periodic saves and re-loads." << endl; \
+        -:   64:    cerr << " --no-save-load-clean         Don't clean up temporary files from periodic saves " \
+        -:   65:         << "and re-loads." << endl << endl; \
+        -:   66:  } while (0)
+        -:   67:
+        -:   68:#define TYPE_USAGE_HELP do {						\
+        -:   69:    cerr << "All arguments must be given before the mesh filename, where:" << endl; \
+        -:   70:    cerr << " 'help'    displays this message and ignores all other options," << endl; \
+        -:   71:    cerr << " 'error'   adds more tests to more thoroughly test TSTT methods" << endl; \
+        -:   72:    cerr << "           with regard to error-throwing circumstances," << endl; \
+        -:   73:    cerr << " 'silent'  limits the output to only the final error count, and" << endl; \
+        -:   74:    cerr << " 'output'  sends the program output to the filename given in the" << endl; \
+        -:   75:    cerr << "           rest of the argument (the default is 'out_test.txt')." << endl << endl; \
+        -:   76:  } while (0)
+        -:   77:
+        -:   78:#define TEST(a) do {							\
+        -:   79:    if (a) iNPassed++;							\
+        -:   80:    else {								\
+        -:   81:      qAllPassed = false;						\
+        -:   82:      qFailed();							\
+        -:   83:      cout << endl << __FILE__ << ":" << __LINE__ << ": " "Failure testing " << #a << endl; \
+        -:   84:    }									\
+        -:   85:  } while (0)
+        -:   86:
+        -:   87:#define TEST2(a, b) do {							\
+        -:   88:    if (a) iNPassed++;							\
+        -:   89:    else {								\
+        -:   90:      qAllPassed = false;						\
+        -:   91:      iNFailed++;							\
+        -:   92:      cout << endl << __FILE__ << ":" << __LINE__ << ": " "Failure: " << b << endl; \
+        -:   93:    }									\
+        -:   94:  } while (0)
+        -:   95:
+        -:   96:#define TESTEQ(a,b) do {                                                        \
+        -:   97:    if (a == b) iNPassed++;                                                     \
+        -:   98:    else {                                                              \
+        -:   99:      qAllPassed = false;                                               \
+        -:  100:      qFailed();                                                       \
+        -:  101:      cout << endl << __FILE__ << ":" << __LINE__ << ": Failure testing " \
+        -:  102:           << #a << "(" << a << ") == " << #b << "(" <<b << ")" << endl; \
+        -:  103:    }                                                                   \
+        -:  104:  } while (0)
+        -:  105:
+        -:  106:#define TEST_STATS do {							\
+        -:  107:    cout << endl << "Test results so far:  " << iNPassed << " passed, " \
+        -:  108:	 << iNFailed << " failed." << endl;				\
+        -:  109:  } while(0)
+        -:  110:
+        -:  111:// The following is currently not counted toward the pass total, as a
+        -:  112:// successful return doesn't mean anything --- an empty function body
+        -:  113:// can do that!
+    #####:  114:inline void writeErrorDescr(int err) {
+        -:  115:  static const char* errorStrings[] = {
+        -:  116:    "iBase_SUCCESS",
+        -:  117:    "iBase_MESH_ALREADY_LOADED",
+        -:  118:    "iBase_FILE_NOT_FOUND",
+        -:  119:    "iBase_FILE_WRITE_ERROR",
+        -:  120:    "iBase_NIL_ARRAY",
+        -:  121:    "iBase_BAD_ARRAY_SIZE",
+        -:  122:    "iBase_BAD_ARRAY_DIMENSION",
+        -:  123:    "iBase_INVALID_ENTITY_HANDLE",
+        -:  124:    "iBase_INVALID_ENTITY_COUNT",
+        -:  125:    "iBase_INVALID_ENTITY_TYPE",
+        -:  126:    "iBase_INVALID_ENTITY_TOPOLOGY",
+        -:  127:    "iBase_BAD_TYPE_AND_TOPO",
+        -:  128:    "iBase_ENTITY_CREATION_ERROR",
+        -:  129:    "iBase_INVALID_TAG_HANDLE",
+        -:  130:    "iBase_TAG_NOT_FOUND",
+        -:  131:    "iBase_TAG_ALREADY_EXISTS",
+        -:  132:    "iBase_TAG_IN_USE",
+        -:  133:    "iBase_INVALID_ENTITYSET_HANDLE",
+        -:  134:    "iBase_INVALID_ITERATOR_HANDLE",
+        -:  135:    "iBase_INVALID_ARGUMENT",
+        -:  136:    "iBase_MEMORY_ALLOCATION_FAILED",
+        -:  137:    "iBase_NOT_SUPPORTED",
+        -:  138:    "iBase_FAILURE"
+        -:  139:  };
+    #####:  140:  cout << errorStrings[err] << endl;
+    #####:  141:}
+        -:  142:
+        -:  143:#define CHECK_ERR_CRITICAL(err_) do {					\
+        -:  144:    if ( err_ != iBase_SUCCESS) {					\
+        -:  145:      writeErrorDescr(err_);						\
+        -:  146:      qFailed();							\
+        -:  147:      cerr << "Cannot continue interface test, exiting..." << endl;     \
+        -:  148:      if ( qSaveLoadClean )                                             \
+        -:  149:        CleanSaveLoad();                                                \
+        -:  150:      exit(iNFailed);                                                   \
+        -:  151:    }									\
+        -:  152:    else								\
+        -:  153:      iNPassed++;							\
+        -:  154:  } while (0)
+        -:  155:
+        -:  156:#define CHECK_ERR(err_) do {					\
+        -:  157:    if (err_) {							\
+        -:  158:      cout << "At line " << __LINE__ << " in " << __FILE__	\
+        -:  159:	   << ", hit error:  ";					\
+        -:  160:      writeErrorDescr(err_);					\
+        -:  161:      qFailed();						\
+        -:  162:    }								\
+        -:  163:  } while (0)
+        -:  164:
+        -:  165:#define CHECK_ERR2(err_, expected_err) do {			\
+        -:  166:    if ( err_ != expected_err) {				\
+        -:  167:      cout << "At line " << __LINE__ << " in " << __FILE__	\
+        -:  168:	   << ", should have hit error:  ";			\
+        -:  169:      writeErrorDescr(expected_err);				\
+        -:  170:      cout << "Instead, hit error:  ";				\
+        -:  171:      writeErrorDescr(err_);					\
+        -:  172:      qFailed();						\
+        -:  173:    }								\
+        -:  174:    else							\
+        -:  175:      iNPassed++;						\
+        -:  176:  } while (0)
+        -:  177:
+        -:  178:// The following macro is a little awkward: it can't be used in a
+        -:  179:// single-line block (like in an if-else, for instance), because it's
+        -:  180:// not a single line!
+        -:  181:#define BREAK_ON_ERR(err_) 			\
+        -:  182:    CHECK_ERR(err_);				\
+        -:  183:    if (err_) break
+        -:  184:    
+        -:  185:
+        -:  186://@ Testing for bad array arguments
+        -:  187:#define TEST_BAD_ARRAY_SIZE CHECK_ERR2(err, iMesh_BAD_ARRAY_SIZE)
+        -:  188:#define TEST_NIL_ARRAY CHECK_ERR2(err, iMesh_NIL_ARRAY)
+        -:  189:
+        -:  190:#define GOT_ALL_ITEMS(_input, _output, _numItems, _qGotAll) do {	\
+        -:  191:    _qGotAll = true;							\
+        -:  192:    bool _gotItem;							\
+        -:  193:    for ( int _i=0; _i<_numItems && _qGotAll; _i++ ) {			\
+        -:  194:      _gotItem = false;							\
+        -:  195:      for ( int _j=0; _j<_numItems && !_gotItem; _j++ )			\
+        -:  196:	_gotItem = _gotItem || (_input[_i] == _output[_j]);		\
+        -:  197:      _qGotAll = _qGotAll && _gotItem;					\
+        -:  198:    }									\
+        -:  199:  } while (0)
+        -:  200:
+        -:  201:#define TOL 1.e-10
+        -:  202:#define APPROX_EQUAL(a, b) (((a) < (b) + TOL) && ((b) < (a) + TOL))
+        -:  203:#define UT_FREE(a) do {if (a) free(a); a = NULL;} while(0)
+        -:  204:
+        -:  205:#define GET_ENTS(aEnts_, iTargetCount_) do {                            \
+        -:  206:    iBase_EntityHandle *aEntsTmp = NULL;                                \
+        -:  207:    int iEntsTmpAlloc = 0, iNEnts;                                      \
+        -:  208:    iMesh_getEntities(instance, pvRootSet, iBase_ALL_TYPES,             \
+        -:  209:                      iMesh_ALL_TOPOLOGIES,                             \
+        -:  210:                      &aEntsTmp, &iEntsTmpAlloc, &iNEnts, &err);        \
+        -:  211:    CHECK_ERR(err);                                                     \
+        -:  212:    if (err || iNEnts < iTargetCount_) {                                \
+        -:  213:      cout << "\nCould not get mesh data to work with... exiting...\n"; \
+        -:  214:      TEST ( data_preparation );                                        \
+        -:  215:      if ( qSaveLoadClean )                                             \
+        -:  216:        CleanSaveLoad();                                                \
+        -:  217:      exit(iNFailed);                                                   \
+        -:  218:    }                                                                   \
+        -:  219:    for (int iE = 0; iE < iTargetCount_; iE++) {                        \
+        -:  220:      aEnts_[iE] = aEntsTmp[iE];                                        \
+        -:  221:    }                                                                   \
+        -:  222:    UT_FREE(aEntsTmp);                                                  \
+        -:  223:  } while(0)
+        -:  224:
+        -:  225:// Variables defined to make TEST statments more descriptive
+        -:  226:static const bool error_throwing = false;
+        -:  227:static const bool data_preparation = false;
+        -:  228:
+        -:  229:#ifdef MAIN_PROGRAM
+        -:  230:int iNPassed = 0, iNFailed = 0,
+        -:  231:  iNNotImpl = 0, iNIntPassed = 0, iNIntFailed = 0;
+        -:  232:bool qAllPassed = true, qErrTests = true, qSilent = false, qOutFile = false;
+        -:  233:bool qSaveLoad = true;
+        -:  234:bool qSaveLoadClean = true;
+        -:  235:
+        -:  236:int a2iAdjTable[4][4];
+        -:  237:
+        -:  238:iBase_EntitySetHandle pvRootSet = NULL;
+        -:  239:bool a2qLegalTypeAndTopo[5][12];
+        -:  240:int a2iEntCount[5][12];
+        -:  241:const char *astrTypes[] = {"vertex",
+        -:  242:			    "edge",
+        -:  243:			    "face",
+        -:  244:			    "region",
+        -:  245:			    "all types"};
+        -:  246:const char *astrTopologies[] = {"point",
+        -:  247:				 "line segment",
+        -:  248:				 "polygon",
+        -:  249:				 "triangle",
+        -:  250:				 "quadrilateral",
+        -:  251:				 "polyhedron",
+        -:  252:				 "tetrahedron",
+        -:  253:				 "pyramid",
+        -:  254:				 "prism",
+        -:  255:				 "hexahedron",
+        -:  256:				 "septahedron",
+        -:  257:				 "all topologies"};
+        -:  258:
+        -:  259:const char *astrTagNames[] = {"unitTest Int Tag", "unitTest Double Tag",
+        -:  260:			   "unitTest Ent Tag", "unitTest Generic Tag"};
+        -:  261:int aiTagNameLen[] = {16, 19, 16, 20};
+        -:  262:int aTagTypes[] = {iBase_INTEGER, iBase_DOUBLE, iBase_ENTITY_HANDLE, iBase_BYTES};
+        -:  263:int aiTagSizes[] = { 1, 2, 3, 4 };
+        -:  264:int aiTagBytes[] = {sizeof(int), sizeof(double),
+        -:  265:			   sizeof(void*), sizeof(char)};
+        -:  266:#else
+        -:  267:extern int iNPassed, iNFailed, iNNotImpl, iNIntPassed, iNIntFailed;
+        -:  268:extern bool qAllPassed, qErrTests, qSilent, qOutFile;
+        -:  269:extern bool qSaveLoad, qSaveLoadClean;
+        -:  270:
+        -:  271:extern int a2iAdjTable[4][4];
+        -:  272:
+        -:  273:extern iBase_EntitySetHandle pvRootSet;
+        -:  274:extern bool a2qLegalTypeAndTopo[5][12];
+        -:  275:extern int a2iEntCount[5][12];
+        -:  276:extern char* astrTypes[];
+        -:  277:extern char* astrTopologies[];
+        -:  278:extern char* astrTagNames[];
+        -:  279:extern int aiTagNameLen[];
+        -:  280:extern int aiTagSizes[];
+        -:  281:extern int aiTagBytes[];
+        -:  282:extern int aTagTypes[];
+        -:  283:
+        -:  284:
+        -:  285:#endif
+        -:  286:
+        -:  287:void qFailed();
+        -:  288:bool qCheckNumOfType(iMesh_Instance instance,
+        -:  289:         iBase_EntitySetHandle SH,
+        -:  290:         int iType,
+        -:  291:	 int iNumEntsExpected);
+        -:  292:bool qCheckNumOfTopo(iMesh_Instance instance,
+        -:  293:         iBase_EntitySetHandle SH,
+        -:  294:         int iTopo,
+        -:  295:         int iNumEntsExpected);
+        -:  296:void vCheckBoolOpResult(iMesh_Instance instance,
+        -:  297:         iBase_EntitySetHandle SH,
+        -:  298:         int iShouldBeList,
+        -:  299:         iBase_EntitySetHandle aSHExpected[],
+        -:  300:         int iNumSetsExpected,
+        -:  301:         iBase_EntityHandle aEHExpected[],
+        -:  302:         int iNumEntsExpected);
+        -:  303:void CleanSaveLoad();
+        -:  304:void vDoSaveLoad(iMesh_Instance *instancep,
+        -:  305:         iBase_EntitySetHandle *rootSet);
+        -:  306:void vCheckEntities(iMesh_Instance instance,
+        -:  307:         iBase_EntitySetHandle SH,
+        -:  308:         int iType, int iTopo,
+        -:  309:         iBase_EntityHandle aEHExpected[],
+        -:  310:         int iNumEntsExpected);
+        -:  311:void vTestIterWithModify(const int iDim);
+        -:  312:void qIssueLoadMessage(const char *filename, int err);
+        -:  313:void vRecoverSetsParentChild(iMesh_Instance instance,
+        -:  314:         iBase_EntitySetHandle pvRootSet,
+        -:  315:	 iBase_EntitySetHandle apvEntSets[]);
+        -:  316:void vRecoverSetsContain(iMesh_Instance instance,
+        -:  317:         iBase_EntitySetHandle pvRootSet,
+        -:  318:         iBase_EntitySetHandle apvEntSets[]);
+        -:  319:void vRecoverSetsFromEntCounts(iMesh_Instance instance,
+        -:  320:         iBase_EntitySetHandle pvRootSet,
+        -:  321:         iBase_EntitySetHandle *apvSets,
+        -:  322:         const int aiNumTypeEnts[],
+        -:  323:         const int aiNumTopoEnts[]);
+        -:  324:void vRecoverTags(iMesh_Instance instance,
+        -:  325:         iBase_EntitySetHandle pvRootSet,
+        -:  326:         iBase_TagHandle aTags[],
+        -:  327:         iBase_EntityHandle *aEnt = 0);
+        -:  328:void vSecondAdjacencyTest(iMesh_Instance instance);
+        -:  329:void vSecondAdjacencyArrayTest(iMesh_Instance instance);
+        -:  330:void vEntityReciprocityTest(iMesh_Instance instance,
+        -:  331:         iBase_EntityType eET1, iBase_EntityType eET2);
+        -:  332:void vArrayReciprocityTest(iMesh_Instance instance,
+        -:  333:         iBase_EntityType eET1, iBase_EntityType eET2);
+        -:  334:void vTestMeshInterface(iMesh_Instance& instance,
+        -:  335:         string strFilename);
+        -:  336:void vTestEntityInterface(iMesh_Instance& instance);
+        -:  337:void vTestArrInterface(iMesh_Instance& instance);
+        -:  338:void vTestModifyInterface(iMesh_Instance& instance);
+        -:  339:void vTestEntSetInterface(iMesh_Instance& instance);
+        -:  340:void vTestMeshWithSets(iMesh_Instance& instance);
+        -:  341:void vTestEntityWithSets(iMesh_Instance& instance);
+        -:  342:void vTestArrayWithSets(iMesh_Instance& instance);
+        -:  343:void vTestEntTagInterface(iMesh_Instance& instance);
+        -:  344:void vTestArrTagInterface(iMesh_Instance& instance);
+        -:  345:void vTestSetRelationInterface(iMesh_Instance& instance);
+        -:  346:void vTestBoolOpsInterface(iMesh_Instance& instance);
+        -:  347:void vTestSetTagInterface(iMesh_Instance& instance);
+        -:  348:void vTestLowerDimensionedCoordinates();

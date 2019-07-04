@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageAdaptive-loops" -->
+</head>
+
+<body class="pageTools pageToolsServices pageAdaptive-loops">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Adaptive Loops</h1>
+
+<div class="imgContainer fRight" style="width: 380px;">
+   <a href="../../assets/images/adapt_loop_full.png" rel="lightbox">
+	<img src="../../assets/images/adapt_loop_mini.png" width="380" height="268" alt="Adaptive Loop" /></a>
+	<p>Figure 1. Adaptive loop procedure.</p>
+</div>
+
+  <p>The ITAPS <a href="../services/adaptServ.html">Mesh Adaptation Service</a><strong> </strong>has been developed in a way that it can be directly integrated with SciDAC analysis procedures to provide parallel adaptive simulations which greatly increase the reliability of the results obtained. The service that has been developed supports generalized parallel mesh adaptation by controlling the mesh to match the given anisotropic mesh metric field defined on the previous mesh of the domain of interest [1,6,9]. Adaptive loops are the essential collaboration between solver and adapter to achieve more accurate results and robust performance.</p>
+  <p>Adaptive loop provides the possibility to connect analysis and adaptation components needed for successful simulation on the problem domain. Typically the solution obtained by the analysis routines is converted to the mesh metric size field which dictates how the mesh should be modified to be passed then back to the solver. To ensure adaptive routines work with general curved geometries such as those commonly found in CAD representations, the procedures build on a generalized interaction with the geometric model [2] to ensure the mesh properly represents the domain of interest [7,11]. Since these procedures fully account for the interactions and representation with curved domains they can be extended to support adaptation in which high order spatial discretizations are used [8,9]. Since the meshes needed by SciDAC applications can be on the order of billions of elements, or more, the mesh adaptation service runs in parallel using the same partitioned mesh used by the solver [3,4,10,12,13].</p>
+  <p>The overall scheme of the adaptive loop procedure is shown on Figure 1. The core of the adaptive loop is the interaction of solver and adapter. Working in parallel with large scale applications, it is important to provide an efficient data transfer between analysis and adaptation parts since working strictly through I/O substantially degrades the performance.</p>
+
+
+
+<p>&nbsp;</p>
+<h3>Impact on ITAPS applications</h3>
+<div class="imgContainer fRight" style="width: 500px;">
+   <a href="../../assets/images/CAD_adapt_full.png" rel="lightbox">
+	<img src="../../assets/images/CAD_adapt_mini.png" width="500" height="203" alt="CAD adapt" /></a>
+	<p>Figure 2. CAD model and mesh adaptation.</p>
+</div>
+<p>To start an adaptive loop, the initial mesh should be created from the available CAD model and existing attributes assigned to a problem domain. An example of a CAD model and the different levels of mesh refinement to achieve better results at the beginning of the simulation are shown in Figure 2. The pictures in the bottom of Figure 2 are zoomed in to show the detail for the model and each mesh. Since these procedures fully account for the interactions and representation with curved domains they can be extended to support adaptation in which high order spatial discretizations are used.</p>
+
+<p>The example of different stages of adapted mesh during the simulation is depicted on Figure 3.</p>
+
+
+<p>It has been demonstrated that adaptive loop technology can be added to existing fixed-grid finite element codes with little to no simulation code modification (see Shephard et. al. for more details). The mesh adaptation service has been used to develop adaptive simulations for <a href="../../applications/accelerator.html">accelerator modeling</a>, <a href="../../applications/fusion.html">fusion</a>, and other applications including ones with evolving geometries. Among them, the parallel adaptive applications are being run for SLAC [8], PPPL [5], KAPL, NASA, Xerox, the Air Force, and Boeing. All the simulations listed use such ITAPS interface implementation as FMDB and GMI, and such ITAPS services as <a href="../services/adaptServ.html">Mesh Adapt</a>, <a href="curve.html">Mesh Curving</a> and IPComMan.</p>
+
+<div class="imgContainer center" style="width: 430px;">
+   <a href="../../assets/images/adapted_meshes_full.png" rel="lightbox">
+	<img src="../../assets/images/adapted_meshes_mini.png" width="430" height="108" alt="adapted mesh during simulation" /></a>
+	<p>Figure 3. Mesh adaptation during the adaptive loop.</p>
+</div>
+
+<h2 class="clear">References</h2>
+<p>[1] F. Alauzet, X. Li, S. Seol, and M.S. Shephard, Parallel anisotropic 3D mesh adaptation by mesh modification, Engng. Comput., 21(3):247-258, 2006.  </p>
+<p>[2] M.W. Beall, J. Walsh and Mark S. Shephard, A comparison of techniques for geometry access related to mesh generation, Engng. Comput., 20(3):210-221, 2004. </p>
+<p>[3]Ge, L., Lee, L.-Q., 
+  [3] A.Y. Galimov, O.Sahni, R.T. Lahey, Jr., M.S. Shephard, D.A. Drew, K.E. Jansen, &#8220;Parallel Adaptive Simulation of a Plunging Liquid Jet&#8221;, Acta Mathematica Scientia, 30B: 522-538, 2010  </p>
+<p>[4] K.E. Jansen, O. Sahni, A. Ovcharenko, M.S. Shephard, and M. Zhou, &#8220;Adaptive Computational Fluid Dynamics: Petascale and Beyond&#8221;, Journal of Physics: Conference Series, 2010.  </p>
+<p>[5] S.C. Jardin, N. Ferraro, X. Luo, J. Chen, J. Breslau, K.E. Jansen and M.S. Shephard, &#8220;The M3D-C1 approach to simulating 3D 2-fluid magnetohydrodynamics in magnetic fusion experiments&#8221;, Journal of Physics: Conference Series, Volume 125, 012044, 7 pages, 2008.  </p>
+<p>[6] X. Li, M.S. Shephard and M.W. Beall, 3-D anisotropic mesh adaptation by mesh modifications, Comp. Meth. Appl. Mech. Engng., 194(48-49):4915-4950, 2005.  </p>
+<p>[7] X. Li, M.S. Shephard and M.W. Beall, Accounting for curved domains in mesh adaptation, Int. J. for Numerical Methods in Engineering, 58:246-276, 2003.  </p>
+<p>[8] X. Luo, M.S. Shephard, L.-Q. Lee, C. Ng and L. Ge, &#8220;Curved mesh correction and adaptation tool to improve COMPASS electromagnetic analyses&#8221;, Journal of Physics: Conference Series, Volume 125, 012082, 5 pages, 2008.  </p>
+<p>[9] O. Sahni, X.J. Luo, K.E. Jansen, M.S. Shephard, &#8220;Curved Boundary Layer Meshing for Adaptive Viscous Flow Simulations&#8221;, Finite Elements in Analysis and Design, 46:132-139, 2010.  </p>
+<p>[10] O. Sahni, K.E. Jansen, C.A. Taylor and M.S. Shephard, &#8220;Automated Adaptive Cardiovascular Flow Simulations&#8221; Engineering with Computers, 25(1):25-36, 2009.  </p>
+<p>[11] M.S. Shephard, J.E. Flaherty, K.E., Jansen, X. Li, X.J. Luo, N. Chevaugeon, J.F. Remacle, M.W. Beall, and R.M. O&#8217;Bara, Adaptive mesh generation for curved domains, J. for Applied Numerical Mathematics, 53(2-3)251-271, 2005.  </p>
+<p>[12] M.S. Shephard, K.E. Jansen, O. Sahni and L.A. Diachin, Parallel adaptive simulations on unstructured meshes, Journal of Physics: Conference Series, 78-012053, 10 pages, 2007.  </p>
+<p>[13] M. Zhou, O. Sahni, H.J. Kim, C.A. Figueroa, CA. Taylor, M.S. Shephard, and K.E. Jansen, &#8220;Cardiovascular Flow Simulation at Extreme Scale&#8221;, Computational Mechanics, 46:71-82, 2010. </p>
+<p>&nbsp;</p>
+
+<h3>POC </h3>
+<p>Aleksandr Ovcharenko, Mark S. Shephard<br />
+  Email: {<a href="mailto:shurik@scorec.rpi.edu">shurik@scorec.rpi.edu</a>, <a href="mailto:shephard@scorec.rpi.edu">shephard@scorec.rpi.edu</a>}</p>
+<h3>Funding sources</h3>
+<p>NSF Grant No. 0749152, DOE Grant No. DE-FC02-06ER25769, SLAC, KAPL, NASA, PPPL, Simmetrix, AFOSR, IBM and Boeing.</p>
+<h3>Download</h3>
+<p>The repository download is accessible at the following URL:<br />
+  <a href="http://redmine.scorec.rpi.edu/anonsvn/meshadapt/trunk/">http://redmine.scorec.rpi.edu/anonsvn/meshadapt/trunk/</a></p>
+<p>&nbsp;</p>
+        <blockquote>&nbsp;</blockquote>
+        <p>&nbsp;</p>
+<p>&nbsp;</p>
+        
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

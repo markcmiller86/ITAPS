@@ -1,0 +1,303 @@
+\appendix
+\section{Enumerations Defined in the TSTT Mesh
+Interface}\label{app:TSTT-enum}
+The TSTT interface uses enumerated types for variables that have a
+specific, restricted range of values.  These enumerations, and their
+possible values, are given in Table~\ref{table:Enums}.  These
+enumerations are largely self-explanatory, with the exception of
+AdjacencyInfo.  The values of AdjacencyInfo reflect that an
+implementation may be able to supply a particular piece of adjacency
+information never, always, or only sometimes (for example, an
+implementation might choose to store boundary faces but not interior
+faces for memory reasons, making it impossible to return the
+latter). Also, if adjacency information is available, the cost of
+retrieving may be constant time (example: stored data); logarithmic time
+(example: tree search); or linear time (example: searching the entire
+list of entities).
+\begin{table}[htp]
+\caption{TSTT Enumerated Types}\label{table:Enums}
+{\small
+\begin{tabular}{|l|p{5in}|}
+\hline 
+Enum Name&
+Values\tabularnewline
+\hline
+\hline 
+ErrorAction&
+SILENT, WARN\_ONLY, THROW\_ERROR\tabularnewline
+\hline 
+ErrorType&
+\raggedright SUCCESS, DATA\_ALREADY\_LOADED, NO\_DATA, FILE\_NOT\_FOUND,
+FILE\_ACCESS\_ERROR, NIL\_ARRAY, BAD\_ARRAY\_SIZE, BAD\_ARRAY\_DIMENSION,
+INVALID\_ENTITY\_HANDLE, INVALID\_ENTITY\_COUNT, INVALID\_ENTITY\_TYPE,
+INVALID\_ENTITY\_TOPOLOGY, BAD\_TYPE\_AND\_TOPO, ENTITY\_CREATION\_ERROR,
+INVALID\_TAG\_HANDLE, TAG\_NOT\_FOUND, TAG\_ALREADY\_EXISTS, TAG\_IN\_USE,
+INVALID\_ENTITYSET\_HANDLE, INVALID\_ITERATOR\_HANDLE,
+INVALID\_ARGUMENT, ARGUMENT\_OUT\_OF\_RANGE, MEMORY\_ALLOCATION\_FAILED, 
+NOT\_SUPPORTED, FAILURE \tabularnewline
+\hline 
+TagValueType&
+\raggedright INTEGER, DOUBLE, ENTITY\_HANDLE, BYTES\tabularnewline
+\hline
+EntityType&
+\raggedright VERTEX, EDGE, FACE, REGION, ALL\_TYPES\tabularnewline
+\hline 
+EntityTopology&
+\raggedright POINT, LINE\_SEGMENT, POLYGON, TRIANGLE, QUADRILATERAL, POLYHEDRON,
+TETRAHEDRON, HEXAHEDRON, PRISM, PYRAMID, SEPTAHEDRON, ALL\_TOPOLOGIES\tabularnewline
+\hline 
+StorageOrder&
+\raggedright BLOCKED, INTERLEAVED, UNDETERMINED\tabularnewline
+\hline 
+AdjacencyInfo&
+\raggedright UNAVAILABLE, ALL\_ORDER\_1, ALL\_ORDER\_LOGN, ALL\_ORDER\_N, SOME\_ORDER\_1,
+SOME\_ORDER\_LOGN, SOME\_ORDER\_N\tabularnewline
+\hline 
+CreationStatus&
+\raggedright NEW, ALREADY\_EXISTED, CREATED\_DUPLICATE, CREATION\_FAILED\tabularnewline
+\hline
+\end{tabular}
+}
+\end{table}
+
+\section{Language-Specific Translations of a Typical SIDL Function
+Definition from the TSTT Mesh Interface}
+
+One of the advantages of using the Scientific Interface Description
+Language (SIDL) is that it eliminates language compatibility issues,
+allowing easy use of TSTT servers written in one language with clients
+written in another. This appendix gives a simple example of a function
+definition in SIDL, and its instantiation in specific programming
+languages. See the Babel documentation for complete information on
+conversion of SIDL files and use of the Babel-generated interfaces
+in client and server code, as well as information about Babel's support
+for Java and Python.
+
+We begin with a snippet from the actual TSTT SIDL file defining the
+\texttt{getAdjacentEntities} function; \texttt{{}``...''} indicates
+omitted definitions. The TSTTM package contains all mesh-specific
+interface definitions; tag and entity set functionality are defined
+in a separate package (TSTTB), because these functions are also useful
+for geometry objects, for instance. TSTTM functions are further divided
+into five interfaces: \texttt{Mesh} for global query, \texttt{Entity}
+and \texttt{EntArr} for entity- and block-based query, and \texttt{Modify}
+and \texttt{ModArr} for single and block modification calls. The \texttt{opaque}
+type identifier is used in SIDL to represent opaque handles for objects,
+and \texttt{array<type>} represents an array of that type. As we shall
+see, Babel converts these meta-types into actual types depending on
+the target language. Finally, note that SIDL supports an exception
+mechanism through the keyword \texttt{throws}; all TSTT functions
+can throw errors, with the precise mechanism being language specific. 
+
+\begin{lyxcode}
+package~TSTTM~version~0.7
+
+\{
+
+~~...
+
+~~interface~Mesh~\{
+
+~~~~void~getAdjEntities(~in~opaque~entity\_set,
+
+~~~~~~in~EntityType~entity\_type\_requestor,~
+
+~~~~~~in~EntityTopology~entity\_topology\_requestor,
+
+~~~~~~in~EntityType~entity\_type\_requested,
+
+~~~~~~inout~array<opaque>~adj\_entity\_handles,
+
+~~~~~~out~int~adj\_entity\_handles\_size,
+
+~~~~~~inout~array<int>~offset,
+
+~~~~~~out~int~offset\_size,
+
+~~~~~~inout~array<int>~in\_entity\_set,
+
+~~~~~~out~int~in\_entity\_set\_size)~throws~TSTTB.Error;
+
+~~\};
+
+~~...
+
+\}
+\end{lyxcode}
+An implementation of the TSTT mesh interface (that is, a mesh database
+server) is also declared in a SIDL file. The following example declares
+an implementation that guarantees to support the TSTTM global query
+and entity interfaces, as well as tags on individual entities.
+
+\begin{lyxcode}
+package~MyMeshDB~version~0.7~\{
+
+~~class~MyMesh~implements-all~TSTTM.Mesh,~TSTTM.Entity,~TSTTB.Tag,
+
+~~~~TSTTB.EntTag;
+
+\}
+\end{lyxcode}
+
+\subsection*{C++ Instantiation}
+
+The C++ instantiation of SIDL functions is most similar syntactically
+to the original SIDL file. A class is defined with the same name as
+the interface (\texttt{Mesh}, in this case), with all classes derived
+from a base class defined in Babel's runtime library. Primitive types
+and enumerations are unchanged in the C++ code. \texttt{opaque}'s
+are mapped to \texttt{void{*}}'s, and a \texttt{sidl::array<>} template
+class handles array data. Note that any \texttt{sidl::NullIORException}'s
+are caught by the glue code between the client and the server.
+
+\begin{lyxcode}
+namespace~TSTTM~\{
+
+~~class~Mesh~:~public~::sidl::StubBase~\{~
+
+~~~~void~getAdjEntities~(
+
+~~~~~~/{*}in{*}/~void{*}~entity\_set,
+
+~~~~~~/{*}in{*}/~::TSTTM::EntityType~entity\_type\_requestor,
+
+~~~~~~/{*}in{*}/~::TSTTM::EntityTopology~entity\_topology\_requestor,
+
+~~~~~~/{*}in{*}/~::TSTTM::EntityType~entity\_type\_requested,
+
+~~~~~~/{*}inout{*}/~::sidl::array<void{*}>\&~adj\_entity\_handles,
+
+~~~~~~/{*}out{*}/~int32\_t\&~adj\_entity\_handles\_size,
+
+~~~~~~/{*}inout{*}/~::sidl::array<int32\_t>\&~offset,
+
+~~~~~~/{*}out{*}/~int32\_t\&~offset\_size,
+
+~~~~~~/{*}inout{*}/~::sidl::array<int32\_t>\&~in\_entity\_set,
+
+~~~~~~/{*}out{*}/~int32\_t\&~in\_entity\_set\_size
+
+~~~~)
+
+~~~~throw~(~
+
+~~~~~~::sidl::NullIORException,~::TSTTB::Error
+
+~~~~);
+
+
+\end{lyxcode}
+
+\subsection*{C Instantiation}
+
+In the C interface for a SIDL function, package and interface names
+are prepended to the function name to disambiguate names. The {}``\texttt{self}''
+argument is a handle for the mesh database information, and exceptions
+are passed as an additional, final argument. SIDL's array type is
+instantiated in C as a structure.
+
+\begin{lyxcode}
+void~TSTTM\_Mesh\_getAdjEntities(
+
+~~TSTTM\_Mesh~self,
+
+~~void{*}~entity\_set,
+
+~~enum~TSTTM\_EntityType\_\_enum~entity\_type\_requestor,
+
+~~enum~TSTTM\_EntityTopology\_\_enum~entity\_topology\_requestor,
+
+~~enum~TSTTM\_EntityType\_\_enum~entity\_type\_requested,
+
+~~struct~sidl\_opaque\_\_array{*}{*}~adj\_entity\_handles,
+
+~~int32\_t{*}~adj\_entity\_handles\_size,
+
+~~struct~sidl\_int\_\_array{*}{*}~offset,
+
+~~int32\_t{*}~offset\_size,
+
+~~struct~sidl\_int\_\_array{*}{*}~in\_entity\_set,
+
+~~int32\_t{*}~in\_entity\_set\_size,
+
+~~sidl\_BaseInterface{*}~\_ex);
+\end{lyxcode}
+
+\subsection*{Fortran 77 Instantiation}
+
+As is the case with C, the Fortran 77 interface for a SIDL function
+prepends the package and interface name to the function name; in addition,
+{}``\texttt{\_f}'' is appended to the end of the function name.
+Because F77 does not support pointers or structures, SIDL opaques,
+arrays, exceptions, interfaces, and classes are stored as \texttt{integer{*}8}.
+Enumerations are passed as integers, and strings as Fortran arrays
+of characters (\texttt{CHARACTER{*}({*})}). 
+
+\begin{lyxcode}
+~~~~~~subroutine~TSTTM\_Mesh\_getAdjEntities\_f(self,~entity\_set,~~
+
+~~~~~1~~~~entity\_type~requestor,~entity\_topology\_requestor,~
+
+~~~~~2~~~~entity\_type\_requested,~adj\_entity\_handles,
+
+~~~~~3~~~~adj\_entity\_handles\_size,~offset,~offset\_size,~
+
+~~~~~4~~~~in\_entity\_set,~in\_entity\_set\_size,~exception)~
+
+~~~~~~integer{*}8~self,~entity\_set
+
+~~~~~~integer~entity\_type\_requestor,~entity\_topology\_requestor
+
+~~~~~~integer~entity\_type\_requested
+
+~~~~~~integer{*}8~adj\_entity\_handles,~offset,~in\_entity\_set
+
+~~~~~~integer{*}4~adj\_entity\_handles\_size,~offset\_size,~in\_entity\_set\_size
+
+~~~~~~integer{*}8~exception
+\end{lyxcode}
+
+\subsection*{Fortran 90 Instantiation}
+
+Because Fortran 90 has support for derived types and modules, F90
+interfaces for SIDL-defined functions are somewhat simpler. Functions
+in the TSTTM \texttt{Mesh} interface are declared in F90 in a module
+called \texttt{TSTTM\_Mesh}; function names have {}``\texttt{\_s}''
+appended. Opaque data in the SIDL interface is passed using long integers,
+just as in F77. Class data, including interfaces, arrays, and exceptions,
+are passed using defined types.
+
+\begin{lyxcode}
+subroutine~getAdjEntities\_s(self,~entity\_set,~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~321\&
+
+~~entity\_type\_requestor,~entity\_topology\_requestor,~entity\_type\_requested,~~~\&
+
+~~adj\_entity\_handles,~adj\_entity\_handles\_size,~offset,~offset\_size,~~~~~~~~~~\&
+
+~~in\_entity\_set,~in\_entity\_set\_size,~exception)
+
+~~type(TSTTM\_Mesh\_t)~,~intent(in)~::~self
+
+~~integer~(selected\_int\_kind(18))~,~intent(in)~::~entity\_set
+
+~~integer~(selected\_int\_kind(9))~,~intent(in)~::~entity\_type\_requestor
+
+~~integer~(selected\_int\_kind(9))~,~intent(in)~::~entity\_topology\_requestor
+
+~~integer~(selected\_int\_kind(9))~,~intent(in)~::~entity\_type\_requested
+
+~~type(sidl\_opaque\_1d)~,~intent(inout)~::~adj\_entity\_handles
+
+~~integer~(selected\_int\_kind(9))~,~intent(out)~::~adj\_entity\_handles\_size
+
+~~type(sidl\_int\_1d)~,~intent(inout)~::~offset
+
+~~integer~(selected\_int\_kind(9))~,~intent(out)~::~offset\_size
+
+~~type(sidl\_int\_1d)~,~intent(inout)~::~in\_entity\_set
+
+~~integer~(selected\_int\_kind(9))~,~intent(out)~::~in\_entity\_set\_size
+
+~~type(sidl\_BaseInterface\_t)~,~intent(out)~::~exception
+\end{lyxcode}

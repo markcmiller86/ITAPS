@@ -1,0 +1,108 @@
+CPPFLAGS = @CPPFLAGS@
+CFLAGS = @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
+JAVACFLAGS = @JAVACFLAGS@
+F77FLAGS = @F77FLAGS@
+FCFLAGS = @FCFLAGS@
+BABELFLAGS = @BABELFLAGS@
+
+CC = @CC@
+CXX = @CXX@
+JAVAC = @JAVAC@
+F77 = @F77@
+FC = @FC@
+BABEL = @BABEL@
+SED = @SED@
+JAR = @JAR@
+PYTHON = @PYTHON@
+
+LDFLAGS = @LDFLAGS@
+LIBTOOL = $(top_builddir)/libtool
+LTFLAGS = @LTFLAGS@
+
+INSTALL = @INSTALL@
+INSTALL_STRIP_FLAG = @INSTALL_STRIP_FLAG@
+
+BABEL_C = @BABEL_C@
+BABEL_CXX = @BABEL_CXX@
+BABEL_F77 = @BABEL_F77@
+BABEL_F90 = @BABEL_F90@
+BABEL_JAVA = @BABEL_JAVA@
+BABEL_PYTHON = @BABEL_PYTHON@
+
+ENABLE_IMESH = @ENABLE_IMESH@
+ENABLE_IGEOM = @ENABLE_IGEOM@
+TEST_IMESH_LIBS = @TEST_IMESH_LIBS@
+TEST_IGEOM_LIBS = @TEST_IGEOM_LIBS@
+
+SIDL_INCLUDES = -I$(SIDL_INCDIR)
+SIDL_INCDIR = @SIDL_INCDIR@
+SIDL_LIBDIR = @SIDL_LIBDIR@
+BABEL_VERSION = @BABEL_VERSION@
+BABEL_PY_VERSION = @BABEL_PY_VERSION@
+BABEL_PY_INCLUDE = @BABEL_PY_INCLUDE@
+BABEL_JNI_INCLUDE = @BABEL_JNI_INCLUDE@
+BABEL_ENUM_ARR_DEFINE = @BABEL_ENUM_ARR_DEFINE@
+
+MAIN_BUILD_FACES = @MAIN_BUILD_FACES@
+MAIN_TEST_FACES = @MAIN_TEST_FACES@
+LANG_BUILD_SUBDIRS = @LANG_BUILD_SUBDIRS@
+
+SED = @SED@
+@SET_MAKE@
+
+bindir = @bindir@
+build = @build@
+build_alias = @build_alias@
+build_cpu = @build_cpu@
+build_os = @build_os@
+build_vendor = @build_vendor@
+datadir = @datadir@
+datarootdir = @datarootdir@
+docdir = @docdir@
+dvidir = @dvidir@
+exec_prefix = @exec_prefix@
+host = @host@
+host_alias = @host_alias@
+host_cpu = @host_cpu@
+host_os = @host_os@
+host_vendor = @host_vendor@
+htmldir = @htmldir@
+includedir = @includedir@
+infodir = @infodir@
+install_sh = $(top_srcdir)/install-sh
+libdir = @libdir@
+libexecdir = @libexecdir@
+localedir = @localedir@
+localstatedir = @localstatedir@
+mandir = @mandir@
+mkdir_p = @MKDIR_P@
+oldincludedir = @oldincludedir@
+pdfdir = @pdfdir@
+prefix = @prefix@
+program_transform_name = @program_transform_name@
+psdir = @psdir@
+sbindir = @sbindir@
+sharedstatedir = @sharedstatedir@
+sysconfdir = @sysconfdir@
+target = @target@
+target_alias = @target_alias@
+target_cpu = @target_cpu@
+target_os = @target_os@
+target_vendor = @target_vendor@
+top_builddir = $(relpath)@top_builddir@
+top_srcdir = $(relpath)@top_srcdir@
+srcdir = $(top_srcdir)/$(subdir)
+
+LTCXXCOMPILE = $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(CXXFLAGS)
+
+LTCOMPILE = $(LIBTOOL) --tag=CC --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+
+LINK = $(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS)  $(LDFLAGS) -o $@
+
+CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@
+
+VPATH = $(srcdir)
+

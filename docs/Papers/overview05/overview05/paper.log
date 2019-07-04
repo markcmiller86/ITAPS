@@ -1,0 +1,573 @@
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2010.8.26)  2 MAR 2011 23:34
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**paper
+(./paper.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, usenglishmax, dumylang, noh
+yphenation, loaded.
+(./svjour.cls
+Document Class: svjour 2003/04/15 
+LaTeX document class for Springer journals - version 1.11
+(./svglobal.clo
+File: svglobal.clo 1998/04/23 v1.0 style option for unspecific journals
+
+SVJour Class option: svglobal.clo for unspecific journals
+)
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 99.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 100.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 101.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 102.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 103.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 104.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 105.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 106.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 107.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 108.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 109.
+\logodepth=\dimen102
+\headerboxheight=\dimen103
+\betweenumberspace=\dimen104
+\aftertext=\dimen105
+\headlineindent=\dimen106
+\c@inst=\count79
+\c@auth=\count80
+\instindent=\dimen107
+\authrun=\box26
+\authorrunning=\toks14
+\titrun=\box27
+\titlerunning=\toks15
+\combirun=\box28
+\c@lastpage=\count81
+\c@section=\count82
+\c@subsection=\count83
+\c@subsubsection=\count84
+\c@paragraph=\count85
+\c@subparagraph=\count86
+\spthmsep=\dimen108
+\c@theorem=\count87
+\c@case=\count88
+\c@conjecture=\count89
+\c@corollary=\count90
+\c@definition=\count91
+\c@example=\count92
+\c@exercise=\count93
+\c@lemma=\count94
+\c@note=\count95
+\c@problem=\count96
+\c@property=\count97
+\c@proposition=\count98
+\c@question=\count99
+\c@solution=\count100
+\c@remark=\count101
+\c@figure=\count102
+\c@table=\count103
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\figcapgap=\dimen109
+\tabcapgap=\dimen110
+\figgap=\dimen111
+\bibindent=\dimen112
+\@tempcntc=\count104
+) (/usr/share/texmf-texlive/tex/latex/graphics/epsfig.sty
+Package: epsfig 1999/02/16 v1.7a (e)psfig emulation (SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/graphicx.sty
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/keyval.sty
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(/usr/share/texmf-texlive/tex/latex/graphics/graphics.sty
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-texlive/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+
+! Package graphics Error: No driver specified.
+
+See the graphics package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.89      }
+           
+? 
+)
+\Gin@req@height=\dimen113
+\Gin@req@width=\dimen114
+)
+\epsfxsize=\dimen115
+\epsfysize=\dimen116
+) (/usr/share/texmf-texlive/tex/latex/ltxmisc/url.sty
+\Urlmuskip=\muskip10
+Package: url 2006/04/12  ver 3.3  Verb mode for urls, etc.
+)
+(/usr/share/texmf-texlive/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count105
+\float@exts=\toks17
+\float@box=\box29
+\@float@everytoks=\toks18
+\@floatcapt=\box30
+)
+\@float@every@algorithm=\toks19
+\c@algorithm=\count106
+ (./paper.aux)
+\openout1 = `paper.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 18.
+LaTeX Font Info:    ... okay on input line 18.
+
+SVJour warning: Missing \date
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 46.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 46.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 46.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 46.
+(./intro.tex [1]
+
+LaTeX Warning: Citation `abaqus' on page 2 undefined on input line 37.
+
+
+LaTeX Warning: Citation `ansys:http' on page 2 undefined on input line 37.
+
+
+LaTeX Warning: Citation `fluent:http' on page 2 undefined on input line 37.
+
+
+LaTeX Warning: Citation `kiva:http' on page 2 undefined on input line 37.
+
+
+LaTeX Warning: Citation `abaqus' on page 2 undefined on input line 42.
+
+
+LaTeX Warning: Citation `BeSh99' on page 2 undefined on input line 58.
+
+
+LaTeX Warning: Citation `overtureTR' on page 2 undefined on input line 58.
+
+
+LaTeX Warning: Citation `pact93' on page 2 undefined on input line 58.
+
+
+LaTeX Warning: Citation `BrLa97' on page 2 undefined on input line 58.
+
+
+LaTeX Warning: Citation `De97' on page 2 undefined on input line 58.
+
+
+LaTeX Warning: Citation `DoLa96' on page 2 undefined on input line 58.
+
+
+LaTeX Warning: Citation `StEd04' on page 2 undefined on input line 58.
+
+[2]
+
+LaTeX Warning: Citation `AsPe98' on page 3 undefined on input line 82.
+
+
+LaTeX Warning: Citation `petsc' on page 3 undefined on input line 82.
+
+
+LaTeX Warning: Citation `BaGr97' on page 3 undefined on input line 82.
+
+
+LaTeX Warning: Citation `eispack' on page 3 undefined on input line 82.
+
+
+LaTeX Warning: Citation `lapack' on page 3 undefined on input line 82.
+
+
+LaTeX Warning: Citation `linpack' on page 3 undefined on input line 82.
+
+
+LaTeX Warning: Citation `keahey00ligature' on page 3 undefined on input line 97
+.
+
+
+LaTeX Warning: Citation `ccachem' on page 3 undefined on input line 97.
+
+
+LaTeX Warning: Citation `Larson:2004:CCO' on page 3 undefined on input line 97.
+
+
+
+LaTeX Warning: Citation `mit2003' on page 3 undefined on input line 97.
+
+
+LaTeX Warning: Citation `ipdps2003' on page 3 undefined on input line 97.
+
+
+LaTeX Warning: Citation `norris02' on page 3 undefined on input line 97.
+
+
+LaTeX Warning: Citation `SGP:Parker02' on page 3 undefined on input line 97.
+
+
+LaTeX Warning: Citation `Zhou:2003:PEC' on page 3 undefined on input line 97.
+
+
+LaTeX Warning: Citation `petsc' on page 3 undefined on input line 110.
+
+
+LaTeX Warning: Citation `BaGr97' on page 3 undefined on input line 110.
+
+
+LaTeX Warning: Citation `ipdps2004:odepackpp' on page 3 undefined on input line
+ 110.
+
+
+LaTeX Warning: Citation `cvode_sandia_report' on page 3 undefined on input line
+ 110.
+
+
+LaTeX Warning: Citation `cca-paper' on page 3 undefined on input line 112.
+
+[3]
+
+! LaTeX Error: Unknown graphics extension: .eps.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.132 ...g{file=information_flow_3.eps,width=11cm}
+                                                  
+? 
+) (./simulation.tex [4]
+
+! LaTeX Error: Unknown graphics extension: .eps.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.139 ...g{file=problem_description.eps,width=9cm}
+                                                  
+? 
+
+LaTeX Warning: Citation `mort97' on page 5 undefined on input line 246.
+
+[5] [6]
+
+! LaTeX Error: Unknown graphics extension: .eps.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.442 ...ile=domain_discretization2.eps,width=8cm}
+                                                  
+? 
+
+LaTeX Warning: Citation `LuSh02' on page 7 undefined on input line 506.
+
+[7]
+
+LaTeX Warning: Citation `BeSh97' on page 8 undefined on input line 530.
+
+
+LaTeX Warning: Citation `DeOB01' on page 8 undefined on input line 530.
+
+
+LaTeX Warning: Citation `Ta00' on page 8 undefined on input line 530.
+
+
+LaTeX Warning: Citation `BeSh97' on page 8 undefined on input line 541.
+
+
+LaTeX Warning: Citation `ShGe92' on page 8 undefined on input line 541.
+
+[8]
+
+! LaTeX Error: Unknown graphics extension: .eps.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.605 \epsfig{file=solution_fields.eps,width=8cm}
+                                                 
+? 
+[9]) (./interface.tex [10]
+
+LaTeX Warning: Citation `cca-forum' on page 11 undefined on input line 72.
+
+
+LaTeX Warning: Citation `babel' on page 11 undefined on input line 74.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [11]
+[12]
+
+LaTeX Warning: Citation `BeSh97' on page 13 undefined on input line 190.
+
+[13]
+
+LaTeX Warning: Citation `BeSh97' on page 14 undefined on input line 212.
+
+[14]
+
+LaTeX Warning: Citation `ReSh03' on page 15 undefined on input line 273.
+
+
+LaTeX Warning: Citation `moab:http' on page 15 undefined on input line 274.
+
+
+LaTeX Warning: Citation `nwgrid:http' on page 15 undefined on input line 275.
+
+
+LaTeX Warning: Citation `GRUMMP:http' on page 15 undefined on input line 276.
+
+(./geometry.tex
+
+LaTeX Warning: Citation `KrOr01' on page 15 undefined on input line 61.
+
+
+LaTeX Warning: Citation `PaOr02' on page 15 undefined on input line 61.
+
+
+LaTeX Warning: Citation `WaKo04' on page 15 undefined on input line 61.
+
+
+LaTeX Warning: Citation `CiOr00' on page 15 undefined on input line 65.
+
+
+LaTeX Warning: Citation `WaKo04' on page 15 undefined on input line 65.
+
+[15]
+
+LaTeX Warning: Citation `TSTT-software' on page 16 undefined on input line 98.
+
+[16]
+
+LaTeX Warning: Citation `BeWa04' on page 17 undefined on input line 157.
+
+
+LaTeX Warning: Citation `ShGe92' on page 17 undefined on input line 157.
+
+
+LaTeX Warning: Citation `BeSh99' on page 17 undefined on input line 160.
+
+) (./fields.tex [17]
+
+LaTeX Warning: Citation `BeSo83' on page 18 undefined on input line 20.
+
+[18])) (./adapt_loop.tex
+
+LaTeX Warning: Citation `AiOd00' on page 19 undefined on input line 7.
+
+
+LaTeX Warning: Citation `BaSt01' on page 19 undefined on input line 7.
+
+
+LaTeX Warning: Citation `BaRa03' on page 19 undefined on input line 7.
+
+
+LaTeX Warning: Citation `BeWa04' on page 19 undefined on input line 32.
+
+
+LaTeX Warning: Citation `ReSh03' on page 19 undefined on input line 36.
+
+
+Overfull \hbox (5.9728pt too wide) in paragraph at lines 34--38
+\OT1/cmr/m/n/10 data dur-ing the adap-tive pro-cess. The Algorithm-Oriented Mes
+h Database
+ []
+
+
+LaTeX Warning: Citation `BeSh99' on page 19 undefined on input line 39.
+
+
+LaTeX Warning: Citation `LiSh05' on page 19 undefined on input line 56.
+
+
+LaTeX Warning: Citation `LiSh03' on page 19 undefined on input line 59.
+
+[19]
+
+LaTeX Warning: Citation `GeLe04' on page 20 undefined on input line 67.
+
+
+LaTeX Warning: Citation `spatial' on page 20 undefined on input line 73.
+
+
+LaTeX Warning: Citation `simmetrix' on page 20 undefined on input line 75.
+
+
+LaTeX Warning: Citation `LiSh05' on page 20 undefined on input line 77.
+
+
+LaTeX Warning: Citation `GeLe04' on page 20 undefined on input line 86.
+
+
+! LaTeX Error: Unknown graphics extension: .ps.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.90 \epsfig{file=adapt-cavity.ps,width=10cm}
+                                             
+? 
+
+LaTeX Warning: Citation `WaKo04' on page 20 undefined on input line 107.
+
+
+LaTeX Warning: Citation `WaKo04' on page 20 undefined on input line 109.
+
+[20]
+
+LaTeX Warning: Citation `Fl04' on page 21 undefined on input line 113.
+
+
+! LaTeX Error: Unknown graphics extension: .ps.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.122 \epsfig{file=forming.ps,width=10cm}
+                                         
+? 
+) (./improve.tex
+
+LaTeX Warning: Citation `Mesquite03' on page 21 undefined on input line 10.
+
+
+LaTeX Warning: Citation `TSTT-swap-tool' on page 21 undefined on input line 38.
+
+
+[21])
+Overfull \hbox (1.02834pt too wide) in paragraph at lines 90--104
+\OT1/cmr/m/n/10 vices for ITAPS-based in-ter-op-er-a-ble com-po-nents pro-vid-i
+ng tech-nolo-gies such
+ []
+
+
+LaTeX Warning: Citation `cca-forum' on page 22 undefined on input line 116.
+
+[22]
+Overfull \hbox (3.55502pt too wide) in paragraph at lines 120--122
+[]\OT1/cmr/m/n/10 More in-for-ma-tion on the ITAPS cen-ter can be found at http
+://www.itaps-
+ []
+
+No file paper.bbl.
+(./examples.tex
+Overfull \hbox (3.1661pt too wide) in paragraph at lines 23--28
+[]\OT1/cmr/m/n/10 Full SIDL de-scrip-tions of the in-ter-faces are avail-able a
+t http://www.itaps-
+ []
+
+
+Overfull \hbox (25.58292pt too wide) in paragraph at lines 23--28
+\OT1/cmr/m/n/10 ac-tiv-ity, please con-tact the ITAPS man-age-ment team at itap
+s-mgmt@lists.llnl.gov. 
+ []
+
+
+LaTeX Warning: Citation `babel' on page 23 undefined on input line 36.
+
+
+LaTeX Warning: Citation `babel:site04' on page 23 undefined on input line 36.
+
+
+Underfull \vbox (badness 2698) has occurred while \output is active []
+
+ [23]
+Overfull \hbox (24.74693pt too wide) in paragraph at lines 68--68
+[]               \OT1/cmtt/m/n/10 out int adj_entity_handles_size) throws iBase
+.Error;[] 
+ []
+
+
+Overfull \hbox (8.99707pt too wide) in paragraph at lines 80--80
+[]                      \OT1/cmtt/m/n/10 ::iMesh::EntityType entity_type_reques
+ted,[] 
+ []
+
+
+Overfull \hbox (3.74712pt too wide) in paragraph at lines 80--80
+[]                      \OT1/cmtt/m/n/10 ::sidl::array<void*>& adj_entity_handl
+es,[] 
+ []
+
+[24]
+Overfull \hbox (82.49643pt too wide) in paragraph at lines 93--93
+[]                            \OT1/cmtt/m/n/10 enum iMesh_EntityType__enum enti
+ty_type_requested,[] 
+ []
+
+
+Overfull \hbox (66.74657pt too wide) in paragraph at lines 93--93
+[]                            \OT1/cmtt/m/n/10 struct sidl_opaque__array** adj_
+entity_handles,[] 
+ []
+
+
+Overfull \hbox (82.49643pt too wide) in paragraph at lines 121--121
+[]\OT1/cmtt/m/n/10 recursive subroutine getEntAdj_s(self, entity_handle, entity
+_type_requested, &[] 
+ []
+
+
+Overfull \hbox (3.74712pt too wide) in paragraph at lines 121--121
+[]  \OT1/cmtt/m/n/10 integer (selected_int_kind(18)) , intent(in) :: entity_han
+dle[] 
+ []
+
+
+Overfull \hbox (40.4968pt too wide) in paragraph at lines 121--121
+[]  \OT1/cmtt/m/n/10 integer (selected_int_kind(9)) , intent(in) :: entity_type
+_requested[] 
+ []
+
+
+Overfull \hbox (56.24666pt too wide) in paragraph at lines 121--121
+[]  \OT1/cmtt/m/n/10 integer (selected_int_kind(9)) , intent(out) :: adj_entity
+_handles_size[] 
+ []
+
+
+Overfull \hbox (3.74615pt too wide) in paragraph at lines 179--179
+[]\OT1/cmtt/m/n/9 18                        iMesh::EntityTopology_ALL_TOPOLOGIE
+S, iter);[] 
+ []
+
+[25] [26]
+Overfull \hbox (8.4711pt too wide) in paragraph at lines 264--264
+[]\OT1/cmtt/m/n/9 38               << "', size = " << tag_size << " bytes." << 
+std::endl;[] 
+ []
+
+) [27] [28] (./paper.aux) ) 
+Here is how much of TeX's memory you used:
+ 1035 strings out of 495062
+ 11449 string characters out of 1182644
+ 71440 words of memory out of 3000000
+ 4224 multiletter control sequences out of 15000+50000
+ 8641 words of font info for 31 fonts, out of 3000000 for 9000
+ 28 hyphenation exceptions out of 8191
+ 32i,8n,24p,502b,261s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on paper.dvi (28 pages, 103684 bytes).

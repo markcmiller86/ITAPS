@@ -1,0 +1,8 @@
+# this include statement works only so far as Makefile.am does
+# not include any non-normal make statements
+include Makefile.am
+
+default:
+	for d in ${SUBDIRS}; do \
+	    (cd $$d ; $(MAKE) $(MAKEFLAGS) -f Makefile.noautoconf $(TARGET)) \
+	done

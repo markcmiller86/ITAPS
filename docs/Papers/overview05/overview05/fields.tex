@@ -1,0 +1,75 @@
+\subsection{The ITAPS Fields Interface}
+\label{sec:fields}
+
+Simulation fields represent tensor quantities defined in terms of
+numerical analysis discretizations in a form useful to support queries
+and operations by other functions or simulations. Common examples
+where fields are used are (i) multiphysics analysis where the solution
+fields from each physics analysis represents a forcing function or
+boundary condition for another, (ii) the construction of external
+adaptive control loops where the solution fields are used by error
+estimation procedures to obtain estimates of the discretization errors
+and to construct new mesh size field, and (iii) visualization and 
+analysis/postprocessing.
+
+Tensor quantities used in the quantification of problems of
+mathematical physics are of order zero or greater and are defined over
+a physical space or space/time domain.  Knowledge of the order of a
+tensor and the dimension of the spatial domain over which it is defined,
+gives the number of components needed to uniquely define the tensor
+\cite{BeSo83}. The symmetries, for tensors of order 2 or greater,
+define those components that are identical to, or the negative of
+(antisymmetric), other components. The components of the tensor are,
+in general, functions of the domain parameters as well as other
+problem parameters. The ability to understand and use a tensor at any
+particular instant requires knowledge of the coordinate system in
+which the components of the tensor are referred.
+
+The qualification of a tensor over a domain is called a field. The
+field inherits the tensor order and spatial domain dimension from the
+tensor along with any symmetries and constraints. The field
+discretizes the tensor component values over the domain with
+distributions and degrees of freedom (DOFs). The distributions are
+defined over the mesh entities (and temporal discretization entities
+as needed) and give the variation of the components of the
+field. Thus, they must have the same functional domain that the
+components of the tensor have.  The DOFs multiply the distributions and
+set the magnitude of the variation of the individual distributions.
+
+A complex simulation process can involve a number of fields defined
+over various portions of the domain of the simulation. A single field
+can be used by a number of different analysis routines that interact,
+and the field may be associated with multiple meshes and have
+a different relationship with each one.
+In addition, different
+distributions can be used by a field to discretize its associated
+tensor. The ability to have a specific tensor defined over multiple
+meshes and/or discretized in terms of multiple distributions is
+handled by supporting multiple instances. A field instance has a
+single set of distributions over a given mesh. These distributions are
+defined over mesh entities which are of same dimension as the tensor
+it is discretizing. A field instance can exist in an evaluated form
+where the DOF have been determined, or in an unevaluated form where
+the DOF are not yet determined.
+
+ITAPS is currently defining interoperable field functions to:
+\begin{itemize}
+\item construct/load/save a field over a mesh,
+\item interrogate the field at specific points and over mesh entities,
+\item transform a field from one coordinate system to another,
+\item project a field to a different set of basis functions (e.g., projecting a discontinuous 
+stress field onto a set of continuous shape functions), and
+\item transfer fields between different meshes including the use of different distributions. 
+\end{itemize}
+
+%% NOTE - IN THE BIBTEX FILE THIS REFERENCE MEEDS TO HAVE THE INITIALS 
+%% P. P. ADDED TO THE 3RD AUTHOR.
+
+%% @book{BeSo83,
+%%  author="Beju, I. and Soos, E. and Teodorescu, P.P.", 
+%%  title="Euclidean Tensor Calculus with Applications", 
+%%  publisher="Abacus Press",
+%%  year=1983
+
+
+

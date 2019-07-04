@@ -1,0 +1,103 @@
+.SILENT:
+include babel.make
+include @IMPL_ROOT@/TSTTB-Defs.inc
+include @IMPL_ROOT@/TSTTM-Defs.inc
+include make.local
+
+PWD=$(shell pwd)
+PARENT_DIR=$(shell dirname ${PWD})
+PACKAGE_NAME=$(shell basename ${PARENT_DIR})
+GENERIC_NAME=$(shell echo $(PACKAGE_NAME) | sed -e "s/_.*//")
+THIS_DIR=$(shell basename ${PWD})
+CLIENT_LANG=$(subst ++,XX,$(subst client_,,${THIS_DIR}))
+
+include @IMPL_ROOT@/$(GENERIC_NAME)-Defs.inc
+
+ALL_INCLUDES=$(INCLUDES) $(SIDL_INCLUDES) $(TSTTB_SERVER_INCLUDES) $($(GENERIC_NAME)_SERVER_INCLUDES) $(TSTTB_CLIENT_${CLIENT_LANG}_INCLUDES) $(TSTTM_CLIENT_${CLIENT_LANG}_INCLUDES) $($(GENERIC_NAME)_CLIENT_${CLIENT_LANG}_INCLUDES) -I.
+
+OPTDebug = -DNDEBUG
+
+CXX=@CXX@
+CC=@CC@
+CFLAGS=@CFLAGS@ $(OPTDebug)
+CXXFLAGS=@CXXFLAGS@ $(OPTDebug)
+CPPFLAGS=@CPPFLAGS@ $(ALL_INCLUDES)
+# Yes, Virginia, make and autoconf disagree about the variable names.
+FC=@F77@
+F90=@FC@
+FFLAGS=@FFLAGS@
+F90FLAGS=@FCFLAGS@ $(OPTDebug)
+
+.cc.o:
+	echo Compiling $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+
+.c.o:
+	echo Compiling $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+
+.F90.o:
+	echo Compiling $<
+	$(F90) $(F90FLAGS) $(CPPFLAGS) -c $<
+
+.f90.o:
+	echo Compiling $<
+	$(F90) $(F90FLAGS) -c $<
+
+.F.o:
+	echo Compiling $<
+	$(FC) $(FFLAGS) $(CPPFLAGS) -c $<
+
+.f.o:
+	echo Compiling $<
+	$(FC) $(FFLAGS) -c $<
+
+AUTO_MODULE_SRCS=${ARRAYMODULESRCS} ${STUBMODULESRCS} ${TYPEMODULESRCS}
+AUTO_HDRS=$(IORHDRS) $(STUBHDRS) $(STUBFORTRANINC)
+AUTO_SERVER_SRCS=$(IORSRCS) $(SKELSRCS) $(STUBSRCS)
+AUTO_CLIENT_SRCS=$(STUBSRCS)
+AUTO_DOC_FILES=$(STUBDOCS)
+AUTO_SRCS=${AUTO_SERVER_SRCS} ${IMPLSRCS}
+
+# Don't add IMPLSRCS to the following line!  Or you'll lose your
+# implementation when you make distclean!
+ALL_AUTO_FILES=$(AUTO_CLIENT_SRCS) $(AUTO_SERVER_SRCS) $(AUTO_MODULE_SRCS) $(AUTO_HDRS) $(AUTO_DOC_FILES)
+
+# The following will expand to both the real objects and the source file
+# names; since the source files already exist, there's no problem.
+STUB_OBJS=${STUBSRCS:$(STUBEXT)=.o}
+
+# Assuming the F90 module sources need not be built and put in the library
+AUTO_OBJS=${STUB_OBJS}
+
+STATIC_LIB=../lib${PACKAGE_NAME}_${CLIENT_LANG}.a
+SHARED_LIB=../lib${PACKAGE_NAME}_${CLIENT_LANG}.so
+
+all: $(STATIC_LIB) $(SHARED_LIB)
+
+objects: 
+	echo Compiling $(CLIENT_LANG) client for $(PACKAGE_NAME)...
+	make $(AUTO_OBJS) $(INTERNAL_OBJS)
+
+$(STATIC_LIB): objects
+	echo Creating static library for $(CLIENT_LANG) $(PACKAGE_NAME) client...
+	@AR_STATIC@ $@ $(AUTO_OBJS) $(INTERNAL_OBJS)
+
+$(SHARED_LIB): objects
+	echo Creating shared library for $(CLIENT_LANG) $(PACKAGE_NAME) client...
+	@AR_SHARED_CXX@ $@ $(AUTO_OBJS) $(INTERNAL_OBJS)
+
+clean: 
+	-rm -f *.o *~
+
+distclean: clean
+	-rm -f $(ALL_AUTO_FILES)
+	-rm -f babel.make* Makefile $(STATIC_LIB) $(SHARED_LIB)
+
+INSTALL=@INSTALL@
+  
+install:
+	# Libraries are installed already.
+	@INSTALL_DATA@ $(AUTO_HDRS) $(AUTO_DOC_FILES) @prefix@/include/TSTT
+
+

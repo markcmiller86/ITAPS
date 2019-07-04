@@ -1,0 +1,117 @@
+.figCaption {
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 10px;
+	font-style: italic;
+	font-weight: bold;
+	color: #333;
+}
+
+.figCaptionFloat {
+	font-family: Verdana, Geneva, sans-serif;
+	float:right;
+	width: 100px;
+	font-size: 10px;
+	font-style: italic;
+	font-weight: bold;
+	color: #333;
+}
+
+.crumbtrail {
+	padding-top: 6px;
+	padding-left: 24px;
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 9px;
+	color: #666;
+}
+
+
+.imgright {
+	padding-top: 6px;
+	padding-left: 24px;
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 9px;
+	color: #666;
+}
+
+#photo_caption {
+	border:1px solid #ccc;
+	padding:2px;
+}
+
+#team {
+	width: 780px;
+	padding-left:50px;
+}
+
+#Name {
+	border: 0;
+}
+
+	#Name tbody tr td {
+		font-family: "lucida grande", verdana, sans-serif;
+		font-size: 8pt;
+		padding: 3px 8px;
+		border-left: 1px solid #D9D9D9;
+		border-right: 1px solid #D9D9D9;
+	}
+	
+	#Name tbody tr.title td {
+	background-color: #afa9a7;
+	color: #ffffff;
+	font-weight: bold;
+	}
+	
+	
+#Specs {
+	border: 0;
+	}
+
+	#Specs tbody tr td {
+	font-family: "lucida grande", verdana, sans-serif;
+	font-size: 8pt;
+	padding: 3px 8px;
+	border-left: 1px solid #D9D9D9;
+	border-right: 1px solid #D9D9D9;
+	}
+	
+	#Specs tbody tr.title td {
+	background-color: #afa9a7;
+	color: #ffffff;
+	font-weight: bold;
+	}	
+
+.float_left {
+	float:left;
+	width: 480px;
+	margin: 0 0 10px 10px;
+	padding: 0 10px 10px 10px;
+	border: 1px solid #CCC;
+}
+
+.float_right {
+	float:right;
+	width: 480px;
+	margin: 0 0 10px 10px;
+	padding: 10px 10px 10px 10px;
+	border: 1px solid #CCC;
+}
+
+.floatright {
+	float: right;
+	width: 200px;
+	margin: 0 0 10px 10px;
+	background-color: #fff;
+	padding: 10px;
+	border: 1px solid #CCC;
+}
+
+
+p { margin-top: 0; }
+
+
+.research {
+	font-family: Calibri, Arial, sans-serif;
+	font-size: 14px;
+	color: #191F8B;
+	font-weight: bold;
+}

@@ -1,0 +1,4 @@
+FACE = Base
+IMPL_SIDL = 
+IBASE_REPO = 
+include @top_srcdir@/subdir.make

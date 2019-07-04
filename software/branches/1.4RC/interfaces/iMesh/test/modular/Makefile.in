@@ -1,0 +1,38 @@
+include @iMesh_ROOT@/iMesh-Defs.inc
+
+ALL_INCLUDES=$(IMESH_INCLUDES)
+
+LIBS=$(IMESH_LIBS) $(IMESH_BACKEND_LIBS) -ldl
+
+DEPS=$(IMESH_FILES)
+
+TEST_OBJECTS=BasicTagTests.o \
+DBaseTests.o \
+EntArrTagTests.o \
+EntArrTests.o \
+EntityTests.o \
+EntTagTests.o \
+iMeshTester.o \
+iMeshWrapper.o \
+SetTagTests.o \
+SetTests.o \
+TestDataSetup.o \
+WrapperConstructor.o
+
+.cc.o: 
+	@CXX@ $(ALL_INCLUDES) $(CXXWARNFLAGS) -g -c $<
+
+modTest: modTest.o $(TEST_OBJECTS)
+	@CXX@ -g -o modTest modTest.o $(TEST_OBJECTS) $(LIBS)
+
+
+depend:
+	makedepend $(ALL_INCLUDES) -Y *.cc 2> /dev/null
+
+clean: 
+	-${RM} *.o
+
+distclean: clean
+	-rm -f Makefile *~ config.* iMesh_unitTest
+
+# DO NOT DELETE

@@ -1,0 +1,249 @@
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap}{
+\section{ITAPS\_\-Swap::Swap Class Reference}
+\label{class_i_t_a_p_s___swap_1_1_swap}\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}}
+}
+
+
+Virtual base class for 2D and 3D swapping classes.  
+
+
+
+
+{\ttfamily \#include $<$ITAPS\_\-Swap.hh$>$}
+
+Inheritance diagram for ITAPS\_\-Swap::Swap:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2cm]{class_i_t_a_p_s___swap_1_1_swap}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap_a169ddddc93fdbddcca76a78e6df090d2}{Swap} ()
+\begin{DoxyCompactList}\small\item\em Default constructor. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a081ac4a0a18d8d814c86dbe6092ee48d}{
+virtual \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a081ac4a0a18d8d814c86dbe6092ee48d}{$\sim$Swap} ()}
+\label{class_i_t_a_p_s___swap_1_1_swap_a081ac4a0a18d8d814c86dbe6092ee48d}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \item\end{DoxyCompactList}\item 
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a1cfc31d486bf82d7481ce87caec66853}{setSwapType} (SwapType ST)  throw (iBase\_\-ErrorType)
+\begin{DoxyCompactList}\small\item\em Set a new swapping type. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a5b46657be10052f7546b320d8abef42c}{
+SwapType \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a5b46657be10052f7546b320d8abef42c}{getSwapType} () const   throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a5b46657be10052f7546b320d8abef42c}
+
+\begin{DoxyCompactList}\small\item\em Return the swapping type in use. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a4bca0bc9501a09e69d629aaa7c57a3d7}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a4bca0bc9501a09e69d629aaa7c57a3d7}{createFromVertsOnly} (bool create\_\-from\_\-verts)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a4bca0bc9501a09e69d629aaa7c57a3d7}
+
+\begin{DoxyCompactList}\small\item\em Set whether entities should be created directly from vertices. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a722719a31d50850b411b4e86f3b7fdfb}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a722719a31d50850b411b4e86f3b7fdfb}{setSwapRecursion} (bool allow\_\-recursion)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a722719a31d50850b411b4e86f3b7fdfb}
+
+\begin{DoxyCompactList}\small\item\em Set whether recursion should be used. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a69252481d8dabc89dab04f3c746a729a}{
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a69252481d8dabc89dab04f3c746a729a}{isRecursionAllowed} () const   throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a69252481d8dabc89dab04f3c746a729a}
+
+\begin{DoxyCompactList}\small\item\em Query whether recursion is in use. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a6b19a2b25ce68389290223e5f732d077}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a6b19a2b25ce68389290223e5f732d077}{setUserQualMeasure} (\hyperlink{class_i_t_a_p_s___swap_1_1_q_m___base}{ITAPS\_\-Swap::QM\_\-Base} $\ast$pQM)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a6b19a2b25ce68389290223e5f732d077}
+
+\begin{DoxyCompactList}\small\item\em Set a user-\/defined quality measure. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_abc4575a381ce0162e8e7cbae7da5ccf4}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap_abc4575a381ce0162e8e7cbae7da5ccf4}{setMeshData} (iMesh\_\-Instance instance)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_abc4575a381ce0162e8e7cbae7da5ccf4}
+
+\begin{DoxyCompactList}\small\item\em Specify the mesh database to be swapped. \item\end{DoxyCompactList}\item 
+virtual int \hyperlink{class_i_t_a_p_s___swap_1_1_swap_adfb444f7ade3254ba8fa9ced2ec15e65}{swap} (iBase\_\-EntitySetHandle entity\_\-set, iBase\_\-EntityHandle entity\_\-handle)=0  throw (iBase\_\-ErrorType)
+\begin{DoxyCompactList}\small\item\em \hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} a single d-\/1 dimensional entity. \item\end{DoxyCompactList}\item 
+virtual int \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a8a1fdc1a12fb71dfe28881b10277eafc}{swapAll} (iBase\_\-EntitySetHandle entity\_\-set, iBase\_\-TagHandle $\ast$ptr\_\-tag\_\-handle=NULL)=0  throw (iBase\_\-ErrorType)
+\begin{DoxyCompactList}\small\item\em \hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} the entire mesh or entity set. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a4a68c5ddcc730223474184c388f59877}{
+virtual int \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a4a68c5ddcc730223474184c388f59877}{swap} (iBase\_\-EntityHandle entity\_\-handle)=0  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a4a68c5ddcc730223474184c388f59877}
+
+\begin{DoxyCompactList}\small\item\em Internal function for swapping a single entity. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a221c0d60ad88953d9347e0d3558864b6}{
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a221c0d60ad88953d9347e0d3558864b6}{qIsEntContained} (iBase\_\-EntityHandle entity\_\-handle)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_a221c0d60ad88953d9347e0d3558864b6}
+
+\begin{DoxyCompactList}\small\item\em Internal convenience function to check whether an entity is in a set. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_ab5651c14ff282a14410932ed94fafbb2}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap_ab5651c14ff282a14410932ed94fafbb2}{vAddToSet} (iBase\_\-EntityHandle entity\_\-handle)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap_ab5651c14ff282a14410932ed94fafbb2}
+
+\begin{DoxyCompactList}\small\item\em Internal convenience function to add an entity to a set. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a08888b614dd06df0ed3d730997424c04}{
+SwapType \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a08888b614dd06df0ed3d730997424c04}{ST\_\-int}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a08888b614dd06df0ed3d730997424c04}
+
+\begin{DoxyCompactList}\small\item\em The swapping measure to use. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a69663e00da10edc7dfada6626bed8abe}{
+\hyperlink{class_i_t_a_p_s___swap_1_1_q_m___base}{QM\_\-Base} $\ast$ \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a69663e00da10edc7dfada6626bed8abe}{pQM\_\-int}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a69663e00da10edc7dfada6626bed8abe}
+
+\begin{DoxyCompactList}\small\item\em Quality measure class to use. \item\end{DoxyCompactList}\item 
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a400dea547bf0c4984d630e2b044a1316}{qAllowRecursion}
+\begin{DoxyCompactList}\small\item\em \hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} faces near changes in the mesh if this is true. \item\end{DoxyCompactList}\item 
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap_ab6c9bfbc58fd9272e3706fa3ce4392c6}{qUsingSet}
+\begin{DoxyCompactList}\small\item\em Change only entities in a given set if this is true. \item\end{DoxyCompactList}\item 
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a37fb33f35799bd3750b2f8fcf32fe81a}{qCreateFromVerts}
+\begin{DoxyCompactList}\small\item\em Create triangles and tets directly from verts if this is true. \item\end{DoxyCompactList}\item 
+std::set$<$ iBase\_\-EntityHandle $>$ \hyperlink{class_i_t_a_p_s___swap_1_1_swap_ab49c1d524e26177afb0c0f76181304d7}{soRecursionQueue}
+\begin{DoxyCompactList}\small\item\em A queue of faces to check because of recursion. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_ad7e45831ec19da09b279a4b39e690429}{
+iMesh\_\-Instance \hyperlink{class_i_t_a_p_s___swap_1_1_swap_ad7e45831ec19da09b279a4b39e690429}{pMeshInst}}
+\label{class_i_t_a_p_s___swap_1_1_swap_ad7e45831ec19da09b279a4b39e690429}
+
+\begin{DoxyCompactList}\small\item\em The mesh database containing the mesh to swap. \item\end{DoxyCompactList}\item 
+iBase\_\-EntitySetHandle \hyperlink{class_i_t_a_p_s___swap_1_1_swap_ae9ab60da4630d1439edcd5401a4be85d}{shSet}
+\begin{DoxyCompactList}\small\item\em Only change highest-\/dimensional entities that are in this set. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a888f09cfa94a1c9ec0c1851ec45ee1a8}{
+iBase\_\-EntitySetHandle \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a888f09cfa94a1c9ec0c1851ec45ee1a8}{shRootSet}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a888f09cfa94a1c9ec0c1851ec45ee1a8}
+
+\begin{DoxyCompactList}\small\item\em The root set of the mesh is needed for internal purposes. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Virtual base class for 2D and 3D swapping classes. The swapping classes hold minimal state data (an iMesh instance and some control options); they're mostly a way to encapsulate algorithms within a common interface. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a169ddddc93fdbddcca76a78e6df090d2}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!Swap@{Swap}}
+\index{Swap@{Swap}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{Swap}]{\setlength{\rightskip}{0pt plus 5cm}ITAPS\_\-Swap::Swap::Swap ()\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a169ddddc93fdbddcca76a78e6df090d2}
+
+
+Default constructor. 
+
+By default, Delaunay swapping is used, recursion is enabled, and the entire mesh is swapped. Note that the mesh database is not yet specified. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a1cfc31d486bf82d7481ce87caec66853}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!setSwapType@{setSwapType}}
+\index{setSwapType@{setSwapType}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{setSwapType}]{\setlength{\rightskip}{0pt plus 5cm}void ITAPS\_\-Swap::Swap::setSwapType (SwapType {\em ST})  throw (iBase\_\-ErrorType)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a1cfc31d486bf82d7481ce87caec66853}
+
+
+Set a new swapping type. 
+
+Only predefined swapping types are allowed for this function, which also assumes that the mesh is 3D. \hypertarget{class_i_t_a_p_s___swap_1_1_swap_adfb444f7ade3254ba8fa9ced2ec15e65}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!swap@{swap}}
+\index{swap@{swap}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{swap}]{\setlength{\rightskip}{0pt plus 5cm}virtual int ITAPS\_\-Swap::Swap::swap (iBase\_\-EntitySetHandle {\em entity\_\-set}, \/  iBase\_\-EntityHandle {\em entity\_\-handle})  throw (iBase\_\-ErrorType)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_adfb444f7ade3254ba8fa9ced2ec15e65}
+
+
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} a single d-\/1 dimensional entity. 
+
+No recursion is ever done by this single-\/entity call.
+
+
+\begin{DoxyParams}{Parameters}
+\item[\mbox{$\leftarrow$} {\em entity\_\-set}]If not the root set, all entities to be changed must be in the set.\item[\mbox{$\leftarrow$} {\em entity\_\-handle}]The handle of the d-\/1 dimensional entity to check.\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Number of equivalent face swaps performed; can be more than one if an edge swap is performed in 3D. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_i_t_a_p_s___swap_1_1_swap2_d_a84a78678e5e830d16c725a93f3b5038f}{ITAPS\_\-Swap::Swap2D}, and \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a82a135da16b4ef6e5ff36f8293cc450c}{ITAPS\_\-Swap::Swap3D}.
+
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a8a1fdc1a12fb71dfe28881b10277eafc}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!swapAll@{swapAll}}
+\index{swapAll@{swapAll}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{swapAll}]{\setlength{\rightskip}{0pt plus 5cm}virtual int ITAPS\_\-Swap::Swap::swapAll (iBase\_\-EntitySetHandle {\em entity\_\-set}, \/  iBase\_\-TagHandle $\ast$ {\em ptr\_\-tag\_\-handle} = {\ttfamily NULL})  throw (iBase\_\-ErrorType)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a8a1fdc1a12fb71dfe28881b10277eafc}
+
+
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} the entire mesh or entity set. 
+
+Checks all entities in the given set for swapping. Multiple passes are made through the mesh to ensure that all candidate swaps are considered; a second call to this function with the same swapping parameters should produce no additional change to the mesh.
+
+An optional tag handle argument allows fine-\/grained control: a d-\/1 dimensional entity is considered for swapping only if the integer tag value is non-\/zero; if the tag is not set, a value of zero (no swapping) is inferred.
+
+
+\begin{DoxyParams}{Parameters}
+\item[\mbox{$\leftarrow$} {\em entity\_\-set}]The set whose entities will be considered for swapping; passing the root set specifies swapping for the entire mesh.\item[\mbox{$\leftarrow$} {\em ptr\_\-tag\_\-handle}]An optional pointer to an integer-\/valued tag. If this tag handle is provided, only d-\/1 dimensional entities with a tag value set != 0 will be checked for swapping.\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Total number of swaps performed. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_i_t_a_p_s___swap_1_1_swap2_d_a4bee7d3a08e3ff6ac85a81ec321479ef}{ITAPS\_\-Swap::Swap2D}, and \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a139a400102ad7039fcc74d92d72dea27}{ITAPS\_\-Swap::Swap3D}.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a400dea547bf0c4984d630e2b044a1316}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!qAllowRecursion@{qAllowRecursion}}
+\index{qAllowRecursion@{qAllowRecursion}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{qAllowRecursion}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf ITAPS\_\-Swap::Swap::qAllowRecursion}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a400dea547bf0c4984d630e2b044a1316}
+
+
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} faces near changes in the mesh if this is true. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap_ab49c1d524e26177afb0c0f76181304d7}{soRecursionQueue} 
+\end{DoxySeeAlso}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_a37fb33f35799bd3750b2f8fcf32fe81a}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!qCreateFromVerts@{qCreateFromVerts}}
+\index{qCreateFromVerts@{qCreateFromVerts}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{qCreateFromVerts}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf ITAPS\_\-Swap::Swap::qCreateFromVerts}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_a37fb33f35799bd3750b2f8fcf32fe81a}
+
+
+Create triangles and tets directly from verts if this is true. 
+
+Some implementations support creation of triangles and tetrahedra only from vertices, others only from edges (2D) or faces (3D), still others from both. This flag tells the swapping code which to use. \hypertarget{class_i_t_a_p_s___swap_1_1_swap_ab6c9bfbc58fd9272e3706fa3ce4392c6}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!qUsingSet@{qUsingSet}}
+\index{qUsingSet@{qUsingSet}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{qUsingSet}]{\setlength{\rightskip}{0pt plus 5cm}bool {\bf ITAPS\_\-Swap::Swap::qUsingSet}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_ab6c9bfbc58fd9272e3706fa3ce4392c6}
+
+
+Change only entities in a given set if this is true. 
+
+The set is stored in shSet, below. \hypertarget{class_i_t_a_p_s___swap_1_1_swap_ae9ab60da4630d1439edcd5401a4be85d}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!shSet@{shSet}}
+\index{shSet@{shSet}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{shSet}]{\setlength{\rightskip}{0pt plus 5cm}iBase\_\-EntitySetHandle {\bf ITAPS\_\-Swap::Swap::shSet}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_ae9ab60da4630d1439edcd5401a4be85d}
+
+
+Only change highest-\/dimensional entities that are in this set. 
+
+This is optional; if no set is provided, the entire mesh is swapped. \begin{DoxySeeAlso}{See also}
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap_ab6c9bfbc58fd9272e3706fa3ce4392c6}{qUsingSet} 
+\end{DoxySeeAlso}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap_ab49c1d524e26177afb0c0f76181304d7}{
+\index{ITAPS\_\-Swap::Swap@{ITAPS\_\-Swap::Swap}!soRecursionQueue@{soRecursionQueue}}
+\index{soRecursionQueue@{soRecursionQueue}!ITAPS_Swap::Swap@{ITAPS\_\-Swap::Swap}}
+\subsubsection[{soRecursionQueue}]{\setlength{\rightskip}{0pt plus 5cm}std::set$<$iBase\_\-EntityHandle$>$ {\bf ITAPS\_\-Swap::Swap::soRecursionQueue}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap_ab49c1d524e26177afb0c0f76181304d7}
+
+
+A queue of faces to check because of recursion. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap_a400dea547bf0c4984d630e2b044a1316}{qAllowRecursion} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+ITAPS\_\-Swap.hh\end{DoxyCompactItemize}

@@ -1,0 +1,90 @@
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d}{
+\section{ITAPS\_\-Swap::Swap3D Class Reference}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d}\index{ITAPS\_\-Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}}
+}
+
+
+A specialization of \hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} for 3D meshes.  
+
+
+
+
+{\ttfamily \#include $<$ITAPS\_\-Swap.hh$>$}
+
+Inheritance diagram for ITAPS\_\-Swap::Swap3D:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2cm]{class_i_t_a_p_s___swap_1_1_swap3_d}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_acf6445ad45f957369eb20b0671bfd5ba}{Swap3D} ()
+\begin{DoxyCompactList}\small\item\em Default constructor. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_a2122e59297538a3489eeb3dd74a2d482}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a2122e59297538a3489eeb3dd74a2d482}{setEdgeSwapping} (bool allow\_\-edge\_\-swapping)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_a2122e59297538a3489eeb3dd74a2d482}
+
+\begin{DoxyCompactList}\small\item\em Set whether edge swapping is allowed. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_a4ce9a3eb26e6be61d006f51fa8720999}{
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a4ce9a3eb26e6be61d006f51fa8720999}{isEdgeSwappingAllowed} ()  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_a4ce9a3eb26e6be61d006f51fa8720999}
+
+\begin{DoxyCompactList}\small\item\em Query whether edge swapping is allowed. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_afe3ed257e355aaac22b281a24b35637c}{
+void \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_afe3ed257e355aaac22b281a24b35637c}{setBdryMutable} (bool allow\_\-bdry\_\-changes)  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_afe3ed257e355aaac22b281a24b35637c}
+
+\begin{DoxyCompactList}\small\item\em Set whether boundary changes are allowed. \item\end{DoxyCompactList}\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_a59dfdb2933f976acb278d6849ab8f90e}{
+bool \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a59dfdb2933f976acb278d6849ab8f90e}{isBdryMutable} ()  throw (iBase\_\-ErrorType)}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_a59dfdb2933f976acb278d6849ab8f90e}
+
+\begin{DoxyCompactList}\small\item\em Query whether boundary changes are allowed. \item\end{DoxyCompactList}\item 
+virtual int \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a82a135da16b4ef6e5ff36f8293cc450c}{swap} (iBase\_\-EntitySetHandle entity\_\-set, iBase\_\-EntityHandle entity\_\-handle)  throw (iBase\_\-ErrorType)
+\item 
+virtual int \hyperlink{class_i_t_a_p_s___swap_1_1_swap3_d_a139a400102ad7039fcc74d92d72dea27}{swapAll} (iBase\_\-EntitySetHandle entity\_\-set, iBase\_\-TagHandle $\ast$ptr\_\-tag\_\-handle=NULL)  throw (iBase\_\-ErrorType)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A specialization of \hyperlink{class_i_t_a_p_s___swap_1_1_swap}{Swap} for 3D meshes. Because of the possibility of changes to the boundary during 3D swapping, some additional publicly available functionality is defined to control changes to the boundary. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_acf6445ad45f957369eb20b0671bfd5ba}{
+\index{ITAPS\_\-Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}!Swap3D@{Swap3D}}
+\index{Swap3D@{Swap3D}!ITAPS_Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}}
+\subsubsection[{Swap3D}]{\setlength{\rightskip}{0pt plus 5cm}ITAPS\_\-Swap::Swap3D::Swap3D ()\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_acf6445ad45f957369eb20b0671bfd5ba}
+
+
+Default constructor. 
+
+By default, edge swapping is enabled (in addition to face swapping). Also by default, pairs of boundary faces that are nearly coplanar and classified on the same geometric face can be reconfigured. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_a82a135da16b4ef6e5ff36f8293cc450c}{
+\index{ITAPS\_\-Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}!swap@{swap}}
+\index{swap@{swap}!ITAPS_Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}}
+\subsubsection[{swap}]{\setlength{\rightskip}{0pt plus 5cm}int ITAPS\_\-Swap::Swap3D::swap (iBase\_\-EntitySetHandle {\em entity\_\-set}, \/  iBase\_\-EntityHandle {\em entity\_\-handle})  throw (iBase\_\-ErrorType)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_a82a135da16b4ef6e5ff36f8293cc450c}
+Method: swap\mbox{[}\mbox{]} 
+
+Implements \hyperlink{class_i_t_a_p_s___swap_1_1_swap_adfb444f7ade3254ba8fa9ced2ec15e65}{ITAPS\_\-Swap::Swap}.
+
+\hypertarget{class_i_t_a_p_s___swap_1_1_swap3_d_a139a400102ad7039fcc74d92d72dea27}{
+\index{ITAPS\_\-Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}!swapAll@{swapAll}}
+\index{swapAll@{swapAll}!ITAPS_Swap::Swap3D@{ITAPS\_\-Swap::Swap3D}}
+\subsubsection[{swapAll}]{\setlength{\rightskip}{0pt plus 5cm}int ITAPS\_\-Swap::Swap3D::swapAll (iBase\_\-EntitySetHandle {\em entity\_\-set}, \/  iBase\_\-TagHandle $\ast$ {\em pTag} = {\ttfamily NULL})  throw (iBase\_\-ErrorType)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_swap3_d_a139a400102ad7039fcc74d92d72dea27}
+Method: swapAll\mbox{[}\mbox{]} 
+
+Implements \hyperlink{class_i_t_a_p_s___swap_1_1_swap_a8a1fdc1a12fb71dfe28881b10277eafc}{ITAPS\_\-Swap::Swap}.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+ITAPS\_\-Swap.hh\item 
+ITAPS\_\-Swap3D.cc\end{DoxyCompactItemize}

@@ -1,0 +1,66 @@
+\subsection{Mesh Quality Improvement}\label{sec:quality-improvement}
+
+Mesh quality improvement techniques can be applied based on {\it a
+priori} geometric quality metrics or {\it a posteriori} solution-based
+metrics improvements.  Low-level mesh improvement operations include
+vertex relocation, topology modification, vertex insertion, and vertex
+deletion.   
+
+The ITAPS center is supporting the development of a stand-alone mesh
+quality improvement toolkit, called Mesquite~\cite{Mesquite03}.
+Mesquite currently provides state-of-the-art algorithms for vertex
+relocation and is flexible enough to work on a
+wide array of mesh types ranging from structured meshes to unstructured
+and hybrid meshes and a number of different two-and three-dimensional
+element types.
+
+% Question for Lori:  Why does Mesquite need to know the number of
+% elements of a given type or topology?
+
+Vertex relocation schemes must operate on the surface of the geometric
+domain as well as in the interior of the domain to fully optimize the
+mesh.  As such, the software must have functional access to both the
+high level description of the geometric domain and to individual mesh
+entities such as element vertices.  In particular, to operate on
+interior vertices, Mesquite queries an ITAPS implementation for vertex
+coordinate information, adjacency information, and the number of
+elements of a given type or topology.  After determining the optimal
+location for a vertex, Mesquite requests that the ITAPS implementation
+update vertex coordinate information.  To operate on the surface mesh,
+Mesquite must also use ITAPS geometric queries to determine the surface
+normal and the closest point on the surface.  Explicit classification
+of the mesh vertex against a geometric surface is required, as there
+are some cases for which the closest point query will return a point
+on the wrong surface, resulting in inverted or invalid meshes.
+
+The ITAPS center is also supporting the development of a simplicial mesh
+topology modification tool, which performs face and edge swapping
+operations.\cite{TSTT-swap-tool}  This tool has been implemented using
+the ITAPS mesh interface, enabling swapping in any ITAPS implementation
+supporting triangles (2D) or tetrahedra (3D).
+
+In gathering enough information to determine whether a swap is
+desirable, any mesh topology modification scheme must make extensive use
+of the ITAPS entity adjacency and vertex coordinate retrieval functions.
+Reconfiguring the mesh, when this is appropriate, requires deletion of
+old entities and creation of new entities through the ITAPS interface.
+In addition, classification operators are again essential.  For
+instance, reconfiguring tetrahedra that are classified on different
+geometric regions results in tetrahedra that are not classified on
+either region, so this case must be avoided.  Likewise, classification
+checks make it easy to identify and disallow mesh reconfigurations that
+would remove a mesh edge classified on a geometric edge.
+
+In addition to basic geometry, topology and classification information,
+a ITAPS implementation must provide additional information for mesh
+improvement schemes to operate effectively and efficiently.  For
+example, even for simple mesh improvement schemes, the implementation
+must be able to indicate which entities may be modified and which may
+not.  For mesh improvement schemes to operate on an entire mesh rather
+than simply accepting requests entity by entity, an ITAPS implementation
+must support some form of iterator.  Furthermore, advanced schemes may
+allow the user to input a desired size, orientation, degree of
+anisotropy, or even an initial reference mesh; exploiting such features
+will require the implementation to associate many different types of
+information with mesh entities and pass that information to the mesh
+improvement scheme when requested.

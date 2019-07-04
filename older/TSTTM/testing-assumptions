@@ -1,0 +1,8 @@
+Should output arrays have the same indexing as incoming arrays?
+
+A minor assumption in checking how entityGetAdjacencies behaves with bad
+input: that no implementation will categorically reject calls for
+vertices adjacent to a set of entities.  This should never be a problem,
+except perhaps if the database contains -only- vertices.
+
+Need to add canonical ordering checks.

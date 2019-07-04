@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head><title>Introduction</title>
+
+<link type="text/css" rel="stylesheet" href="../templates/stylesheet.css" />
+</head>
+
+
+<body>
+
+<div id="container">
+
+<div id="banner"> <img alt="ITAPS" src="../graphics/banner.gif" > <br> </div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+
+<h1>Introduction</h1>
+<p><b><i> Our Vision. </i></b>
+The advent of petascale computing will enable increasingly complex,
+realistic simulations of PDE-based applications.  Numerous software
+tools are available to help manage the complexity of these
+simulations, including computer-aided design systems used to represent
+the geometry of the computational domain, mesh generation tools to
+discretize those domains, solution adaptive methods (AMR) to improve
+the accuracy and efficiency of simulation techniques, and parallel
+tools such as dynamic partitioning to ease implementation on today's
+computer architectures.
+These tools would be particularly effective if they could be easily
+integrated and used in concert in existing simulations, or if they
+could enable integration of existing simulations into multi-physics,
+multi-scale codes.  At present, however, this type of integration is
+exceedingly difficult, largely due to software compatibility issues
+rather than underlying technical issues.
+<it> So that numerical simulations can be constructed more efficiently using
+the latest technologies, the Center for Interoperable Technologies for Advanced
+Petascale Simulations (ITAPS) will develop interoperable and
+interchangeable mesh, geometry, and field manipulation tools that are
+of direct use to SciDAC applications.</it>  We are building on our successes
+as the Terascale Simulations Tools and Technologies (TSTT) ISIC
+funded during SciDAC-1, and we will develop new tools in
+critical areas identified by SciDAC application teams.
+</p>
+
+<p><b><i> The Current State of Technology. </i></b>
+In today's environment, there are many tools available that generate a
+variety of mesh types ranging from unstructured meshes of various types
+to overlapping structured meshes and hybrid meshes that include both
+structured and unstructured components (for an extensive list, see <a href="http://www-users.informatik.rwth-aachen.de/%7Eroberts/meshgeneration.html">
+Robert Schneiders' web page</a>). Approximation techniques used
+on these meshes include finite difference (FD), finite volume (FV),
+finite element (FE), spectral element (SE), and discontinuous Galerkin
+(DG) methods. Any combination of these mesh and approximation types may
+be used to solve PDE-based problems. The fundamental concepts are the
+same for all approaches: some discrete representation of the geometry
+(the mesh) is used to approximate the physical domain, and some
+discretization procedure is used to represent approximate solutions and
+differential operators on the mesh. In addition, the concepts of
+adaptive mesh refinement for local resolution enhancement, time-varying
+meshes to represent moving geometry, data transfer between different
+meshes, and parallel decomposition of the mesh for computation on
+advanced computers are the same regardless of their implementation. In
+each case, the software tools providing these advanced capabilities are
+becoming increasingly accepted by the scientific community, but their
+application interfaces are not compatible. Thus interchanging
+technology is often a labor intensive and error prone code modification
+process that must be endured by the application scientist. This
+typically results in a lengthy diversion from the central scientific
+investigation and severely inhibits experimentation with improved mesh
+and discretization technologies.</p>
+
+<p><b><i>Research Goals.</i></b>
+The premise of our technology development goal is that advanced mesh,
+geometry and field services can be provided as libraries that can be
+used with minimal intrusion into application codes.  During SciDAC-1,
+the ITAPS team developed and deployed a number of advanced
+technologies --- including the <it> Frontier-Lite</it> front tracking library,
+the <it> Mesquite</it> mesh quality improvement toolkit,
+along with unstructured mesh refinement and
+swapping tools --- that provide ample evidence
+of the viability of this approach.  Moreover, we combined these <it>
+component services</it> in an interoperable way to provide new <it>
+integrated services</it> such as AMR-front tracking, parallel adaptive
+loop libraries, and combined geometry-mesh modification tools for use
+in shape optimization applications.  Critical to the ITAPS
+interoperability goal is the development of common interfaces that
+provide data-structure-neutral access to mesh, geometry, and field
+information.  These interfaces provide access to all ITAPS services in
+a uniform way and are fundamental to creating interoperability for the
+integrated services.  Moreover, a uniform interface allows easier
+experimentation with different, but functionally similar, technologies
+to determine which is best suited for a given application. The
+development of such interfaces requires creating consensus among a
+large group of mesh, geometry, and field experts; a difficult
+technical and sociological challenge that would have been impossible
+to achieve without the collaborative environment fostered by the
+SciDAC program. It is this bringing together of a wide range of DOE and
+university mesh-related technologies under a common interface that
+distinguishes ITAPS as a center.
+</p>
+
+<p><b><i>Application Use of ITAPS Technologies.</i></b>
+Figure 1 shows the two ways that applications can use
+ITAPS services.  In the left figure (a), the application already has
+geometry, mesh, and/or field data and implements the ITAPS interfaces
+as wrapper functions around their own data structures.  Once the
+necessary interface functions are implemented and tested, the ITAPS
+services can easily access the application data they need through the
+ITAPS interface.  In the right figure (b), the application scientist
+can take advantage of data implementations already available from
+ITAPS for rapid prototyping of new applications.  This mode of access
+also allows easy access to ITAPS services using a very small number of
+function calls to copy the necessary data to a fully compliant
+implementation of the interface. In some cases the memory overhead
+associated with the data copy is relatively small and this access mode
+is sufficient for long term use. In other cases, it provides the
+mechanism for easy access to and experimentation with ITAPS services;
+as the benefits of the services become clear, application scientists
+can implement the interfaces more efficiently based on their own data
+structures.
+
+<p><IMG SRC="../graphics/App_schematic.gif" NAME="App Schematic"><BR>
+<p> Figure 1: A schematic showing the use of ITAPS interfaces and
+services in application codes.  The figure on the left (a) shows the use of the
+interfaces implemented directly on the application data structures.  The figure
+on the right (b) shows the use of a reference implementation of the interfaces to
+provide immediate access to ITAPS services at the cost of a data copy}
+</p>
+
+<p><b><i>Related Efforts.</i></b>
+The time is ripe for such an effort in the area of meshing and
+discretization technology. The existence of mature software tools in
+these fields allows us to examine them, and their use in applications,
+to extract the appropriate abstractions for developing common
+interfaces at both high and low levels. We note that such
+multi-institutional activities are underway in other scientific
+domains. For example, the <a href="http://z.ca.sandia.gov/esi">Equation
+Solver Interface (ESI) group [ESI]</a> is defining a set of
+common interfaces for linear solvers and preconditioners and is
+implementing them in a number of independently developed tools
+including, e.g., PETSc, ISIS++, and Aztec. In a related effort, the <a href="http://z.ca.sandia.gov/fei">Finite Element Interface
+(FEI) group</a> is developing a high level abstraction and
+interface definition between (implicit) FE/FV codes and linear and
+nonlinear solver packages [FEI]. The <a href="http://www.cca-forum.org">Common Component
+Architecture (CCA) Forum [CCA]</a> has developed a standard
+interface for the interactions between software components and
+frameworks that promotes "plug and play" experimentation. Moreover,
+this group has recently initiated an effort to define common interfaces
+for scientific data, including meshes and fields; collaboration with
+them in this area is an integral part of the proposed ITAPS center.
+However, the scope of the CCA effort is limited to providing
+interfaces to existing mesh technology. Our proposed work includes such
+interface definition development and goes beyond it, providing the
+additional functionality needed to create a truly interoperable
+environment for meshing and discretization.</p>
+</div>
+</div>
+</div>
+</body></html>

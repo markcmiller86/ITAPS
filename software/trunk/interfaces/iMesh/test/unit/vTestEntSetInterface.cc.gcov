@@ -1,0 +1,418 @@
+        -:    0:Source:vTestEntSetInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestEntSetInterface(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  int err;
+        -:    6:  //     createEntSet, destroyEntSet, isList, getNumEntSets, getEntSets,
+        -:    7:  //     addEntToSet, rmvEntFromSet, addEntArrToSet, rmvEntArrFromSet,
+        -:    8:  //     addEntSet, rmvEntSet, isContainedIn
+        -:    9:  iBase_EntitySetHandle apvEntSets[11];
+        -:   10:  int iNumSets, iOrigNumSets;
+        -:   11:  bool qGotAllSets;
+        -:   12:  int i;
+        -:   13:
+        -:   14:  // Find out how many sets there were originally 
+        1:   15:  iMesh_getNumEntSets(instance, pvRootSet, -1, &iOrigNumSets, &err);
+        -:   16:  // Make a place to store retrieved sets
+        1:   17:  int iSetsAlloc = 10 + iOrigNumSets;
+        -:   18:  iBase_EntitySetHandle *aSets =
+        1:   19:    (iBase_EntitySetHandle*) calloc(iSetsAlloc,sizeof(iBase_EntitySetHandle));
+        -:   20:
+        1:   21:  cout << "Testing creation, basic methods, deletion...              ";
+        -:   22:  // Try creating a number of sets and lists and see if they show up as members
+        -:   23:  // of the root set...
+        1:   24:  bool qOK = true;
+        -:   25:
+        6:   26:  for ( i=0; i<5; i++ ) {
+        5:   27:    iMesh_createEntSet(instance, true, &apvEntSets[2*i], &err);
+        5:   28:    CHECK_ERR(err);
+        5:   29:    if (err) qOK = false;
+        -:   30:    int list;
+        5:   31:    iMesh_isList(instance, apvEntSets[2*i], &list, &err);
+        5:   32:    CHECK_ERR(err);
+        5:   33:    if (err || !list) qOK = false;
+        -:   34:  }
+        6:   35:  for ( i=0; i<5; i++ ) {
+        5:   36:    iMesh_createEntSet(instance, false, &apvEntSets[2*i+1], &err);
+        5:   37:    CHECK_ERR(err);
+        5:   38:    if (err) qOK = false;
+        -:   39:    int list;
+        5:   40:    iMesh_isList(instance, apvEntSets[2*i+1], &list, &err);
+        5:   41:    CHECK_ERR(err);
+        5:   42:    if (err || list) qOK = false;
+        -:   43:  }
+        1:   44:  TEST(qOK);
+        -:   45:
+        -:   46:  // Whether the number of hops is -1, 0, 1 is irrelevant for the root set,
+        -:   47:  // especially since none of the sets contain each other
+        1:   48:  qGotAllSets = true;
+        -:   49:
+        1:   50:  iMesh_getNumEntSets(instance, pvRootSet, -1, &iNumSets, &err);
+        1:   51:  CHECK_ERR(err);
+        1:   52:  qGotAllSets = qGotAllSets && ((iNumSets - iOrigNumSets) == 10);
+        -:   53:
+        1:   54:  iMesh_getNumEntSets(instance, pvRootSet,  0, &iNumSets, &err);
+        1:   55:  CHECK_ERR(err);
+        1:   56:  qGotAllSets = qGotAllSets && ((iNumSets - iOrigNumSets) == 10);
+        -:   57:
+        1:   58:  iMesh_getNumEntSets(instance, pvRootSet,  1, &iNumSets, &err);
+        1:   59:  CHECK_ERR(err);
+        1:   60:  qGotAllSets = qGotAllSets && ((iNumSets - iOrigNumSets) == 10);
+        -:   61:
+        1:   62:  TEST ( qGotAllSets );
+        -:   63:
+        -:   64:  // Try to get all the entity sets from the root set
+        -:   65:  iMesh_getEntSets(instance,  pvRootSet, 0,
+        1:   66:		   &aSets, &iSetsAlloc, &iNumSets , &err);
+        1:   67:  CHECK_ERR(err);
+        1:   68:  qGotAllSets = false;
+        1:   69:  if ( (iNumSets - iOrigNumSets) == 10 )
+        1:   70:    GOT_ALL_ITEMS ( apvEntSets, aSets, iNumSets, qGotAllSets );
+        1:   71:  TEST ( qGotAllSets );
+        -:   72:
+        -:   73:  // Try to destroy all the sets
+       11:   74:  for ( i=0; i<10; i++ ) {
+       10:   75:    iMesh_destroyEntSet(instance,  apvEntSets[i], &err);
+       10:   76:    CHECK_ERR(err);
+        -:   77:  }
+        1:   78:  cout << "DONE\n";
+        -:   79:
+        1:   80:  cout << "Testing addition and removal for sets in sets...          ";
+        -:   81:
+        -:   82:  // Create 10 sets, the even ones of which are lists ( irrelevant as far
+        -:   83:  // as sets containing one another, but good for thoroughness )
+       11:   84:  for ( i=0; i<10; i++ ) {
+       10:   85:    iMesh_createEntSet(instance, (i%2 == 0), &apvEntSets[i], &err);
+       10:   86:    CHECK_ERR(err);
+        -:   87:  }
+        -:   88:
+        -:   89:  // Create a hierarchy of sets where            [0]
+        -:   90:  //     set 0 contains sets 1-3,           ______|_____
+        -:   91:  //     set 1 contains sets 4-5,           [1], [2], [3]
+        -:   92:  //     set 3 contains sets 6-7,         ___|___   ___|___
+        -:   93:  // and set 4 contains sets 8-9          [4],[5]   [6],[7]
+        -:   94:  //                                              ___|___
+        -:   95:  // (and test the contain query)                 [8],[9]
+        -:   96:
+        1:   97:  qGotAllSets = true;
+        -:   98:  int iIsContained;
+        4:   99:  for ( i=1; i<=3; i++ ) {
+        3:  100:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[0], &err);
+        3:  101:    CHECK_ERR(err);
+        -:  102:    iMesh_isEntSetContained(instance, apvEntSets[0], apvEntSets[i],
+        3:  103:			    &iIsContained, &err);
+        3:  104:    CHECK_ERR(err);
+        3:  105:    qGotAllSets = qGotAllSets && iIsContained;
+        -:  106:  }
+        3:  107:  for ( i=4; i<=5; i++ ) {
+        2:  108:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[1], &err);
+        2:  109:    CHECK_ERR(err);
+        -:  110:    iMesh_isEntSetContained(instance, apvEntSets[1], apvEntSets[i],
+        2:  111:			    &iIsContained, &err);
+        2:  112:    CHECK_ERR(err);
+        2:  113:    qGotAllSets = qGotAllSets && iIsContained;
+        -:  114:  }
+        3:  115:  for ( i=6; i<=7; i++ ) {
+        2:  116:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[3], &err);
+        2:  117:    CHECK_ERR(err);
+        -:  118:    iMesh_isEntSetContained(instance, apvEntSets[3], apvEntSets[i],
+        2:  119:			    &iIsContained, &err);
+        2:  120:    CHECK_ERR(err);
+        2:  121:    qGotAllSets = qGotAllSets && iIsContained;
+        -:  122:  }
+        3:  123:  for ( i=8; i<=9; i++ ) {
+        2:  124:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[6], &err);
+        2:  125:    CHECK_ERR(err);
+        -:  126:    iMesh_isEntSetContained(instance, apvEntSets[6], apvEntSets[i],
+        2:  127:			    &iIsContained, &err);
+        2:  128:    CHECK_ERR(err);
+        2:  129:    qGotAllSets = qGotAllSets && iIsContained;
+        -:  130:  }
+        1:  131:  TEST ( qGotAllSets );
+        1:  132:  vDoSaveLoad(&instance, &pvRootSet);
+        -:  133:
+        1:  134:  if (qSaveLoad) {
+        1:  135:    vRecoverSetsContain(instance, pvRootSet, apvEntSets);
+        -:  136:  }
+        -:  137:
+        -:  138:  // The numbers expected should be obvious from the diagram above, keeping in
+        -:  139:  // mind that -1 hops really means infinite
+        1:  140:  int aiTotal[] =    {9, 2, 0, 4, 0, 0, 2, 0, 0, 0};
+        1:  141:  int aiDirect[] =   {3, 2, 0, 2, 0, 0, 2, 0, 0, 0};
+        1:  142:  int aiTwoLayer[] = {7, 2, 0, 4, 0, 0, 2, 0, 0, 0};
+        1:  143:  int aiOffset[] =   {1, 4, 10, 6, 10, 10, 8, 10, 10, 10};
+        1:  144:  qGotAllSets = true;
+        -:  145:  int iSet;
+       11:  146:  for (iSet = 0; iSet < 10; iSet++) {
+        -:  147:    int iTotal, iDirect, iTwoLayer;
+        -:  148:    int iTotalRet, iDirectRet, iTwoLayerRet;
+        -:  149:
+       10:  150:    iMesh_getNumEntSets(instance, apvEntSets[iSet],  -1, &iTotal, &err);
+       10:  151:    CHECK_ERR(err);
+        -:  152:    iMesh_getEntSets(instance,  apvEntSets[iSet], -1,
+       10:  153:		     &aSets, &iSetsAlloc, &iTotalRet, &err);
+       10:  154:    CHECK_ERR(err);
+       10:  155:    GOT_ALL_ITEMS((apvEntSets + aiOffset[iSet]), aSets, iTotalRet, qGotAllSets);
+       10:  156:    TEST((aiTotal[iSet] == iTotal) &&
+        -:  157:	 (aiTotal[iSet] == iTotalRet) &&
+        -:  158:	 qGotAllSets);
+        -:  159:
+       10:  160:    iMesh_getNumEntSets(instance, apvEntSets[iSet],  0, &iDirect, &err);
+       10:  161:    CHECK_ERR(err);
+        -:  162:    iMesh_getEntSets(instance,  apvEntSets[iSet], 0,
+       10:  163:		     &aSets, &iSetsAlloc, &iDirectRet, &err);
+       10:  164:    CHECK_ERR(err);
+       10:  165:    GOT_ALL_ITEMS((apvEntSets + aiOffset[iSet]), aSets, iDirectRet, qGotAllSets);
+       10:  166:    TEST((aiDirect[iSet] == iDirect) &&
+        -:  167:	 (aiDirect[iSet] == iDirectRet) &&
+        -:  168:	 qGotAllSets);
+        -:  169:
+       10:  170:    iMesh_getNumEntSets(instance, apvEntSets[iSet],  1, &iTwoLayer, &err);
+       10:  171:    CHECK_ERR(err);
+        -:  172:    iMesh_getEntSets(instance,  apvEntSets[iSet], 1,
+       10:  173:		     &aSets, &iSetsAlloc, &iTwoLayerRet, &err);
+       10:  174:    CHECK_ERR(err);
+       10:  175:    GOT_ALL_ITEMS((apvEntSets + aiOffset[iSet]), aSets, iTwoLayerRet, qGotAllSets);
+       10:  176:    TEST((aiTwoLayer[iSet] == iTwoLayer) &&
+        -:  177:	 (aiTwoLayer[iSet] == iTwoLayerRet) &&
+        -:  178:	 qGotAllSets);
+        -:  179:  }
+        -:  180:
+        -:  181:  // Test the ability to remove sets from sets
+        1:  182:  qGotAllSets = true;
+        4:  183:  for ( i=1; i<=3; i++ ) {
+        3:  184:    iMesh_rmvEntSet(instance,  apvEntSets[i], apvEntSets[0], &err);
+        3:  185:    CHECK_ERR(err);
+        -:  186:    int iIsContained;
+        -:  187:    iMesh_isEntSetContained(instance, apvEntSets[0], apvEntSets[i],
+        3:  188:			    &iIsContained, &err);
+        3:  189:    CHECK_ERR(err);
+        3:  190:    qGotAllSets = qGotAllSets && !iIsContained;
+        -:  191:  }
+        3:  192:  for ( i=4; i<=5; i++ ) {
+        2:  193:    iMesh_rmvEntSet(instance,  apvEntSets[i], apvEntSets[1], &err);
+        2:  194:    CHECK_ERR(err);
+        -:  195:    int iIsContained;
+        -:  196:    iMesh_isEntSetContained(instance, apvEntSets[1], apvEntSets[i],
+        2:  197:			    &iIsContained, &err);
+        2:  198:    CHECK_ERR(err);
+        2:  199:    qGotAllSets = qGotAllSets && !iIsContained;
+        -:  200:  }
+        3:  201:  for ( i=6; i<=7; i++ ) {
+        2:  202:    iMesh_rmvEntSet(instance,  apvEntSets[i], apvEntSets[3], &err);
+        2:  203:    CHECK_ERR(err);
+        -:  204:    int iIsContained;
+        -:  205:    iMesh_isEntSetContained(instance, apvEntSets[3], apvEntSets[i],
+        2:  206:			    &iIsContained, &err);
+        2:  207:    CHECK_ERR(err);
+        2:  208:    qGotAllSets = qGotAllSets && !iIsContained;
+        -:  209:  }
+        3:  210:  for ( i=8; i<=9; i++ ) {
+        2:  211:    iMesh_rmvEntSet(instance,  apvEntSets[i], apvEntSets[4], &err);
+        2:  212:    CHECK_ERR(err);
+        -:  213:    int iIsContained;
+        -:  214:    iMesh_isEntSetContained(instance, apvEntSets[4], apvEntSets[i],
+        2:  215:			    &iIsContained, &err);
+        2:  216:    CHECK_ERR(err);
+        2:  217:    qGotAllSets = qGotAllSets && !iIsContained;
+        -:  218:  }
+        1:  219:  TEST ( qGotAllSets );
+        1:  220:  cout << "DONE\n";
+        -:  221:
+        1:  222:  cout << "Testing addition and removal for entities in sets...      ";
+        -:  223:  iBase_EntityHandle aEnts[10];
+        -:  224:
+        -:  225:  // Get some entities to work with (any generic entities will do)
+        1:  226:  GET_ENTS(aEnts, 10);
+        -:  227:
+        -:  228:  // Create a hierarchy of sets where            [0]
+        -:  229:  //     set 0 contains sets 1-3,           ______|_____
+        -:  230:  //     set 1 contains sets 4-5,           [1], [2], [3]
+        -:  231:  //     set 3 contains sets 6-7,         ___|___   ___|___
+        -:  232:  // and set 4 contains sets 8-9          [4],[5]   [6],[7]
+        -:  233:  //                                              ___|___
+        -:  234:  // (and test the contain query)                 [8],[9]
+        -:  235:  //
+        -:  236:  // This has already been done above, so presumably it'll just work.
+        -:  237:  //
+        4:  238:  for ( i=1; i<=3; i++ ) {
+        3:  239:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[0], &err);
+        3:  240:    CHECK_ERR(err);
+        -:  241:  }
+        3:  242:  for ( i=4; i<=5; i++ ) {
+        2:  243:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[1], &err);
+        2:  244:    CHECK_ERR(err);
+        -:  245:  }
+        3:  246:  for ( i=6; i<=7; i++ ) {
+        2:  247:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[3], &err);
+        2:  248:    CHECK_ERR(err);
+        -:  249:  }
+        3:  250:  for ( i=8; i<=9; i++ ) {
+        2:  251:    iMesh_addEntSet(instance,  apvEntSets[i], apvEntSets[6], &err);
+        2:  252:    CHECK_ERR(err);
+        -:  253:  }
+        -:  254:
+        -:  255:  // Ensure that none of the entities are already in the newly created sets
+        1:  256:  bool qEmpty = true;
+       11:  257:  for ( i=0; i<10; i++ ) {
+      110:  258:    for ( int j=0; j<10; j++ ) {
+        -:  259:      int iCont;
+      100:  260:      iMesh_isEntContained(instance,  apvEntSets[i], aEnts[j], &iCont, &err);
+      100:  261:      CHECK_ERR(err);
+      100:  262:      qEmpty = qEmpty && !iCont;
+        -:  263:    }
+        -:  264:  }
+        1:  265:  TEST ( qEmpty );
+        -:  266:
+        -:  267:  // Add all the entities to each of the sets in two different ways
+        -:  268:  // Since the first five sets are lists, they should end up with
+        -:  269:  // two copies of each entity
+       11:  270:  for ( i=0; i<10; i++ ) {
+       10:  271:    iMesh_addEntArrToSet(instance,  aEnts, 10, apvEntSets[i], &err);
+       10:  272:    CHECK_ERR(err);
+      110:  273:    for ( int j=0; j<10; j++ ) {
+      100:  274:      iMesh_addEntToSet(instance,  aEnts[j], apvEntSets[i], &err);
+      100:  275:      CHECK_ERR(err);
+        -:  276:    }
+        -:  277:  }
+        -:  278:
+        1:  279:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  280:  if (qSaveLoad) {
+        1:  281:    vRecoverSetsContain(instance, pvRootSet, apvEntSets);
+        1:  282:    iBase_EntityHandle *aEntsTmp = NULL;
+        1:  283:    int aEntsTmpAlloc = 0, aEntsTmpSize;
+        -:  284:    iMesh_getEntities(instance, apvEntSets[1], iBase_ALL_TYPES,
+        -:  285:		      iMesh_ALL_TOPOLOGIES,
+        1:  286:		      &aEntsTmp, &aEntsTmpAlloc, &aEntsTmpSize, &err);
+        1:  287:    CHECK_ERR(err);
+        1:  288:    TESTEQ(aEntsTmpSize,10);
+       11:  289:    for (int j = 0; j<10; j++)
+       10:  290:      aEnts[j] = aEntsTmp[j];
+        1:  291:    UT_FREE(aEntsTmp);
+        -:  292:  }
+        -:  293:
+        -:  294:  // Test that all of the entities are in each of the sets
+        1:  295:  bool qAllIn = true;
+       11:  296:  for ( i=0; i<10; i++ ) {
+      110:  297:    for ( int j=0; j<10; j++ ) {
+        -:  298:      int iCont;
+      100:  299:      iMesh_isEntContained(instance,  apvEntSets[i], aEnts[j], &iCont, &err);
+      100:  300:      CHECK_ERR(err);
+      100:  301:      qAllIn = qAllIn && iCont;
+        -:  302:    }
+        -:  303:  }
+        1:  304:  TEST ( qAllIn );
+        -:  305:
+        1:  306:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  307:  if (qSaveLoad) {
+        1:  308:    vRecoverSetsContain(instance, pvRootSet, apvEntSets);
+        1:  309:    iBase_EntityHandle *aEntsTmp = NULL;
+        1:  310:    int aEntsTmpAlloc = 0, aEntsTmpSize;
+        -:  311:    iMesh_getEntities(instance, apvEntSets[1], iBase_ALL_TYPES,
+        -:  312:		      iMesh_ALL_TOPOLOGIES,
+        1:  313:		      &aEntsTmp, &aEntsTmpAlloc, &aEntsTmpSize, &err);
+        1:  314:    CHECK_ERR(err);
+        1:  315:    TESTEQ(aEntsTmpSize,10);
+       11:  316:    for (int j = 0; j<10; j++)
+       10:  317:      aEnts[j] = aEntsTmp[j];
+        1:  318:    UT_FREE(aEntsTmp);
+        -:  319:  }
+        -:  320:
+        -:  321:  // Remove one copy of the entities using two different function calls
+        6:  322:  for ( i=0; i<5; i++ ) {
+        5:  323:    iMesh_rmvEntArrFromSet(instance,  aEnts, 10, apvEntSets[i], &err);
+        5:  324:    CHECK_ERR(err);
+       55:  325:    for ( int j=0; j<10; j++ ) {
+       50:  326:      iMesh_rmvEntFromSet(instance,  aEnts[j], apvEntSets[i+5], &err);
+       50:  327:      CHECK_ERR(err);
+        -:  328:    }
+        -:  329:  }
+        -:  330:
+        -:  331:  // Check that the lists still contain a copy of each entity
+        1:  332:  qAllIn = true;
+        6:  333:  for ( i=0; i<5; i++ ) {
+       55:  334:    for ( int j=0; j<10; j++ ) {
+        -:  335:      int iCont;
+       50:  336:      iMesh_isEntContained(instance,  apvEntSets[2*i], aEnts[j], &iCont, &err);
+       50:  337:      CHECK_ERR(err);
+       50:  338:      qAllIn = qAllIn && iCont;
+        -:  339:    }
+        -:  340:  }
+        1:  341:  TEST ( qAllIn );
+        -:  342:
+        -:  343:  // Check that the sets no longer have any of the entities
+        1:  344:  qEmpty = true;
+        6:  345:  for ( i=0; i<5; i++ ) {
+       55:  346:    for ( int j=0; j<10; j++ ) {
+        -:  347:      int iCont;
+       50:  348:      iMesh_isEntContained(instance,  apvEntSets[2*i+1], aEnts[j], &iCont, &err);
+       50:  349:      CHECK_ERR(err);
+       50:  350:      qEmpty = qEmpty && !iCont;
+        -:  351:    }
+        -:  352:  }
+        1:  353:  TEST ( qEmpty );
+        -:  354:
+        -:  355:  // Remove the entities from the lists...
+        6:  356:  for ( i=0; i<5; i++ ) {
+        5:  357:    iMesh_rmvEntArrFromSet(instance,  aEnts, 10, apvEntSets[2*i], &err);
+        5:  358:    CHECK_ERR(err);
+        -:  359:  }
+        -:  360:
+        -:  361:  // ...and ensure that the lists and sets are indeed empty
+        1:  362:  qEmpty = true;
+       11:  363:  for ( i=0; i<10; i++ ) {
+      110:  364:    for ( int j=0; j<10; j++ ) {
+        -:  365:      int iCont;
+      100:  366:      iMesh_isEntContained(instance,  apvEntSets[i], aEnts[j], &iCont, &err);
+      100:  367:      CHECK_ERR(err);
+      100:  368:      qEmpty = qEmpty && !iCont;
+        -:  369:    }
+        -:  370:  }
+        1:  371:  TEST ( qEmpty );
+        1:  372:  cout << "DONE\n";
+        -:  373:
+        1:  374:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  375:  if (qSaveLoad) {
+        1:  376:    vRecoverSetsContain(instance, pvRootSet, apvEntSets);
+        -:  377:  }
+        -:  378:
+        1:  379:  if ( qErrTests ) {
+        1:  380:    cout << "Testing error throwing...                                 ";
+        -:  381:    // Error throwing tests simply try to create a situation where the interface
+        -:  382:    // should, according to the spec, throw an error, and verify that:
+        -:  383:    // (a) an error is thrown, and (b) the error is the one expected.
+        -:  384:    // If an error is not thrown, the reversal of the action is attempted, if
+        -:  385:    // it would interfere with further tests.
+        -:  386:
+        -:  387:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -:  388:    // entity as an entity set or vice versa, etc., but sometimes try more
+        -:  389:    // difficult tests such as passing in a pointer to character data as an
+        -:  390:    // entity handle.
+        -:  391:
+        -:  392:    // Adding set to root set
+        1:  393:    iMesh_addEntSet(instance,  apvEntSets[0], pvRootSet, &err);
+        1:  394:    CHECK_ERR2(err, iBase_INVALID_ARGUMENT );
+        -:  395:
+        -:  396:    // Adding root set to another set
+        1:  397:    iMesh_addEntSet(instance,  pvRootSet, apvEntSets[0], &err);
+        1:  398:    CHECK_ERR2(err, iBase_INVALID_ARGUMENT );
+        -:  399:
+        -:  400:    // Removing set from root set
+        1:  401:    iMesh_rmvEntSet(instance,  apvEntSets[0], pvRootSet, &err);
+        1:  402:    CHECK_ERR2(err, iBase_INVALID_ARGUMENT );
+        -:  403:
+        -:  404:    // Removing root set from set
+        1:  405:    iMesh_rmvEntSet(instance,  pvRootSet, apvEntSets[0], &err);
+        1:  406:    CHECK_ERR2(err, iBase_INVALID_ARGUMENT );
+        -:  407:
+        1:  408:    cout << "DONE\n";
+        -:  409:  }
+       11:  410:  for ( i=0; i<10; i++ ) {
+       10:  411:    iMesh_destroyEntSet(instance, apvEntSets[i], &err);
+       10:  412:    CHECK_ERR(err);
+        -:  413:  }
+        1:  414:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  415:  UT_FREE(aSets);
+        3:  416:}

@@ -1,0 +1,36 @@
+Response to the reviewers:
+
+Reviewer 1:
+
+Reviewer 1 requested that we add pseudo code examples in an appendix
+to highlight the use of the interfaces.  We have added Appendix A with
+two examples showing illustrative examples that get entity adjacency
+information in two different ways and shows the use of sets and tags.
+We also include examples that highlight the use of Babel and the
+various language bindings that it produces.  The full interfaces are
+available for public review at http://www.itaps-scidac.org/ under the
+software link and we have added a reference to this web page in the
+appendix.  
+
+Reviewer 1 also indicated a desire to see more information on the
+forward path for interface definition and to learn if interested
+parties could participate.  A high level description of our future
+development plans can be found in the Conclusions section of the
+paper.  In addition, interested parties are certainly welcome to
+provide feedback on the interface definitions and to participate in
+the interface definition activity.  A sentence to this effect has been
+added to the appendix.
+
+Reviewer 2:
+
+Reviewer 2 made several specific suggestions for improvements to the
+paper and all of these have been addressed in the manuscript.  
+ - The wording suggestions were all taken. 
+ - We added an explanation for entity handle invariance and clarified 
+   the load functionality in Section 3.1.  
+ - In Section 3.3 we clarified the geometry model loading and 
+   which aspects belong to TSTT/ITAPS.
+ - Section 3.3 was polished and now contains more prose, although the 
+   lists of functionalities provided still make sense to us as bulleted lists.
+ - Added a reference to visualization/post processing in Sect 3.4, which 
+   has certainly been considered as a use case for the interfaces.

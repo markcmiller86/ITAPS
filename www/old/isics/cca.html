@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>CCA</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+	<link type="text/css" rel="stylesheet" href="/templates/isics.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><!--#include virtual="../templates/banner.html"--></div>
+
+<div id="nav"><!--#include virtual="../templates/nav.html"--></div>
+
+<div id="content">
+
+<h1>Use of CCA Technologies in the ITAPS Interface Definition Efforts</h1>
+
+<p><i><a href="http://www.cca-forum.org/ccttss">
+Center for Technology for Advanced Scientific Component Software</a><br />
+PI: David Bernholdt (ORNL), ITAPS Point of Contact: L. Diachin (LLNL)</i></p>
+
+<p>We have close collaborations with various members of the TASCS SciDAC
+center and have worked with them in a number of different ways to
+ensure that ITAPS and CCA technologies will be compatible.  In particular,
+a pervading theme in the ITAPS center work is the creation of
+interoperable technologies for meshing and discretization tools.
+Critical to this effort is the development of common interfaces that
+support mesh and data field access at many different levels of
+sophistication, and we are collaborating with the Center for Component
+Technology and the CCA Forum to define these interfaces. 
+For SC01, we worked with several members of TASCS to demonstrate the
+use of ITAPS mesh components in the CCAFFIENE CCA-compliant framework
+to solve a time-dependent PDE.  As mentioned in the meshing
+interoperability section, we are also working closely with SIDL and
+Babel to investigate the creation of language independent mesh
+components.  Our basic interfaces are defined using SIDL, and
+additional work is now underway to determine the best way to provide
+high performance interfaces for entity-by-entity interactions.</p>
+
+
+<p>Throughout SciDAC-1, the interface definition group has
+worked in conjunction with the Common Component Architecture (CCA)
+Forum in a number of ways to ensure that the ITAPS interfaces are
+compatible with CCA specifications.  Our efforts fall into two major
+categories.</p>
+
+<p>First, we have done a significant amount of work to understand and use
+the <a href="http://www.llnl.gov/CASC/components">Scientific Interface Definition Language (SIDL)</a> and associated
+Babel compiler developed as part of the CCA effort.  This work is
+motivated by the fact that many of the ITAPS tools are written in C++
+and most of our targeted applications are written in Fortran.  We did
+not wish to settle for the least common denominator solution of
+using arrays for all of our data transfer.  Thus we are using the SIDL
+tool to define our interfaces in a language independent manner and to
+facilitate the consistent and efficient implementation of language
+bindings to these interfaces.  In particular, we have generated and
+used the C, C++ and Fortran bindings for various ITAPS mesh
+implementations.  In addition, LLNL has created a prototype interface
+for fields and operators using SIDL. Ongoing work is being performed to
+clearly understand the performance ramifications of using SIDL/Babel,
+particularly on fine-grained operations such as entity-by-entity
+access to mesh geometry and topology.  In particular, we are
+investigating the possibility of providing language- or tool-specific
+access to the underlying meshes for the cases where high performance
+is critical for this type of access.  Early efforts include a
+development of a C++ version of the ITAPS interface that bypasses the
+SIDL intermediate object representation (written in C).  However this
+work is very preliminary; much more needs to be done to evaluate the
+performance ramifications of SIDL on our interface and to develop
+solutions that are compatible with the SIDL specification.
+</p>
+
+<p>Second we are developing ITAPS and CCA-compliant mesh components and
+using them with other numerical components to demonstrate their
+ability to solve application problems.  The first application involves
+a two-dimensional ITAPS mesh that was used in conjunction with time
+integrator, linear solver, MxN redistribution, and visualization
+components (all developed at different labs as part of the CCA Forum
+efforts) to solve a time dependent PDE in the CCAFFIENE framework
+developed at SNL.  This work was demonstrated at SC01 and continues to
+be used to illustrate complex application scenarios in the quarterly
+CCA tutorials.  The second application was developed using the NWGrid
+meshing software from PNNL.  In this case, a SIDL version of the TSTT
+interface was used to generate a Fortran binding for NWGrid so that it
+could be used with a mesh quality improvement component (based on
+Opt-MS algorithms from ANL) that was written in C.  These components
+were successfully deployed and used in the DeCaf framework developed
+by LLNL.</p>
+	</div>
+	<div id="footer">
+<!--#include virtual="/templates/footer.html"-->
+	</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+// This SIDL file describes the interface to TSTT-compliant mesh
+// reconnection services in two and three dimensions.
+
+// These services operate on a TSTTM entity set: all D-1 dimensional
+// entities in the set (which can be the root set) are checked to see
+// whether swapping will improve local mesh quality.  Mesh quality
+// measures can be specified in one of two ways: either using an
+// enumeration value to identify which built-in measure to use, or by
+// registering a callback (basically, a SIDL class that implements
+// interface QualMeasure.
+
+require TSTTB version 0.7;
+require TSTTM version 0.7;
+require TSTTG version 0.7;
+require TSTTR version 0.7;
+
+package TSTT_Swap version 0.7 {
+  enum SwapType {
+    DELAUNAY,
+    MAX_MIN_SINE,
+    MIN_MAX_ANGLE,
+    USER_DEFINED
+  }
+
+  interface QualMeasure {
+    /* This next function returns true if we want to minimize the
+       quality measure; false otherwise. */
+    bool shouldMinimize() throws TSTTB.Error;
+    /* Computes a quality measure for the given collection of vertex
+       coordinates, given in xyzxyz... format. */
+    double calcQuality(in array<double> coords, in int coords_size)
+      throws TSTTB.Error;
+    /* Need a way to specify the entity topology and/or entity geometric
+       dimension so that these can be checked? */
+  }
+
+  interface Swap { 
+    void setSwapType(in SwapType ST) throws TSTTB.Error;
+    /* The following implies setSwapType(USER_DEFINED) */
+    void setUserQualMeasure(in QualMeasure QM) throws TSTTB.Error;
+    SwapType getSwapType() throws TSTTB.Error;
+
+    void setSwapRecursion(in bool allow_recursion) throws TSTTB.Error;
+    bool isRecursionAllowed() throws TSTTB.Error;
+
+    /* The swapping implementation must store a pointer to the mesh,
+       model, and association data, so that changes will be propagated
+       back to the caller!  That is, explicitly, the data that Swap
+       manipulates is owned by its caller, not by the Swap
+       implementation. */
+    void setMeshData(in TSTTM.Modify Mod_Mesh) throws TSTTB.Error;
+    void setModelData(in TSTTG.Model Geom_Model) throws TSTTB.Error;
+    void setAssocData(in TSTTR.Associate Assoc_Data ) throws TSTTB.Error;
+
+    int swap(inout opaque entity_set, inout opaque entity_handle) 
+      throws TSTTB.Error;
+    int swapAll(inout opaque entity_set)
+      throws TSTTB.Error;
+  }
+
+  class Swap2D implements-all Swap {};
+  class Swap3D implements-all Swap {
+    void setEdgeSwapping(in bool allow_edge_swapping) 
+      throws TSTTB.Error;
+    bool isEdgeSwappingAllowed() throws TSTTB.Error;
+    void setBdryMutable(in bool allow_bdry_changes) throws TSTTB.Error;
+    bool isBdryMutable() throws TSTTB.Error;
+  }
+
+  class Delaunay3D implements-all QualMeasure {};
+  class MaxMinSine3D implements-all QualMeasure {};
+  class MinMaxAngle3D implements-all QualMeasure {};
+}

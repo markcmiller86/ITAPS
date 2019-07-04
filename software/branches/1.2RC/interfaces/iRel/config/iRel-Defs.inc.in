@@ -1,0 +1,51 @@
+# This file contains variables that are essential for building
+# applications on iRel implementations without having to hack
+# application Makefiles horribly each time.  Instead, one can simply
+# re-run configure in the application tree with a new -with-TSTT-dir
+# argument, and the implementation-specific version of this file gets
+# included automatically.  The application programmer/user can also just
+# edit the pathname in their Makefile if they prefer.
+
+INSTALLED_MAKE_DEFS_PATH=@prefix@/share/TSTT
+INSTALLED_INCLUDES=-I@prefix@/include/TSTT
+INSTALLED_LIB_DIR=-L@prefix@/lib
+
+iRel_LIB_DIR=-L@IMPL_ROOT@/iRel -L@IMPL_ROOT@/iRel_@IMPL_NAME@
+
+# The following odd-looking order is needed for static linkage
+iRel_SERVER_LIBS =-liRel -liRel_@IMPL_NAME@
+iRel_ALL_CXX_LIBS=-liRel_@IMPL_NAME@_C++ -liRel_C++ $(iRel_SERVER_LIBS)
+iRel_ALL_C_LIBS  =-liRel_@IMPL_NAME@_C   -liRel_C   $(iRel_SERVER_LIBS)
+iRel_ALL_F77_LIBS=-liRel_@IMPL_NAME@_F77 -liRel_F77 $(iRel_SERVER_LIBS)
+iRel_ALL_F90_LIBS=-liRel_@IMPL_NAME@_F90 -liRel_F90 $(iRel_SERVER_LIBS)
+
+iRel_SERVER_INCLUDES=-I@IMPL_ROOT@/iRel/server -I@IMPL_ROOT@/iRel_@IMPL_NAME@/server
+iRel_SERVER_LIBFILE=@IMPL_ROOT@/iRel/libiRel.so @IMPL_ROOT@/iRel_@IMPL_NAME@/libiRel_@IMPL_NAME@.so
+
+# C++ client stuff
+iRel_CLIENT_CXX_INCLUDES=-I@IMPL_ROOT@/iRel/client_C++/
+iRel_CLIENT_CXX_LIBFILE=@IMPL_ROOT@/iRel/libiRel_C++.so @IMPL_ROOT@/iRel_@IMPL_NAME@/libiRel_@IMPL_NAME@_C++.so
+
+# C client stuff
+iRel_CLIENT_C_INCLUDES=-I@IMPL_ROOT@/iRel/client_C/
+iRel_CLIENT_C_LIBFILE=@IMPL_ROOT@/iRel/libiRel_C.so @IMPL_ROOT@/iRel_@IMPL_NAME@/libiRel_@IMPL_NAME@_C.so
+
+# F77 client stuff
+iRel_CLIENT_F77_INCLUDES=-I@IMPL_ROOT@/iRel/client_F77/
+iRel_CLIENT_F77_LIBFILE=@IMPL_ROOT@/iRel/libiRel_F77.so @IMPL_ROOT@/iRel_@IMPL_NAME@/libiRel_@IMPL_NAME@_F77.so
+
+# F90 client stuff
+iRel_CLIENT_F90_INCLUDES=-I@IMPL_ROOT@/iRel/client_F90/
+iRel_CLIENT_F90_LIBFILE=@IMPL_ROOT@/iRel/libiRel_F90.so @IMPL_ROOT@/iRel_@IMPL_NAME@/libiRel_@IMPL_NAME@_F90.so
+
+# Java client stuff; who knows?
+
+# python client stuff; who knows?
+
+iRel_BACKEND_INCLUDES=
+iRel_BACKEND_LIBS=
+iRel_BACKEND_LIBFILE=
+
+SIDL_LIBS=-L@BABEL_ROOT@/lib -lsidlstub_cxx -lsidl @SIDL_STATIC_LIBS@
+SIDL_INCLUDES=-I@BABEL_ROOT@/include -I@BABEL_ROOT@/include/cxx
+

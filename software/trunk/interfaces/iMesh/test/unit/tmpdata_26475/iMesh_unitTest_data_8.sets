@@ -1,0 +1,71 @@
+Total number of sets: 10
+Set #0; ordered
+Set #1; unordered
+Set #2; unordered
+Set #3; unordered
+Set #4; ordered
+Set #5; unordered
+Set #6; ordered
+Set #7; ordered
+Set #8; unordered
+Set #9; ordered
+Set #0
+Contains entities: 
+Set members (0): 
+Child sets (2): 6 8 
+Parent sets (1): 2 
+
+Set #1
+Contains entities: 
+Set members (0): 
+Child sets (0): 
+Parent sets (1): 3 
+
+Set #2
+Contains entities: 
+Set members (0): 
+Child sets (2): 0 5 
+Parent sets (1): 9 
+
+Set #3
+Contains entities: 
+Set members (0): 
+Child sets (2): 1 7 
+Parent sets (1): 9 
+
+Set #4
+Contains entities: 
+Set members (0): 
+Child sets (0): 
+Parent sets (1): 9 
+
+Set #5
+Contains entities: 
+Set members (0): 
+Child sets (0): 
+Parent sets (1): 2 
+
+Set #6
+Contains entities: 
+Set members (0): 
+Child sets (0): 
+Parent sets (1): 0 
+
+Set #7
+Contains entities: 
+Set members (0): 
+Child sets (0): 
+Parent sets (1): 3 
+
+Set #8
+Contains entities: 
+Set members (0): 
+Child sets (0): 
+Parent sets (1): 0 
+
+Set #9
+Contains entities: 
+Set members (0): 
+Child sets (3): 2 3 4 
+Parent sets (0): 
+

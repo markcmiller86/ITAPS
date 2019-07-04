@@ -1,0 +1,30 @@
+objects: 
+	$(MAKE) $(OBJS)
+
+include @TSTT_DIR@/@TSTT_VAR_FILE@
+include babel.make
+include make.depend
+
+OPTDebug = -DNDEBUG -O3
+
+.cc.o:
+	g++ $(OPTDebug) -fPIC -Wall $(INCLUDES) -c $<
+
+.c.o:
+	gcc $(OPTDebug) -fPIC -Wall $(INCLUDES) -c $<
+
+OBJS = ${IMPLSRCS:.cc=.o} ${IORSRCS:.c=.o} \
+	${SKELSRCS:.cc=.o} ${STUBSRCS:.cc=.o} 
+
+depend make.depend: ${IMPLSRCS} ${IORSRCS} ${SKELSRCS} ${STUBSRCS} 
+	makedepend -f- $(INCLUDES) *.c *.cc > make.depend 2> /dev/null
+
+clean: 
+	-rm *.o
+
+distclean: clean
+	-rm $(IORHDRS) $(IORSRCS) $(SKELSRCS) $(STUBHDRS) $(STUBSRCS)
+	-rm Makefile *~ make.depend
+
+
+MY_OBJS = 

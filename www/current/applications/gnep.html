@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS - Nuclear Reactor Simulation</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageGnep" -->
+</head>
+
+<body class="pageApplications pageGnep">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+ <h1>Nuclear Reactor Simulation</h1>
+
+        <p>Nuclear energy can play a key role in securing the energy independence of the United States by offering a clean, safe alternative to traditional fossil fuel energy production. Simulation and modeling will play a key role in the development of next generation nuclear reactors to improve their design, implementation and operation. The physics associated with these systems operate in very complex geometrical domains and will benefit from the tools and technologies developed by ITAPS. We are involved in several collaborations whose goals are to develop and deploy high-performance computing tools for coupled multi-scale simulations of the sodium fast reactor. </p>
+        <h2>Next Generation Nuclear Reactor Design</h2>
+        <p class="research"> Funded by DOE's Office of Nuclear Energy<br />
+          ITAPS Personnel: Tim Tautges (ANL) <br />
+          Nuclear Energy Personnel: Andrew Siegel (ANL) <br />
+        Project Status: Active </p>
+<p> The geometries of reactor cores can be quite complex and require scalable geometry and mesh generation tools. For example, the 217-pin fuel assembly shown in the figure below uses a conformal hexahedral mesh for the 1520 geometrical volumes. Each fuel pin is wrapped with a thin wire the small scale of which significantly complicates the mesh generation process. </p>       
+        
+<div class="imgContainer center" style="width: 650px;">
+	<img src="../assets/images/nuclear_mesh.jpg" width="650" height="264" alt="Nuclear Mesh" />
+    <p>Figure: The geometrical domain and a conformal hexahedral mesh for modeling the reactor core of a sodium fast reactor.</p>
+</div>        
+                
+        
+<p>Once the mesh is generated, the physics that is modeled is a combination of thermal hydraulics, structural mechanics, and neutronics. A different simulation tool is used for each of these physical processes, but there is a strong need for them to interact with and exchange data with each other. The SHARP framework being developed at Argonne National Laboratory provides the infrastructure necessary to do this coupling on large-scale computer architectures. ITAPS technology is used as the basis of the SHARP reactor simulation project and the common ITAPS interfaces simplify the coupling between thermal/hydraulics and neutronics physics modules. These interfaces and the ITAPS approach in general also serve as a means for collaborating with other institutions and for coupling with commercial codes. </p>
+        
+<div class="imgContainer center" style="width: 650px;">
+	<img src="../assets/images/sharp.jpg" width="650" height="187" alt="SHARP framework" />
+    <p>Figure: The SHARP framework developed at Argonne National Laboratory with LDRD and funding from DOE's office of Nuclear Energy. This framework uses the ITAPS interfaces and tools as a key mechanism for coupling different physics modules to perform high-fidelity simulations of nuclear reactors. The results of one such simulation (shown on the left use the Nek5000 and UNIC codes developed at ANL to model fluid flow and neutronics through the reactor core.</p>
+</div> 
+
+
+
+    <h2>Multiphase flow for accident scenarios</h2>
+        <p class="research">Funded under US DOE Nuclear Energy Research Initiative for Consortia, DE-PS07-07ID14812<br />
+          ITAPS Personnel: Ken Jansen (RPI), Roman Samulyak (BNL), Jim  Glimm (BNL) <br />
+          Nuclear Energy Personnel: Michael Podowski (RPI) <br />
+        Project Status: Active </p>
+<p>The overall purpose of this collaboration is to deploy advanced simulation capabilities for next generation reactor systems utilizing newly available, high-performance computing facilities. The goals are 1) to develop and deploy high-performance computing tools for coupled thermal-hydraulic, neutronic, and materials multi-scale simulations of the sodium fast reactor (SFR) and 2) apply the new computational methodology to study reactor fuel and core transient response under beyond-design and accident conditions. </p>
+<p>The work will encompass a broad spectrum of issues that are critical for developing next-generation reactors. Deliverables will include multi-physics, multi-scale computational modeling capabilities to investigate the impact of long-term thermal and mechanical loads and high-burnup fuel on reactor safety and accident mitigation strategies. The consortium will address three major groups of problems: 1) development of new simulation capabilities for state-of-the-art computer codes (FronTier, PHASTA, and NPHASE) coupled with MD-type analysis, 2) development of advanced numerical solvers for massive parallel computing, and 3) deployment of a multiple-code computational platform for the Blue Gene supercomputer simulations of SFR fuel performance during accidents. </p>
+<p>Researchers will use the simulation codes to study fuel performance, including molecular-scale fission product release from ceramic fuel material, local core degradation, and fission product/fuel particle transport and release in the reactor core. Since no single computer code or technology level can be expected to cover such a broad range of design and operation issues during the reactor's lifetime, it is anticipated that the proposed suite of tools will dramatically improve the accuracy and efficiency of reactor simulations. This, in turn, will significantly reduce conservative design and safety margins that are inherently associated with current reactor engineering methods.</p>
+        
+<div class="imgContainer fLeft" style="width: 500px;">
+	<img src="../assets/images/SFR.jpg" width="500" height="230" alt="Schematic of fuel degradation" />
+    <p>Schematic  of fuel degradation and transport in SFR during fuel rod failure accidents.</p>
+</div>
+
+
+<p>The NPHASE, PHASTA and FronTier codes are well suited to form the basis of a multidimensional, multifield and multiscale simulation capability. The NPHASE code is robust finite volume solver for the simulation of ensemble averaged time-dependent two-phase flows. PHASTA is a finite element, time-accurate computer code using single phase and level-set tracking methods.  FronTier is a multiphysics code for the simulation of multiphase/free surface flows based on the explicit tracking of material interfaces.  To enhance and optimize the performance of these three codes on massively parallel supercomputers, state-of-the-art multilevel solvers software for nonlinear partial differential equations will be used, developed at Columbia University. </p>
+
+
+ <h3 class="clear">ITAPS related software</h3>
+    <h4>FronTier Code </h4>
+        
+        <p> FronTier, a multiphysics code for the simulation of multiphase / free surface flows based on the method of front tracking has been developed at Stony Brook University in collaboration with BNL and LANL. Front tracking is a numerical method in which surfaces of discontinuity are given explicit computational degrees of freedom, supplementing the continuous solution values at regular grid points.   FronTier has been tested on multi-material, multi-physics problems using massively parallel supercomputers, and used for simulations of turbulent fluid mixing, design of liquid mercury targets for future advances accelerators, pellet fuelling of thermonuclear fusion reactors, and astrophysical studies. </p>
+        <p>The FronTier research will be focused in the following major directions: </p>
+        <ul>
+          <li> The development of new capabilities of the FronTier code to enable  simulations of the fuel rod failure during severe accidents in Liquid Metal Fast  Rectors. New phase transition models for the fuel melting and vaporization will be  developed as well as models fpor the formation and evolution of cracks in the  solid fuel cladding. FronTier will simulate the creation of a melt volume within  the fuel rod, release of volatile fission products and the subsequent rise in  melt volume pressure, growth of the melt volume, the clad failure and debris ejection into the coolant channel.</li>
+        </ul>
+        <ul>
+          <li>The modeling and simulations of the injection of fission products from the failed fuel rod into liquid coolant and the  injection of liquid coolant into the inside of fuel elements. The interface with  the NPHASE and PHASTA codes will also be developed for the data exchange  purpose.</li>
+        </ul>
+        <ul>
+          <li>FronTier will provide new closure models for multiphase systems and benchmark  with existing averaged models of NPHASE through direct numerical simulations  at microscale.</li>
+        </ul>
+        <ul>
+          <li>The development of geometrical interface tracking capabilities to NPHASE and PHASTA codes, and the multiple code platform. Explicit interface tracking will increase capabilities of  NPHASE and PHASTA to simulate complex multiphase flows. We will leverage the  development of the geometrical front tracking package FronTier-Lite within the  SciDAC ITAPS collaboration, and provide interfaces for its use in both single and  coupled code simulations. </li>
+        </ul>
+        
+        
+        
+	<h4>Application to fuel reprocessing of nuclear reaction</h4>
+
+
+<p>We apply the sharp front tracking method for the solution of the governing 
+equations of motion for two-phase incompressible microflows with application 
+to liquid-liquid centrifugal contactors used in solvent extraction processes.
+A discussion of the progress made in the first year of this project follows
+after a brief review of alternative methods for modeling and simulation of 
+two-phase flows. The results presented here focus on a study of convergence 
+requirements needed for establishing the accuracy of the front tracking method. 
+We measure convergence in terms of a required ratio of a Weber number length 
+scale to the grid spacing.  Motivated by the interfacial phenomena in solvent 
+extraction processes, we assess convergence in terms of two functionals of 
+the numerical solution. The first is the time-dependent surface area of the 
+interface separating the two liquid phases; an exceedingly difficult quantity 
+to compute accurately which is present in most rate-based kinetics models.
+The second functional is the probability distribution function of distances of 
+a random point to the interface. Here, for diffusion limited processes, it 
+allows for the assessment of the diffusion of species from the aqueous phase 
+to the organic phase. The purpose of the convergence study is to assess mesh 
+requirements ultimately needed for a mesh convergence study of these two 
+functionals.</p>
+<p><em>Simulation courtesy of Hyunkyun Lim, based on the code front tracking
+FronTier.</em></p>
+
+
+  <div class="imgContainer fLeft" style="width: 300px;">
+    <a href="../../assets/images/velo_streamline_full.jpg" rel="lightbox">
+	<img src="../../assets/images/velo_streamline_mini.jpg" width="300" height="290" alt="Velocity streamline of a Taylor vortex flow" />
+    </a>
+    <p>Velocity streamlines of a Taylor vortex flow.</p>
+</div>
+
+  <div class="imgContainer fLeft" style="width: 280px;">
+    <a href="../../assets/images/two_phase_tub_full.jpg" rel="lightbox">
+	<img src="../../assets/images/two_phase_tub_mini.jpg" width="280" height="300" alt="two-phase turbulent Taylor-Couette flow" />
+    </a>
+    <p>Late time step from a simulation of two-phase 
+turbulent Taylor-Couette flow.</p>
+</div>
+
+
+
+<p class="clear">&nbsp;</p>        
+        
+
+
+
+        <h3>References</h3>
+      <blockquote>
+          <p>Hughes, T.J.R., Mazzei, L., and Jansen, K.E.,  2000, &#8220;Large-Eddy Simulation and the Variational Multiscale Method,&#8221; <em>Computing and Visualization in Science</em>, 3, 47-59.</p>
+          <p>Jansen, K.E., 1999, &#8220;A stabilized finite element  method for computing turbulence,&#8221; <em>Computer Methods in Applied Mechanics and Engineering</em>, 174, 299-317<strong>.</strong></p>
+          <p>Jansen, K.E., 1993, &#8220;Unstructured Grid Large Eddy Simulations of Wall Bounded Flows&#8221;, <em>Annual Research Briefs, Center  for Turbulence Research, NASA Ames/Stanford University,</em> 151.</p>
+          <p>Jansen, K.E., 1994, &#8220;Unstructured Grid  Large Eddy Simulations of Flow Over an Airfoil&#8221;, <em>Annual Research Briefs, Center for  Turbulence Research, NASA Ames/Stanford University,</em> 161-.</p>
+          <p>Jansen, K.E., Johan, Z., Hughes, T.J.R., 1993, &#8220;Implementation of a One-Equation Turbulence Model within A Stabilized  Finite Element Formulation of a Symmetric Advective-Diffusive System,&#8221; <em>Computational  Methods in Applied Mechanics and Engineering,</em> <strong>105,</strong> 405-. </p>
+          <p>Karanam, A.K., Jansen, K.E. and Whiting, C.H.,  2007, &#8220;Geometry based pre-processor for parallel fluid dynamic simulations&#8221;, <em>Engineering with  Computers </em>(in press).</p>
+          <p>Mueller, J., Sahni, O., Jansen, K.E., Shephard,  M.S. and Taylor, C.A., 2005, &#8220;Anisotropic Adaptive Finite Element Method for Modeling Blood Flow&#8221;, <em>Computer Methods in Biomechanics and Biomedical Engineering,</em><strong>8</strong>, n5, pp 295-305. </p>
+          <p>Nagrath, S, Jansen, K.E. , Lahey, R.T.  and Akhatov, I. ,  2006, &#8220;Hydrodynamic Simulation of Air Bubble Implosion Using a FEM based Level Set Approach&#8221;, <em>Journal  of Computational Physics,</em> <strong>215</strong>, pp 98-132.</p>
+          <p>Nagrath,S. ,  Jansen,  K.E. , and Lahey, R.T. , 2005,&#8220;Three Dimensional Simulation  of Incompressible Two Phase Flows Using a Stabilized Finite Element Method and the Level  Set Approach&#8221;, <em>Computer Methods in Applied Mechanics and Engineering,</em> <strong>194</strong>, n 42-44, 4565-4587.<strong> </strong></p>
+          <p>Sahni, O., Mueller, J., Jansen, K.E., Shephard, M.S. and Taylor, C.A., 2006, &#8220;Efficient Anisotropic Adaptive Discretization of the Cardiovascular System&#8221;, <em>Computer  Methods in Applied Mechanics and Engineering</em>, <strong>195</strong>, n41-43, pp 5634-5655. </p>
+          <p>Sahni, O., Jansen, K.E., Shephard, M.S., Taylor, C.A., and Beall, M.W., 2007, &#8220;Adaptive Boundary  Layer Meshing for Viscous Flow Simulations&#8221;, <em>Engineering with Computers</em>, accepted. </p>
+          <p>Shephard, M.S., Flaherty, J.E., Jansen, K.E., Li,  X., Luo, X., Chevaugeon, N., Remacle, J.F., Beall, M.W., and O&#8217;Bara, R.M., 2005, &#8220;Adaptive Mesh Generation for Curved Domains&#8221;, <em>Journal of  Applied Numerical Math, </em><strong>52,</strong> 251-271.</p>
+          <p>Tejada-Martinez, A.E. and Jansen, K.E., 2005, &#8220;A parameter-free dynamic subgrid-scale model for large-eddy simulation&#8221;, <em>Computer Methods in Applied Mechanics and Engineering, </em><strong>194</strong>, No. 9, 1225-1248.</p>
+          <p>Tejada-Martinez, A.E. and Jansen, K.E., 2004, &#8220;A  Dynamic Smagorinsky Model with a Dynamic Filter Width Ratio&#8221;, <em>Physics of  Fluids</em>, <strong>16</strong>, 2514-2528.<strong></strong></p>
+          <p>Tejada-Martinez, A.E. and Jansen, K.E., 2005, &#8220;On  the Interaction Between Dynamic Model Dissipation and Numerical Dissipation  Due to Streamline Upwind/Petrov-Galerkin Stabilization&#8221;, <em>Computer Methods in Applied Mechanics and Engineering</em>, <strong>194</strong>, n9-11, 1225-1248.<strong></strong></p>
+          <p>Tejada-Martinez, A.E. and Jansen, K.E., 2003,  &#8220;Spatial Test Filters for Dynamic Model LES with Finite Elements&#8221;, <em>Communications  in Numerical Methods in Engineering</em>, 19, 3, 205-213.</p>
+          <p>Whiting, C.H. and Jansen, K.E., 2001, &#8220;A  Stabilized Finite Element Formulation For The Incompressible Navier-Stokes Equations Using  A Hierarchical Basis,&#8221; <em>International Journal of Numerical Methods in Fluids,</em> 35, 93-116.</p>
+          <p>Whiting, C.H, Jansen, K.E. and Dey, S., 2003,  &#8220;Hierarchical Basis for Stabilized Finite Element Methods for Compressible Flows,&#8221; <em>Computer Methods in Applied Mechanics and Engineering</em>, 192, 5167-5185.</p>
+        </blockquote>
+        <p>&nbsp;</p>
+        <p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

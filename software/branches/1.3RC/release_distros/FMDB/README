@@ -1,0 +1,25 @@
+
+                            FMDB v1.3.2 
+
+
+To download and build Serial FMDB: 
+  - set env. var. ENABLE_IMESH to 1
+  - run build_Serial_FMDB_GMI.sh shell script
+
+
+To download and build Parallel FMDB:
+  - set ENABLE_IMESHP to 1
+  - set MPIHOME, CXX, CC  
+  - to skip zoltan installation, set ZOLTAN_HOME
+  - to skip parmetis installation, set PARMETIS_HOME 
+  - run build_Parallel_FMDB_GMI.sh shell script
+
+
+For more information and user's guide, please visit FMDB home page:
+
+    http://www.scorec.rpi.edu/FMDB
+
+
+Email: fmdb@scorec.rpi.edu.
+
+

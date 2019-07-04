@@ -1,0 +1,42 @@
+SUBDIRS = @SUBDIRS@
+
+check:
+	@buildlist= ;\
+	buildfail= ;\
+	runfail= ;\
+	success= ;\
+	for dir in ${SUBDIRS}; do \
+	  echo "build dir = $$dir"; \
+	  if (cd $$dir && make); then \
+	    buildlist="$$buildlist $$dir"; \
+	    echo "buildlist = $$buildlist" ;\
+	  else \
+	    buildfail="$$buildfail $$dir"; \
+	    echo "buildfail = $$buildfail" ;\
+	  fi ; \
+	done ; \
+	for dir in $$buildlist; do \
+	  echo "run dir = $$dir"; \
+	  if (cd $$dir && make check); then \
+	    success="$$success $$dir"; \
+	    echo "success = $$success" ;\
+	  else \
+	    runfail="$$runfail $$dir"; \
+	    echo "runfail = $$runfail" ;\
+	  fi ;\
+	done ;\
+	if [ -n "$$buildfail" ]; then \
+	  echo "The following tests failed to build:"; \
+	  for dir in $$buildfail; do echo "  $$dir"; done ;\
+	fi ;\
+	if [ -n "$$runfail" ]; then \
+	  echo "The following tests failed:"; \
+	  for dir in $$runfail; do echo "  $$dir"; done ;\
+	fi 
+
+
+Makefile: Makefile.in config.status
+	./config.status
+	
+config.status: configure
+	./config.status --recheck

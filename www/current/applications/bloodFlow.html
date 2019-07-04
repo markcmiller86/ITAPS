@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS - Cardiovascular Blood Flow Simulations</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageBloodFlow" -->
+</head>
+
+<body class="pageApplications pageBloodFlow">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodFlow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+   <h1>Cardiovascular Blood Flow Simulations</h1>
+<h2> Challenges</h2>
+<p>Computational simulations of blood flow have been used to study the cardiovascular system in a variety of applications. As computing power and numerical methods advance, simulation-based approaches are expected to become even more extensively used in studying the cardiovascular system.  In such studies, there are several challenging aspects that must be considered. First, we need to represent complex geometries of the cardiovascular system accurately. The aorta starts from the left ventricle and it tapers, bends, and bifurcates into small vessels. The geometric changes directly affect hemodynamic factors such as blood velocity, pressure, and wall shear stress. Thus, to compute realistic hemodynamic factors in the cardiovascular system, the geometry should be represented accurately. The reliability and accuracy of simulations is also a strong function of the mesh quality and configuration. Since there are no reliable a priori methods to control the approximation errors, adaptive methods must be applied where the mesh resolution is determined in a local fashion based on the spatial distribution of the solution and errors associated with its numerical approximation. In the cases of cardiovascular blood flows the use of boundary layer meshes is central to the ability to effectively perform the flow simulations. The techniques of anisotropic mesh adaptation with boundary layer maintenance developed in [1] have been used in the study. Besides accurate description of the complicated geometric model and high-resolution spacial discretization (mesh), we need to assign boundary conditions, which can represent absent parts of the cardiovascular system properly. Otherwise, the computed flow and pressure are not physiologically realistic. More sophisticated boundary conditions have been developed for cardiovascular blood flow simulation [2].  Inclusion of the aforementioned models into cardiovascular simulations often results in a very large-scale computation. The ability to solve problems of practical interest in a reasonable time requires the use of massively parallel computers and a flow solver that is both computationally efficient and highly scalable. An implicit finite element flow solver, PHASTA, has demonstrated the ability to meet these performance requirements [3, 4].</p>
+
+<h2>"Whole" body simulation</h2>
+<h3>Geometric model and BCs</h3>
+<p>We demonstrate the capability of our methods by applying them to compute physiologically realistic blood flow and pressure in a subject-specific ``whole'' body model within a short time frame [4]. The ``whole'' body model is constructed from computer tomography (CT) data, which covered the entire body from the neck to the feet of a female patient. The layout of the ``whole'' body model is illustrated in Figure 1 along with the labels of sections where the velocity magnitude are reported. The figure also shows the inflow waveform and the three-element Windkessel model [2] assigned to each outlet. The geometric model consists of seventy-eight arteries, starting from the root of the aorta and including major branch vessels and main branches of the upper-body and lower-body vasculature.</p>
+<p class="clear">&nbsp;</p>
+
+
+<div class="imgContainer fRight" style="width: 300px;">
+	 <a href="../assets/images//whole_body_full.png" rel="lightbox">
+	<img src="../assets/images/whole_body_mini.png" alt="whole body model" width="282" height="304" /></a>
+    <p>Figure 1: The ``whole'' body model with the labels of sections (left) and the boundary conditions (right).</p>
+</div>
+
+
+<h3>Mesh creation and adaptation</h3>
+<p>The discretization of this geometric model is challenging because it is a large complex model that spans a large range of vessel diameters. The length of the model is roughly 150cm whereas the diameter varies from 3cm at the aortic inlet to 0.2cm in small branch vessels. To construct an efficient finite element mesh, we initially created a fairly coarse unstructured mesh with two semi-structured layers of the constant thickness of 0.004 cm within the boundary layer. Figure 2 presents magnified views for different arteries along with those of the adapted mesh. Due to the high ratio between the model's total height and the diameter of small arteries
+(150cm/0.3cm=500), we varied the initial local mesh size for different blood vessels from 0.03cm to 0.1cm on the basis of the outlet diameter. The initial mesh had 1.86 million nodes and 7.1 million elements but is still relatively uniform and isotropic in the interior volume and does not have high resolution on small blood vessels (e.g., Radial artery in Figure 2 shows only tens of triangles on the outlet surface). The solution based, anisotropic, boundary layer mesh adaptation was used to improve the mesh quality. After four sets of flow computation and mesh modification, we obtained an adapted mesh with 9.0 million nodes and 42.8 million elements. Figure 2 depicts magnified views of selected arteries in comparison with the initial mesh. The effect of flow features can be clearly seen on the adapted meshes. Elongated elements aligned in the flow direction are created in the regions where one velocity component is varying sharply relative to the other ones such as near the vessel walls due to boundary layers. Isotropic elements are created where flow variation in each direction is relatively similar, for example, in branching regions.</p>
+
+
+<div class="imgContainer fLeft" style="width: 300px;">
+	 <a href="../assets/images/arteries_adapt_full.png" rel="lightbox">
+	<img src="../assets/images/arteries_adapt_mini.png" alt="comparison meshes" width="300" height="262" class="imgrt" /></a>
+    <p>Figure 2: The comparison of initial and adapted mesh.</p>
+</div>
+
+
+
+<p>The minimum local size in the adapted mesh is 0.004cm while the maximum size is 0.8cm. The adaptation increased the mesh size by a factor of six (42 million/7 million). However, the local resolution was increased up to a factor of twenty-five (0.1cm/0.004cm) in some regions. </p>
+
+
+<h3 class="clear">Parallel Simulation</h3>
+<p>The simulation of the adapted mesh were performed on Kraken (Cray XT5) at NICS, using 2048 processing cores and the simulation took ninety minutes (3,000 CPU hours) for one cardiac cycle. These results indicate that we can run cardiovascular simulations with complex geometry and flow characteristics such as the ``whole'' body model in a reasonable time frame because the flow solver has strong scalability [3, 4], which is very important for time critical simulations.</p>
+
+
+<h3>Simulation Results</h3>
+<p>In Figure 3, velocity magnitude on six selected cut-planes (see Figure 1) are shown at four instants of a cardiac cycle. When the inflow is decelerating, some cut-planes experience complex flow structures due to the complex geometry and the interactions of the boundary conditions. Small-scale flow features are developed at this phase and the adapted mesh demonstrates its ability to capture them.
+Figure 4 shows the wall shear stress of the aorta in the mesenteric region in a magnified view. Note that the wall shear stress was plotted in the same scale (0-20 dynes/cm2). In the magnified view, we see a smooth distribution of wall shear stress on the model, which demonstrates another benefit of using the adaptive boundary layer mesh [1].
+Figure 5 compares the wall shear stress over vessel walls in a magnified view obtained on the initial (M0) and the adapted mesh (M4) at peak systole. Obvious differences are observed between these two meshes. The wall shear stress on the initial mesh already captured the overall distribution patterns, but it is not as smooth as the field on the adapted mesh and is over predicted in some regions.  </p>
+
+
+<div class="imgContainer fLeft" style="width: 295px;">
+	<img src="../assets/images/Monster_velocity.gif" width="295" height="244" alt="Velocity magnitude on selected cut-planes" />
+    <p>Figure 3: Velocity magnitude on selected cut-planes (defined in Figure 4) obtained on the adapted mesh at four instants.</p>
+</div>
+
+
+<div class="imgContainer fLeft" style="width: 380px;">
+	<img src="../assets/images/Monster_wss_zoom.gif" width="380" height="215" alt="Wall shear stress of the descending thoracic aorta" />
+    <p>Figure 4: Wall shear stress of the descending thoracic aorta using the adapted mesh at peak systole, early diastole, and end diastole.</p>
+</div>
+
+
+<div class="imgContainer fLeft" style="width: 380px;">
+	<img src="../assets/images/Monster_wss_comparison.gif" width="380" height="326" alt="comparison of wall shear stress" />
+    <p>Figure 5: Comparison of wall shear stress on the initial and the adapted meshes at peak systole.</p>
+</div>
+
+
+
+
+<p>&nbsp;</p>
+<h2 class="clear">Impact to ITAPS applications</h2>
+<p>Cardiovascular simulation is advancing rapidly to include more physiologically realistic geometry, boundary conditions, and coupled structural response. A framework to address these issues was described and demonstrated on a "whole" body model.  The simulation demonstrated the potential for anisotropic adaptivity to match local solution resolution needs and provide a dramatic reduction in computational effort relative to isotropic meshing approaches.</p>
+<h2>Support </h2>
+<p>This work is supported in part by the U.S. Department of Energy under grant DE-FC02-06ER25769 and in part by the National Science Foundation under grant 0749152.</p>
+
+
+<h2>Contact information</h2>
+<p>Min Zhou <a href="mailto:zhoum@scorec.rpi.edu">zhoum@scorec.rpi.edu</a>  <br />
+  Kenneth E. Jansen <a href="mailto:Kenneth.Jansen@Colorado.EDU">Kenneth.Jansen@Colorado.EDU</a></p>
+  
+  
+<h2>References</h2>
+<p> [1]. O. Sahni and Y. M&uuml;ller and K.E. Jansen and M.S. Shephard and C.A. Taylor, Efficient Anisotropic Adaptive Discretization of the Cardiovascular System, Comp. Meth. Appl. Mech. Engng. 195: 5634-5655, 2006.</p>
+<p>[2]. I.E. Vignon-Clementel, C.A. Figueroa, K.E. Jansen, C.A. Taylor, Outflow boundary conditions for three-dimensional finite element modeling of blood flow and pressure in arteries. Comp Methods, Appl Mech Eng 195(29–32):3776–3796.</p>
+<p>[3]. O. Sahni, M. Zhou, M.S. Shephard, K.E. Jansen, Scalable implicit finite element solver for massively parallel processing with demonstration to 160k cores. In: Proceedings of IEEE/ACM SC'09, Finalist paper for the Gordon Bell Prize.</p>
+<p>[4]. M. Zhou, O. Shahni, H.J. Kim, C.A. Flgueroa, C.A. Taylor, M.S. Shephard, K.E. Jansen, Cardiovascular Flow Simulation at Extreme Scale, Computational Mechanics, 4(1):71-82, 2010. </p>
+<p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

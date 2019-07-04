@@ -1,0 +1,75 @@
+.SILENT:
+
+ROOT=@IMPL_ROOT@
+
+BACKEND_DIRS=@BACKEND_DIRS@
+
+@SET_MAKE@
+
+EXTERNAL_PACKAGES=@EXTERNAL_PACKAGES@
+BUILD_INTERFACES=@BUILD_INTERFACES@
+
+INSTALL=@INSTALL@
+INSTALL_SHARE=@prefix@/share/ITAPS
+INSTALL_INCLUDE=@prefix@/include/ITAPS
+INSTALL_LIB=@prefix@/lib/ITAPS
+
+all:
+	echo "Building all server and client libraries..."
+	for i in $(EXTERNAL_PACKAGES) ; do \
+	  (cd $$i && $(MAKE) all) ; \
+	done
+	$(MAKE) TARGET=all recurse
+
+clean:
+	-rm -f  conf/config.log
+	$(MAKE) TARGET=clean recurse
+
+distclean:
+	$(MAKE) TARGET=distclean recurse
+	-rm -f Makefile @ITAPS_DEF_FILES@ *~ config.* 
+	-rm -f conf/Makefile-include
+	-rm -rf autom4te.cache
+
+iBase iField iGeom iMesh iRel:
+	cd $@ && $(MAKE) all
+
+iBase-install: $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE)
+	cd iBase && $(MAKE) install
+	@INSTALL_DATA@ iBase-Defs.inc $(INSTALL_INCLUDE)/ITAPS
+
+iField-install: $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE)
+	cd iField && $(MAKE) install
+	@INSTALL_DATA@ iField-Defs.inc $(INSTALL_INCLUDE)/ITAPS
+
+iGeom-install: $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE)
+	cd iGeom && $(MAKE) install
+	@INSTALL_DATA@ iGeom-Defs.inc $(INSTALL_INCLUDE)/ITAPS
+
+iMesh-install: $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE)
+	cd iMesh && $(MAKE) install
+	@INSTALL_DATA@ iMesh-Defs.inc $(INSTALL_INCLUDE)/ITAPS
+
+iRel-install: $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE)
+	cd iRel && $(MAKE) install
+	@INSTALL_DATA@ iRel-Defs.inc $(INSTALL_INCLUDE)/ITAPS
+
+recurse:
+	(cd $(BACKEND_DIRS) && $(MAKE) $(TARGET))
+	for i in $(BUILD_INTERFACES) ; do \
+	  (cd $$i && $(MAKE) $(TARGET)) ; \
+	done
+
+maintainer-clean:
+	$(MAKE) distclean
+	-rm -rf $(EXTERNAL_PACKAGES)
+
+ $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE):
+	-mkdir -p $@
+
+install: $(INSTALL_LIB) $(INSTALL_SHARE) $(INSTALL_INCLUDE)
+	@INSTALL_DATA@ i*-Defs.inc $(INSTALL_SHARE)
+	for i in $(BUILD_INTERFACES) $(BACKEND_DIRS); do \
+	 (cd $$i && $(MAKE) install) ; \
+	done
+

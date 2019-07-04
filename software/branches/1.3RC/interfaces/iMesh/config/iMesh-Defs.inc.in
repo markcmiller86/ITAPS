@@ -1,0 +1,21 @@
+# This file contains variables that are essential for building
+# applications on iMesh implementations without having to hack
+# application Makefiles horribly each time.  Instead, one can simply
+# re-run configure in the application tree with a new -with-ITAPS-dir
+# argument, and the implementation-specific version of this file gets
+# included automatically.  The application programmer/user can also just
+# edit the pathname in their Makefile if they prefer.
+
+IMESH_INCLUDES=-I@IMPL_ROOT@/iMesh -I@IMPL_ROOT@/iBase
+
+IMESH_LIBS=-L@IMPL_ROOT@/iMesh -liMesh_@IMPL_NAME@ $(IMESH_BACKEND_LIBS)
+
+IMESH_FILES=@IMPL_ROOT@/iMesh/libiMesh_@IMPL_NAME@.a \
+	@IMPL_ROOT@/iMesh/iMesh.h $(IMESH_BACKEND_FILES)
+
+
+IMESH_BACKEND_INCLUDES=-I@IMPL_ROOT@/GRUMMP/include
+
+IMESH_BACKEND_LIBS=-L@IMPL_ROOT@/GRUMMP/lib/libO/@host_os@ -lGR_3D -lGR_surf -lGR_2D -lGR_base -lSUMAAlog_lite -lOptMS
+
+IMESH_BACKEND_FILES=@IMPL_ROOT@/GRUMMP/lib/libO/@host_os@/libGR_3D.so @IMPL_ROOT@/GRUMMP/lib/libO/@host_os@/libGR_2D.so

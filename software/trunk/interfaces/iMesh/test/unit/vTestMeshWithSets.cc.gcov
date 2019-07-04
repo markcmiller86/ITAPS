@@ -1,0 +1,529 @@
+        -:    0:Source:vTestMeshWithSets.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestMeshWithSets(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  //    getNumOfType, getNumOfTopo, getAllVtxCoords,
+        -:    6:  //    getVtxCoordIndex, getEntities, and getAdjEntities
+        1:    7:  const int iNumType = iBase_ALL_TYPES - iBase_VERTEX;
+        1:    8:  const int iNumTopo = iMesh_ALL_TOPOLOGIES - iMesh_POINT;
+        -:    9:  iBase_EntitySetHandle apvSets[5];
+        -:   10:  iBase_EntityHandle a2pvTypeEnts[iNumType][iNumType*5];
+        -:   11:  iBase_EntityIterator pvIter;
+        -:   12:  iBase_EntityHandle a2pvTopoEnts[iNumTopo][iNumTopo*5];
+        1:   13:  int aiNumTypeEnts[iNumType] = {0};
+        1:   14:  int aiNumTopoEnts[iNumTopo] = {0};
+        1:   15:  int i, iGeoDim, qGotData = false, err;
+        -:   16:
+        1:   17:  iMesh_getGeometricDimension(instance, &iGeoDim, &err);
+        1:   18:  CHECK_ERR(err);
+        -:   19:
+        -:   20:  // Get a different number of entities for each type and record how
+        -:   21:  // many were retrieved --a2pvTypeEnts stores the entities,
+        -:   22:  // aiNumTypeEnts stores how many for each type
+        1:   23:  qGotData = false;
+        -:   24:
+        5:   25:  for ( i = 0; i < iNumType; i++ ) {
+        4:   26:    if ( (iGeoDim == 2) && (i > iBase_FACE) )
+        -:   27:      break;
+        -:   28:    iMesh_initEntIter(instance, pvRootSet,
+        -:   29:		      static_cast<iBase_EntityType>(i+iBase_VERTEX),
+        4:   30:		      iMesh_ALL_TOPOLOGIES, 0, &pvIter, &err);
+        4:   31:    CHECK_ERR(err);
+        -:   32:
+        -:   33:    iBase_EntityHandle entity;
+        4:   34:    iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+        4:   35:    CHECK_ERR(err);
+        -:   36:
+        4:   37:    int j = 0;
+       43:   38:    while (qGotData && aiNumTypeEnts[i] < 5*(iNumType-i)) {
+       35:   39:      a2pvTypeEnts[i][j] = entity;
+       35:   40:      j++;
+       35:   41:      aiNumTypeEnts[i] = j;
+       35:   42:      iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+       35:   43:      CHECK_ERR(err);
+        -:   44:    };
+        4:   45:    iMesh_endEntIter(instance, pvIter, &err);
+        4:   46:    CHECK_ERR(err);
+        -:   47:  }
+        -:   48:
+        -:   49:  // If there aren't the required number of vertices (20 to be exact) or
+        -:   50:  // there aren't any of any of the other types of entities, bail out
+        -:   51:  // because the subsequent tests would be useless and might not even
+        -:   52:  // work.
+        1:   53:  if ( (aiNumTypeEnts[0] < 20) ) {
+    #####:   54:    cout << "\nCould not get mesh data to work with... exiting...\n";
+    #####:   55:    TEST ( data_preparation );
+        -:   56:    return;
+        -:   57:  }
+        -:   58:
+        -:   59:  // Get a different number of entities for each topology and record how
+        -:   60:  // many were retrieved -- a2pvTopoEnts stores the entities,
+        -:   61:  // aiNumTopoEnts stores how many for each topology.
+        1:   62:  qGotData = false;
+       12:   63:  for ( i = 0; i < iNumTopo; i++ ) {
+       11:   64:    if ( (iGeoDim == 2) && (i > iMesh_QUADRILATERAL) )
+        -:   65:      break;
+        -:   66:    iMesh_initEntIter(instance, pvRootSet, iBase_ALL_TYPES,
+       11:   67:		      static_cast<iMesh_EntityTopology>(i), 0, &pvIter, &err);
+       11:   68:    CHECK_ERR(err);
+        -:   69:
+        -:   70:    iBase_EntityHandle entity;
+       11:   71:    iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+       11:   72:    CHECK_ERR(err);
+       11:   73:    int j = 0;
+      222:   74:    while (qGotData && aiNumTopoEnts[i] < 5*(iNumTopo-i)) {
+      200:   75:      a2pvTopoEnts[i][j] = entity;
+      200:   76:      j++;
+      200:   77:      aiNumTopoEnts[i] = j;
+      200:   78:      iMesh_getNextEntIter(instance, pvIter, &entity, &qGotData, &err);
+      200:   79:      CHECK_ERR(err);
+        -:   80:    }
+       11:   81:    iMesh_endEntIter(instance,  pvIter, &err);
+       11:   82:    CHECK_ERR(err);
+        -:   83:  }
+        -:   84:
+        -:   85:  // If there aren't the required number of points (55 to be exact) or
+        -:   86:  // there aren't any of any of the other topologies of entities, bail
+        -:   87:  // out because the subsequent tests would be useless and might not
+        -:   88:  // even work
+        1:   89:  if ( aiNumTopoEnts[0] < 55 ) {
+    #####:   90:    cout << "\nCould not get mesh data to work with... exiting...\n";
+    #####:   91:    TEST ( data_preparation );
+        -:   92:    return;
+        -:   93:  }
+        -:   94:
+        -:   95:  // Create two lists and two sets, one for types and one for topologies each,
+        -:   96:  // as well as an empty list
+        6:   97:  for ( i=0; i<5; i++ ) {
+        5:   98:    iMesh_createEntSet(instance,  i<3, &apvSets[i], &err);
+        5:   99:    CHECK_ERR(err);
+        -:  100:  }
+        -:  101:
+        -:  102:  // Add all of the type entities to list 1 and set 3
+        5:  103:  for ( i=0; i<iNumType; i++ ) {
+       39:  104:    for ( int j=0; j<aiNumTypeEnts[i]; j++ ) {
+       35:  105:      iMesh_addEntToSet(instance,  a2pvTypeEnts[i][j], apvSets[1], &err);
+       35:  106:      CHECK_ERR(err);
+       35:  107:      iMesh_addEntToSet(instance,  a2pvTypeEnts[i][j], apvSets[3], &err);
+       35:  108:      CHECK_ERR(err);
+        -:  109:    }
+        -:  110:  }
+        -:  111:
+        -:  112:  // Double the number of vertices for the list
+       21:  113:  for ( int j=0; j<aiNumTypeEnts[0]; j++ )
+       20:  114:    iMesh_addEntToSet(instance,  a2pvTypeEnts[0][j], apvSets[1], &err);
+        1:  115:  CHECK_ERR(err);
+        -:  116:
+        -:  117:  // Add all of the topology entities to list 2 and set 4
+       12:  118:  for ( i=0; i<iNumTopo; i++ ) {
+      211:  119:    for ( int j=0; j<aiNumTopoEnts[i]; j++ ) {
+      200:  120:      iMesh_addEntToSet(instance,  a2pvTopoEnts[i][j], apvSets[2], &err);
+      200:  121:      CHECK_ERR(err);
+      200:  122:      iMesh_addEntToSet(instance,  a2pvTopoEnts[i][j], apvSets[4], &err);
+      200:  123:      CHECK_ERR(err);
+        -:  124:    }
+        -:  125:  }
+        -:  126:  // Double the number of points for the list
+       56:  127:  for (int j=0; j<aiNumTopoEnts[0]; j++ )
+       55:  128:    iMesh_addEntToSet(instance,  a2pvTopoEnts[0][j], apvSets[2], &err);
+        1:  129:  CHECK_ERR(err);
+        -:  130:
+        1:  131:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  132:  if (qSaveLoad) {
+        -:  133:    vRecoverSetsFromEntCounts(instance, pvRootSet,
+        1:  134:			      apvSets, aiNumTypeEnts, aiNumTopoEnts);
+        -:  135:  }
+        -:  136:
+        1:  137:  cout << "Testing basic queries...                                  ";
+        -:  138:
+        1:  139:  bool qNumOK0 = true, qNumOK1 = true, qNumOK2 = true,
+        1:  140:    qNumOK3 = true, qNumOK4 = true;
+        -:  141:  // Ensure that the correct number of each type/topology of entities is
+        -:  142:  // returned
+        -:  143:
+        -:  144:  // The vertices have to be handled separately because they were added
+        -:  145:  // twice to the list
+        1:  146:  qNumOK0 = qNumOK0 && qCheckNumOfType(instance, apvSets[0], iBase_VERTEX, 0);
+        -:  147:  qNumOK1 = qNumOK1 && qCheckNumOfType(instance, apvSets[1], iBase_VERTEX,
+        1:  148:				       2*aiNumTypeEnts[0]);
+        -:  149:  qNumOK3 = qNumOK3 && qCheckNumOfType(instance, apvSets[3], iBase_VERTEX,
+        1:  150:				       aiNumTypeEnts[0] );
+        4:  151:  for ( int iType = iBase_VERTEX+1;
+        -:  152:	iType < iBase_ALL_TYPES; iType++ ) {
+        3:  153:    if ( (iGeoDim == 2) && (iType > iBase_FACE) )
+        -:  154:      break;
+        3:  155:    qNumOK0 = qNumOK0 && qCheckNumOfType(instance, apvSets[0], iType, 0);
+        -:  156:    qNumOK1 = qNumOK1 && qCheckNumOfType(instance, apvSets[1], iType,
+        3:  157:					 aiNumTypeEnts[iType]);
+        -:  158:    qNumOK3 = qNumOK3 && qCheckNumOfType(instance, apvSets[3], iType,
+        3:  159:					 aiNumTypeEnts[iType]);
+        -:  160:  }
+        -:  161:
+        -:  162:  // The points have to be handled separately because they were added
+        -:  163:  // twice to the list
+        -:  164:  qNumOK0 = qNumOK0 && qCheckNumOfTopo(instance, apvSets[0], iMesh_POINT,
+        1:  165:				       0);
+        -:  166:  qNumOK2 = qNumOK2 && qCheckNumOfTopo(instance, apvSets[2], iMesh_POINT,
+        1:  167:				     2*aiNumTopoEnts[0] );
+        -:  168:  qNumOK4 = qNumOK4 && qCheckNumOfTopo(instance, apvSets[4], iMesh_POINT,
+        1:  169:				     aiNumTopoEnts[0] );
+       11:  170:  for ( int iTopo = iMesh_POINT+1;
+        -:  171:	iTopo < iMesh_ALL_TOPOLOGIES; iTopo++ ) {
+       10:  172:    if ( (iGeoDim == 2) && (i > iMesh_QUADRILATERAL) )
+        -:  173:      break;
+        -:  174:    qNumOK0 = qNumOK0 && qCheckNumOfTopo(instance, apvSets[0], iTopo,
+       10:  175:				       0);
+        -:  176:    qNumOK2 = qNumOK2 && qCheckNumOfTopo(instance, apvSets[2], iTopo,
+       10:  177:				       aiNumTopoEnts[iTopo]);
+        -:  178:    qNumOK4 = qNumOK4 && qCheckNumOfTopo(instance, apvSets[4], iTopo,
+       10:  179:				       aiNumTopoEnts[iTopo]);
+        -:  180:  }
+        1:  181:  TEST ( qNumOK0 && qNumOK1 && qNumOK2 && qNumOK3 && qNumOK4 );
+        1:  182:  cout << "DONE\n";
+        -:  183:
+        1:  184:  cout << "Testing entity retrieval...                               ";
+        -:  185:  // Try to retrieve the entities for each type (sets 0, 1, 3)
+        -:  186:  // Set #0 is empty
+        -:  187:
+        5:  188:  for (int iType = iBase_VERTEX; iType < iBase_ALL_TYPES; iType++) {
+        -:  189:    vCheckEntities(instance, apvSets[0], iType, iMesh_ALL_TOPOLOGIES,
+        4:  190:		   a2pvTypeEnts[iType], 0);
+        -:  191:    vCheckEntities(instance, apvSets[3], iType, iMesh_ALL_TOPOLOGIES,
+        4:  192:		   a2pvTypeEnts[iType], aiNumTypeEnts[iType]);
+        -:  193:    {
+        4:  194:      iBase_EntityHandle *aEnts = new iBase_EntityHandle[2*aiNumTypeEnts[0]];
+        4:  195:      int iTotal = 0;
+       39:  196:      for (; iTotal < aiNumTypeEnts[iType]; iTotal++) {
+       35:  197:	aEnts[iTotal] = a2pvTypeEnts[iType][iTotal];
+        -:  198:      }
+        4:  199:      if (iType == 0) {
+        -:  200:	// In this case, add the verts again.
+       20:  201:	for ( ; iTotal < 2*aiNumTypeEnts[0]; iTotal++) {
+       20:  202:	  aEnts[iTotal] = a2pvTypeEnts[0][iTotal - aiNumTypeEnts[0]];
+        -:  203:	}
+        -:  204:      }
+        -:  205:      vCheckEntities(instance, apvSets[1], iType, iMesh_ALL_TOPOLOGIES,
+        4:  206:		     aEnts, iTotal);
+        4:  207:      delete [] aEnts;
+        -:  208:    }
+        -:  209:  }
+        -:  210:
+        -:  211:  // Try to retrieve the entities for each topo (sets 0, 2, 4)
+        -:  212:  // Set #0 is empty
+        -:  213:
+       12:  214:  for (int iTopo = iMesh_POINT; iTopo < iMesh_ALL_TOPOLOGIES; iTopo++) {
+        -:  215:    vCheckEntities(instance, apvSets[0], iBase_ALL_TYPES, iTopo,
+       11:  216:		   a2pvTopoEnts[iTopo], 0);
+        -:  217:    vCheckEntities(instance, apvSets[4], iBase_ALL_TYPES, iTopo,
+       11:  218:		   a2pvTopoEnts[iTopo], aiNumTopoEnts[iTopo]);
+        -:  219:    {
+       11:  220:      iBase_EntityHandle *aEnts = new iBase_EntityHandle[2*aiNumTopoEnts[0]];
+       11:  221:      int iTotal = 0;
+      211:  222:      for (; iTotal < aiNumTopoEnts[iTopo]; iTotal++) {
+      200:  223:	aEnts[iTotal] = a2pvTopoEnts[iTopo][iTotal];
+        -:  224:      }
+       11:  225:      if (iTopo == 0) {
+        -:  226:	// In this case, add the verts again.
+       55:  227:	for ( ; iTotal < 2*aiNumTopoEnts[0]; iTotal++) {
+       55:  228:	  aEnts[iTotal] = a2pvTopoEnts[0][iTotal - aiNumTopoEnts[0]];
+        -:  229:	}
+        -:  230:      }
+        -:  231:      vCheckEntities(instance, apvSets[2], iBase_ALL_TYPES, iTopo,
+       11:  232:		     aEnts, iTotal);
+       11:  233:      delete [] aEnts;
+        -:  234:    }
+        -:  235:  }
+        1:  236:  cout << "DONE\n";
+        1:  237:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  238:  if (qSaveLoad) {
+        -:  239:    vRecoverSetsFromEntCounts(instance, pvRootSet,
+        1:  240:			      apvSets, aiNumTypeEnts, aiNumTopoEnts);
+        -:  241:  }
+        -:  242:
+        1:  243:  cout << "Testing entity adjacency consistency...\n";
+        -:  244:  bool qAdjCons, qInCons;
+        -:  245:
+        5:  246:  for ( int eEType = iBase_VERTEX;
+        -:  247:	eEType < iBase_ALL_TYPES; eEType++ ) {
+       48:  248:    for ( int eETopo = iMesh_POINT;
+        -:  249:	  eETopo < iMesh_ALL_TOPOLOGIES; eETopo++ ) {
+       44:  250:      if ( a2qLegalTypeAndTopo[eEType][eETopo] ) {
+       11:  251:	if ( (iGeoDim == 2) && (eEType > iBase_FACE ||
+        -:  252:				eETopo > iMesh_QUADRILATERAL) )
+    #####:  253:	  continue;
+        -:  254:	int iNumEnt;
+        -:  255:	iMesh_getNumOfTopo(instance, apvSets[2],
+        -:  256:			   static_cast<iMesh_EntityTopology>(eETopo),
+       11:  257:			   &iNumEnt, &err);
+       11:  258:	CHECK_ERR(err);
+       11:  259:	if ( iNumEnt == 0 ) continue;
+        -:  260:
+        7:  261:	cout << "  Type: ";
+        -:  262:	cout.width(9);
+        7:  263:	cout << astrTypes[eEType] << "      with topology: ";
+        -:  264:	cout.width(14);
+        7:  265:	cout << astrTopologies[eETopo] << endl;
+        -:  266:
+        -:  267:	// Now test for equivalence in adjacency operations.
+        7:  268:	int eAdjType, eLastType = iBase_REGION;
+       35:  269:	for ( eAdjType = iBase_VERTEX; eAdjType <= eLastType; eAdjType++ ) {
+        -:  270:	  // Skip any that are unsupported.
+       28:  271:	  if ( a2iAdjTable[eEType][eAdjType] == iBase_UNAVAILABLE )
+        7:  272:	    continue;
+       21:  273:	  qAdjCons = true;
+       21:  274:	  qInCons = true;
+        -:  275:
+       21:  276:	  iBase_EntityHandle * aAdjEnt = NULL, *aEnt = NULL;
+       21:  277:	  int * aiOffset = NULL, * aiIndex = NULL;
+        -:  278:	  int iNumAdj, iOffsetSize, iIndexSize, iEntSize;
+       21:  279:	  int iAdjEntAlloc = 0;
+       21:  280:	  int iOffsetAlloc = 0;
+       21:  281:	  int iIndexAlloc = 0;
+       21:  282:	  int iEntAlloc = 0;
+        -:  283:
+        -:  284:	  // Get adjacencies using the entityset version of the index call.
+        -:  285:	  iMesh_getAdjEntIndices(instance,  apvSets[2], eEType,
+        -:  286:				 eETopo, eAdjType,
+        -:  287:				 &aEnt, &iEntAlloc, &iEntSize,
+        -:  288:				 &aAdjEnt, &iAdjEntAlloc, &iNumAdj,
+        -:  289:				 &aiIndex, &iIndexAlloc, &iIndexSize, 
+       21:  290:				 &aiOffset, &iOffsetAlloc, &iOffsetSize, &err);
+       21:  291:	  CHECK_ERR(err);
+        -:  292:
+        -:  293:	  // Now check that the adjacencies match with the single entity call.
+       21:  294:	  cout << "   Checking adjacency for entity type:\t";
+        -:  295:	  cout.width(9);
+       21:  296:	  cout << astrTypes[eAdjType] << "\t";
+       21:  297:	  if ( iNumEnt != iOffsetSize-1 ) {
+    #####:  298:	    qAdjCons = false;
+        -:  299:	  }
+        -:  300:	  else {
+      786:  301:	    for ( int iEnt = 0; iEnt < iNumEnt && qAdjCons; iEnt++ ) {
+        -:  302:	      int iNLocalAdj;
+      765:  303:	      iBase_EntityHandle * aAdjEntHandles = NULL;
+      765:  304:	      int iAdjEntHandlesAlloc = 0;
+        -:  305:	      iMesh_getEntAdj(instance,  aEnt[iEnt], eAdjType,
+        -:  306:			      &aAdjEntHandles, &iAdjEntHandlesAlloc,
+      765:  307:			      &iNLocalAdj, &err);
+      765:  308:	      CHECK_ERR(err);
+        -:  309:	      // Number of adjacencies must match.
+      765:  310:	      if ( iNLocalAdj != (aiOffset[iEnt+1] - aiOffset[iEnt]) ) {
+    #####:  311:		qAdjCons = false;
+    #####:  312:		continue;
+        -:  313:	      }
+      765:  314:	      int iOffset = aiOffset[iEnt];
+     7000:  315:	      for (int iAdj = 0; iAdj < iNLocalAdj; iAdj++) {
+        -:  316:		iBase_EntityHandle global_handle =
+     6235:  317:		  aAdjEnt[aiIndex[iOffset + iAdj]];
+     6235:  318:		iBase_EntityHandle local_handle = aAdjEntHandles[iAdj];
+     6235:  319:		qAdjCons = qAdjCons && (global_handle == local_handle);
+        -:  320:	      } // Loop over local adjacencies
+      765:  321:	      UT_FREE(aAdjEntHandles);
+        -:  322:	    } // Loop over entities
+       21:  323:	    cout << "\tDONE\n";
+        -:  324:	  }
+       21:  325:	  UT_FREE(aAdjEnt);
+       21:  326:	  UT_FREE(aEnt);
+       21:  327:	  UT_FREE(aiOffset);
+       21:  328:	  UT_FREE(aiIndex);
+        -:  329:	} // Loop over adjacency types
+        7:  330:	TEST(qAdjCons);
+        7:  331:	TEST(qInCons);
+        -:  332:      }
+        -:  333:    }
+        -:  334:  } // Done with double loop to verify consistency of adjacencies
+        1:  335:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  336:  if (qSaveLoad) {
+        -:  337:    vRecoverSetsFromEntCounts(instance, pvRootSet,
+        1:  338:			      apvSets, aiNumTypeEnts, aiNumTopoEnts);
+        -:  339:  }
+        -:  340:
+        -:  341:  // getAllVtxCoords, getVtxCoordIndex
+        -:  342://   cout << "Checking consistency of vertex coordinate retrieval...    ";
+        -:  343://   int iNumAdjEnts, iNumVerts, iNumIndices, iNumTopologies,
+        -:  344://     iNumOffsets1, iNumOffsets2, iNumOffsets3,
+        -:  345://     iNumAllCoords, iNumCoords,
+        -:  346://     iNumInSet1, iNumInSet2;
+        -:  347://   bool qCoordsCons, qStorCons, qToposCons;
+        -:  348://   int SOTemp;
+        -:  349:
+        -:  350://   int SODefault;
+        -:  351://   iMesh_getDfltStorage(instance, &SODefault, &err);
+        -:  352://   CHECK_ERR(err);
+        -:  353:
+        -:  354://   qStorCons = true;
+        -:  355://   for ( int iSet = 0; iSet < 5 && qStorCons; iSet++ ) {
+        -:  356://     int * aiInSet1;
+        -:  357://     double *adAllCoords;
+        -:  358://     SOTemp = iBase_BLOCKED;
+        -:  359://     int iAllCoordsAlloc = 0;
+        -:  360://     int iInSet1Alloc = 0;
+        -:  361://     iMesh_getAllVtxCoords(instance,  apvSets[iSet],
+        -:  362:// 			  &adAllCoords, &iAllCoordsAlloc, &iNumAllCoords,
+        -:  363:// 			  &aiInSet1, &iInSet1Alloc, &iNumInSet1,
+        -:  364:// 			  SOTemp, &err);
+        -:  365://     CHECK_ERR(err);
+        -:  366://     TEST ( iNumAllCoords == iNumInSet1*iGeoDim );
+        -:  367://     qStorCons = qStorCons && ( SOTemp == SODefault );
+        -:  368:
+        -:  369://     qInCons = qCoordsCons = ( iNumAllCoords == iNumInSet1*iGeoDim );
+        -:  370://     qToposCons = true;
+        -:  371://     for ( int eEType = iBase_VERTEX;
+        -:  372:// 	  eEType <= iBase_ALL_TYPES; eEType++ ) {
+        -:  373://       for ( int eETopo = iMesh_POINT;
+        -:  374:// 	    eETopo <= iMesh_ALL_TOPOLOGIES
+        -:  375:// 	      && qInCons && qToposCons && qCoordsCons
+        -:  376:// 	      ; eETopo++ ) {
+        -:  377:// 	// Skip any illegal type-topology combinations
+        -:  378:// 	if ( !a2qLegalTypeAndTopo[eEType][eETopo] )
+        -:  379:// 	  continue;
+        -:  380:// 	if ( (iGeoDim == 2) && (eEType == iBase_REGION ||
+        -:  381:// 				(eETopo > iMesh_QUADRILATERAL &&
+        -:  382:// 				 eETopo != iMesh_ALL_TOPOLOGIES)) )
+        -:  383:// 	  continue;
+        -:  384:
+        -:  385:// 	for ( int eAdjType = iBase_VERTEX;
+        -:  386:// 	      eAdjType < iBase_ALL_TYPES; eAdjType++ ) {
+        -:  387:// 	  // Skip any that are identities or unsupported.
+        -:  388:// 	  if ( eEType == eAdjType ||
+        -:  389:// 	       a2iAdjTable[eEType][eAdjType] == iBase_UNAVAILABLE)
+        -:  390:// 	    continue;
+        -:  391:	  
+        -:  392:// 	  iBase_EntityHandle * aAdjEnts;
+        -:  393:// 	  int * aiOffsets1, *aiInSet2;
+        -:  394:// 	  int iAdjEntsAlloc = 0;
+        -:  395:// 	  int iOffsets1Alloc = 0;
+        -:  396:// 	  int iInSet2Alloc = 0;
+        -:  397:// 	  iMesh_getAdjEntities(instance,  apvSets[iSet], eEType,
+        -:  398:// 			       eETopo, eAdjType,
+        -:  399:// 			       &aAdjEnts, &iAdjEntsAlloc, &iNumAdjEnts,
+        -:  400:// 			       &aiOffsets1, &iOffsets1Alloc, &iNumOffsets1,
+        -:  401:// 			       &aiInSet2, &iInSet2Alloc, &iNumInSet2, &err);
+        -:  402:// 	  CHECK_ERR(err);
+        -:  403:	  
+        -:  404:// 	  iBase_EntityHandle *aVerts;
+        -:  405:// 	  int * aiOffsets2;
+        -:  406:// 	  if ( eAdjType == iBase_VERTEX ) {
+        -:  407:// 	    aVerts = aAdjEnts;
+        -:  408:// 	    iNumVerts = iNumAdjEnts;
+        -:  409:// 	  }
+        -:  410:// 	  else {
+        -:  411:// 	    int iVertsAlloc = 0;
+        -:  412:// 	    int iOffsets2Alloc = 0;
+        -:  413:// 	    iMesh_getEntArrAdj(instance,  aAdjEnts, iNumAdjEnts, iBase_VERTEX,
+        -:  414:// 			       &aVerts, &iVertsAlloc, &iNumVerts,
+        -:  415:// 			       &aiOffsets2, &iOffsets2Alloc, &iNumOffsets2,
+        -:  416:// 			       &err);
+        -:  417:// 	    CHECK_ERR(err);
+        -:  418:// 	  }
+        -:  419:// 	  double * adCoords;
+        -:  420:// 	  SOTemp = iBase_BLOCKED;
+        -:  421:// 	  int iCoordsAlloc = 0;
+        -:  422:// 	  iMesh_getVtxArrCoords(instance,  aVerts, iNumVerts, SOTemp,
+        -:  423:// 				&adCoords, &iCoordsAlloc, &iNumCoords, &err);
+        -:  424:// 	  CHECK_ERR(err);
+        -:  425:// 	  qStorCons = qStorCons && ( SOTemp == SODefault );
+        -:  426:	  
+        -:  427:	  
+        -:  428:// 	  int * aiOffsets3, *aiIndices;
+        -:  429:// 	  int * aiTopologies;
+        -:  430:// 	  int iOffsets3Alloc = 0;
+        -:  431:// 	  int iIndicesAlloc = 0;
+        -:  432:// 	  int iTopologiesAlloc = 0;
+        -:  433:// 	  iMesh_getVtxCoordIndex(instance,  apvSets[iSet], eEType, eETopo,
+        -:  434:// 				 eAdjType,
+        -:  435:// 				 &aiOffsets3, &iOffsets3Alloc, &iNumOffsets3,
+        -:  436:// 				 &aiIndices, &iIndicesAlloc, &iNumIndices,
+        -:  437:// 				 &aiTopologies, &iTopologiesAlloc,
+        -:  438:// 				 &iNumTopologies, &err);
+        -:  439:// 	  CHECK_ERR(err);
+        -:  440:// 	  if ( iNumTopologies == iNumAdjEnts ) {
+        -:  441:// 	    for ( i = 0; i < iNumAdjEnts; i++ ) {
+        -:  442:// 	      int iTopo;
+        -:  443:// 	      iMesh_getEntTopo(instance, aAdjEnts[i], &iTopo, &err);
+        -:  444:// 	      CHECK_ERR(err);
+        -:  445:// 	      qToposCons = qToposCons && ( aiTopologies[(i)] == iTopo );
+        -:  446:// 	    }
+        -:  447:// 	  }
+        -:  448:// 	  else {
+        -:  449:// 	    qToposCons = false;
+        -:  450:// 	  }
+        -:  451:// 	  if ( (iNumOffsets3 == iNumAdjEnts+1 ) &&
+        -:  452:// 	       (iNumVerts == iNumIndices) &&
+        -:  453:// 	       (iNumCoords == iGeoDim*iNumVerts) ) {
+        -:  454:// 	    if ( SOTemp == iBase_BLOCKED )
+        -:  455:// 	      cout << "\nUsing blocked storage order...";
+        -:  456:// 	    int iBegin = 0;
+        -:  457:// 	    for ( i = 0; i < iNumAdjEnts && qCoordsCons; i++ ) {
+        -:  458:// 	      if ( aiInSet2[i] == 1 ) {
+        -:  459:// 		for ( int j = aiOffsets3[i]; j < aiOffsets3[i+1]; j++ ) {
+        -:  460:// 		  int iCurrInd = iGeoDim*aiIndices[j];
+        -:  461:// 		  iBegin = iGeoDim*j;
+        -:  462:// 		  qCoordsCons = qCoordsCons
+        -:  463:// 		    && ( adCoords[iBegin] == adAllCoords[iCurrInd] )
+        -:  464:// 		    && ( adCoords[iBegin+1] == adAllCoords[iCurrInd+1] );
+        -:  465:// 		  if ( iGeoDim == 3 )
+        -:  466:// 		    qCoordsCons = qCoordsCons
+        -:  467:// 		      && ( adCoords[iBegin+2] == adAllCoords[iCurrInd+2] );
+        -:  468:// 		  int iIsCont;
+        -:  469:// 		  iMesh_isEntContained(instance, apvSets[iSet], aVerts[j],
+        -:  470:// 				       &iIsCont, &err);
+        -:  471:// 		  CHECK_ERR(err);
+        -:  472:// 		  qInCons = qInCons
+        -:  473:// 		    && ( aiInSet1[iCurrInd/iGeoDim] == iIsCont );
+        -:  474:// 		}
+        -:  475:// 	      }
+        -:  476:// 	      else {
+        -:  477:// 		int iIsCont;
+        -:  478:// 		iMesh_isEntContained(instance, apvSets[iSet], aAdjEnts[i],
+        -:  479:// 				     &iIsCont, &err);
+        -:  480:// 		CHECK_ERR(err);
+        -:  481:// 		qInCons = qInCons && ( !iIsCont );
+        -:  482:// 	      }
+        -:  483:// 	    } // Done looping over adjacent ents
+        -:  484:// 	  } // Done with if (sizes are okay) ...
+        -:  485:// 	  else {
+        -:  486:// 	    qCoordsCons = false;
+        -:  487:// 	  }
+        -:  488:// 	} // Loop over adjacent types
+        -:  489://       } // Loop over topos
+        -:  490://     } // Loop over types
+        -:  491://     TEST ( qCoordsCons );
+        -:  492://     TEST ( qInCons );
+        -:  493://     TEST ( qToposCons );
+        -:  494://   } // Loop over sets
+        -:  495://   TEST ( qStorCons );
+        -:  496://   cout << "DONE\n";
+        -:  497:
+        1:  498:  if ( qErrTests ) {
+        1:  499:    cout << "Testing error throwing...                                 ";
+        -:  500:    // Error throwing tests simply try to create a situation where the interface
+        -:  501:    // should, according to the spec, throw an error, and verify that:
+        -:  502:    // (a) an error is thrown, and (b) the error is the one expected.
+        -:  503:    // If an error is not thrown, the reversal of the action is attempted, if
+        -:  504:    // it would interfere with further tests.
+        -:  505:
+        -:  506:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -:  507:    // entity as an entity set or vice versa, etc., but sometimes try more
+        -:  508:    // difficult tests such as passing in a pointer to character data as an
+        -:  509:    // entity handle.
+        -:  510:
+        -:  511:    int iDum;
+        -:  512:    //  Getting number of type for invalid entity type
+        1:  513:    iMesh_getNumOfType(instance,  apvSets[0], iBase_ALL_TYPES+1, &iDum, &err);
+        1:  514:    CHECK_ERR2(err, iBase_INVALID_ENTITY_TYPE);
+        -:  515:
+        -:  516:    // Getting number of topology for invalid entity topology
+        1:  517:    iMesh_getNumOfTopo(instance,  apvSets[0], iMesh_ALL_TOPOLOGIES+1, &iDum, &err);
+        1:  518:    CHECK_ERR2(err, iBase_INVALID_ENTITY_TOPOLOGY);
+        -:  519:
+        1:  520:    cout << "DONE\n";
+        -:  521:  }
+        -:  522:
+        6:  523:  for ( i=0; i<5; i++ ) {
+        5:  524:    iMesh_destroyEntSet(instance,  apvSets[i], &err);
+        5:  525:    CHECK_ERR(err);
+        -:  526:  }
+        2:  527:}

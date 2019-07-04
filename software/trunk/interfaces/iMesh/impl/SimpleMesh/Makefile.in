@@ -1,0 +1,175 @@
+.SILENT:
+
+TSTT_VERSION=0.7
+
+ROOT=@IMPL_ROOT@
+REPOS_ROOT=$(ROOT)/repos
+
+BACKEND_DIRS=@BACKEND_DIRS@
+
+BABEL=@BABEL@ --suppress-timestamp
+
+@SET_MAKE@
+
+EXTERNAL_PACKAGES=@EXTERNAL_PACKAGES@
+BUILD_INTERFACES=@BUILD_INTERFACES@
+
+all:
+	for i in $(BUILD_INTERFACES) ; do \
+	  $(MAKE) ${REPOS_ROOT}/$$i/$$i-v${TSTT_VERSION}.xml ; \
+	  if (test -d "$$i") ; then \
+	    $(MAKE) $${i}/Makefile $${i}/$${i}.sidl ; \
+	    (cd $$i && $(MAKE) server/babel.make) ; \
+	  fi ; \
+	  if (test -d "$${i}_@IMPL_NAME@") ; then \
+	    $(MAKE) $${i}_@IMPL_NAME@/Makefile ; \
+	    (cd $${i}_@IMPL_NAME@ && $(MAKE) server/babel.make) ; \
+	  fi \
+	done
+	echo "Building all server and client libraries..."
+	for i in $(EXTERNAL_PACKAGES) ; do \
+	  (cd $$i && $(MAKE) $(TARGET)) ; \
+	done
+	$(MAKE) TARGET=all recurse
+
+clean:
+	-rm -f  conf/config.log
+	$(MAKE) TARGET=clean recurse
+
+SIDL_FILE_COPIES=TSTTB/TSTTB.sidl TSTTF/TSTTF.sidl TSTTG/TSTTG.sidl \
+TSTTM/TSTTM.sidl TSTTR/TSTTR.sidl
+
+distclean:
+	$(MAKE) TARGET=distclean recurse
+	-rm -f Makefile @TSTT_DEF_FILES@ *~ config.* 
+	-rm -f conf/Makefile-client conf/Makefile-server-inc conf/Makefile-package
+	-rm -f $(SIDL_FILE_COPIES)
+	-rm -rf $(REPOS_ROOT) autom4te.cache
+
+interface:
+	for i in $(SUBDIRS) ; do \
+	  $(MAKE) $${i}/Makefile ; \
+	  (cd $$i && $(MAKE) $(TARGET)) ; \
+	done
+
+tsttb:
+	$(MAKE) SUBDIRS="TSTTB" TARGET=all interface
+
+INSTALL=@INSTALL@
+
+tsttb-install:
+	$(MAKE) SUBDIRS="TSTTB" TARGET=install interface
+	@INSTALL_DATA@ TSTTB.sidl $(INSTALL_SHARE)/TSTT
+	@INSTALL_DATA@ TSTTB-Defs.inc $(INSTALL_INCLUDE)/TSTT
+
+tsttf:
+	$(MAKE) SUBDIRS="TSTTF TSTTF_@IMPL_NAME@" TARGET=all interface
+
+tsttf-install:
+	$(MAKE) SUBDIRS="TSTTF TSTTF_@IMPL_NAME@" TARGET=install interface
+	@INSTALL_DATA@ TSTTF.sidl $(INSTALL_SHARE)/TSTT
+	@INSTALL_DATA@ TSTTF-Defs.inc $(INSTALL_INCLUDE)/TSTT
+
+tsttg:
+	$(MAKE) SUBDIRS="TSTTG TSTTG_@IMPL_NAME@" TARGET=all interface
+
+tsttg-install:
+	$(MAKE) SUBDIRS="TSTTG TSTTG_@IMPL_NAME@" TARGET=install interface
+	@INSTALL_DATA@ TSTTG.sidl $(INSTALL_SHARE)/TSTT
+	@INSTALL_DATA@ TSTTG-Defs.inc $(INSTALL_INCLUDE)/TSTT
+
+tsttm:
+	$(MAKE) SUBDIRS="TSTTM TSTTM_@IMPL_NAME@" TARGET=all interface
+
+tsttm-install:
+	$(MAKE) SUBDIRS="TSTTM TSTTM_@IMPL_NAME@" TARGET=install interface
+	@INSTALL_DATA@ TSTTM.sidl $(INSTALL_SHARE)/TSTT
+	@INSTALL_DATA@ TSTTM-Defs.inc $(INSTALL_INCLUDE)/TSTT
+
+tsttr:
+	$(MAKE) SUBDIRS="TSTTR TSTTR_@IMPL_NAME@" TARGET=all interface
+
+tsttr-install:
+	$(MAKE) SUBDIRS="TSTTR TSTTR_@IMPL_NAME@" TARGET=install interface
+	@INSTALL_DATA@ TSTTR.sidl $(INSTALL_SHARE)/TSTT
+	@INSTALL_DATA@ TSTTR-Defs.inc $(INSTALL_INCLUDE)/TSTT
+
+${REPOS_ROOT}/TSTTB/TSTTB-v${TSTT_VERSION}.xml: TSTTB.sidl
+	echo "Creating Babel repository for TSTTB"
+	$(BABEL) --text XML -o $(REPOS_ROOT)/TSTTB TSTTB.sidl
+	touch $@
+
+$(REPOS_ROOT)/TSTTG/TSTTG-v$(TSTT_VERSION).xml: TSTTG.sidl
+	echo "Creating Babel repository for TSTTG"
+	$(BABEL) --text XML -R $(REPOS_ROOT)/TSTTB -o $(REPOS_ROOT)/TSTTG TSTTG.sidl
+	touch $@
+
+$(REPOS_ROOT)/TSTTF/TSTTF-v$(TSTT_VERSION).xml: TSTTF.sidl
+	echo "Creating Babel repository for TSTTF"
+	$(BABEL) --text XML -R $(REPOS_ROOT)/TSTTB -o $(REPOS_ROOT)/TSTTF TSTTF.sidl
+	touch $@
+
+$(REPOS_ROOT)/TSTTM/TSTTM-v$(TSTT_VERSION).xml: TSTTM.sidl
+	echo "Creating Babel repository for TSTTM"
+	$(BABEL) --text XML -R $(REPOS_ROOT)/TSTTB -o $(REPOS_ROOT)/TSTTM TSTTM.sidl
+	touch $@
+
+$(REPOS_ROOT)/TSTTR/TSTTR-v$(TSTT_VERSION).xml: TSTTR.sidl
+	echo "Creating Babel repository for TSTTR"
+	$(BABEL) --text XML -R $(REPOS_ROOT)/TSTTB -o $(REPOS_ROOT)TSTTR TSTTR.sidl
+	touch $@
+
+recurse:
+	(cd $(BACKEND_DIRS) && $(MAKE) $(TARGET))
+	for i in $(BUILD_INTERFACES) ; do \
+	  if (test -f "$$i/Makefile") ; then \
+	    (cd $$i && $(MAKE) $(TARGET)) ; \
+	  fi ; \
+	  if (test -f "$${i}_@IMPL_NAME@/Makefile") ; then \
+	    (cd $${i}_@IMPL_NAME@ && $(MAKE) $(TARGET)) ; \
+	  fi \
+	done
+
+maintainer-clean:
+	$(MAKE) distclean
+	-rm -rf $(EXTERNAL_PACKAGES)
+
+INSTALL_SHARE=@prefix@/share
+INSTALL_INCLUDE=@prefix@/include
+INSTALL_LIB=@prefix@/lib
+
+install:
+	-mkdir -p $(INSTALL_SHARE)/TSTT $(INSTALL_INCLUDE)/TSTT $(INSTALL_LIB)
+	@INSTALL_DATA@ TSTT*.sidl TSTT?-Defs.inc $(INSTALL_SHARE)/TSTT
+	for i in $(BUILD_INTERFACES) ; do \
+	  if (test -f "$$i/Makefile") ; then \
+	    (cd $$i && $(MAKE) install) ; \
+	  fi ; \
+	  if (test -f "$${i}_@IMPL_NAME@/Makefile") ; then \
+	    (cd $${i}_@IMPL_NAME@ && $(MAKE) install) ; \
+	  fi \
+	done
+
+TSTTB/Makefile \
+TSTTF/Makefile TSTTF_@IMPL_NAME@/Makefile \
+TSTTG/Makefile TSTTG_@IMPL_NAME@/Makefile \
+TSTTM/Makefile TSTTM_@IMPL_NAME@/Makefile \
+TSTTR/Makefile TSTTR_@IMPL_NAME@/Makefile \
+: conf/Makefile-package
+	cp conf/Makefile-package $@
+
+TSTTB/TSTTB.sidl: TSTTB.sidl
+	cp TSTTB.sidl TSTTB
+
+TSTTF/TSTTF.sidl: TSTTF.sidl
+	cp TSTTF.sidl TSTTF
+
+TSTTG/TSTTG.sidl: TSTTG.sidl
+	cp TSTTG.sidl TSTTG
+
+TSTTM/TSTTM.sidl: TSTTM.sidl
+	cp TSTTM.sidl TSTTM
+
+TSTTR/TSTTR.sidl: TSTTR.sidl
+	cp TSTTR.sidl TSTTR
+

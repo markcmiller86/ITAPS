@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Dynamic Parallel Data Services</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>Dynamic Parallel Data Services</h1>
+<p>
+Dynamic parallel data services, such as parallel partitioning, dynamic
+load balancing, data migration, unstructured communication maps, and
+geometrically-based processor searches, are crucial to petascale performance of
+mesh-based simulations.
+For example, with adaptive mesh refinement, processor
+workloads change as elements are added and deleted;
+dynamic load balancing and data migration are needed to redistribute
+work after 
+adaptation. 
+Our experiments on the IBM BG/L have shown that even
+differences of 5-10% between the maximum and average processor
+workloads can lead to dramatic losses of scalability in applications.
+Similarly, unstructured communication maps and
+geometrically-based processor searches are key components of solution
+transfer schemes.  Although many frameworks implement 
+these services internally, their implementations are data-structure 
+specific, preventing interoperability with components not in the frameworks. 
+We are developing
+dynamic services that work through the ITAPS interfaces, allowing them
+to be used easily by SciDAC applications.
+
+<p>
+In particular, we have adopted the Zoltan Dynamic Load-Balancing
+toolkit to provide load balancing services to ITAPS applications such
+as accelerator design, subsurface transport, and climate modeling.
+Zoltan contains a suite of parallel dynamic
+load-balancing methods, including geometric, graph-based, and
+hypergraph-based algorithms as well as interfaces to the popular
+graph-partitioning packages PT-Scotch and
+ParMETIS.  In SciDAC-2, we have extended Zoltan's
+capabilities by developing a mesh-based service using the ITAPS iMesh
+and iMeshP interfaces.  Our new dynamic service, iZoltan, allows iMesh
+and iMeshP implementations to easily compute new mesh distributions,
+migrate entities to new parts, and update iMeshP part and partition
+information.  We have demonstrated the effectiveness and
+interoperability of our serial partitioning capability using the iMesh
+interfaces to FMDB, MOAB, and GRUMMP; our parallel capabilities have
+been tested and adopted in FMDB. Zoltan is open-source and is widely
+used in the national laboratories, academia, and industry, with over
+1800 downloads since 2001.
+<p>
+Going forward, we will extend iZoltan's capabilities to handle
+arbitrary partition objects (for specialized cases such as boundary
+layers), user-specified partition entities and adjacencies, and
+hierarchical partitioning for large number of parts and processors.
+In collaboration with the CSCAPES Institute, we will also
+incorporate and extend the petascale partitioning techniques developed
+under ITAPS.
+	</div>
+</div>
+
+</body>
+</html>

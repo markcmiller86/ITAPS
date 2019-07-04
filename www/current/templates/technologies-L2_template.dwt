@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="description" content="Your description goes here." />
+<meta name="keywords" content="your,keywords,goes,here" />
+<meta name="author" content="KEYWORD OPEN PARAGRAPH" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+<!-- TemplateParam name="bodyID" type="text" value="default" -->
+<!-- TemplateParam name="bodyClass" type="text" value="" -->
+</head>
+
+<body class="@@(_document['bodyClass'])@@">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="../technologies/research/index.html">Research</a><span class="hide"> | </span>
+<a class="nav" href="../technologies/results/index.html">Scaling Results</a><span class="hide"> | </span>
+
+</p>
+
+
+</div>
+
+<div id="rightside">
+  <!--#include virtual="/assets/inc/rCol_technologies.html" -->
+</div>
+
+<div id="content"><!-- TemplateBeginEditable name="content" -->
+  <h1>Interoperable Technologies for Advanced Petascale Simulations (ITAPS)</h1>
+  <img src="../assets/images/Lori-Diachin.jpg" height="165" width="130" alt="Thumbnail example" />
+  <p>The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in  the <a href="http://www.energy.gov/">Department of Energy's</a> <a href="http://www.scidac.gov/">Scientific Discovery through Advanced Computing (SciDAC)</a> program.</p>
+  <p>Many applications need advanced software tools to manage the complexities associated with sophisticated geometry, mesh, and field manipulation tasks, particularly as computer architectures move toward the petascale. The Center for Interoperable Technologies for Advanced Petascale Simulations (ITAPS) will deliver interoperable and interchangeable mesh, geometry, and field manipulation services that are of direct use to scientific applications. The premise of our technology development goal is that such services can be provided as libraries that can be used with minimal intrusion into application codes. Through SciDAC funding, the ITAPS team is developing and deploying a number of advanced technologies including front tracking, mesh quality improvement via smoothing and swapping, adaptive mesh refinement (AMR), and dynamic load balancing that are used by application scientists and provide ample evidence of the viability of this approach. </p>
+  <p>To allow applications easy use of all ITAPS tools and to create interoperability among those tools, we have defined common interfaces that provide data-structure neutral access to mesh, geometry, and field information. Using these technologies we are working with application scientists to develop the next generation of petascale simulation codes. In particular, we are collaborating with domain scientists interested in accelerator modeling, fusion, nuclear energy, subsurface flow, blood flow, wind energy, to name a few. </p>
+  <p></p>
+<div class="clearingdiv"></div>
+<!-- TemplateEndEditable -->
+
+
+
+
+</div>
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+</html>

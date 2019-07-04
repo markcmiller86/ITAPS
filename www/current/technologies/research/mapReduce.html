@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-research_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResearch pageMapReduce" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResearch pageMapReduce">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="index.html" id="linkIndex">Research</a><span class="hide"> | </span>
+<a class="nav sub" href="partition.html" id="linkPartition">Partition Improvement</a><span class="hide"> | </span>
+<a class="nav sub" href="predictiveLoad.html" id="linkPredictiveLoad">Predictive Load Balance</a><span class="hide"> | </span>
+<a class="nav sub" href="commLib.html" id="linkCommLib">Communication Libraries</a><span class="hide"> | </span>
+<a class="nav sub" href="mapReduce.html" id="linkMapReduce">MapReduce Experiments</a><span class="hide"> | </span>
+<a class="nav" href="../results/index.html">Scaling Results</a>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+ <h1>MapReduce and Transaction-Based Computing Experiments</h1>
+<p>Given the current trend toward computer systems that provide petascale computing capabilities composed of hundreds of thousands to millions of processing elements, we have to ask the question, &#8220;Is continuing to 24 scale our traditional approaches to parallel computing going to let us take advantage of these new architectures?&#8221;. One of the major issues facing the community with so many processing elements has to do with the recovery of user application codes after CPU, communication, and I/O related failures. Over the past twenty years there has been considerable effort put into the design of "state recovery" at both the system and user code level that allows applications to back up and restart at a point before the failure. </p>
+
+<p>Since the Cray machines in the mid-80&#8217;s, these attempts have not been effective or successful, and as systems get larger, the problem becomes more difficult. To address this, the ITAPS team is researching the redesign of mesh-based computational algorithms so that they are inherently tolerant to component failure. Our approach leverages transaction-based parallel computing techniques using a MapReduce formulation within a Hadoop framework. </p>
+
+<p>The MapReduce approach works by decomposing algorithms into a series of map and reduce phases that input (key,value) pairs and output new (key, value) lists. Hadoop is an open source implementation of MapReduce based on Google's description of how they use MapReduce for indexing the web and internet searches. One of the major advantages of the MapReduce paradigm is that it is inherently tolerant to failures of CPU, communication, and I/O subsystems through the creative use of redundant computational and storage strategies. Within ITAPS, we have been exploring MapReduce using Hadoop to generate computational kernels designed to operate on mesh data (vertices, edges, and regions). These kernels form the basis of mesh-based PDE operations that perform volume, gradient, and divergence calculations. 
+The results of these calculations are used to advance the solution from one time level to the next.</p>
+<div class="imgContainer fLeft" style="width: 400px;">
+    <a href="../../assets/images/plumeCalculation_full.jpg" rel="lightbox">
+	<img src="../../assets/images/plumeCalculation_mini.jpg" width="400" height="115" alt="parallel isotropic mesh" />
+    </a>
+    <p>Figure: The left image (a) is an example plume calculation run using a Hadoop MapReduce implementation; the middle image (b) shows the execution time for mesh problems ranging from 10 million to 100 million elements on a Dual XPS laptop computer, the right image (c) shows the execution time to run the Map (red) and the Reduce (green) phases of a calculation for a 10 million element mesh.</p>
+</div>
+
+<p>Besides fault-tolerance, one of the advantages of a MapReduce/Hadoop infrastructure is its ability to run and scale to very large problem sizes. This capability is highly scalable from high-performance supercomputers down to laptops. For example, when using the PNNL Chinook supercomputer ( 18K processing elements), with a high-performance Luster file system attached, Hadoop has been shown to scale well when running a seismic wave calculation with 500 billion elements (Figure 12 (a)). Figure 12 (b) shows the timings for a series of calculations that were run on a Dell XPS laptop (dual core, 8GBytes of memory). The problem sizes ranged from 10 million to 100 million tetrahedral elements. The scaling is relatively linear throughout this range of problem sizes. Figure 12 (c) shows a breakout of the execution time for the Map and Reduce phases of a mesh calculation. For efficient parallel computing it is important to be able to overlap various phases of calculations to minimize the latency; this plot show that the Hadoop implementation of MapReduce has that feature built into the framework.</p>
+</p>
+
+<p class="clear">&nbsp;</p>
+
+
+
+
+
+
+
+ 
+ 
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

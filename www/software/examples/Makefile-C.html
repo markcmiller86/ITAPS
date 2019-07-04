@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+  <title>Simple Example (C specification)</title>
+  <link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+	<link type="text/css" rel="stylesheet" href="/templates/software.css" />
+</head>
+<body style="color: rgb(0, 0, 0); "
+ alink="#000099" link="#000099" vlink="#990099">
+<div id="container">
+<div id="banner"><img alt="ITAPS" src="../../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+<h1>Simple Example (C specification)</h1>
+<!--#include virtual="/templates/specification.html"-->
+
+<h2>Hello Mesh in C</h2>
+
+#include <iostream><br>
+#include "iMesh.h" <br>
+<br><br>
+int main( int argc, char *argv[] ) <br>
+{<br>
+    // create the Mesh instance<br>
+  char *options = NULL;<br>
+  iMesh_Instance mesh;<br>
+  int ierr, options_len = 0;<br>
+  iMesh_newMesh(options, &mesh, &ierr, <br>
+                options_len);<br>
+  <br><br>
+    // load the mesh<br>
+  iMesh_load(mesh, argv[1], options, &ierr, <br>
+             strlen(argv[1]), options_len);<br>
+<br><br>
+    // report the number of elements of each dimension<br>
+  for (int dim = iBase_VERTEX; dim <= iBase_REGION; dim++) {<br>
+    int numd;<br>
+    iMesh_getNumOfType(mesh, 0, dim, &numd, &ierr);<br>
+    std::cout << "Number of " << dim << "d elements = " <br>
+              << numd << std::endl;<br>
+  }<br>
+  return true;}<br>
+<br><br>
+
+<h2>The Makefile</h2>
+
+Applications will have a file called iMesh-Defs.inc which can be included in a 
+makfile and which provides the following variables:
+
+<ul>
+<li>
+iMesh_DIR: the path to the iMesh implementation root.  Mostly for
+defining other variables.  This could be the only variable that
+configure needs to touch?
+</li>
+
+<li>
+iMesh_LIBS: everything you need to link to this iMesh implementation,
+including both -L and -l args to the linker.   This should specifically
+include any backend or auxiliary libraries.
+</li>
+
+<li>
+iMesh_INCLUDES: path for iMesh include files (including any trailing
+/iMesh, if needed.
+</li>
+
+</li>
+iMesh_DEPS: key files that, if changed, should cause the app to re-link.
+  This may be more of an implementation developer convenience than
+anything else.
+</li>
+</ul>
+
+For example: <br><br>
+include ../../iMesh-Defs.inc
+<br><br>
+HELLOiMesh: HELLOiMesh.o  ${iMesh_DEPS} <br>
+$(CXX)  $(CXXFLAGS) -o $@ HELLOiMesh.o ${iMesh_LIBS}
+<br><br>
+.cpp.o:<br>
+${CXX} -c ${CXXFLAGS} ${iMesh_INCLUDES} $<
+<br><br>

@@ -1,0 +1,82 @@
+.SILENT:
+.SUFFIXES: .cxx
+include @IMPL_ROOT@/iBase-Defs.inc
+
+PWD=$(shell pwd)
+PACKAGE_NAME=$(shell basename ${PWD})
+
+include @IMPL_ROOT@/$(PACKAGE_NAME)-Defs.inc
+
+ALL_INCLUDES=$(INCLUDES) -I. $(IMESH_INCLUDES) $(IMESH_BACKEND_INCLUDES)
+
+CXX=@CXX@
+CC=@CC@
+CFLAGS=@CFLAGS@ $(ALL_INCLUDES)
+CXXFLAGS=@CXXFLAGS@ $(ALL_INCLUDES)
+CPPFLAGS=@CPPFLAGS@ $(ALL_INCLUDES) 
+# Yes, Virginia, make and autoconf disagree about the variable names.
+FC=@F77@
+F90=@FC@
+FFLAGS=@FFLAGS@
+F90FLAGS=@FCFLAGS@
+
+.cxx.o:
+	echo Compiling $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+
+.cc.o:
+	echo Compiling $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $<
+
+.c.o:
+	echo Compiling $<
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $<
+
+.F90.o:
+	echo Compiling $<
+	$(F90) $(F90FLAGS) $(CPPFLAGS) -c $<
+
+.f90.o:
+	echo Compiling $<
+	$(F90) $(F90FLAGS) -c $<
+
+.F.o:
+	echo Compiling $<
+	$(FC) $(FFLAGS) $(CPPFLAGS) -c $<
+
+.f.o:
+	echo Compiling $<
+	$(FC) $(FFLAGS) -c $<
+
+STATIC_LIB=lib${PACKAGE_NAME}_@IMPL_NAME@.a
+SHARED_LIB=lib${PACKAGE_NAME}_@IMPL_NAME@.so
+
+all: $(STATIC_LIB) $(SHARED_LIB)
+
+$(STATIC_LIB): $(INTERNAL_OBJS)
+	if (test "$(INTERNAL_OBJS)" != "") ; then \
+	  echo Creating static library for $(PACKAGE_NAME) server...; \
+	  @AR_STATIC@ $@ $(INTERNAL_OBJS); \
+	fi
+
+$(SHARED_LIB): $(INTERNAL_OBJS)
+	if (test "$(INTERNAL_OBJS)" != "") ; then \
+	  echo Creating shared library for $(PACKAGE_NAME) server...; \
+	  @AR_SHARED_CXX@ $@ $(INTERNAL_OBJS); \
+	fi
+
+clean: 
+	-rm -f *.o *~
+
+distclean: clean
+	-rm -f Makefile Makefile.bak $(STATIC_LIB) $(SHARED_LIB)
+
+INSTALL=@INSTALL@
+install:
+	-mkdir -p @prefix@/include/ITAPS @prefix@/lib/ITAPS
+	if (test "$(PACKAGE_NAME)" != "iBase") ; then \
+	  @INSTALL@ $(STATIC_LIB) $(SHARED_LIB) @prefix@/lib/ITAPS ; \
+	fi
+	@INSTALL_DATA@ $(PACKAGE_NAME).h @prefix@/include/ITAPS
+
+

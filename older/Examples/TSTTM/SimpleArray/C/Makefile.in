@@ -1,0 +1,29 @@
+.SILENT:
+
+include @TSTTB_ROOT@/TSTTB-Defs.inc
+include @TSTTM_ROOT@/TSTTM-Defs.inc
+
+INCLUDES = $(TSTTB_SERVER_INCLUDES) $(TSTTM_SERVER_INCLUDES) \
+	   $(TSTTM_BACKEND_INCLUDES) $(SIDL_INCLUDES) \
+	   $(TSTTB_CLIENT_C_INCLUDES) $(TSTTM_CLIENT_C_INCLUDES)
+LIBS = $(TSTTM_SERVER_LIBS) $(TSTTB_SERVER_LIBS) \
+	$(TSTTM_BACKEND_LIBS) $(TSTTM_CLIENT_C_LIBS) $(TSTTB_CLIENT_C_LIBS) \
+	$(TSTTM_CLIENT_CXX_LIBS) $(TSTTB_CLIENT_CXX_LIBS)\
+	$(SIDL_LIBS)
+
+C_OBJS = array_example.o 
+
+all: array_example
+
+hello_mesh: $(C_OBJS)
+	gcc $(C_OBJS) -o $@ $(LIBS)
+
+clean:
+	rm -rf *.o *~
+
+distclean:
+	rm -rf *.o *~ hello_mesh
+
+.c.o:
+	echo Compiling *.c
+	gcc $(INCLUDES) -c $< 

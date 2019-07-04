@@ -1,0 +1,13 @@
+--2013-01-21 17:29:06--  https://redmine.scorec.rpi.edu/anonsvn/itaps/software/trunk/interfaces/iMesh/spec/iMesh.h
+Resolving redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)... 128.113.131.53, 2620:0:2820:4108:80::53
+Connecting to redmine.scorec.rpi.edu (redmine.scorec.rpi.edu)|128.113.131.53|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 122516 (120K) [text/plain]
+Saving to: `iMesh.h.4'
+
+     0K .......... .......... .......... .......... .......... 41%  488K 0s
+    50K .......... .......... .......... .......... .......... 83%  624K 0s
+   100K .......... .........                                  100% 64.3M=0.2s
+
+2013-01-21 17:29:10 (654 KB/s) - `iMesh.h.4' saved [122516/122516]
+

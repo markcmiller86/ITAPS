@@ -1,0 +1,1804 @@
+        -:    0:Source:iMesh_unitTest.cc
+        -:    0:Programs:15
+        -:    1://@ File header
+        -:    2:
+        -:    3:#ifndef CREATE_ARG
+        -:    4:#define CREATE_ARG ""
+        -:    5:#endif
+        -:    6:
+        -:    7:// This file is intended to test functionality of a iMesh implementation.
+        -:    8:// Mesh query, modification, iterators, entity sets, and tags are all
+        -:    9:// tested.  In cases where it's practical to define a priori a correct
+        -:   10:// result for a query, that is done.  In other cases, consistency is the
+        -:   11:// only thing checked.  In still others, the only possible correctness
+        -:   12:// check is that the function took correct input and didn't choke
+        -:   13:// (things like getAdjTable or getGeometricDim, for instance).
+        -:   14:
+        -:   15:// It is worth noting that, although efforts have been made to make each
+        -:   16:// test as independent as possible, it is unavoidable that a failure
+        -:   17:// during one test may cause failures in subsequent tests, sometimes
+        -:   18:// even across different interface tests.  In light of this, it is best
+        -:   19:// to try to correct errors in the order they occur, or at least to
+        -:   20:// exclude interface tests that cause errors to see if later errors are
+        -:   21:// avoided.
+        -:   22:
+        -:   23:// Modifications:
+        -:   24://    Mark C. Miller, Thu Aug 12 09:53:51 PDT 2010
+        -:   25://    Added Save/Load option and randomly sprinkled DoSaveLoad calls
+        -:   26://    throughout the tests to provide a means to ensure relevant
+        -:   27://    state is preserved across _save and _load operations.
+        -:   28://
+        -:   29://    Mark C. Miller, Mon Aug 16 09:37:27 PDT 2010
+        -:   30://    Deal with fact that iMesh_unitTest maintains a handle on the
+        -:   31://    root set and that may need to change during Save/Load. So, it
+        -:   32://    was added to vDoSaveLoad arglist.
+        -:   33://
+        -:   34://    Mark C. Miller, Wed Dec  1 09:51:42 PST 2010
+        -:   35://    Replaced use of '/tmp' with a directory in . named with pid
+        -:   36://    of process. Note that if iMesh_unitTest does not exit 'normally'
+        -:   37://    the resulting temporary directories can be left around.
+        -:   38://
+        -:   39://    Mark C. Miller, Wed Dec  8 00:01:49 PST 2010
+        -:   40://    Turn off save-load-clean if we are not even doing save-load.
+        -:   41:
+        -:   42:#define MAIN_PROGRAM
+        -:   43:#include "iMesh_unitTest.hh"
+        -:   44:#include <dirent.h>
+        -:   45:#include <errno.h>
+        -:   46:#include <limits>
+        -:   47:#include <sys/types.h>
+        -:   48:#include <sys/stat.h>
+        -:   49:#include <string.h>
+        -:   50:#include <unistd.h>
+        -:   51:#include <vector>
+        -:   52:
+        -:   53:static char TMPDIR[64];
+        -:   54:
+    #####:   55:void qFailed()
+        -:   56:{
+    #####:   57:    iNFailed++;
+    #####:   58:}
+        -:   59:
+        2:   60:void qIssueLoadMessage(const char *filename, int err)
+        -:   61:{
+        2:   62:    if (err == iBase_SUCCESS)
+        -:   63:        return;
+        -:   64:
+        -:   65:    cout << endl;
+    #####:   66:    cout << "Unable to load file \"" << filename << "\"" << endl;
+        -:   67:    cout << endl;
+        -:   68:
+    #####:   69:    int len = strlen(filename);
+    #####:   70:    bool isVTK = false;
+        -:   71:
+    #####:   72:    if (filename[len-4] == '.' && filename[len-3] == 'v' &&
+    #####:   73:        filename[len-2] == 't' && filename[len-1] == 'k')
+    #####:   74:        isVTK = true;
+        -:   75:
+    #####:   76:    if (isVTK)
+        -:   77:    {
+        -:   78:        cout <<
+        -:   79:            "The file name extension suggests this is a VTK file.\n"
+        -:   80:            "For testing purposes, all 'compliant' implementations\n"
+        -:   81:            "are required to read VTK files. However, VTK files come\n"
+        -:   82:            "in many flavors and may contain a lot of optional things.\n"
+        -:   83:            "Therefore, for testing purposes, the flavor of VTK files\n"
+        -:   84:            "an iMesh implementation is required to be able to read is\n"
+        -:   85:            "constrained to the following:\n"
+        -:   86:            "   - Must be ASCII format\n"
+        -:   87:            "   - Must be DATASET UNSTRUCTURED_GRID\n"
+        -:   88:            "   - May NOT contain optional VTK data\n"
+        -:   89:            "   - Must be float data type\n"
+        -:   90:            "   - Must have >55 verticies and >10 elements\n"
+        -:   91:            "   - Must be 2D or 3D\n"
+        -:   92:            "   - For 3D: Must consist only of Tets, Pyrmaids, Prisms and/or Hexs\n"
+    #####:   93:            "   - For 2D: Must consist only of Triangles and/or Quads\n";
+        -:   94:        cout << endl;
+        -:   95:    }
+        -:   96:    else
+        -:   97:    {
+        -:   98:        cout <<
+        -:   99:            "The file name extension suggests this is NOT a VTK file.\n"
+        -:  100:            "Not all implementations read the same file formats.\n"
+        -:  101:            "You may wish to independently confirm that the iMesh\n"
+        -:  102:            "implementation you have linked to can indeed read this file.\n"
+        -:  103:            "In addition, also be aware that for purposes of testing\n"
+    #####:  104:            "the input mesh must have >55 vertices and >10 elements\n";
+        -:  105:        cout << endl;
+        -:  106:    }
+        -:  107:}
+        -:  108:
+       12:  109:bool qCheckNumOfType(iMesh_Instance instance,
+        -:  110:			   iBase_EntitySetHandle SH,
+        -:  111:			   int iType,
+        -:  112:			   int iNumEntsExpected)
+        -:  113:{
+        -:  114:  int err, iNumEnts;
+       12:  115:  iMesh_getNumOfType(instance, SH, iType, &iNumEnts, &err);
+       12:  116:  CHECK_ERR(err);
+       12:  117:  return (iNumEnts == iNumEntsExpected);
+        -:  118:}
+        -:  119:
+       33:  120:bool qCheckNumOfTopo(iMesh_Instance instance,
+        -:  121:			   iBase_EntitySetHandle SH,
+        -:  122:			   int iTopo,
+        -:  123:			   int iNumEntsExpected)
+        -:  124:{
+        -:  125:  int err, iNumEnts;
+       33:  126:  iMesh_getNumOfTopo(instance, SH, iTopo, &iNumEnts, &err);
+       33:  127:  CHECK_ERR(err);
+       33:  128:  return (iNumEnts == iNumEntsExpected);
+        -:  129:}
+        -:  130:
+       45:  131:void vCheckEntities(iMesh_Instance instance,
+        -:  132:			   iBase_EntitySetHandle SH,
+        -:  133:			   int iType, int iTopo,
+        -:  134:			   iBase_EntityHandle aEHExpected[],
+        -:  135:			   int iNumEntsExpected)
+        -:  136:{
+        -:  137:  int err;
+       45:  138:  iBase_EntityHandle *aGotEnts = NULL;
+        -:  139:  int iNumEnts;
+       45:  140:  int iGotEntsAlloc = 0;
+        -:  141:  iMesh_getEntities(instance, SH, iType, iTopo,
+       45:  142:		    &aGotEnts, &iGotEntsAlloc, &iNumEnts, &err);
+       45:  143:  CHECK_ERR(err);
+        -:  144:
+        -:  145:  int iIsList;
+       45:  146:  iMesh_isList(instance, SH, &iIsList, &err);
+       45:  147:  CHECK_ERR(err);
+        -:  148:
+        -:  149:  // This used to be the test:  did you get precisely the entities
+        -:  150:  // you expected?  Can't do this in the presence of save-load
+        -:  151:  // pairs.
+       45:  152:  if (!qSaveLoad) {
+    #####:  153:    bool qGotAllEnts = true;
+    #####:  154:    if (iNumEnts == iNumEntsExpected) {
+    #####:  155:      if (iIsList) {
+    #####:  156:	for (int ii = 0; ii < iNumEntsExpected; ii++) {
+    #####:  157:	  qGotAllEnts = qGotAllEnts && (aGotEnts[ii] == aEHExpected[ii]);
+        -:  158:	}
+        -:  159:      }
+        -:  160:      else {
+    #####:  161:	GOT_ALL_ITEMS( aEHExpected, aGotEnts, iNumEntsExpected, qGotAllEnts);
+        -:  162:      }
+        -:  163:    }
+    #####:  164:    TEST((iNumEnts == iNumEntsExpected) && qGotAllEnts);
+        -:  165:  }
+        -:  166:
+        -:  167:  // The following tests are weaker, but work even if you've done a
+        -:  168:  // save-load pair.
+       45:  169:  bool qTypesOK = true, qToposOK = true;
+       45:  170:  if (iType != iBase_ALL_TYPES) {
+        -:  171:    // No point in testing if anything will pass.
+       12:  172:    int *aiEType = NULL, type_alloc = 0, type_size;
+        -:  173:    iMesh_getEntArrType(instance, aGotEnts, iNumEnts,
+       12:  174:			&aiEType, &type_alloc, &type_size, &err);
+       12:  175:    qTypesOK = (iNumEnts == type_size);
+      102:  176:    for (int ii = 0; ii < type_size; ii++) {
+       90:  177:      qTypesOK = qTypesOK && (aiEType[ii] == iType);
+        -:  178:    }
+       12:  179:    UT_FREE(aiEType);
+        -:  180:  }
+       45:  181:  if (iTopo != iMesh_ALL_TOPOLOGIES) {
+        -:  182:    // No point in testing if anything will pass.
+       33:  183:    int *aiETopo = NULL, topo_alloc = 0, topo_size;
+        -:  184:    iMesh_getEntArrTopo(instance, aGotEnts, iNumEnts,
+       33:  185:			&aiETopo, &topo_alloc, &topo_size, &err);
+       33:  186:    qToposOK = (iNumEnts == topo_size);
+      488:  187:    for (int ii = 0; ii < topo_size; ii++) {
+      455:  188:      qToposOK = qToposOK && (aiETopo[ii] == iTopo);
+        -:  189:    }
+       33:  190:    UT_FREE(aiETopo);
+        -:  191:  }
+       45:  192:  UT_FREE(aGotEnts);
+        -:  193:  
+       45:  194:  TEST(qTypesOK && qToposOK);
+       45:  195:}
+        -:  196:
+       45:  197:void vCheckBoolOpResult(iMesh_Instance instance,
+        -:  198:			       iBase_EntitySetHandle SH,
+        -:  199:			       int iShouldBeList,
+        -:  200:			       iBase_EntitySetHandle aSHExpected[],
+        -:  201:			       int iNumSetsExpected,
+        -:  202:			       iBase_EntityHandle aEntsExpected[],
+        -:  203:			       int iNumEntsExpected)
+        -:  204:{
+        -:  205:  int err;
+        -:  206:  int iIsList;
+       45:  207:  iMesh_isList(instance, SH, &iIsList, &err);
+       45:  208:  CHECK_ERR(err);
+       45:  209:  TESTEQ(iIsList,iShouldBeList);
+        -:  210:
+       45:  211:  if (iNumSetsExpected != -1) {
+       43:  212:    iBase_EntitySetHandle *aGotSets = NULL;
+       43:  213:    int iGotSetsAlloc = 0, iNumSets;
+        -:  214:    iMesh_getEntSets(instance,  SH, 0, &aGotSets, &iGotSetsAlloc,
+       43:  215:                     &iNumSets, &err);
+       43:  216:    CHECK_ERR(err);
+       43:  217:    TESTEQ(iNumSets,iNumSetsExpected);
+        -:  218:
+       43:  219:    bool qGotAllSets = true;
+       43:  220:    if ( iNumSets == iNumSetsExpected ) {
+       43:  221:      GOT_ALL_ITEMS (aSHExpected, aGotSets, iNumSetsExpected, qGotAllSets);
+       43:  222:      TEST(qGotAllSets);
+        -:  223:    }
+       43:  224:    UT_FREE(aGotSets);
+        -:  225:  }
+        -:  226:
+        -:  227:  int iNumEnts;
+       45:  228:  iBase_EntityHandle * aGotEnts = NULL;
+       45:  229:  int iGotEntsAlloc = 0;
+        -:  230:  iMesh_getEntities(instance, SH, iBase_ALL_TYPES, iMesh_ALL_TOPOLOGIES,
+       45:  231:		    &aGotEnts, &iGotEntsAlloc, &iNumEnts, &err);
+       45:  232:  CHECK_ERR(err);
+       45:  233:  TESTEQ(iNumEnts,iNumEntsExpected);
+       45:  234:  bool qGotAllEnts = ( iNumEnts == iNumEntsExpected );
+       45:  235:  if ( qGotAllEnts ) {
+       45:  236:    if (iShouldBeList) {
+      112:  237:      for (int ii = 0; ii < iNumEntsExpected; ii++) {
+       98:  238:	qGotAllEnts = qGotAllEnts && (aGotEnts[ii] == aEntsExpected[ii]);
+       98:  239:	TESTEQ(aGotEnts[ii],aEntsExpected[ii]);
+        -:  240:      }
+        -:  241:    }
+        -:  242:    else {
+       31:  243:      GOT_ALL_ITEMS( aEntsExpected, aGotEnts, iNumEntsExpected, qGotAllEnts);
+        -:  244:    }
+       45:  245:    TEST(qGotAllEnts);
+        -:  246:  }
+       45:  247:  UT_FREE(aGotEnts);
+       45:  248:}
+        -:  249:
+        1:  250:void CleanSaveLoad()
+        -:  251:{
+        -:  252:    DIR *dir; struct dirent *dent;
+        1:  253:    dir = opendir(TMPDIR);
+        1:  254:    if (chdir(TMPDIR) == 0)
+        -:  255:    {
+       47:  256:        while (dir && (dent = readdir(dir)))
+        -:  257:        {
+       47:  258:            string dname = string(dent->d_name);
+       93:  259:            if (dname == "." || dname == "..") continue;
+       45:  260:	    unlink(dname.c_str());
+        -:  261:        }
+        1:  262:        if (chdir("..") != 0)
+    #####:  263:            std::cerr << "Unable to cleanup temp data dir" << endl;
+        -:  264:    }
+        1:  265:    closedir(dir);
+        1:  266:    rmdir(TMPDIR);
+        1:  267:}
+        -:  268:
+        -:  269://
+        -:  270:// Test save/load to ensure that the two operations result in
+        -:  271:// a valid and expected iMesh_Instance object where relevant
+        -:  272:// state is preserved. If a run of iMesh_unitTest can succeed
+        -:  273:// without save/loads but fails with them, that means that
+        -:  274:// the implementation's save/load operations are not working
+        -:  275:// in that they fail to preserve the state iMesh_unitTest is
+        -:  276:// expecting and testing for.
+        -:  277://
+       15:  278:void vDoSaveLoad(iMesh_Instance *instancep, iBase_EntitySetHandle *rootSet)
+        -:  279:{
+        -:  280:    static int numcalls = 0;
+        -:  281:    int imErr;
+       15:  282:    iMesh_Instance instance = *instancep;
+        -:  283:    iMesh_Instance newinst;
+        -:  284:    iBase_EntitySetHandle newroot;
+        -:  285:    DIR *dir; struct dirent *dent;
+       15:  286:    bool foundIt = false;
+        -:  287:
+       15:  288:    if (!qSaveLoad)
+        -:  289:        return;
+        -:  290:
+        -:  291://     cout << " ***Save/Load...";
+        -:  292:    char imeshBasename[128];
+        -:  293:    char imeshFilename[128];
+       15:  294:    snprintf(imeshBasename, sizeof(imeshFilename), "iMesh_unitTest_data_%d", numcalls);
+        -:  295:    snprintf(imeshFilename, sizeof(imeshFilename), "%s/%s", TMPDIR, imeshBasename);
+       15:  296:    int len = strlen(imeshFilename);
+        -:  297:    char options[1024];
+        -:  298:    snprintf(options, sizeof(options),
+        -:  299:	     "grummp:silent grummp:vtk refimpl:silent");
+        -:  300:    iMesh_save(*instancep, *rootSet, imeshFilename, options,
+       15:  301:	       &imErr, len, strlen(options));
+       15:  302:    CHECK_ERR(imErr);
+        -:  303:
+        -:  304:    // Lets do a tiny bit of work to ensure we've actually got a file on disk now
+       15:  305:    dir = opendir(TMPDIR);
+      420:  306:    while (dir && (dent = readdir(dir)))
+        -:  307:    {
+        -:  308:        struct stat statbuf;
+      390:  309:        errno = 0;
+        -:  310:        memset(&statbuf, 0, sizeof(statbuf));
+      390:  311:        if (strncmp(imeshBasename, dent->d_name, strlen(imeshBasename)) == 0)
+        -:  312:        { 
+        -:  313:            char tmpname[256];
+       45:  314:            snprintf(tmpname, sizeof(tmpname), "%s/%s", TMPDIR, dent->d_name);
+       45:  315:            if (stat(tmpname, &statbuf) == 0 && errno == 0 && statbuf.st_size > 0)
+       45:  316:                foundIt = true;
+        -:  317:        }
+        -:  318:    }
+       15:  319:    closedir(dir);
+       15:  320:    if (!foundIt)
+        -:  321:    {
+    #####:  322:        CHECK_ERR(iBase_FILE_WRITE_ERROR);
+    #####:  323:        return;
+        -:  324:    }
+        -:  325:
+        -:  326:    // Ok, now try to read this file into a new instance and root set
+       15:  327:    iMesh_newMesh("", &newinst, &imErr, 0);
+       15:  328:    iMesh_getRootSet(newinst, &newroot, &imErr);
+        -:  329:    iMesh_load(newinst, newroot, imeshFilename, options, &imErr, len,
+       15:  330:	       strlen(options));
+       15:  331:    if (imErr == iBase_SUCCESS)
+        -:  332:    {
+        -:  333:        // Destroy the old mesh now
+       15:  334:        iMesh_dtor(*instancep, &imErr);
+       15:  335:        CHECK_ERR(imErr);
+        -:  336:
+       15:  337:        *instancep = newinst;
+       15:  338:        *rootSet = newroot;
+        -:  339:    }
+        -:  340:    else
+        -:  341:    {
+    #####:  342:        qIssueLoadMessage(imeshFilename, imErr);
+    #####:  343:        CHECK_ERR(imErr);
+        -:  344:    }
+        -:  345://     cout << " Save/Load-DONE*** ";
+        -:  346:
+       15:  347:    numcalls++;
+        -:  348:}
+        -:  349:
+        4:  350:void vRecoverSetsContain(iMesh_Instance instance,
+        -:  351:				iBase_EntitySetHandle pvRootSet,
+        -:  352:				iBase_EntitySetHandle apvEntSets[])
+        -:  353:{
+        -:  354:  // The save-load cycle probably invalidated our set handles.  Bummer.
+        -:  355:  // So now we need to re-identify the sets.
+        -:  356:
+        4:  357:  iBase_EntitySetHandle *aSets = NULL;
+        4:  358:  int iTotalRet, iSetsAlloc = 0, err;
+        -:  359:  iMesh_getEntSets(instance, pvRootSet, -1,
+        4:  360:		   &aSets, &iSetsAlloc, &iTotalRet, &err);
+        -:  361:  // Once sets are identified, these should be unique integers.
+        4:  362:  int aiSetNum[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+        -:  363:  
+        -:  364:  // The complicated bit is that there may be other sets defined than
+        -:  365:  // the ten that were just created.  Also, there's no guarantee at
+        -:  366:  // all about the order in which sets are listed in the return data.
+        -:  367:  // Distinguishing characteristics:
+        -:  368:  // Set   Sets cont  Cont by   Set/List
+        -:  369:  // 0     3/9         ---         L
+        -:  370:  // 1     2/2          0          S
+        -:  371:  // 2     0/0          0          L
+        -:  372:  // 3     2/4          0          S
+        -:  373:  // 4     0/0          1          L
+        -:  374:  // 5     0/0          1          S
+        -:  375:  // 6     2/2          3          L
+        -:  376:  // 7     0/0          3          S
+        -:  377:  // 8     0/0          6          L
+        -:  378:  // 9     0/0          6          S
+        -:  379:  
+        -:  380:  // This code assumes that there won't be any remarkable coincidences
+        -:  381:  // in the sets that the implementation auto-created.
+        -:  382:  
+        4:  383:  for (int ii = 0; ii < 10; apvEntSets[ii++] = NULL);
+        -:  384:  
+        -:  385:  std::vector<int> vecNoDescend;
+       44:  386:  for (int iSet = 0; iSet < iTotalRet; iSet++) {
+       40:  387:    int iNumSets = -1;
+       40:  388:    iMesh_getNumEntSets(instance, aSets[iSet], -1, &iNumSets, &err);
+       40:  389:    CHECK_ERR(err);
+        -:  390:    
+       40:  391:    switch (iNumSets) {
+        -:  392:    case 0:
+        -:  393:      vecNoDescend.push_back(iSet);
+        -:  394:      break;
+        -:  395:    case 2:
+        -:  396:      int iIsList;
+        8:  397:      iMesh_isList(instance, aSets[iSet], &iIsList, &err);
+        8:  398:      CHECK_ERR(err);
+        8:  399:      if (iIsList) {
+        4:  400:	apvEntSets[6] = aSets[iSet];
+        -:  401:      }
+        -:  402:      else {
+        4:  403:	apvEntSets[1] = aSets[iSet];
+        -:  404:      }
+        -:  405:      break;
+        -:  406:    case 4:
+        4:  407:      apvEntSets[3] = aSets[iSet];
+        4:  408:      break;
+        -:  409:    case 9:
+        4:  410:      apvEntSets[0] = aSets[iSet];
+        -:  411:      break;
+        -:  412:    default:
+        -:  413:      // Do nothing with these; they aren't ours.
+        -:  414:      break;
+        -:  415:    }
+        -:  416:  }
+        4:  417:  TEST(vecNoDescend.size() >= 6);
+       28:  418:  for (int i = vecNoDescend.size() - 1; i >= 0; i--) {
+        -:  419:    int iIsCont, iIsList;
+       48:  420:    iBase_EntitySetHandle es = aSets[vecNoDescend[i]];
+       24:  421:    iMesh_isList(instance, es, &iIsList, &err);
+       24:  422:    CHECK_ERR(err);
+        -:  423:    
+       24:  424:    iMesh_isEntSetContained(instance, apvEntSets[0], es, &iIsCont, &err);
+       24:  425:    CHECK_ERR(err);
+       24:  426:    if (iIsCont) {
+        4:  427:      TEST(iIsList);
+        4:  428:      apvEntSets[2] = es;
+        -:  429:    }
+        -:  430:    else {
+       20:  431:      iMesh_isEntSetContained(instance, apvEntSets[3], es, &iIsCont, &err);
+       20:  432:      CHECK_ERR(err);
+       20:  433:      if (iIsCont) {
+        4:  434:	TEST(!iIsList);
+        4:  435:	apvEntSets[7] = es;
+        -:  436:      }
+        -:  437:      else {
+       16:  438:	iMesh_isEntSetContained(instance, apvEntSets[1], es, &iIsCont, &err);
+       16:  439:	CHECK_ERR(err);
+       16:  440:	if (iIsCont) {
+        8:  441:	  if (iIsList) apvEntSets[4] = es;
+        4:  442:	  else         apvEntSets[5] = es;
+        -:  443:	}
+        -:  444:	else {
+        8:  445:	  iMesh_isEntSetContained(instance, apvEntSets[6], es, &iIsCont, &err);
+        8:  446:	  CHECK_ERR(err);
+        8:  447:	  if (iIsCont) {
+        8:  448:	    if (iIsList) apvEntSets[8] = es;
+        4:  449:	    else         apvEntSets[9] = es;
+        -:  450:	  }
+        -:  451:	} // Fell through to checking for membership in set 6
+        -:  452:      } // Fell through to checking for membership in sets 1 or 6
+        -:  453:    } // Fell through to checking for membership in sets 1, 3, or 6
+        -:  454:  } // Checking what to do with each set.
+       44:  455:  for (int ii = 0; ii < 10; ii++ ) {
+       40:  456:    TEST(apvEntSets[ii] != NULL);
+        -:  457:  }
+        4:  458:  UT_FREE(aSets);
+        4:  459:}
+        -:  460:
+        1:  461:void vRecoverSetsParentChild(iMesh_Instance instance,
+        -:  462:				    iBase_EntitySetHandle pvRootSet,
+        -:  463:				    iBase_EntitySetHandle apvEntSets[])
+        -:  464:{
+        -:  465:  // The save-load cycle probably invalidated our set handles.  Bummer.
+        -:  466:  // So now we need to re-identify the sets.
+        -:  467:
+        1:  468:  iBase_EntitySetHandle *aSets = NULL;
+        1:  469:  int iTotalRet, iSetsAlloc = 0, err;
+        -:  470:  iMesh_getEntSets(instance, pvRootSet, -1,
+        1:  471:		   &aSets, &iSetsAlloc, &iTotalRet, &err);
+        -:  472:  // Once sets are identified, these should be unique integers.
+        1:  473:  int aiSetNum[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+        -:  474:  
+        -:  475:  // The complicated bit is that there may be other sets defined than
+        -:  476:  // the ten that were just created.  Also, there's no guarantee at
+        -:  477:  // all about the order in which sets are listed in the return data.
+        -:  478:  // Distinguishing characteristics:
+        -:  479:  // Set   TotChild  TotPar ImmPar  Set/List
+        -:  480:  // 0     9          0       ---   L
+        -:  481:  // 1     2          1        0    S
+        -:  482:  // 2     0          1        0    L
+        -:  483:  // 3     4          1        0    S
+        -:  484:  // 4     0          2        1    L
+        -:  485:  // 5     0          2        1    S
+        -:  486:  // 6     2          2        3    L
+        -:  487:  // 7     0          2        3    S
+        -:  488:  // 8     0          3        6    L
+        -:  489:  // 9     0          3        6    S
+        -:  490:  
+        -:  491:  // This code assumes that there won't be any remarkable coincidences
+        -:  492:  // in the sets that the implementation auto-created.
+        -:  493:  
+        1:  494:  for (int ii = 0; ii < 10; apvEntSets[ii++] = NULL);
+        -:  495:  
+        -:  496:  std::vector<int> vecNoDescend;
+       11:  497:  for (int iSet = 0; iSet < iTotalRet; iSet++) {
+       10:  498:    int iNumChildren = -1;
+       10:  499:    iMesh_getNumChld(instance, aSets[iSet], -1, &iNumChildren, &err);
+       10:  500:    CHECK_ERR(err);
+        -:  501:
+       10:  502:    switch (iNumChildren) {
+        -:  503:    case 0:
+        -:  504:      vecNoDescend.push_back(iSet);
+        -:  505:      break;
+        -:  506:    case 2:
+        -:  507:      {
+        2:  508:	int iNumParents = -1;
+        2:  509:	iMesh_getNumPrnt(instance, aSets[iSet], -1, &iNumParents, &err);
+        2:  510:	CHECK_ERR(err);
+        -:  511:	
+        2:  512:	if (iNumParents == 2) {
+        1:  513:	  apvEntSets[6] = aSets[iSet];
+        -:  514:	}
+        -:  515:	else {
+        1:  516:	  apvEntSets[1] = aSets[iSet];
+        -:  517:	}
+        -:  518:      }
+        -:  519:      break;
+        -:  520:    case 4:
+        1:  521:      apvEntSets[3] = aSets[iSet];
+        1:  522:      break;
+        -:  523:    case 9:
+        1:  524:      apvEntSets[0] = aSets[iSet];
+        -:  525:      break;
+        -:  526:    default:
+        -:  527:      // Do nothing with these; they aren't ours.
+        -:  528:      break;
+        -:  529:    }
+        -:  530:  }
+        1:  531:  TEST(vecNoDescend.size() >= 6);
+        7:  532:  for (int i = vecNoDescend.size() - 1; i >= 0; i--) {
+        -:  533:    int iIsList;
+       12:  534:    iBase_EntitySetHandle es = aSets[vecNoDescend[i]];
+        6:  535:    iMesh_isList(instance, es, &iIsList, &err);
+        6:  536:    CHECK_ERR(err);
+        -:  537:    
+        6:  538:    iBase_EntitySetHandle *aesParent = NULL;
+        6:  539:    int aesParentAlloc=0, aesParentSize;
+        -:  540:
+        -:  541:    iMesh_getPrnts(instance, es, 0, &aesParent, &aesParentAlloc,
+        6:  542:		   &aesParentSize, &err);
+        6:  543:    CHECK_ERR(err);
+        6:  544:    if (aesParentSize != 1) continue; // This isn't one of ours.
+        -:  545:
+        6:  546:    int iNumParents = -1;
+        6:  547:    iMesh_getNumPrnt(instance, es, -1, &iNumParents, &err);
+        6:  548:    CHECK_ERR(err);
+        -:  549:
+        6:  550:    switch (iNumParents) {
+        -:  551:    case 1:
+        -:  552:      // There's only one of these.
+        1:  553:      TEST(iIsList);
+        1:  554:      apvEntSets[2] = es;
+        1:  555:      break;
+        -:  556:    case 2:
+        3:  557:      if (iIsList) {
+        -:  558:	// Only one of these.
+        1:  559:	apvEntSets[4] = es;
+        -:  560:      }
+        -:  561:      else {
+        2:  562:	if (aesParent[0] == apvEntSets[1]) {
+        1:  563:	  apvEntSets[5] = es;
+        -:  564:	}
+        -:  565:	else {
+        1:  566:	  TESTEQ(aesParent[0],apvEntSets[3]);
+        1:  567:	  apvEntSets[7] = es;
+        -:  568:	}
+        -:  569:      }
+        -:  570:      break;
+        -:  571:    case 3:
+        2:  572:      if (iIsList) {
+        1:  573:	apvEntSets[8] = es;
+        -:  574:      }
+        -:  575:      else {
+        1:  576:	apvEntSets[9] = es;
+        -:  577:      }
+        -:  578:      break;
+        -:  579:    default:
+        -:  580:      // Bad things are about to happen, somewhere...
+        -:  581:      break;
+        -:  582:    }
+        6:  583:    UT_FREE(aesParent);
+        -:  584:  } // Checking what to do with each set.
+       11:  585:  for (int ii = 0; ii < 10; ii++ ) {
+       10:  586:    TEST(apvEntSets[ii] != NULL);
+        -:  587:  }
+        1:  588:  UT_FREE(aSets);
+        1:  589:}
+        -:  590:
+        3:  591:void vRecoverSetsFromEntCounts(iMesh_Instance instance,
+        -:  592:				      iBase_EntitySetHandle pvRootSet,
+        -:  593:				      iBase_EntitySetHandle *apvSets,
+        -:  594:				      const int aiNumTypeEnts[],
+        -:  595:				      const int aiNumTopoEnts[])
+        -:  596:{
+        -:  597:  // In the original setup, we had:
+        -:  598:  // Set #     List?   Matching type/topo
+        -:  599:  //   0         Y         (Empty)
+        -:  600:  //   1         Y         Type
+        -:  601:  //   2         Y         Topo
+        -:  602:  //   3         N         Type
+        -:  603:  //   4         N         Topo
+        -:  604:  //
+        -:  605:  // Set 0 could actually be masqueraded for fairly easily, but that's
+        -:  606:  // probably okay....
+        -:  607:  int i, err;
+        3:  608:  int iTotalEntsExpectedType = 0, iTotalEntsExpectedTopo = 0;
+       18:  609:  for (i = 0; i < 5; i++) {
+       15:  610:    apvSets[i] = NULL;
+        -:  611:  }
+       15:  612:  for (i = 0; i < iBase_ALL_TYPES; i++) {
+       12:  613:    iTotalEntsExpectedType += aiNumTypeEnts[i];
+        -:  614:  }
+       36:  615:  for (i = 0; i < iMesh_ALL_TOPOLOGIES; i++) {
+       33:  616:    iTotalEntsExpectedTopo += aiNumTopoEnts[i];
+        -:  617:  }
+        -:  618:
+        3:  619:  iBase_EntitySetHandle *allSets = NULL;
+        3:  620:  int allSets_alloc = 0, allSets_size;
+        -:  621:  iMesh_getEntSets(instance, pvRootSet, 0, &allSets, &allSets_alloc,
+        3:  622:		   &allSets_size, &err);
+        3:  623:  CHECK_ERR(err);
+        -:  624:
+       24:  625:  for (i = 0; i < allSets_size; i++) {
+        -:  626:    int iIsList;
+       21:  627:    iBase_EntitySetHandle es = allSets[i];
+       21:  628:    iMesh_isList(instance, es, &iIsList, &err);
+       21:  629:    CHECK_ERR(err);
+        -:  630:
+        -:  631:    int iNumAllEnts;
+       21:  632:    iMesh_getNumOfType(instance, es, iBase_ALL_TYPES, &iNumAllEnts, &err);
+       21:  633:    if (iNumAllEnts == 0) {
+        3:  634:      apvSets[0] = es;
+        -:  635:    }
+        -:  636:
+        -:  637:    // It's possible to make a mistake with this simple test, but
+        -:  638:    // another set would have to happen to hit the jackpot...
+       24:  639:    if (iTotalEntsExpectedType == iNumAllEnts && !iIsList) {
+        3:  640:      apvSets[3] = es;
+        -:  641:    }
+       21:  642:    else if (iTotalEntsExpectedTopo == iNumAllEnts && !iIsList) {
+        3:  643:      apvSets[4] = es;
+        -:  644:    }
+       18:  645:    else if (iTotalEntsExpectedTopo < iNumAllEnts && iIsList) {
+        3:  646:      apvSets[2] = es;
+        -:  647:    }
+       12:  648:    else if (iTotalEntsExpectedType < iNumAllEnts && iIsList) {
+        3:  649:      apvSets[1] = es;
+        -:  650:    }
+        -:  651:  }
+        3:  652:  bool qSetsOK = true;
+       18:  653:  for (i = 0; i < 5; i++) {
+       15:  654:    qSetsOK = qSetsOK && (apvSets[i] != NULL);
+        -:  655:  }
+        3:  656:  TEST(qSetsOK);
+        3:  657:  UT_FREE(allSets);
+        3:  658:}
+        -:  659:
+        2:  660:void vRecoverTags(iMesh_Instance instance,
+        -:  661:			 iBase_EntitySetHandle pvRootSet,
+        -:  662:			 iBase_TagHandle aTags[],
+        -:  663:			 iBase_EntityHandle *aEnt)
+        -:  664:{
+        -:  665:  // This is easier than sets, because we can get the tags by name.
+        -:  666:  int err;
+       10:  667:  for (int i = 0; i < 4; i++) {
+        -:  668:    iMesh_getTagHandle(instance, astrTagNames[i], &(aTags[i]), &err,
+        8:  669:		       aiTagNameLen[i]);
+        8:  670:    CHECK_ERR_CRITICAL(err);
+        -:  671:  }
+        -:  672:
+        2:  673:  if (aEnt) {
+        -:  674:    // Identify the entity that's been tagged.
+        -:  675:    iBase_EntityIterator iter;
+        -:  676:    iMesh_initEntIter(instance, pvRootSet, iBase_ALL_TYPES,
+        1:  677:		      iMesh_ALL_TOPOLOGIES, 0, &iter, &err);
+        1:  678:    CHECK_ERR(err);
+        -:  679:    int qGotData;
+        -:  680:    char strTagName[100];
+        -:  681:    iBase_EntityHandle ent;
+        1:  682:    qGotData = true;
+        2:  683:    while (qGotData) {
+        1:  684:      iMesh_getNextEntIter(instance, iter, &ent, &qGotData, &err);
+        1:  685:      CHECK_ERR(err);
+        -:  686:
+        1:  687:      iBase_TagHandle *allTags = NULL;
+        1:  688:      int allTags_alloc = 0, allTags_size;
+        1:  689:      iMesh_getAllTags(instance, ent, &allTags, &allTags_alloc, &allTags_size, &err);
+        -:  690:      // Now loop over all of those tags.
+        1:  691:      if (allTags_size < 4) {
+    #####:  692:       UT_FREE(allTags);
+    #####:  693:       continue;
+        -:  694:      }
+        1:  695:      int iNumFound = 0;
+        5:  696:      for (int k = 0; k < 4; k++) {
+       12:  697:	for (int j = 0; j < allTags_size; j++) {
+       12:  698:	  if (aTags[k] == allTags[j]) {
+        4:  699:	    iNumFound++;
+        4:  700:	    break;
+        -:  701:	  }
+        -:  702:	}
+        -:  703:      }
+        1:  704:      UT_FREE(allTags);
+        1:  705:      if (iNumFound == 4) {
+        1:  706:	*aEnt = ent;
+        1:  707:	break;
+        -:  708:      }
+        -:  709:    } // Done looping over entities.
+        1:  710:    iMesh_endEntIter(instance, iter, &err);
+        -:  711:  } // Done identifying the entity that has these tags on it.
+        2:  712:}
+        -:  713:
+        1:  714:void vSetupTypeAndTopo()
+        -:  715:{
+        -:  716:  // Which combinations are okay doesn't depend on whether the mesh
+        -:  717:  // database is 2D, 3D, etc.  Meshes are required to returned nothing
+        -:  718:  // if they don't have something, that's all.
+        -:  719:
+        -:  720:  int eEType;
+        -:  721:  int eETopo;
+        -:  722:
+        -:  723:  //@@ Setup data
+       13:  724:  for (eETopo = iMesh_POINT;
+        -:  725:       eETopo <= iMesh_ALL_TOPOLOGIES;
+        -:  726:       eETopo++) {
+       60:  727:    for (eEType = iBase_VERTEX;
+        -:  728:	 eEType < iBase_ALL_TYPES;
+        -:  729:	 eEType++) {
+       48:  730:      a2qLegalTypeAndTopo[eEType][eETopo] = false;
+        -:  731:    }
+       12:  732:    a2qLegalTypeAndTopo[iBase_ALL_TYPES][eETopo] = true;
+        -:  733:  }
+        -:  734:
+        -:  735:  a2qLegalTypeAndTopo[iBase_VERTEX]
+        1:  736:    [iMesh_POINT] = true;
+        -:  737:
+        -:  738:  a2qLegalTypeAndTopo[iBase_EDGE]
+        1:  739:    [iMesh_LINE_SEGMENT] = true;
+        -:  740:
+        -:  741:  a2qLegalTypeAndTopo[iBase_FACE]
+        1:  742:    [iMesh_TRIANGLE] = true;
+        -:  743:  a2qLegalTypeAndTopo[iBase_FACE]
+        1:  744:    [iMesh_QUADRILATERAL] = true;
+        -:  745:  a2qLegalTypeAndTopo[iBase_FACE]
+        1:  746:    [iMesh_POLYGON] = true;
+        -:  747:
+        -:  748:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  749:    [iMesh_TETRAHEDRON] = true;
+        -:  750:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  751:    [iMesh_PYRAMID] = true;
+        -:  752:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  753:    [iMesh_PRISM] = true;
+        -:  754:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  755:    [iMesh_HEXAHEDRON] = true;
+        -:  756:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  757:    [iMesh_SEPTAHEDRON] = true;
+        -:  758:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  759:    [iMesh_POLYHEDRON] = true;
+        -:  760:
+        -:  761:  a2qLegalTypeAndTopo[iBase_VERTEX]
+        1:  762:    [iMesh_ALL_TOPOLOGIES] = true;
+        -:  763:  a2qLegalTypeAndTopo[iBase_EDGE]
+        1:  764:    [iMesh_ALL_TOPOLOGIES] = true;
+        -:  765:  a2qLegalTypeAndTopo[iBase_FACE]
+        1:  766:    [iMesh_ALL_TOPOLOGIES] = true;
+        -:  767:  a2qLegalTypeAndTopo[iBase_REGION]
+        1:  768:    [iMesh_ALL_TOPOLOGIES] = true;
+        -:  769:  a2qLegalTypeAndTopo[iBase_ALL_TYPES]
+        1:  770:    [iMesh_ALL_TOPOLOGIES] = true;
+        1:  771:}
+        -:  772:
+        -:  773:// Second adjacencies are tested by comparison to a chain of first
+        -:  774:// adjacencies.
+        1:  775:void vSecondAdjacencyTest(iMesh_Instance instance)
+        -:  776:{
+        1:  777:  int err = iBase_SUCCESS;
+        -:  778:  // Start by checking that first adjacencies don't return the entity itself.
+        -:  779:  
+        -:  780:  // Check all possible combinations of second adjacencies.
+        2:  781:  for (int sourceType = iBase_VERTEX;
+        -:  782:       sourceType < iBase_ALL_TYPES; sourceType++) {
+        2:  783:    if (a2iAdjTable[sourceType][sourceType] != iBase_AVAILABLE) return;
+        6:  784:    for (int bridgeType = iBase_VERTEX; bridgeType <= iBase_ALL_TYPES;
+        -:  785:	 bridgeType++) {
+       30:  786:      for (int requestedType = iBase_VERTEX; requestedType <= iBase_ALL_TYPES;
+        -:  787:	   requestedType++) {
+        -:  788:	// Don't do this test if -either- of the required first
+        -:  789:	// adjacencies is unavailable.
+       49:  790:	if ((bridgeType != iBase_ALL_TYPES &&
+        -:  791:	     requestedType != iBase_ALL_TYPES) &&	    
+       16:  792:	    ((a2iAdjTable[sourceType][bridgeType] != iBase_ALL_ORDER_1 &&
+        -:  793:	      a2iAdjTable[sourceType][bridgeType] != iBase_ALL_ORDER_LOGN &&
+        -:  794:	      a2iAdjTable[sourceType][bridgeType] != iBase_ALL_ORDER_N)
+        -:  795:	     ||
+        8:  796:	     (a2iAdjTable[bridgeType][requestedType] != iBase_ALL_ORDER_1 &&
+        -:  797:	      a2iAdjTable[bridgeType][requestedType] != iBase_ALL_ORDER_LOGN &&
+        -:  798:	      a2iAdjTable[bridgeType][requestedType] != iBase_ALL_ORDER_N)))
+       12:  799:	  continue;
+        -:  800:
+       13:  801:	cout << "  Source type: ";
+        -:  802:	cout.width(9);
+       13:  803:	cout << astrTypes[sourceType] << "  Bridge type: ";
+        -:  804:	cout.width(9);
+       13:  805:	cout << astrTypes[bridgeType] << " Target type: ";
+        -:  806:	cout.width(9);
+       13:  807:	cout << astrTypes[requestedType] << endl;
+        -:  808:	
+        -:  809:	// Start an iterator and grab an entity.
+        -:  810:	iBase_EntityIterator entIter;
+        -:  811:	iMesh_initEntIter(instance, pvRootSet, sourceType,
+       13:  812:			  iMesh_ALL_TOPOLOGIES, 0, &entIter, &err);
+        -:  813:	iBase_EntityHandle ent;
+       13:  814:	int hasData, count = 0;
+       13:  815:	bool qOK = true;
+       13:  816:	iMesh_getNextEntIter(instance, entIter, &ent, &hasData, &err);
+       13:  817:	while (hasData && qOK && count < 100) {
+     1300:  818:	  count++;
+        -:  819:	  std::set<iBase_EntityHandle> setDirect;
+        -:  820:	  {
+        -:  821:	    // Grab second adjacency directly; the result goes into an
+        -:  822:	    // STL set (setDirect) for later comparison.
+     1300:  823:	    iBase_EntityHandle *adjEnts = NULL;
+     1300:  824:	    int adjEnts_allocated = 0, adjEnts_size = 0;
+        -:  825:	    iMesh_getEnt2ndAdj(instance, ent, bridgeType, requestedType,
+     1300:  826:			       &adjEnts, &adjEnts_allocated, &adjEnts_size, &err);
+    41902:  827:	    for (int ii = 0; ii < adjEnts_size; ii++) {
+    40602:  828:	      setDirect.insert(adjEnts[ii]);
+        -:  829:	    }
+        -:  830:	    // Was the returned list unique?
+     1300:  831:	    qOK = (setDirect.size() == adjEnts_size);
+     1300:  832:	    UT_FREE(adjEnts);
+        -:  833:	  }
+        -:  834:
+        -:  835:	  // Spec says the original ent shouldn't be in the result.
+     3900:  836:	  qOK = (setDirect.find(ent) == setDirect.end());
+        -:  837:
+        -:  838:	  // Some comparison cases are easy...
+        -:  839:	  std::set<iBase_EntityHandle> setIndirect;
+     1300:  840:	  if ((bridgeType == requestedType ||
+        -:  841:	       bridgeType == sourceType) && bridgeType != iBase_ALL_TYPES) {
+        -:  842:	    // The output should be empty, so do nothing.
+        -:  843:	  }
+     1300:  844:	  else if ((sourceType < bridgeType && bridgeType < requestedType &&
+        -:  845:		    requestedType != iBase_ALL_TYPES)
+        -:  846:		   ||
+        -:  847:		   (sourceType > bridgeType && bridgeType > requestedType &&
+        -:  848:		    sourceType != iBase_ALL_TYPES)) {
+        -:  849:	    // This case is simply a first adjacency call.   It might
+        -:  850:	    // succeed even if the implementation doesn't support one of
+        -:  851:	    // the requested adjacencies, but never gets tested in that
+        -:  852:	    // case. 
+      100:  853:	    iBase_EntityHandle *adjEnts = NULL;
+      100:  854:	    int adjEnts_allocated = 0, adjEnts_size = 0;
+        -:  855:	    iMesh_getEntAdj(instance, ent, requestedType,
+      100:  856:			    &adjEnts, &adjEnts_allocated, &adjEnts_size, &err);
+     1400:  857:	    for (int ii = 0; ii < adjEnts_size; ii++) {
+     1300:  858:	      setIndirect.insert(adjEnts[ii]);
+        -:  859:	    }
+      100:  860:	    UT_FREE(adjEnts);
+        -:  861:	  }
+        -:  862:	  else {
+        -:  863:	    // Do two first adjacency calls, which should give the same
+        -:  864:	    // result as the second adjacency call.
+        -:  865:	    
+        -:  866:	    // Grab first adjacency...
+     1100:  867:	    iBase_EntityHandle *adjEnts = NULL;
+     1100:  868:	    int adjEnts_allocated = 0, adjEnts_size = 0;
+        -:  869:	    iMesh_getEntAdj(instance, ent, bridgeType,
+     1100:  870:			    &adjEnts, &adjEnts_allocated, &adjEnts_size, &err);
+     1100:  871:	    CHECK_ERR(err);
+        -:  872:	    // ... and first adjacencies of those
+     1100:  873:	    iBase_EntityHandle *adjEnts2 = NULL;
+     1100:  874:	    int adjEnts2_allocated = 0, adjEnts2_size;
+     1100:  875:	    int *offset, offset_allocated = 0, offset_size;
+        -:  876:	    iMesh_getEntArrAdj(instance, adjEnts, adjEnts_size, requestedType,
+        -:  877:			       &adjEnts2, &adjEnts2_allocated, &adjEnts2_size,
+     1100:  878:			       &offset, &offset_allocated, &offset_size, &err);
+     1100:  879:	    CHECK_ERR(err);
+   104824:  880:	    for (int ii = 0; ii < adjEnts2_size; ii++) {
+   103724:  881:	      setIndirect.insert(adjEnts2[ii]);
+        -:  882:	    }
+     1100:  883:	    UT_FREE(adjEnts);
+     1100:  884:	    UT_FREE(offset);
+     1100:  885:	    UT_FREE(adjEnts2);
+        -:  886:	  }
+        -:  887:	  // Spec says the original ent shouldn't be in the result.
+        -:  888:	  setIndirect.erase(ent);
+        -:  889:
+        -:  890:	  // Compare results: STL set comparison should handle this
+        -:  891:	  // flawlessly. 
+     1300:  892:	  qOK = (setDirect == setIndirect);
+        -:  893:// 	  if (!qOK) {
+        -:  894:// 	    iBase_EntityHandle *aHandles =
+        -:  895:// 	      new iBase_EntityHandle[setDirect.size()];
+        -:  896:// 	    iBase_EntityHandle *result =
+        -:  897:// 	      std::set_difference(setIndirect.begin(), setIndirect.end(),
+        -:  898:// 				  setDirect.begin(), setDirect.end(), aHandles);
+        -:  899:// 	    assert(result - aHandles > 0);
+        -:  900:// 	  }
+     1300:  901:	  iMesh_getNextEntIter(instance, entIter, &ent, &hasData, &err);
+        -:  902:	} // Loop over entities.
+       13:  903:	iMesh_endEntIter(instance, entIter, &err);
+       13:  904:	TEST(qOK);
+        -:  905:      } // Loop over requested type
+        -:  906:    } // Loop over bridge type
+        -:  907:  } // Loop over source topologies
+        -:  908:}
+        -:  909:
+        1:  910:void vSecondAdjacencyArrayTest(iMesh_Instance instance)
+        -:  911:{
+        1:  912:  int err = iBase_SUCCESS;
+        -:  913:  // Start by checking that first adjacencies don't return the entity itself.
+        -:  914:  
+        -:  915:  // Check all possible combinations of second adjacencies.
+        5:  916:  for (int sourceType = iBase_VERTEX;
+        -:  917:       sourceType < iBase_ALL_TYPES; sourceType++) {
+       24:  918:    for (int bridgeType = iBase_VERTEX; bridgeType <= iBase_ALL_TYPES;
+        -:  919:	 bridgeType++) {
+      120:  920:      for (int requestedType = iBase_VERTEX; requestedType <= iBase_ALL_TYPES;
+        -:  921:	   requestedType++) {
+      376:  922:	if ((bridgeType != iBase_ALL_TYPES &&
+       80:  923:	     a2iAdjTable[sourceType][bridgeType] != iBase_ALL_ORDER_1 &&
+       50:  924:	     a2iAdjTable[sourceType][bridgeType] != iBase_ALL_ORDER_LOGN &&
+       50:  925:	     a2iAdjTable[sourceType][bridgeType] != iBase_ALL_ORDER_N)
+        -:  926:	    ||
+        -:  927:	    (requestedType != iBase_ALL_TYPES &&
+       40:  928:	     a2iAdjTable[bridgeType][requestedType] != iBase_ALL_ORDER_1 &&
+       28:  929:	     a2iAdjTable[bridgeType][requestedType] != iBase_ALL_ORDER_LOGN &&
+       28:  930:	     a2iAdjTable[bridgeType][requestedType] != iBase_ALL_ORDER_N))
+       78:  931:	  continue;
+        -:  932:	
+       22:  933:	cout << "  Source type: ";
+        -:  934:	cout.width(9);
+       22:  935:	cout << astrTypes[sourceType] << "  Bridge type: ";
+        -:  936:	cout.width(9);
+       22:  937:	cout << astrTypes[bridgeType] << " Target type: ";
+        -:  938:	cout.width(9);
+       22:  939:	cout << astrTypes[requestedType] << endl;
+        -:  940:	
+        -:  941:	// Start an iterator and grab an entity.
+        -:  942:	iBase_EntityArrIterator wsIter;
+        -:  943:	iMesh_initEntArrIter(instance, pvRootSet, sourceType,
+       22:  944:			     iMesh_ALL_TOPOLOGIES, 100, 0, &wsIter, &err);
+       22:  945:	iBase_EntityHandle *ents = NULL;
+       22:  946:	int ents_allocated = 0, ents_size = 0;
+       22:  947:	int hasData, count = 0;
+       22:  948:	bool qOK = true;
+        -:  949:	iMesh_getNextEntArrIter(instance, wsIter,
+        -:  950:				&ents, &ents_allocated, &ents_size,
+       22:  951:				&hasData, &err);
+      149:  952:	while (hasData && qOK && count < 5) {
+      105:  953:	  count++;
+        -:  954:
+        -:  955:	  // Grab second adjacency for all entities directly
+      105:  956:	  iBase_EntityHandle *adjEnts = NULL;
+      105:  957:	  int adjEnts_allocated = 0, adjEnts_size = 0;
+      105:  958:	  int *offsets = NULL, offsets_allocated = 0, offsets_size = 0;
+        -:  959:	  iMesh_getEntArr2ndAdj(instance, ents, ents_size,
+        -:  960:				bridgeType, requestedType,
+        -:  961:				&adjEnts, &adjEnts_allocated, &adjEnts_size,
+        -:  962:				&offsets, &offsets_allocated, &offsets_size,
+      105:  963:				&err);
+        -:  964:
+    10605:  965:	  for (int i = 0; i < ents_size; i++) {
+        -:  966:	    // Shove the array data for this ent into a set.
+        -:  967:	    std::set<iBase_EntityHandle> setArray;
+   854901:  968:	    for (int ii = offsets[i]; ii < offsets[i+1]; ii++) {
+   844401:  969:	      setArray.insert(adjEnts[ii]);
+        -:  970:	    }
+        -:  971:
+        -:  972:	    // Was the returned list unique?
+    10500:  973:	    qOK = (setArray.size() == offsets[i+1] - offsets[i]);
+        -:  974:	    
+        -:  975:	    // Now grab 2nd adj entity by entity
+    10500:  976:	    iBase_EntityHandle *adjEnts2 = NULL;
+    10500:  977:	    int adjEnts2_allocated = 0, adjEnts2_size = 0;
+        -:  978:	    iMesh_getEnt2ndAdj(instance, ents[i], bridgeType, requestedType,
+        -:  979:			       &adjEnts2, &adjEnts2_allocated, &adjEnts2_size,
+    10500:  980:			       &err);
+        -:  981:
+        -:  982:	    // Shove that into a set as well.
+        -:  983:	    std::set<iBase_EntityHandle> setSingle;
+    10500:  984:	    setSingle.insert(adjEnts2, adjEnts2 + adjEnts2_size);
+    10500:  985:	    UT_FREE(adjEnts2);
+    10500:  986:	    qOK = (setArray == setSingle);
+        -:  987:	  }
+      105:  988:	  UT_FREE(adjEnts);
+      105:  989:	  UT_FREE(offsets);
+        -:  990:	  iMesh_getNextEntArrIter(instance, wsIter, &ents, &ents_allocated,
+      105:  991:				  &ents_size, &hasData, &err);
+        -:  992:	} // Loop over entities.
+       22:  993:	iMesh_endEntArrIter(instance, wsIter, &err);
+       22:  994:	UT_FREE(ents);
+       22:  995:	TEST(qOK);
+        -:  996:      } // Loop over requested type
+        -:  997:    } // Loop over bridge type
+        -:  998:  } // Loop over source topologies
+        1:  999:}
+        -: 1000:
+        -: 1001://@ Adjacency reciprocity test kernel
+        -: 1002:
+        6: 1003:void vEntityReciprocityTest(iMesh_Instance instance,
+        -: 1004:			    iBase_EntityType eET1, iBase_EntityType eET2)
+        -: 1005:{
+        -: 1006:  // Iterate over entities of type eET1
+        -: 1007:  int err;
+        6: 1008:  int qHasData, qOK = true;
+        -: 1009:  iBase_EntityIterator entIter;
+        -: 1010:  iMesh_initEntIter(instance, pvRootSet, eET1,
+        6: 1011:		    iMesh_ALL_TOPOLOGIES, 0, &entIter, &err);
+        6: 1012:  CHECK_ERR_CRITICAL(err);
+        -: 1013:  iBase_EntityHandle entity;
+        6: 1014:  iMesh_getNextEntIter(instance, entIter, &entity, &qHasData, &err);
+        6: 1015:  if (err != iBase_SUCCESS) {
+    #####: 1016:    qOK = false;
+        -: 1017:  }
+    11552: 1018:  while (qOK && qHasData) {
+        -: 1019:    // Grab the entities of type eET2 adjacent to entity.
+    11546: 1020:    iBase_EntityHandle* aAdjEnt1 = NULL;
+    11546: 1021:    int iNAdjEnt1, iAdjEnt_allocated = 0;
+        -: 1022:    iMesh_getEntAdj(instance, entity, eET2, &aAdjEnt1, &iAdjEnt_allocated,
+    11546: 1023:		    &iNAdjEnt1, &err);
+    11546: 1024:    if (err != iBase_SUCCESS) {
+    #####: 1025:      qOK = false;
+    #####: 1026:      break;
+        -: 1027:    }
+        -: 1028:    // Loop over those entities
+    68786: 1029:    for (int iAdj1 = 0; iAdj1 < iNAdjEnt1 && qOK; iAdj1++) {
+    57240: 1030:      iBase_EntityHandle adj_entity = aAdjEnt1[iAdj1];
+        -: 1031:      // Now get their adjacencies.
+        -: 1032:      iBase_EntityHandle* aAdjEnt2;
+    57240: 1033:      int iNAdjEnt2, iAdjEnt2Alloc = 0;
+        -: 1034:      iMesh_getEntAdj(instance, adj_entity, eET1, &aAdjEnt2, &iAdjEnt2Alloc,
+    57240: 1035:		      &iNAdjEnt2, &err);
+    57240: 1036:      if (err != iBase_SUCCESS) {
+    #####: 1037:	qOK = false;
+    #####: 1038:	break;
+        -: 1039:      }
+        -: 1040:      // Loop over -those- to make sure the original entity is one of
+        -: 1041:      // them.
+    57240: 1042:      qOK = false;
+   332690: 1043:      for (int iAdj2 = 0; iAdj2 < iNAdjEnt2; iAdj2++) {
+   332690: 1044:	iBase_EntityHandle adj_ent2 = aAdjEnt2[iAdj2];
+   332690: 1045:	if (adj_ent2 == entity) {
+    57240: 1046:	  qOK = true;
+    57240: 1047:	  break;
+        -: 1048:	}
+        -: 1049:      } // Loop over entities of type eET1 adj to eET2's adj to the
+        -: 1050:	// original ent.
+    57240: 1051:      UT_FREE(aAdjEnt2);
+        -: 1052:    } // Loop over entities of type eET2 adj to original ent
+    11546: 1053:    UT_FREE(aAdjEnt1);
+    11546: 1054:    iMesh_getNextEntIter(instance, entIter, &entity, &qHasData, &err);
+    11546: 1055:    if (err != iBase_SUCCESS) {
+    #####: 1056:      qOK = false;
+        -: 1057:    }
+        -: 1058:  } // Loop over entities of type eET1.
+        6: 1059:  iMesh_endEntIter(instance, entIter, &err);
+        6: 1060:  CHECK_ERR_CRITICAL(err);
+        6: 1061:  if (qOK) {
+        6: 1062:    cout << " passed";
+        6: 1063:    TEST(true);
+        -: 1064:  }
+        -: 1065:  else {
+    #####: 1066:    cout << " failed";
+    #####: 1067:    TEST(false);
+        -: 1068:  }
+        6: 1069:} // Done with entity reciprocity test
+        -: 1070:
+        6: 1071:void vArrayReciprocityTest(iMesh_Instance instance,
+        -: 1072:			   iBase_EntityType eET1, iBase_EntityType eET2)
+        -: 1073:{
+        6: 1074:  int err = 0;
+        -: 1075:  // First, get all eET1 -> eET2 adjacency info.
+        6: 1076:  iBase_EntityHandle *aHandles1 = NULL, *aHandles2 = NULL, *aAdjHandles1 = NULL;
+        6: 1077:  int *aiFirstOffset = NULL, *aiSecondOffset = NULL;
+        6: 1078:  int iHandles1_allocated = 0, iHandles2_allocated = 0;
+        6: 1079:  int iAdjHandles_allocated = 0, iOffset1_allocated = 0;
+        6: 1080:  int iOffset2_allocated = 0;
+        -: 1081:  int iNumEntities;
+        -: 1082:  iMesh_getEntities(instance, pvRootSet, eET1, iMesh_ALL_TOPOLOGIES,
+        6: 1083:		    &aHandles1, &iHandles1_allocated, &iNumEntities, &err);
+        6: 1084:  CHECK_ERR_CRITICAL(err);
+        -: 1085:  int iNum1st, iOffset1st, iNum2nd, iOffset2nd;
+        -: 1086:  iMesh_getEntArrAdj(instance, aHandles1, iNumEntities, eET2,
+        -: 1087:		     &aHandles2, &iHandles2_allocated, &iNum1st,
+        6: 1088:		     &aiFirstOffset, &iOffset1_allocated, &iOffset1st, &err);
+        6: 1089:  CHECK_ERR_CRITICAL(err);
+        -: 1090:  iMesh_getEntArrAdj(instance, aHandles2, iNum1st, eET1,
+        -: 1091:		     &aAdjHandles1, &iAdjHandles_allocated, &iNum2nd,
+        6: 1092:		     &aiSecondOffset, &iOffset2_allocated, &iOffset2nd, &err);
+        6: 1093:  CHECK_ERR_CRITICAL(err);
+        -: 1094:
+        -: 1095:  bool qOK = (iNumEntities == iOffset1st - 1) && (iNum1st == iOffset2nd - 1)
+        6: 1096:    && (iNum1st == aiFirstOffset[iNumEntities])
+        6: 1097:    && (iNum2nd == aiSecondOffset[iNum1st])
+        6: 1098:    && (aiFirstOffset[0] == 0)
+       24: 1099:    && (aiSecondOffset[0] == 0);
+        -: 1100:
+        -: 1101:  // For every entity, check that every adjacent entity also thinks
+        -: 1102:  // the first entity is adjacent to it.
+        -: 1103:  int iEH1, iEH2;
+    11552: 1104:  for (iEH1 = 0; qOK && iEH1 < iNumEntities; iEH1++) {
+    11546: 1105:    void * Handle1 = aHandles1[iEH1];
+    11546: 1106:    int iBegin = aiFirstOffset[iEH1];
+    11546: 1107:    int iEnd = aiFirstOffset[iEH1+1] - 1;
+    68786: 1108:    for (iEH2 = iBegin; iEH2 <= iEnd; iEH2++) {
+    57240: 1109:      bool qFoundIt = false;
+    57240: 1110:      int iBegin2 = aiSecondOffset[iEH2];
+    57240: 1111:      int iEnd2 = aiSecondOffset[iEH2+1] - 1;
+   389930: 1112:      for (int iAEH = iBegin2; !qFoundIt && iAEH <= iEnd2; iAEH++) {
+   332690: 1113:	iBase_EntityHandle AdjHandle = aAdjHandles1[iAEH];
+   332690: 1114:	if (Handle1 == AdjHandle) qFoundIt = true;
+        -: 1115:      }
+    57240: 1116:      qOK = qFoundIt;
+        -: 1117:    } // Done with inner loop
+        -: 1118:  } // Done with outer loop
+        6: 1119:  UT_FREE(aHandles1);
+        6: 1120:  UT_FREE(aHandles2);
+        6: 1121:  UT_FREE(aAdjHandles1);
+        6: 1122:  UT_FREE(aiFirstOffset);
+        6: 1123:  UT_FREE(aiSecondOffset);
+        6: 1124:  if (qOK) {
+        6: 1125:    cout << " passed";
+        6: 1126:    TEST(true);
+        -: 1127:  }
+        -: 1128:  else {
+    #####: 1129:    cout << " failed";
+    #####: 1130:    TEST(false);
+        -: 1131:  }
+        6: 1132:} // Done with array reciprocity test
+        -: 1133:
+        1: 1134:void vTestArrModInterface(iMesh_Instance& instance)
+        -: 1135:{
+        -: 1136:  int err;
+        -: 1137:  // setVtxArrCoords is trivial to test:  get vertices, change their coords,
+        -: 1138:  // and verify that the change worked.
+        1: 1139:  iBase_EntityHandle *aVerts = NULL;
+        -: 1140:  int iNVerts;
+        1: 1141:  int iVertsAlloc = 0;
+        -: 1142:  iMesh_getEntities(instance, pvRootSet, iBase_VERTEX,
+        1: 1143:		    iMesh_POINT, &aVerts, &iVertsAlloc, &iNVerts, &err);
+        1: 1144:  CHECK_ERR(err);
+        -: 1145:
+        1: 1146:  double * adCoords1 = NULL;
+        -: 1147:  int iCoords1Size;
+        1: 1148:  int SO = iBase_INTERLEAVED;
+        1: 1149:  int iCoords1Alloc = 0;
+        -: 1150:  iMesh_getVtxArrCoords(instance, aVerts, iNVerts, SO,
+        1: 1151:			&adCoords1, &iCoords1Alloc, &iCoords1Size, &err);
+        1: 1152:  CHECK_ERR(err);
+        -: 1153:  int iGeomDim;
+        1: 1154:  iMesh_getGeometricDimension(instance, &iGeomDim, &err);
+        1: 1155:  CHECK_ERR(err);
+        -: 1156:
+        -: 1157:  bool qOK;
+        -: 1158:  {
+        1: 1159:    cout << " Setting vertex coordinates..." << endl;
+        1: 1160:    double * adCoordsTmp = (double*) calloc(iNVerts*iGeomDim, sizeof(double));
+     1094: 1161:    for (int iV = 0; iV < iNVerts; iV++) {
+     1093: 1162:      int iOff = iGeomDim * iV;
+     4372: 1163:      for (int i = 0; i < iGeomDim; i++) {
+     3279: 1164:	adCoordsTmp[iOff + i] = adCoords1[iOff + i] + iV + i + 1;
+        -: 1165:      }
+        -: 1166:    }
+        -: 1167:
+        -: 1168:    iMesh_setVtxArrCoords(instance, aVerts, iNVerts, SO, adCoordsTmp,
+        1: 1169:			  iCoords1Size, &err);
+        1: 1170:    CHECK_ERR(err);
+        -: 1171:
+        1: 1172:    double * adCoords2 = NULL;
+        -: 1173:    int iCoords2Size;
+        1: 1174:    int iCoords2Alloc = 0;
+        -: 1175:    iMesh_getVtxArrCoords(instance, aVerts, iNVerts, SO,
+        1: 1176:			  &adCoords2, &iCoords2Alloc, &iCoords2Size, &err);
+        1: 1177:    CHECK_ERR(err);
+        -: 1178:
+        1: 1179:    qOK = (iCoords2Size == iCoords1Size);
+     1094: 1180:    for (int iV = 0; iV < iNVerts; iV++) {
+     1093: 1181:      int iOff = iGeomDim * iV;
+     4372: 1182:      for (int i = 0; i < iGeomDim; i++) {
+     9837: 1183:	qOK = qOK && (APPROX_EQUAL(adCoords1[(iOff + i)],
+        -: 1184:				   adCoords2[(iOff + i)]
+    13116: 1185:				   - iV - i - 1));
+        -: 1186:      }
+        -: 1187:    }
+        1: 1188:    TEST(qOK);
+        -: 1189:    // Now set them back.
+        -: 1190:    iMesh_setVtxArrCoords(instance, aVerts, iNVerts, SO, adCoords1,
+        1: 1191:			  iCoords1Size, &err);
+        1: 1192:    CHECK_ERR(err);
+        1: 1193:    UT_FREE(adCoordsTmp);
+        1: 1194:    UT_FREE(aVerts);
+        1: 1195:    UT_FREE(adCoords1);
+        1: 1196:    UT_FREE(adCoords2);
+        -: 1197:  }
+        -: 1198:
+        -: 1199:  // Now create a flock of new vertices.  Then verify that their handles
+        -: 1200:  // and coordinates are returned properly .
+        -: 1201:  {
+        1: 1202:    qOK = true;
+        1: 1203:    cout << " Creating new vertices..." << endl;
+        1: 1204:    double * adCoords2 = (double*) calloc(10*iGeomDim, sizeof(double));
+       11: 1205:    for (int i = 0; i < 10; i++) {
+       10: 1206:      switch (iGeomDim) {
+        -: 1207:      case 3:
+       10: 1208:	adCoords2[i*iGeomDim + 0] =  3.14159 * i; // i*pi
+       10: 1209:	adCoords2[i*iGeomDim + 1] =  2.81828 * i; // i*e
+       10: 1210:	adCoords2[i*iGeomDim + 2] =  1.414 * i; // i*sqrt(2)
+       10: 1211:	break;
+        -: 1212:      case 2:
+    #####: 1213:	adCoords2[i*iGeomDim + 0] =  3.14159 * i; // i*pi
+    #####: 1214:	adCoords2[i*iGeomDim + 1] =  2.81828 * i; // i*e
+    #####: 1215:	break;
+        -: 1216:      default:
+    #####: 1217:	assert(0);
+        -: 1218:      }
+        -: 1219:    }
+        1: 1220:    vDoSaveLoad(&instance, &pvRootSet);
+        -: 1221:
+        1: 1222:    iBase_EntityHandle *aNewVerts = NULL;
+        -: 1223:    int iNumNewVerts;
+        1: 1224:    int SO = iBase_INTERLEAVED;
+        1: 1225:    int iNewVertsAlloc = 0;
+        -: 1226:    iMesh_createVtxArr(instance, 10, iBase_INTERLEAVED, adCoords2, 10*iGeomDim,
+        1: 1227:		       &aNewVerts, &iNewVertsAlloc, &iNumNewVerts, &err);
+        1: 1228:    CHECK_ERR(err);
+        1: 1229:    qOK = (iNumNewVerts == 10);
+        -: 1230:
+        -: 1231:    // Now verify the coords.
+        1: 1232:    double * adCoords3 = NULL;
+        -: 1233:    int iCoords3Size;
+        1: 1234:    int iCoords3Alloc = 0;
+        -: 1235:    iMesh_getVtxArrCoords(instance, aNewVerts, iNumNewVerts, SO,
+        1: 1236:			  &adCoords3, &iCoords3Alloc, &iCoords3Size, &err);
+        1: 1237:    CHECK_ERR(err);
+        1: 1238:    qOK = qOK && (iCoords3Size == iGeomDim*10);
+        -: 1239:
+       11: 1240:    for (int iV = 0; iV < 10; iV++) {
+       40: 1241:      for (int i = 0; i < iGeomDim; i++) {
+       30: 1242:	qOK = qOK && (adCoords3[(iV*iGeomDim + i)]
+       60: 1243:		      == adCoords2[(iV*iGeomDim + i)]);
+        -: 1244:      }
+        -: 1245:    }
+        1: 1246:    UT_FREE(adCoords2);
+        1: 1247:    UT_FREE(adCoords3);
+        1: 1248:    TEST(qOK);
+        1: 1249:    iMesh_deleteEntArr(instance, aNewVerts, iNumNewVerts, &err);
+        1: 1250:    CHECK_ERR(err);
+        1: 1251:    vDoSaveLoad(&instance, &pvRootSet);
+        1: 1252:    UT_FREE(aNewVerts);
+        -: 1253:    
+        -: 1254:    // Check that they were really deleted.
+        -: 1255:    int iNewNVerts;
+        1: 1256:    iMesh_getNumOfTopo(instance, pvRootSet, iMesh_POINT, &iNewNVerts, &err);
+        1: 1257:    CHECK_ERR(err);
+        1: 1258:    TESTEQ(iNewNVerts,iNVerts);
+        -: 1259:  } // Done checking array vertex creation
+        1: 1260:}
+        -: 1261:
+        1: 1262:void vTestTagInterface(iMesh_Instance& instance)
+        -: 1263:{
+        -: 1264:  //     createTag, destroyTag, getTagName, getTagSizeValues,
+        -: 1265:  //     getTagSizeBytes, getTagHandle, getTagType
+        -: 1266:  iBase_TagHandle aTags[4], pvBadTag, theTag;
+        -: 1267:  char strTagName[100];
+        -: 1268:  int err;
+        -: 1269:  int iType, iSizeBytes, iSizeValues;
+        -: 1270:
+        1: 1271:  cout << "Creating tags of each type...                             ";
+        -: 1272:
+        1: 1273:  bool qNamesOK = true, qTypesOK = true, qSizeBytesOK = true,
+        1: 1274:    qSizeValuesOK = true, qRetrieved = true;
+        -: 1275:  // Create a tag of each type and check that the queries for each of the various
+        -: 1276:  // parameters are working properly
+        5: 1277:  for ( int i=0; i<4; i++ ) {
+        -: 1278:    iMesh_createTag(instance,  astrTagNames[i], aiTagSizes[i], aTagTypes[i],
+        4: 1279:		    &aTags[i], &err, aiTagNameLen[i]);
+        4: 1280:    CHECK_ERR(err);
+        -: 1281:
+        4: 1282:    iMesh_getTagName(instance, aTags[i], strTagName, &err, 100);
+        4: 1283:    CHECK_ERR(err);
+        4: 1284:    qNamesOK = qNamesOK && ( !strncmp(astrTagNames[i], strTagName, 100) );
+        -: 1285:
+        4: 1286:    iMesh_getTagType(instance, aTags[i], &iType, &err);
+        4: 1287:    CHECK_ERR(err);
+        4: 1288:    qTypesOK = qTypesOK && ( iType == aTagTypes[i] );
+        -: 1289:
+        4: 1290:    iMesh_getTagSizeBytes(instance, aTags[i], &iSizeBytes, &err);
+        4: 1291:    CHECK_ERR(err);
+        4: 1292:    qSizeBytesOK = qSizeBytesOK && ( iSizeBytes == aiTagBytes[i]*aiTagSizes[i] );
+        -: 1293:
+        4: 1294:    iMesh_getTagSizeValues(instance, aTags[i], &iSizeValues, &err);
+        4: 1295:    CHECK_ERR(err);
+        4: 1296:    qSizeValuesOK = qSizeValuesOK && ( iSizeValues == aiTagSizes[i] );
+        -: 1297:
+        4: 1298:    iMesh_getTagHandle(instance, astrTagNames[i], &theTag, &err, aiTagNameLen[i]);
+        4: 1299:    CHECK_ERR(err);
+        4: 1300:    qRetrieved = qRetrieved && ( theTag == aTags[i] );
+        -: 1301:  }
+        -: 1302:
+        1: 1303:  TEST ( qNamesOK );
+        1: 1304:  TEST ( qTypesOK );
+        1: 1305:  TEST ( qSizeBytesOK );
+        1: 1306:  TEST ( qSizeValuesOK );
+        1: 1307:  TEST ( qRetrieved );
+        1: 1308:  cout << "DONE\n";
+        -: 1309:
+        1: 1310:  if ( qErrTests ) {
+        1: 1311:    cout << "Testing error throwing for Tag methods...                 ";
+        -: 1312:    // Error throwing tests simply try to create a situation where the interface
+        -: 1313:    // should, according to the spec, throw an error, and verify that:
+        -: 1314:    // (a) an error is thrown, and (b) the error is the one expected.
+        -: 1315:    // If an error is not thrown, the reversal of the action is attempted, if
+        -: 1316:    // it would interfere with further tests.
+        -: 1317:
+        -: 1318:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -: 1319:    // entity as an entity set or vice versa, etc., but sometimes try more
+        -: 1320:    // difficult tests such as passing in a pointer to character data as an
+        -: 1321:    // entity handle.
+        -: 1322:    // Duplicate tag name not caught
+        -: 1323:    iMesh_createTag(instance,  astrTagNames[0], 2, iBase_DOUBLE,
+        1: 1324:		    &pvBadTag, &err, aiTagNameLen[0]);
+        1: 1325:    CHECK_ERR2(err, iBase_TAG_ALREADY_EXISTS );
+        -: 1326:
+        -: 1327:    // Invalid tag value size not caught
+        -: 1328:    iMesh_createTag(instance,  "Bad", -1, iBase_ENTITY_HANDLE,
+        1: 1329:		    &pvBadTag, &err, 3);
+        1: 1330:    CHECK_ERR2(err, iBase_INVALID_ARGUMENT );
+        -: 1331:
+        -: 1332:    // Invalid tag value type not caught
+        -: 1333:    iMesh_createTag(instance,  "Bad", 1, iBase_TagValueType(5),
+        1: 1334:		    &pvBadTag, &err, 3);
+        1: 1335:    CHECK_ERR2(err, iBase_INVALID_ARGUMENT );
+        -: 1336:
+        -: 1337:    //
+        1: 1338:    cout << "DONE\n";
+        -: 1339:  }
+        -: 1340:
+        1: 1341:  cout << "Testing tag destruction...                                ";
+        -: 1342:  // Try to destroy tags... can't test forced/unforced destruction just yet
+        5: 1343:  for ( int i=0; i<4; i++ ) {
+        4: 1344:    iMesh_destroyTag(instance, aTags[i], false, &err);
+        4: 1345:    CHECK_ERR(err);
+        -: 1346:  }
+        1: 1347:  cout << "DONE\n";
+        1: 1348:}
+        -: 1349:
+        -: 1350:// Test some of the version macros
+        1: 1351:int vTestVersionMacros()
+        -: 1352:{
+        1: 1353:    const bool have_version_ge = true;
+        1: 1354:    const bool version_ge_0_0_8 = true;
+        1: 1355:    const bool version_ge_99_3_5 = false;
+        -: 1356:    bool ge;
+        -: 1357:
+        -: 1358:// It'd be nicer to use #if defined(IMESH_VERSION_GE) && IMESH_VERSION_GE(1,3,0)
+        -: 1359:// but I've seen CPP that don't handle the && operator correctly.
+        -: 1360:#ifdef IMESH_VERSION_GE
+        -: 1361:
+        -: 1362:#if IMESH_VERSION_GE(0,0,8)
+        1: 1363:    ge = true;
+        -: 1364:#else
+        -: 1365:    ge = false;
+        -: 1366:#endif // #if IMESH_VERSION_GE(0,0,8)
+        1: 1367:    TESTEQ(ge, version_ge_0_0_8);
+        -: 1368:
+        -: 1369:#if IMESH_VERSION_GE(99,3,5)
+        -: 1370:    ge = true;
+        -: 1371:#else
+        1: 1372:    ge = false;
+        -: 1373:#endif // #if IMESH_VERSION_GE(99,3,5)
+        1: 1374:    TESTEQ(ge, version_ge_99_3_5);
+        -: 1375:
+        -: 1376:#else
+        -: 1377:
+        -: 1378:    TESTEQ(false, have_version_ge);
+        -: 1379:
+        -: 1380:#endif // #ifdef IMESH_VERSION_GE
+        -: 1381:
+        -: 1382:    char tmp[256];
+        -: 1383:    sprintf(tmp, "iMesh_Version_%1d.%1d.%1d",
+        -: 1384:        IMESH_VERSION_MAJOR, IMESH_VERSION_MINOR, IMESH_VERSION_PATCH);
+        3: 1385:    TESTEQ(IMESH_VERSION_STRING, string(tmp));
+        1: 1386:}
+        -: 1387:
+        -: 1388://@ Test iterators in the presence of deletion and addition of entities.
+        -: 1389:// Basically, getting iterators to always behave properly when entities
+        -: 1390:// are added or deleted during iteration is a non-trivial exercise.  The
+        -: 1391:// current test checks only iterators for edges and triangles (for 2D
+        -: 1392:// meshes), or triangles and tetrahedra (for 3D meshes), as those are
+        -: 1393:// what's needed for the swapping service.  Other iterators should be
+        -: 1394:// bomb-proofed in the same way, and should be checked eve
+        -: 1395:
+        -: 1396://@ Main program
+        -: 1397:
+        1: 1398:int main(int argc, char *argv[] )
+        -: 1399:{
+        -: 1400:  // Check command line arg
+        1: 1401:  int iFile = 1, err;
+        -: 1402:  string sArg;
+        1: 1403:  string filename = "";
+        -: 1404:  const char* sOutFile;
+        3: 1405:  while ( iFile < argc ) {
+        1: 1406:    sArg = argv[iFile];
+        2: 1407:    if ( sArg == "-h" || sArg == "--help" ) {
+    #####: 1408:      TYPE_HELP;
+    #####: 1409:      TYPE_USAGE;
+    #####: 1410:      TYPE_USAGE_HELP;
+    #####: 1411:      return 0;
+        1: 1412:    } else if ( sArg == "--no-error" ) {
+    #####: 1413:      qErrTests = false;
+        2: 1414:    } else if ( sArg == "-s" || sArg == "--silent" ) {
+    #####: 1415:      qSilent = true;
+        1: 1416:    } else if (argv[iFile][0] == '-' && argv[iFile][1] == 'o') {
+    #####: 1417:      if ( argv[iFile][2] == '\0' ) {
+    #####: 1418:	sOutFile = "out_test.txt";
+        -: 1419:      } else {
+    #####: 1420:	sOutFile = ( argv[iFile]+2 );
+        -: 1421:      }
+    #####: 1422:      qOutFile = true;
+        1: 1423:    } else if (argv[iFile][0] == '-' && argv[iFile][1] == '-' &&
+    #####: 1424:	       argv[iFile][2] == 'o' && argv[iFile][3] == 'u' &&
+    #####: 1425:	       argv[iFile][4] == 't' && argv[iFile][5] == 'p' &&
+    #####: 1426:	       argv[iFile][6] == 'u' && argv[iFile][7] == 't') {
+    #####: 1427:      if ( argv[iFile][8] != '\0' && argv[iFile][8] != '=' ) {
+    #####: 1428:	sArg = ( argv[iFile]+2 );
+    #####: 1429:	TYPE_USAGE;
+        -: 1430:	std::cerr << "Invalid option: '" << sArg << "'.  Try '"
+    #####: 1431:		  << argv[0] << " --help'." << endl << endl;
+    #####: 1432:	return 1;
+    #####: 1433:      } else if ( argv[iFile][8] == '=' ) {
+    #####: 1434:	if ( argv[iFile][9] == '\0' ) {
+    #####: 1435:	  TYPE_USAGE;
+    #####: 1436:	  std::cerr << "No output file given!  Try '" << argv[0]
+    #####: 1437:		    << " --help'." << endl << endl;
+    #####: 1438:	  return 1;
+        -: 1439:	}
+    #####: 1440:	sOutFile = (argv[iFile]+9);
+        -: 1441:      } else {
+    #####: 1442:	sOutFile = "out_test.txt";
+        -: 1443:      }
+    #####: 1444:      qOutFile = true;
+        1: 1445:    } else if (sArg == "--no-save-load") {
+    #####: 1446:        qSaveLoad = false;
+    #####: 1447:        qSaveLoadClean = false;
+        1: 1448:    } else if (sArg == "--no-save-load-clean") {
+    #####: 1449:        qSaveLoadClean = false;
+        1: 1450:    } else if ( argv[iFile][0] == '-' ) {
+    #####: 1451:      if ( argv[iFile][1] == '-' )
+    #####: 1452:	sArg = (argv[iFile]+2);
+        -: 1453:      else
+    #####: 1454:	sArg = (argv[iFile]+1);
+    #####: 1455:      TYPE_USAGE;
+        -: 1456:      std::cerr << "Invalid option: '" << sArg << "'.  Try '"
+    #####: 1457:		<< argv[0] << " --help'." << endl << endl;
+    #####: 1458:      return 1;
+        -: 1459:    } else {
+        1: 1460:      filename = argv[iFile];
+        -: 1461:    }
+        1: 1462:    iFile++;
+        -: 1463:  }
+        1: 1464:  if ( filename == "" ) {
+    #####: 1465:    TYPE_USAGE;
+    #####: 1466:    std::cerr << "Need an input file!  Try '" << argv[0]
+    #####: 1467:	      << " --help'." << endl << endl;
+    #####: 1468:    return 1;
+        -: 1469:  }
+        -: 1470:
+        -: 1471:#ifdef SETVBUF_REVERSED
+        -: 1472:  setvbuf(stdout, _IONBF, NULL, 1);
+        -: 1473:#else
+        1: 1474:  setvbuf(stdout, NULL, _IONBF, 1);
+        -: 1475:#endif
+        -: 1476:
+        1: 1477:  std::streambuf* outbuf = cout.rdbuf();
+        1: 1478:  std::streambuf* errbuf = std::cerr.rdbuf();
+        1: 1479:  std::ofstream file, nullFile;
+        1: 1480:  if ( qOutFile ) {
+    #####: 1481:    file.open(sOutFile);
+    #####: 1482:    if ( !file.is_open() ) {
+        -: 1483:      std::cerr << endl << "Error: Could not open output file '"
+    #####: 1484:		<< sOutFile << "'!" << endl << endl;
+    #####: 1485:      return 1;
+        -: 1486:    }
+    #####: 1487:    cout.rdbuf( file.rdbuf() );
+    #####: 1488:    std::cerr.rdbuf( file.rdbuf() );
+        -: 1489:  }
+        1: 1490:  if ( qSilent ) {
+    #####: 1491:    nullFile.open("/dev/null/");
+    #####: 1492:    cout.rdbuf( nullFile.rdbuf() );
+    #####: 1493:    std::cerr.rdbuf( nullFile.rdbuf() );
+        -: 1494:  }
+        1: 1495:  if ( qSaveLoad ) {
+        1: 1496:    snprintf(TMPDIR, sizeof(TMPDIR), "./tmpdata_%llu", (unsigned long long) getpid());
+        1: 1497:    mkdir(TMPDIR, 0770);
+        -: 1498:  }
+        -: 1499:
+        1: 1500:  vTestVersionMacros();
+        -: 1501:
+        -: 1502:  iMesh_Instance instance;
+        1: 1503:  iMesh_newMesh("", &instance, &err, 0);
+        1: 1504:  if (err != iBase_SUCCESS) {
+    #####: 1505:    cout << "Can't create an iMesh instance; giving up!" << endl;
+    #####: 1506:    exit(1);
+        -: 1507:  }
+        -: 1508:
+        1: 1509:  vSetupTypeAndTopo();
+        -: 1510:
+        -: 1511:  {
+        -: 1512:    // Test stuff specific to interface iMesh_  Those functions are:
+        -: 1513:    //    load, save, getRootSet, getGeometricDimension, getDfltStorage,
+        -: 1514:    //    getAdjTable, getNumOfType, getNumOfTopo, getAllVtxCoords,
+        -: 1515:    //    getVtxCoordIndex, getEntities, getVtxArrCoords, and
+        -: 1516:    //    getAdjEntities
+        -: 1517:
+        1: 1518:    cout << "Testing mesh interface..." << endl;
+        1: 1519:    qAllPassed = true;
+        1: 1520:    vTestMeshInterface(instance, filename);
+        1: 1521:    if ( qAllPassed )
+        1: 1522:      iNIntPassed++;
+        -: 1523:    else
+    #####: 1524:      iNIntFailed++;
+        2: 1525:    TEST_STATS;
+        -: 1526:  }
+        -: 1527:
+        -: 1528:  // Test stuff specific to interface Entity.  Those functions are:
+        -: 1529:  //    initEntIter, getNextEntIter, resetEntIter, endEntIter,
+        -: 1530:  //    getEntTopo, getEntType, getVtxCoord, getEntAdj
+        1: 1531:  bool qEntityPassed = false;
+        -: 1532:  {
+        1: 1533:    qAllPassed = true;
+        1: 1534:    vTestEntityInterface(instance);
+        1: 1535:    if ( qAllPassed ) {
+        1: 1536:      qEntityPassed = true;
+        1: 1537:      iNIntPassed++;
+        -: 1538:    }
+        -: 1539:    else
+    #####: 1540:      iNIntFailed++;
+        2: 1541:    TEST_STATS;
+        -: 1542:  }
+        -: 1543:
+        -: 1544:  // Test stuff specific to interface Arr.  Those functions are:
+        -: 1545:  //     initEntArrIter, getEntArrNextIter, resetEntArrIter,
+        -: 1546:  //     endEntArrIter, getEntArrTopo, getEntArrType, getEntArrAdj
+        -: 1547:  {
+        1: 1548:    qAllPassed = true;
+        1: 1549:    vTestArrInterface(instance);
+        1: 1550:    if ( qAllPassed )
+        1: 1551:      iNIntPassed++;
+        -: 1552:    else
+    #####: 1553:      iNIntFailed++;
+        2: 1554:    TEST_STATS;
+        -: 1555:  }
+        -: 1556:
+        -: 1557:  // Test stuff specific to interface Modify.  Those functions are:
+        -: 1558:  //     setVtxCoords, createVtx, createEnt, deleteEnt
+        1: 1559:  bool qModifyPassed = false;
+        -: 1560:  {
+        1: 1561:    qAllPassed = true;
+        1: 1562:    vTestModifyInterface(instance);
+        1: 1563:    if ( qAllPassed ) {
+        1: 1564:      qModifyPassed = true;
+        1: 1565:      iNIntPassed++;
+        -: 1566:    }
+        -: 1567:    else
+    #####: 1568:      iNIntFailed++;
+        2: 1569:    TEST_STATS;
+        -: 1570:  }
+        -: 1571:
+        -: 1572:  // Test stuff specific to interface ModArr.  Those functions are:
+        -: 1573:  //     setVtxArrCoords, createVtxArr, createEntArr, deleteEntArr
+        -: 1574:  {
+        1: 1575:    qAllPassed = true;
+        1: 1576:    vTestArrModInterface(instance);
+        1: 1577:    if ( qAllPassed )
+        1: 1578:      iNIntPassed++;
+        -: 1579:    else
+    #####: 1580:      iNIntFailed++;
+        2: 1581:    TEST_STATS;
+        -: 1582:  }
+        -: 1583:
+        -: 1584:  // Tag and entity set testing, appended June 2005 by Ben Kerby
+        -: 1585:
+        -: 1586:  // Test stuff specific to interface EntSet.  Those functions are:
+        -: 1587:  //     createEntSet, destroyEntSet, isList, getNumEntSets, getEntSets,
+        -: 1588:  //     addEntToSet, rmvEntFromSet, addEntArrToSet, rmvEntArrFromSet,
+        -: 1589:  //     addEntSet, rmvEntSet, isContainedIn
+        -: 1590:  {
+        1: 1591:    cout << "Testing entity set interface..." << endl;
+        1: 1592:    qAllPassed = true;
+        1: 1593:    vTestEntSetInterface(instance);
+        1: 1594:    if ( qAllPassed )
+        1: 1595:      iNIntPassed++;
+        -: 1596:    else
+    #####: 1597:      iNIntFailed++;
+        2: 1598:    TEST_STATS;
+        -: 1599:  }
+        -: 1600:
+        -: 1601:  // Test stuff specific to interface SetRelation.  Those functions are:
+        -: 1602:  //     addPrntChld, rmvPrntChld, isChildOf, getNumChld, getNumPrnt,
+        -: 1603:  //     getChldn, getPrnts
+        -: 1604:  {
+        1: 1605:    qAllPassed = true;
+        1: 1606:    vTestSetRelationInterface(instance);
+        1: 1607:    if ( qAllPassed )
+        1: 1608:      iNIntPassed++;
+        -: 1609:    else
+    #####: 1610:      iNIntFailed++;
+        2: 1611:    TEST_STATS;
+        -: 1612:  }
+        -: 1613:
+        -: 1614:  // Test stuff specific to interface SetBoolOps.  Those functions are:
+        -: 1615:  //     subtract, intersect, unite
+        -: 1616:  {
+        1: 1617:    qAllPassed = true;
+        1: 1618:    vTestBoolOpsInterface(instance);
+        1: 1619:    if ( qAllPassed )
+        1: 1620:      iNIntPassed++;
+        -: 1621:    else
+    #####: 1622:      iNIntFailed++;
+        2: 1623:    TEST_STATS;
+        -: 1624:  }
+        -: 1625:
+        -: 1626:  // Now that entity sets have been tested, go back and re-test query
+        -: 1627:  // using entity sets.
+        -: 1628:
+        -: 1629:  // Retest stuff specific to interface Mesh that can take entity_set
+        -: 1630:  // args.  Those functions are:
+        -: 1631:  //    getNumOfType, getNumOfTopo, getAllVtxCoords,
+        -: 1632:  //    getVtxCoordIndex, getEntities, and getAdjEntities
+        -: 1633:
+        -: 1634:  {
+        1: 1635:    qAllPassed = true;
+        1: 1636:    vTestMeshWithSets(instance);
+        1: 1637:    if ( qAllPassed )
+        1: 1638:      iNIntPassed++;
+        -: 1639:    else
+    #####: 1640:      iNIntFailed++;
+        2: 1641:    TEST_STATS;
+        -: 1642:  }
+        -: 1643:
+        -: 1644:  // Test single-entity iterators over EntitySets. Those functions are:
+        -: 1645:  //    initEntIter, getNextEntIter, resetEntIter, endEntIter
+        -: 1646:  {
+        1: 1647:    cout << "Testing single entity iterators with entity sets..." << endl;
+        1: 1648:    qAllPassed = true;
+        1: 1649:    vTestEntityWithSets(instance);
+        1: 1650:    if ( qAllPassed )
+        1: 1651:      iNIntPassed++;
+        -: 1652:    else
+    #####: 1653:      iNIntFailed++;
+        2: 1654:    TEST_STATS;
+        -: 1655:  }
+        -: 1656:
+        -: 1657:  // Test array iterators over EntitySets. Those functions are:
+        -: 1658:  //     initEntArrIter, getEntArrNextIter, resetEntArrIter,
+        -: 1659:  //     endEntArrIter
+        -: 1660:  {
+        1: 1661:    cout << "Testing entity array iterators over entity sets..." << endl;
+        1: 1662:    qAllPassed = true;
+        1: 1663:    vTestArrayWithSets(instance);
+        1: 1664:    if ( qAllPassed )
+        1: 1665:      iNIntPassed++;
+        -: 1666:    else
+    #####: 1667:      iNIntFailed++;
+        2: 1668:    TEST_STATS;
+        -: 1669:  }
+        -: 1670:
+        -: 1671:  // Test stuff specific to interface Tag.  Those functions are:
+        -: 1672:  //     createTag, destroyTag, getTagName, getTagSizeValues,
+        -: 1673:  //     getTagSizeBytes, getTagHandle, getTagType
+        -: 1674:  {
+        1: 1675:    cout << "Testing tag interface..." << endl;
+        1: 1676:    qAllPassed = true;
+        1: 1677:    vTestTagInterface(instance);
+        1: 1678:    if ( qAllPassed )
+        1: 1679:      iNIntPassed++;
+        -: 1680:    else
+    #####: 1681:      iNIntFailed++;
+        2: 1682:    TEST_STATS;
+        -: 1683:  }
+        -: 1684:
+        -: 1685:  // Test stuff specific to interface EntTag.  Those functions are:
+        -: 1686:  //     getData, getIntData, getDblData, getEHData, setData,
+        -: 1687:  //     setIntData, setDblData, setEHData, getAllTags, rmvTag
+        -: 1688:  {
+        1: 1689:    cout << "Testing entity tag interface..." << endl;
+        1: 1690:    qAllPassed = true;
+        1: 1691:    vTestEntTagInterface(instance);
+        1: 1692:    if ( qAllPassed )
+        1: 1693:      iNIntPassed++;
+        -: 1694:    else
+    #####: 1695:      iNIntFailed++;
+        2: 1696:    TEST_STATS;
+        -: 1697:  }
+        -: 1698:
+        -: 1699:  // Test stuff specific to interface ArrTag.  Those functions are:
+        -: 1700:  //     getArrData, getIntArrData, getDblArrData, getEHArrData,
+        -: 1701:  //     setArrData, setIntArrData, setDblArrData, setEHArrData,
+        -: 1702:  //     rmvArrTag
+        -: 1703:  {
+        1: 1704:    cout << "Testing array tag interface..." << endl;
+        1: 1705:    qAllPassed = true;
+        1: 1706:    vTestArrTagInterface(instance);
+        1: 1707:    if ( qAllPassed )
+        1: 1708:      iNIntPassed++;
+        -: 1709:    else
+    #####: 1710:      iNIntFailed++;
+        2: 1711:    TEST_STATS;
+        -: 1712:  }
+        -: 1713:
+        -: 1714:  // Test stuff specific to interface SetTag.  Those functions are:
+        -: 1715:  //     getEntSetData, getEntSetIntData, getEntSetDblData,
+        -: 1716:  //     getEntSetEHData, setEntSetData, setEntSetIntData,
+        -: 1717:  //     setEntSetDblData, setEntSetEHData, getAllEntSetTags,
+        -: 1718:  //     rmvEntSetTag
+        -: 1719:  {
+        1: 1720:    cout << "Testing entity set tag interface..." << endl;
+        1: 1721:    qAllPassed = true;
+        1: 1722:    vTestSetTagInterface(instance);
+        1: 1723:    if ( qAllPassed )
+        1: 1724:      iNIntPassed++;
+        -: 1725:    else
+    #####: 1726:      iNIntFailed++;
+        2: 1727:    TEST_STATS;
+        -: 1728:  }
+        -: 1729:
+        -: 1730:  // Test coordinate handling for 1 and 2D meshes
+        -: 1731:  {
+        1: 1732:    cout << "Testing lower geometric dimensioned meshes..." << endl;
+        1: 1733:    qAllPassed = true;
+        1: 1734:    vTestLowerDimensionedCoordinates();
+        1: 1735:    if ( qAllPassed )
+        1: 1736:      iNIntPassed++;
+        -: 1737:    else
+    #####: 1738:      iNIntFailed++;
+        2: 1739:    TEST_STATS;
+        -: 1740:  }
+        -: 1741:    
+        -: 1742:
+        -: 1743:  // These tests aren't yet ready for primetime, so they're commented out.
+        -: 1744:
+        -: 1745:  // Now test the behavior of iterators in the presence of mesh
+        -: 1746:  // modification, provided that both Entity and Modify interfaces
+        -: 1747:  // passed their tests.
+        -: 1748://   if (qEntityPassed && qModifyPassed) {
+        -: 1749://     qAllPassed = true;
+        -: 1750://     vTestIterWithModify(iMesh_getGeometricDimension(instance, ));
+        -: 1751://     if ( qAllPassed )
+        -: 1752://       iNIntPassed++;
+        -: 1753://     else
+        -: 1754://       iNIntFailed++;
+        -: 1755://     TEST_STATS;
+        -: 1756://   }
+        -: 1757://   else {
+        -: 1758://     iNNotImpl++;
+        -: 1759://     cout << "Can't test iterators with Modify; either Entity or Modify failed a test.\n" << endl;
+        -: 1760://   }
+        -: 1761:
+        1: 1762:  if ( qSilent || qOutFile ) {
+    #####: 1763:    cout.rdbuf( outbuf );
+    #####: 1764:    std::cerr.rdbuf( errbuf );
+        -: 1765:  }
+        -: 1766:
+        1: 1767:  std::stringstream stst;
+        -: 1768:
+        -: 1769:  stst << endl << "FINAL RESULTS: " << std::setw(4) << iNPassed
+        -: 1770:       << " tests passed, " << endl << "               "
+        -: 1771:       << std::setw(4) << iNFailed << " tests failed in a total of "
+        -: 1772:       << endl << "               " << std::setw(4)
+        -: 1773:       << iNPassed+iNFailed << " tests, a pass rate of "
+        -: 1774:       << (int)100*iNPassed/(iNPassed+iNFailed) << "%." << endl
+        -: 1775:       << endl << "               " << std::setw(4)
+        -: 1776:       << iNIntPassed+iNIntFailed+iNNotImpl
+        -: 1777:       << " interfaces/interface combinations were tested: " << endl
+        -: 1778:       << "               " << std::setw(4) << iNIntPassed
+        -: 1779:       << " passed all interface-specific tests"
+        -: 1780:       << ( iNNotImpl == 0 ? " and" : ", " ) << endl
+        -: 1781:       << "               " << std::setw(4) << iNIntFailed
+       18: 1782:       << " failed at least one test";
+        1: 1783:  if ( iNNotImpl != 0 ) {
+        -: 1784:    stst << ", and " << endl << "               " << std::setw(4)
+        -: 1785:	 << iNNotImpl << ( iNNotImpl==1 ? " was " : " were ")
+    #####: 1786:	 << "not implemented. " << endl << endl;
+        -: 1787:  } else
+        1: 1788:    stst << "." << endl << endl;
+        -: 1789:
+        1: 1790:  cout << stst.str();
+        -: 1791:
+        1: 1792:  if ( qOutFile ) {
+    #####: 1793:    file << stst.str();
+    #####: 1794:    file.close();
+        -: 1795:  }
+        1: 1796:  if ( qSaveLoadClean ) {
+        1: 1797:    CleanSaveLoad();
+        -: 1798:  }
+        -: 1799:
+        1: 1800:  iMesh_dtor(instance, &err);
+        1: 1801:  exit(iNFailed);
+        2: 1802:}

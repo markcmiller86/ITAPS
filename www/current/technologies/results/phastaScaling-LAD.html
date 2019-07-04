@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_techno-results_template.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTechnologies pageTechnologiesResults pagePhastaScaling-LAD" -->
+</head>
+
+<body class="pageTechnologies pageTechnologiesResults pagePhastaScaling-LAD">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Petascale Technologies</h1>
+<p>
+<a class="nav" href="../research/index.html">Research</a><span class="hide"> | </span>
+<a class="nav" href="index.html" id="linkIndex">Scaling Results</a><span class="hide"> | </span>
+<a class="nav sub" href="phastaScaling-LAD.html" id="linkPhastaScaling-LAD">PHASTA Scaling</a><span class="hide"> | </span>
+<a class="nav sub" href="FMDB_imesh.html" id="linkFMDB_imesh">FMDB iMesh Implementation</a><span class="hide"> | </span>
+<a class="nav sub" href="meshAdapt.html" id="linkMeshAdapt">Mesh Adapt </a><span class="hide"> | </span>
+<a class="nav sub" href="zoltan.html" id="linkZoltan">Zoltan Partitioning </a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesquite Mesh Quality </a><span class="hide"> | </span>
+
+<a class="nav sub" href="parallelScaling.html" id="linkParallelScaling">FronTier parallel scaling</a><span class="hide"> | </span>
+</p>
+
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+<h1> Scaling Unstructured Mesh Computations Using PHASTA </h1>
+
+<p class="clear">&nbsp;</p>
+
+<p>A prerequisite to supporting unstructured mesh operations and adaptive simulations on petascale computers
+is ensuring that the unstructured mesh solvers scale on these machines. ITAPS team members are involved
+with the development of such solvers based on implicit methods and unstructured, adapted meshes.
+This challenging but important class of methods allows for efficient solution of many interesting real-world
+problems that are otherwise prohibitively expensive to consider with methods using structured grids (mesh
+grows too large) and/or explicit methods (time step becomes too small). Strong scaling of a method based
+on unstructured, implicit and adaptive techniques not only enables the solution of extremely large problems
+but also allows for significant compression in the solution-time for a fixed size problem. Achieving strong
+scaling on leadership class computing facilities requires advanced interoperable software tools designed
+specifically to meet the needs of different domain-specific simulations. The table below illustrates the parallel efficiency
+of PHASTA, a parallel, unstructured and implicit flow solver developed at RPI on up to O(100,000)
+cores of IBM BG and Cray XT systems. PHASTA uses ITAPS technologies including FMDB and the MeshAdapt
+service for refinement on up to 16K processors and iMeshP and iZoltan to partition the resulting
+meshes into 128K parts for distribution to the full machine for the analysis step. Near-perfect (linear) strong
+scaling of the analysis step over multiple doublings of cores can be clearly seen on various systems with a
+slight decrease in parallel efficiency on the largest core counts due to the fact that computational load per
+core becomes insignificant (for a fixed-size problem).
+ </p>
+<div class="imgContainer center" style="width: 295px;">
+  <table width="295" cellpadding="0" cellspacing="0">
+    <caption>
+      Strong scaling results for PHASTA for 105 Million elements on up to 32K processors
+      </caption>
+    <tr>
+      <th width="39" bgcolor="#99CCFF" scope="col">Core Count</th>
+      <th width="76" bgcolor="#99CCFF" scope="col">BGL-CCNI RPI</th>
+      <th width="76" bgcolor="#99CCFF" scope="col">BGP-ALCF ANL</th>
+      <th width="76" bgcolor="#99CCFF" scope="col"><p>XT4-NERSC LBNL</p></th>
+    </tr>
+    <tr>
+      <td>512</td>
+      <td align="center">1.00</td>
+      <td align="center">1.00</td>
+      <td align="center">1.00</td>
+    </tr>
+    <tr>
+      <td>1024</td>
+      <td align="center">1.01</td>
+      <td align="center">1.02</td>
+      <td align="center">1.03</td>
+    </tr>
+    <tr>
+      <td>2048</td>
+      <td align="center">1.00</td>
+      <td align="center">0.99</td>
+      <td align="center">1.16</td>
+    </tr>
+    <tr>
+      <td>4096</td>
+      <td align="center">0.99</td>
+      <td align="center">0.99</td>
+      <td align="center">1.00</td>
+    </tr>
+    <tr>
+      <td>8192</td>
+      <td align="center">1.02</td>
+      <td align="center">0.95</td>
+      <td align="center">0.77</td>
+    </tr>
+    <tr>
+      <td>16384</td>
+      <td align="center">1.03</td>
+      <td align="center">0.95</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+    <tr>
+      <td>32768</td>
+      <td align="center">0.93</td>
+      <td align="center">0.88</td>
+      <td align="center">&nbsp;</td>
+    </tr>
+  </table>
+</div>
+
+<div class="imgContainer center" style="width: 175px;">
+	  <table width="175" cellpadding="0" cellspacing="0">
+    <caption>
+      Strong Scaling results for PHASTA for 1 Billion Elements on up to 131,072 processors
+      </caption>
+    <tr>
+      <th width="83" bgcolor="#99CCFF" scope="col">Core Count</th>
+      <th width="76" align="center" bgcolor="#99CCFF" scope="col">BGP-ALCF ANL</th>
+    </tr>
+    <tr>
+      <td>16384</td>
+      <td align="center">1.00</td>
+    </tr>
+    <tr>
+      <td>32678</td>
+      <td align="center">0.99</td>
+    </tr>
+    <tr>
+      <td>65536</td>
+      <td align="center">0.97</td>
+    </tr>
+    <tr>
+      <td height="16">131072</td>
+      <td align="center">0.89</td>
+    </tr>
+  </table>
+</div>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

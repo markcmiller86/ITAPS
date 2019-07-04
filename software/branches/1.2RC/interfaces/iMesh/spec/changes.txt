@@ -1,0 +1,24 @@
+- changed return values all to int
+- added iMesh_LAST_ERROR struct to track last error
+- added dtor function to replace sidl-based delete function
+- added options string and length to load, save functions
+- added iMesh_Instance args to all/most functions (except for ctor)
+- EntityType, TagValueType, StorageOrder, AdjacencyInfo moved down to
+  iBase from iMesh
+- EntityHandle, EntitySetHandle, TagHandle moved down to iBase
+- Added 2nd order adjacencies
+
+- add pre-processor macros defining interface version
+- replace void* typedefs with anonymous structs for better type safety
+- fix documentation that referred to root set as a null handle or zero value
+- add iMesh_setGeometricDimension
+- remove iMesh_getAllVtxCoords and iMesh_getVtxCoordIndex
+- add iMesh_getAdjEntIndices
+- fix set handles incorrectly declared as inout
+- add iMesh_isEntArrContained
+
+- remove in_entity_set argument from iMesh_getAdjEntities
+
+- remove getAdjEntities
+- rename setVtxCoords to setVtxCoord
+- make all storage order arguments 'in' rathar than 'inout'

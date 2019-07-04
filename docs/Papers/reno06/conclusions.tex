@@ -1,0 +1,36 @@
+
+\section{Current Status and Ongoing Work\label{sec:Conclusions}}
+
+The TSTT mesh interface has been implemented into several existing
+meshing tools, including FMDB (RPI), GRUMMP (UBC), MOAB (SNL), Frontier
+(SUNY SB), Overture (LLNL), and NWGrid (PNNL).  The interface is used by
+several TSTT-developed mesh services tools including a mesh quality
+improvement toolkit (Mesquite)\cite{Mesquite03}, a face- and
+edge-swapping service\cite{TSTT-swap-tool}, and a mesh adaptation service.  In
+addition, the TSTT interface is used in several
+application codes.  The most notable of these is the joint work between
+the TSTT consortium and researchers at the Stanford Linear Accelerator
+Center (SLAC).  In this work, researchers are developing the TSTT-based
+mesh services needed in design optimization of accelerator cavities and
+to insert a mesh adaptation loop into SLAC's linear accelerator design
+code\cite{GeLe04}.
+
+To increase the dissemination of TSTT-compliant tools, we are now
+working to establish component-level compliance with the standards of
+the Common Component Architecture (CCA) Forum\cite{cca-forum}.  The CCA
+Forum is defining a component architecture tailored to address all
+aspects of high-performance scientific computing.  As part of this
+effort, they are creating the Rapid Application Development environment,
+in which TSTT mesh implementations will play a key role.
+
+Work continues to improve the functionality and ease of use of the TSTT
+interface.  We are working to adapt our current unit test suite for full
+TSTTM implementations for use by those requiring correct behavior for
+only a subset of functionality to be able to use a particular service.
+Also, we expect to leverage current Babel research aimed at improving
+software component compliance and usage through interface-level software
+contracts\cite{dahlgren:sehpcs04,dahlgren:study04,dahlgren:sehpcs05}.
+
+More information on the TSTT interface, including complete documentation,
+can be found at http://www.tstt-scidac.org.
+

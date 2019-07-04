@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Parallel Adaptive Loops</title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>Parallel Adaptive Loops</h1>
+
+A parallel solution adaptive loop service is being developed to support SLAC
+accelerator modeling and PPPL MHD modeling
+of fusion plasmas (currently underway), and is also being applied to
+blood flow and large deformation forming
+problems. The current service is based on generalized
+mesh modification procedures that accept a discretized mesh size field
+as input and modifies simplex (tetrahedral) meshes to match the
+specified mesh sizes including anisotropic
+mesh configurations. These procedures have been
+developed to work in conjunction with a CAD definition of the
+geometric domain so that as the mesh is refined its geometric
+approximation is automatically improved.  A
+generalized partition model has been added to this
+service to allow it to support parallel distributed meshes that are
+dynamically load-balanced as part of adaptive simulations.  
+
+<p>
+We will continue to develop this service
+to provide applications the ability to
+employ adaptive simulation technologies with either no modification,
+or minimal modification, to their analysis procedures. The minimal set
+of components required to construct an adaptive loop are (i) a
+mesh-based analysis procedure capable of solving the PDE's, (ii) an
+error estimation procedure that can use the current solution
+information to indicate the changes desired to the discretization,
+(iii) a mesh adaptation procedure (which must be geometry-aware) that
+can modify the mesh as specified and (iv) a procedure to map solution
+parameters to the new discretization. This service will build on
+component services for mesh adaptation, error estimation, solution
+transfer, and dynamic services, as well as the ITAPS interfaces.  We
+will also complete the parallelization of this service, to eliminate
+the serial I/O bottleneck of the current process, with a goal of
+improving the scalability of the current service to treat meshes of
+over 10^9 elements.
+
+
+
+	</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>AMR Front Tracking </title>
+	<link type="text/css" rel="stylesheet" href="/templates/stylesheet.css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="banner"><img alt="ITAPS" src="../graphics/banner.gif" > <br></div>
+
+<div id="menu"><!--#include virtual="/templates/menu.html"--> </div>
+
+<div id="content">
+	
+<h1>AMR Front Tracking</h1>
+
+<p>
+FronTier (SUNY SB and BNL) has been used to
+apply the front-tracking method to different scientific problems such
+as gas dynamics, petroleum reservoir study, MHD and solid interface
+problems.
+Our goal within the context of the
+ITAPS center is to combine the strengths of the FronTier and various
+block-structured adaptive mesh refinement codes
+to develop a new, efficient front-tracking algorithm combined
+with the AMR technique, the so-called AMR Front Tracking Method.
+
+<p>Our focus is on the three-dimensional coupling and the design of a
+code interface with different AMR libraries including Overture,
+SAMRAI, and Chombo, the last of which is developed by the APDEC SciDAC
+Center. To achieve interoperability with all three AMR packages, we
+have designed a common interface for block-structured AMR codes and
+redesigned the FronTier-AMR module to use these interfaces.  The
+corresponding wrappers for the Overture package are functional and in
+use; wrappers for the SAMRAI and Chombo codes are being written and
+tested.
+
+<p> The most difficult part of the work has been in the generalization
+of patch and subdomain communications. Although FronTier is
+parallelized, the data communication between patches inside the same
+parallel processor is outside of the development framework. As a
+result, we needed to find a practical method to synchronize the
+computation of different patches inside the same parallel
+processor. We finally decided to modify the entire functional
+structure of the interface propagation in the FronTier code to have it
+fully modularized at the synchronization points inside a single driver
+function. Figure 8 shows the adaptive patches with the tracked front.
+
+</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+\hypertarget{class_i_t_a_p_s___swap_1_1_delaunay3_d}{
+\section{ITAPS\_\-Swap::Delaunay3D Class Reference}
+\label{class_i_t_a_p_s___swap_1_1_delaunay3_d}\index{ITAPS\_\-Swap::Delaunay3D@{ITAPS\_\-Swap::Delaunay3D}}
+}
+Inheritance diagram for ITAPS\_\-Swap::Delaunay3D:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2cm]{class_i_t_a_p_s___swap_1_1_delaunay3_d}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_i_t_a_p_s___swap_1_1_delaunay3_d_aa1017e73711b3cd8f3a04d64572eff43}{
+virtual bool \hyperlink{class_i_t_a_p_s___swap_1_1_delaunay3_d_aa1017e73711b3cd8f3a04d64572eff43}{shouldMinimize} () const }
+\label{class_i_t_a_p_s___swap_1_1_delaunay3_d_aa1017e73711b3cd8f3a04d64572eff43}
+
+\begin{DoxyCompactList}\small\item\em Returns true iff the quality measure should be minimized by swapping. \item\end{DoxyCompactList}\item 
+virtual double \hyperlink{class_i_t_a_p_s___swap_1_1_delaunay3_d_a5d045c523425ea05cdc4df77a4df61ce}{calcQuality} (const double coords\mbox{[}$\,$\mbox{]}, const int coords\_\-size) const 
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_i_t_a_p_s___swap_1_1_delaunay3_d_a5d045c523425ea05cdc4df77a4df61ce}{
+\index{ITAPS\_\-Swap::Delaunay3D@{ITAPS\_\-Swap::Delaunay3D}!calcQuality@{calcQuality}}
+\index{calcQuality@{calcQuality}!ITAPS_Swap::Delaunay3D@{ITAPS\_\-Swap::Delaunay3D}}
+\subsubsection[{calcQuality}]{\setlength{\rightskip}{0pt plus 5cm}double ITAPS\_\-Swap::Delaunay3D::calcQuality (const double {\em coords}\mbox{[}$\,$\mbox{]}, \/  const int {\em coords\_\-size}) const\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{class_i_t_a_p_s___swap_1_1_delaunay3_d_a5d045c523425ea05cdc4df77a4df61ce}
+This quality measure actually computes the ratio of shortest edge length to circumradius, since Delaunay isn't a single cell quality measure. This doesn't affect the swapping code directly, since there's a hard-\/coded swapping decision for Delaunay. 
+
+Implements \hyperlink{class_i_t_a_p_s___swap_1_1_q_m___base_aea047b3afc06b75a1115bbaddd8286ee}{ITAPS\_\-Swap::QM\_\-Base}.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+ITAPS\_\-QualMeasure.hh\item 
+ITAPS\_\-Delaunay3D.cc\end{DoxyCompactItemize}

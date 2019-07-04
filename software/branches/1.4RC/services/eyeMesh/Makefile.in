@@ -1,0 +1,55 @@
+.SUFFIXES: .cpp _moc.cpp
+include @IMESH_DEFS@
+
+CXXFLAGS=@CXXFLAGS@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+VTK_RPATH_FLAGS=`echo "@VTK_LDFLAGS@" | tr ' ' '\n' | grep -e -L | sed -e 's|-L|-Wl,-rpath,|'`
+IMESH_RPATH_FLAGS=`echo $(IMESH_LIBS) | tr ' ' '\n' | grep -e -L | sed -e 's|-L|-Wl,-rpath,|'`
+CPPFLAGS=@QTINC@ @VTK_CFLAGS@ $(IMESH_INCLUDES) -I.
+LDFLAGS=@QTLIBS@ @VTK_LDFLAGS@ $(IMESH_LIBS) $(VTK_RPATH_FLAGS) $(IMESH_RPATH_FLAGS)
+
+# Implicit rules
+.h_moc.cpp:
+	rm -rf $@
+	@QTBIN@/moc $< > $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
+
+# First, all of the header files that define Qt objects.
+HDRMOC = \
+    Explorer.h \
+    iMeshArrayView.h \
+    iMeshSetView.h \
+    iMeshSetTreeView.h \
+    iMeshView.h
+
+# Then, all of the rest of the header files
+HDR = ${HDRMOC} \
+    iMeshFile.h \
+    iBase_names.h
+
+# All of the sources
+SRC = \
+    ${HDRMOC:.h=.cpp} \
+    iMeshFile.cpp \
+    iBase_names.cpp
+
+# Where main() is.
+MAINSRC = main.cpp
+
+SRCMOC=${HDRMOC:.h=_moc.cpp}
+OBJMOC=${SRCMOC:.cpp=.o}
+
+OBJ=$(SRC:.cpp=.o) ${OBJMOC}
+MAINOBJ=$(MAINSRC:.cpp=.o)
+
+eyeMesh: $(MAINOBJ) $(OBJ)	
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+clean:
+	rm -f eyeMesh $(SRCMOC) $(OBJ) $(MAINOBJ)
+
+install: eyeMesh
+	install $^ @bindir@/.

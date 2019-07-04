@@ -1,0 +1,21 @@
+1. To build the unit test suite against an iMesh implementation, run:
+
+  ./configure --with-iMesh=/path/to/implementation
+  make
+
+This is a good time to be sure you set your LD_LIBRARY_PATH environment
+variable so that your system can find shared libraries at runtime.
+
+2. To run the unit tests, run
+
+  ./iMesh_unitTest filename.vtk
+
+Three test files are provided:
+
+  rand1.vtk contains about 5000 tetrahedra.
+
+  brick.vtk contains 1000 hexahedra, plus some edges and faces.
+
+  globe_mats.vtk contains 40 tets, 160 pyramides, 200 prisms, and 800
+    hexes; this is the prefered test file for implementations that
+    support all entity types.

@@ -1,0 +1,267 @@
+To support the flow of information in mesh-based simulations a number
+of tools and technologies have been developed by different research
+groups in academia, industry and the government labs.  For these tools
+to have maximum impact it is important that they be interoperable,
+interchangeable, and easily inserted into existing application
+simulation codes.  Accomplishing this goal will allow easier
+experimentation with different, but functionally similar, technologies
+to determine which is best suited for a given application.  In
+addition, it will provide mechanisms for combining technologies
+together to create hybrid solution techniques that use multiple
+advanced tools.
+
+To accomplish this goal, we have defined an abstract data model that
+encompasses a broad spectrum of mesh types and usage scenarios {\it
+and} a set of common interfaces that are implementation and data
+structure neutral.  The set of interfaces must be both small enough to
+encourage adoption but also flexible enough to support a broad range
+of mesh types.  {\it LAF should we move this figure and discussion to
+section 2?} Figure \ref{fig:hieracrhy} shows the hierarchical
+relationship between the geometric description of the computational
+domain and first discretization step in PDE-based simulation.  At the
+highest level is the geometric description of the computational
+domain; in many cases this domain description will be a CAD boundary
+representation.  This domain must be decomposed into a set of mesh
+entities. This process may employ a hierarchical decomposition of the
+geometric domain. For example, the first level may decompose the
+domain into a set of sub-domains that can be meshed using various
+meshing strategies.  In particular, hybrid meshes consisting of
+different component meshes can be used to discretize different
+portions of the geometric domain, or different full geometry meshes
+can be used during different stages of the numerical solution.  Each
+of these meshes is associated with the full geometry domain so that
+any changes made there propogate properly to the associated meshes.
+Each mesh can be further decomposed into partitions for solution on a
+massively parallel computer.
+
+The TSTT data model abstracts this simulation data hierachy and is
+decomposed into three {\it core data types}: the geometric data, the
+mesh data, and the field data.  These core data types are associated
+with each other through {\it data relation managers}. The data
+relation managers control the relationships among two or more of the
+core data types, resolve cross references between entities in
+different groups, and can provide additional functionality that
+depends on multiple core data types.  Work on the mesh data model and
+API has progressed the farthest and we describe it some detail in
+Section \ref{sec:mesh}.  Preliminary work on the geometry and field
+data model and interfaces are discussed as well.
+
+A key aspect of this approach is that we do not enforce any particular
+data structure or implementation with our interfaces, only that
+certain questions about the mesh, geometry or field data can be
+answered through calls to the interface.  To encourage adoption of the
+interface we aim to create a small set of interfaces that existing
+mesh and geometry packages can support.  The latter point is critical.
+The DOE, NSF, DoD and other federal agencies have invested hundreds of
+person-years in the development of a wide variety of geometry, mesh
+generation and mesh management toolkits.  These software packages will
+not be rewritten from scratch to conform to a common API, rather the
+API must be data structure neutral and allow for a broad range of
+underlying mesh representations. However, only a small set of
+functionalities can be covered by a 'core' set of interface functions.
+To increase the functionality of the TSTT interface, we define
+additional, optional, interfaces for which we will provide reference
+implementations based on the core interface methods.  Developers can
+implement these functions on their own mesh database as needed.
+The allows for incremental adoption of the interface.
+
+One of the foremost challenges inherent in this type of effort include
+balancing performance of the interface with the flexibility needed to
+support a wide variety of mesh types.  Performance is critical for
+kernel computations involving mesh access.  To address this need we
+provide a number of different access patterns including array and
+iterator-based.  The user may choose the access pattern that is best
+suited for their application; the underlying implementation must
+provide both styles of access even though only one is likely to be
+native.  Further challenges arise when considering the support of many
+different scientific programming languages.  This aspect is addressed
+through our joint work with the Center for Component Technologies for
+Terascale Simulation Science (CCTTSS) \cite{cca-forum} to provide
+language independent interfaces by using their SIDL/Babel technology
+\cite{babel}.  Preliminary results for the use of SIDL/Babel with
+the TSTT mesh interface are given in Section \ref{sec:mesh_perf}.
+
+\subsection{The TSTT Mesh Interface}
+
+\subsubsection{The Mesh Data Model}
+\label{sec:mesh}
+
+The TSTT mesh data model is composed of two different types of
+entities: mesh entities and entity sets.  To allow the interface to
+remain data structure neutral, these entities are uniquely represented
+by 32-bit opaque handle which may or may not be invariant through
+different calls to the interface in the lifetime of the TSTT mesh.
+
+{\bf Mesh Entity Definition}: TSTT mesh entities are the core of the
+TSTT mesh interface and are defined by their entity type and entity
+topology.  Allowable entity types are VERTEX (0D), EDGE (1D), FACE
+(2D), and REGION (3D).  Allowable entity topologies are listed
+WHERE??; each of these topologies has a unique entity type associated
+with it.  Higher-dimensional entities are defined by lower-dimensional
+entities using canonical ordering relationships.  Mesh geometry shape
+information can be associated with the individual mesh entities. For
+example, the vertices will have coordinates associated with
+them. Higher order mesh entities can also have shape information
+associated with them. For example the coordinates of higher-order
+nodes can be associated with mesh edges, faces and regions.
+
+%Vertices can return
+%coordinate information in blocked or interleaved fashion.
+
+Entity adjacency relationships define how the entities connect to
+each other and both first-order and second-order adjacencies are
+supported.
+\begin{itemize}
+\item {\it First-order adjacencies}: For an entity of dimension $d$,
+first-order adjacencies return all of the mesh entities of dimension
+$q$, which are either on the closure of the entity ($d > q$, downward
+adjacency), or which it is on the closure of ($d < q$, upward
+adjacency).  %If available, first-order adjacencies can be obtainable
+%by either stored adjacencies, local traversal of stored adjacencies of
+%an entity's neighborhood, or global mesh level traversal.  
+
+\item {\it Second-order adjacencies}: There are times when applications 
+would want not just what bounds an entity or the what an entity
+bounds, but the next level of neighbors. Although such information can
+always be determined from the appropriate first order adjacencies,
+their application is common enough that supporting a second order
+adjacency function is useful. A second order adjacency determines the
+set of topological entities of a given order adjacent to entities that
+that share common boundary entities of the specified order. An example
+would be to determine the set of model regions that share a bounding
+edge with the given region.
+
+%For an entity of dimension $d$,
+%second-order adjacencies describe all of the mesh entities of
+%dimension $q$ that share any adjacent entities of dimension $b$, where
+%$d \neq b$ and $b \neq q$.  Second-order adjacencies can be derived
+%from first-order adjacencies.  Examples include for a given face, a
+%set of regions adjacent to the face (first-order upward), a set of
+%vertices bounding the face (first-order downward), a set of faces that
+%share any vertex of the face (second-order).
+
+\end{itemize}
+
+To determine which adjacencies are supported by an underlying
+implementation, an adjacency table is defined which can be
+returned by a query through the interface.  Adjacencies are defined be
+either immediately available, available through a local traversal,
+available through a global traversal, or not available.  If adjacency
+information exists, entities must be able to return both upward and
+downward adjacency information in the canonical ordering using both
+individual and agglomerated request mechanisms.
+
+%%%% ***** MS Comment - To this points the sets are defined as discrete entity sets (as approsed to spaces, etc.) with some specific rules. These sets support specific standard operations. This is very useful and of critical importance to our ability to support applications.  However, I still have some indigestion the things we say sets can do and they "theory" aspects. We support basic Boolean operations (with some care needed) on sets of discrete entities - using the term "set theoretic sense" implies more than that - we should be specific. The use of the sets for most all the examples defined requires a fair amount of additional algorithm development and specific definitions that are not captured directly by basic the set operations. That's fine since we want a general tool that can support lots of things we have not considered and/or do not want to formalize. (There are some we may want to formalize that the current sets do poorly - but we can consider that when (and only when) we decide we want them. On the other hand, some stated examples go well beyond anything the sets come close to supporting - for example supporting the prolongation and restriction operators of multigrid methods with the mesh sets would actually be much harder than most of the normal mechanisms used for these processes. Based on this concern I have made some suggested edits to the text below to try to focus the discussion of sets on what I think we should tell people about them.
+
+{\bf Entity Set Definition:} A TSTT entity set is an arbitrary
+collection of TSTT entities that have uniquely defined entity handles.
+Each EntitySet may be an unordered set or it
+may a (possibly non-unique) ordered list of entities.  When the TSTT
+mesh interface is first created in a simulation, a {\it Root Set} is
+created and can be populated by string name using the load
+functionality.  Example entity sets include a set of vertices, the set
+of all faces classified on a geometric face, the set of regions in a
+domain decomposition for parallel computing.%, the set of all entities
+%in a given level of a multigrid mesh sequence.
+
+
+
+Two primary relationships among EntitySets are supported:
+
+\begin{itemize}
+\item Entity sets may {\it contain} one or more entity sets.  An
+entity set contained in another may be either a subset or an element
+of that entity set.  The choice between these two interpretations is
+left to the application; TSTT supports both interpretations. If entity
+set A is contained in entity set B, a request for the contents of B
+will include the entities in A and the entities in sets contained in A
+if the application requests the contents recursively.  We note that
+the {\it Root Set} cannot be contained in another entity set.
+
+\item {\it Parent/child relationships} between entity sets are used to
+represent relations between sets, much like edges connecting nodes in
+a graph.  This relationship can be used to indicate that two meshes
+have a logical relationship to each other, including multigrid and
+adaptive mesh sequences. Because we distinguish between parent and
+child links, this is a directed graph. Also, the meaning of cyclic
+parent/child relationships is dubious, at best, so graphs must be
+acyclic. No other assumptions are made about the graph.
+\end{itemize}
+
+Users are able to query entity sets for their entities and entity
+adjacency relationships.  Both array- and iterator-based access
+patterns are supported.  In addition, entity sets also have "set
+operation" capabilities; in particular, you may add and remove
+existing TSTT entities to the entity set and you may subtract,
+intersect, or unite entity sets.  %In addition, subset and hierarchical
+%parent/child relationships among EntitySets are supported.
+
+We note that to be useful to computational simulations, entity sets
+can comprise a valid computational mesh; the most simple example of
+which is a nonoverlapping, connected set of TSTT entity regions, for
+example, the structured and unstructured meshes commonly used in
+finite element simulations.  Collections of entity sets can compose,
+for example, overlapping and multiblock meshes. In both of these
+examples, supplemental information on the interactions of the mesh sets
+will be defined and maintained by the application.  Smooth particle
+hydrodynamic (SPH) meshes can consist of a collection of TSTT vertices
+with no connectivity or adjacency information.
+
+%In addition, entity sets can also be extended to be "modifiable", in
+%which case, basic operations that allow applications to change the
+%geometry and topology are provided.  
+
+The mesh interface, including the use of mesh sets, is extendable to
+include ``modificiation operators'' that change the geometry and topology.
+Capabilities include changing
+vertex coordinates and adding or deleting entities. No validity checks
+are provided with this basic interface so that care must be taken when
+using these interfaces.  These interfaces are intended to support
+higher-level functionality such as mesh quality improvement, adaptive
+schemes, front tracking proceedures, and basic mesh generation
+capabilities, all of which would provide validity checking.
+Modifiable meshes require interactions with the underlying
+geometric model including classifying entities.% and this interaction is described
+%in Section \ref{sec:mesh_geom_class}.
+
+Tags are used as containers for user-defined opaque data that can be
+attached to TSTT entities and entity sets.  Tags can be
+multi-valued which implies that a given tag handle can be associated
+with many mesh entities.  In the general case, TSTT tags do not have a
+predefined type and allow the user to attach any opaque data to mesh
+entities.  To improve ease of use and performance, we support three
+specialized tag types: integers, doubles, and Booleans.  Tags have and
+can return their string name, size, handle and data (data retrieval is
+done in the entity, mesh and entity set interfaces).  Tag data can be
+retrieved from TSTT objects by handle in an agglomerated or individual
+manner.  The implementation is expected to allocate the memory as
+needed to store the tag data.
+
+\subsubsection{Status of the mesh interface}
+
+The TSTT mesh interface has been under development for approximately
+two years and several revisions have been made in that time.  Several
+implementations are well underway and are supported by mesh management
+toolkits such as AOMD (RPI) \cite{ReSh03}, Overture (LLNL)
+\cite{overture}, MOAB (SNL) \cite{moab}, NWGrid (PNL) \cite{nwgrid},
+and GRUMMP (UBC) \cite{grummp}.  
+
+In addition to the development of underlying implementations, the
+TSTT mesh interface has also been used in a variety of contexts as
+well.  In particular, it serves as the interface to the Mesquite 
+mesh quality improvement and Frontier front tracking
+
+
+\subsubsection{Preliminary performance results for the mesh interface}
+
+\input{geometry.tex}
+
+\input{fields.tex}
+%% \subsection{Geometry Interface}
+%% \begin{verbatim}
+%%       - Data Model
+%%       - Functionality
+%%       - Status of interface/implementations
+%% \end{verbatim}
+
+%% \subsection{Field Interface}

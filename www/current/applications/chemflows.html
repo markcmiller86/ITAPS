@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/templates/2col-LeftNav_application.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="The Interoperable Technologies for Advanced Petascale Simulations (ITAPS) center is one of the mathematics enabling technologies centers in the Department of Energy's Scientific Discovery through Advanced Computing (SciDAC) program." />
+<meta name="Keywords" content="petascale simulations, mathematics, department of energy, Scientific Discovery through Advanced Computing, interchangeable mesh, geometry, field manipulation services, Lawrence Livermore National Laboratory" />
+<meta name="author" content="Lori Diachin" />
+<link rel="stylesheet" href="../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageApplications pageChemflows" -->
+</head>
+
+<body class="pageApplications pageChemflows">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Application Impact</h1>
+<p>
+<a class="nav active" href="index.html" id="linkIndex">Application Impact</a><span class="hide"> | </span>
+<a class="nav sub" href="accelerator.html" id="linkAccelerator">Accelerator Design</a><span class="hide"> | </span>
+<a class="nav sub" href="fusion.html" id="linkFusion">Fusion</a><span class="hide"> | </span>
+<a class="nav sub" href="subsurface.html" id="linkSubsurface">Subsurface Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="gnep.html" id="linkGnep">Nuclear Reactor</a><span class="hide"> | </span>
+<a class="nav sub" href="climate.html" id="linkClimate">Climate</a><span class="hide"> | </span>
+<a class="nav sub" href="chemflows.html" id="linkChemflows">Diesel Jet Spray</a><span class="hide"> | </span>
+<a class="nav sub" href="biology.html" id="linkBiology">Biology</a><span class="hide"> | </span>
+<a class="nav sub" href="bloodFlow.html" id="linkBloodflow">Blood Flow</a><span class="hide"> | </span>
+<a class="nav sub" href="astrophysics.html" id="linkAstrophysics">Astrophysics</a>
+<a class="nav sub" href="windEnergy.html" id="linkWindEnergy">Wind Energy</a><span class="hide"> | </span>
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Basic Energy Sciences</h1>
+
+  <div class="imgContainer fRight" style="width: 319px;">
+	<a href="../assets/images/gifs/jet3d1.gif" rel="lightbox">
+    	<img src="../assets/images/gifs/jet3d1_poster.gif" alt="M3D-C1 framework" width="319" height="266" />
+    </a>
+	<p>Movie 1</p>
+  </div>
+
+<h3><strong>Diesel Jet Spray Formation</strong></h3>
+        
+ <p>ITAPS members at BNL and SUNY SB have been working with scientists at Argonne to create a simulation code that models spray formation in diesel jet break up. This is an important aspect of the problem as it provides input to spray combustion models and is critical for predictive modeling of bio-diesel engine combustion. The overall goal of such an effort is the design of a nonpolluting, fuel-efficient engine. <a href="http://www.ams.sunysb.edu/~linli/FTruns/jet3d1.html" title="meshed interface between fuel and air" target="_blank">Movie 1 (right)</a>shows the meshed interface between the fuel and the air (in very coarse grid).</p>
+
+<p>Spray formation is a difficult problem for simulation due to</p>
+<ul>
+	<li>the geometric complexity and multiscale nature of the spray,</li> 
+	<li>the stiff equation of state (EOS) for diesel fuel, and the need to model cavitations, phase transitions, shock waves and other strong hydrodynamic transients,</li>
+	<li>the limited resolution of experimental diagnostics, and </li>
+	<li>the sensitive dependence of spray formation on nozzle geometry and other problem parameters. </li>
+</ul>
+
+<p>To model this process, we are using a 3D compressible fluid code coupled with FronTier which has a high quality interface capability that enables multiscale resolution of complex geometries. Through our study, we have found that the formation of cavitation vapor bubbles is the key phenomena contributing to the breakup. We have developed a three scale hetrogeneous EOS model consisting of explicitly tracked cavitation vapor bubbles within the liquid diesel fuel for the mixed phase (diesel vapor/liquid) regime for cavitations in the nozzle and atomization, in the regime of a high speed jet. This appears to be the first calculation of this nature, and in this high speed atomization parameter regime.</p>
+
+<p>The three scales we study are a thermal diffusion boundary layer (nm) at the edge of the cavitation bubbles, and regulating the rate of phase transition on the bubble wall, the bubble diameter, on the scale of microns, and the device (nozzle and combustion chamber) on the scale of cm. </p>
+
+<p>New developments supported by ITAPS required to make this simulation a success include: AMR (from code merger with Overture), a phase transition module and Riemann solver, and a numerical model for the initiation of a tracked bubble, inserted when the pressure is less than a critical (tension) value. </p>
+
+<p>The current work is mainly focused on the simulation of the two-phase mixture resulting from cavitation. The influence of other parameters on spray formation is a subject of further research. <a href="http://www.ams.sunysb.edu/~linli/FTruns/spray3d.html" title="3D simulation of jet break-up and droplet formation" target="_blank">Movie 2 (left)</a> shows the 3D simulation of the jet break-up and droplet formation when the fuel is injected into the combustion chamber. </p>
+
+<p><em>Acknowledge: Simulation performed by Wurigen Bo</em></p>
+       
+
+
+
+  <div class="imgContainer fLeft" style="width: 319px;">
+	<a href="../assets/images/gifs/spray3d.gif" rel="lightbox">
+    	<img src="../assets/images/gifs/spray3d_poster.gif" alt="M3D-C1 framework" width="319" height="266" />
+    </a>
+	<p>Movie 2</p>
+  </div>
+
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+  <!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+	<!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

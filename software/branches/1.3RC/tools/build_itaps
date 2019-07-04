@@ -1,0 +1,1155 @@
+#!/bin/sh
+
+# USER NOTES:
+#
+# See http://redmine.scorec.rpi.edu/projects/itaps/wiki/_build_itaps_primer_
+# for intstructions in how to use this script. Note, there may be minor
+# variations depending in ITAPS release number.
+#
+
+
+
+#
+# DEVELOPMENT NOTES:
+#
+# All notes here and below are related to development of this script.
+# List of implementations to build
+# We have one list for all possible ITAPS interface implementations.
+# Each implmentation listed here implements one or more ITAPS interfaces.
+# Order can matter. For example, GRUMMP depends on CGM. So, CGM is listed
+# as a prerequisite for GRUMMP. But, CGM also implements iGeom interface
+# so it is listed here as an ITAPS_IMPL too. And, it is intentionally
+# listed before GRUMMP so that can we bypass GRUMMP's config feature
+# to download it itself if it is not told not to.
+# GMI (an iGeom impl) is handled as pre-requisite of FMDB but is not
+# also listed here as explicitly in ITAPS_IMPL because GMI cannot
+# actually build without the FMDB source tarball 'next to' it.
+#
+# Note: Would like ability to specify a given interface 'iMesh' and
+# have it build all iMesh implementations. Or, a given institution
+# name, (e.g. RPI) and have it build everything from RPI.
+#
+
+# List of services to build.
+# eyeMesh requires qt-4 via QTDIR env. variable. However, we won't
+# ever intend to list qt-4 as a pre-requisite for eyeMesh here
+# because if its not available, we're certainly not going to try
+# to go ahead and build it here either.
+
+# Allows us to turn on debugging info useful to debug the script itself
+[[ -z "${DEBUG}" ]] || set -x
+##[[ -n "${IGNORE_ERRORS}" ]] || set -e
+
+# Name of file to which ALL OUTPUT goes
+export LOG_FILE=${LOG_FILE:-"$(pwd)/${0##*/}_log"}
+BLOG_FILE=$(basename $LOG_FILE)
+
+# We do this funky subshell syntax to capture BOTH stdout/stderr in a file
+# AS WELL as print it on the terminal. The enclosing paren. is at the end
+# of this script. The initial exec statement forces stderr into stdout and
+# opens two new file descriptors for stdout and stderr. This is to take
+# info and error messages 'out of band' of normal stdout so that function
+# calls can work like so...var=$(func) which takes stdout of func and places
+# it into variable var but func can still nonetheless also issue info and/or
+# error messages. 3=stdout, 4=stderr
+# [
+(
+exec 2>&1
+
+# See notes regarding these variables.
+export ITAPS_IMPLS=${ITAPS_IMPLS:-"CGM REFIMPL GRUMMP FMDB MOAB LASSO"}
+export ITAPS_SERVICES=${ITAPS_SERVICES:-"iMesh_unitTest Swapping eyeMesh VisItPlugin HelloMesh"}
+
+export ITAPS_VERSION=1.3
+export ITAPS_BRANCH=branches/${ITAPS_VERSION}RC
+export DEFURL=${DEFURL:-"https://redmine.scorec.rpi.edu/anonsvn/itaps/software/${ITAPS_BRANCH}"}
+
+# Global pre-processor/compiler choices/flags
+export CPPFLAGS=${CPPFLAGS:-""}
+export CC=${CC:-"gcc"}
+export CFLAGS=${CFLAGS:-"-O2 -DNDEBUG -fPIC"}
+export CXX=${CXX:-"g++"}
+export CXXFLAGS=${CXXFLAGS:-"-O2 -DNDEBUG -fPIC"}
+export FC=${FC:-"gfortran"}
+export FCFLAGS=${FCFLAGS:-"-O2 -DNDEBUG"}
+
+compiler_version()
+{
+    for vflag in --version -V -v; do
+        vout=$($CC $vflag 2>&1)
+        [[ $? -ne 0 ]] && continue
+        vout=$(echo $vout | tr '-' ' ' | tr ' ' '\n' | grep '[0-9]\.[0-9]' | sed -n 1,1p)
+        echo ${CC}-${vout}
+        break
+    done
+}
+
+# Internal variables (but can also be overridden)
+# compiler_version us $CC so CC must be defined first.
+export OPSYS=${OPSYS:-$(uname -s)}
+export ARCH=${ARCH:-$(uname -s)-$(uname -p)-$(compiler_version)}
+export INSTALLROOT=${INSTALLROOT:-"$(pwd)/itaps/${ARCH}"}
+export PWDDIR=${PWDDIR:-$(pwd)}
+export DOWNLOAD_ONLY=${DOWNLOAD_ONLY:-"no"}
+export SVN=${SVN:-$(which svn)}
+export SVN_OPTS=${SVN_OPTS:-""}
+export WGET=${WGET:-$(which wget)}
+export WGET_OPTS=${WGET_OPTS:-""}
+if [[ "$OPSYS" != "Darwin" ]]; then
+    WGET_MINOR_VERSION=$(wget --version| head -n 1|cut -d. -f 2)
+    # version 1.7 pre-dates ssl integration
+    if [[ "${WGET_MINOR_VERSION}" == "8" ]] ; then
+       export WGET_OPTS=${WGET_OPTS=""}
+    elif [[ "${WGET_MINOR_VERSION}" == "9" ]] ; then
+       export WGET_OPTS=${WGET_OPTS:="--sslcheckcert=0"}
+    else
+       export WGET_OPTS=${WGET_OPTS:-"--no-check-certificate"}
+    fi
+fi
+
+# Global configure/make/install choices
+export CFGFLAGS=${CFGFLAGS:-""}
+export XCFGFLAGS=${XCFGFLAGS:-""}
+export MKFLAGS=${MKFLAGS:-"-j2"}
+export MKCKCMD=${MKCKCMD:-"make check"}
+export MKINSTCMD=${MKINSTCMD:-"make -i install"}
+export OVERINSTALL=${OVERINSTALL:-"no"}
+export OVERDOWNLOAD=${OVERDOWNLOAD:-"no"}
+export MVSHLIBS=${MVSHLIBS:-"yes"}
+export USESHLIBS=${USESHLIBS:-"no"}
+
+# Base variable names that control each product's build/install
+export PROD_VARS="\
+    CPPFLAGS \
+    CC \
+    CFLAGS \
+    CXX \
+    CXXFLAGS \
+    FC \
+    FCFLAGS \
+    CFGFLAGS \
+    XCFGFLAGS \
+    INSTALL \
+    MKFLAGS \
+    MKCKCMD \
+    MKINSTCMD \
+    OVERINSTALL \
+    OVERDOWNLOAD \
+    MVSHLIBS \
+    USESHLIBS"
+
+#
+# Product specific non-defaultable overrides for various flags.
+#
+
+#
+# MOAB and its prerequisites. Unless HDF5_INSALL is set to an installed HDF5
+# this script will download and install HDF5 for MOAB. Likewise for NETCDF.
+#
+export HDF5_VERSION=${HDF5_VERSION:-"1.8.6"}
+export HDF5_INSTALL=${HDF5_INSTALL:-"${INSTALLROOT}/3rd_party/hdf5-${HDF5_VERSION}"}
+export HDF5_DISTFILE=${HDF5_DISTFILE:-"hdf5-${HDF5_VERSION}.tar.gz"}
+export HDF5_URL=${HDF5_URL:-"http://www.hdfgroup.org/ftp/HDF5/hdf5-${HDF5_VERSION}/src"}
+export HDF5_CFGFLAGS=${HDF5_CFGFLAGS:-"--disable-shared --enable-static --enable-production ${HDF5_XCFGFLAGS}"}
+# problem here: Can't tell difference between unset variable and ""
+export HDF5_MKCKCMD=${HDF5_MKCKCMD:-" "}
+
+export NETCDF_VERSION=${NETCDF_VERSION:-"4.1.1"}
+export NETCDF_INSTALL=${NETCDF_INSTALL:-"${INSTALLROOT}/3rd_party/netcdf-${NETCDF_VERSION}"}
+export NETCDF_DISTFILE=${NETCDF_DISTFILE:-"netcdf-${NETCDF_VERSION}.tar.gz"}
+export NETCDF_URL=${NETCDF_URL:-"http://www.unidata.ucar.edu/downloads/netcdf/ftp"}
+export NETCDF_CFGFLAGS=${NETCDF_CFGFLAGS:-"--disable-shared --enable-static --enable-netcdf4 --enable-cxx-4 --disable-dap --with-hdf5=${HDF5_INSTALL} ${NETCDF_XCFGFLAGS}"}
+export NETCDF_MKCKCMD=${NETCDF_MKCKCMD:-" "}
+
+export CGM_IMPLEMENTS="iGeom"
+export CGM_VERSION=${CGM_VERSION:-"10.2.3"}
+export CGM_DISTFILE=${CGM_DISTFILE:-"cgm-${CGM_VERSION}-itaps-1.3.tar.gz"}
+export CGM_INSTALL=${CGM_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/cgm-${CGM_VERSION}"}
+
+export MOAB_IMPLEMENTS="iMesh iMeshP"
+export MOAB_PREREQS=${MOAB_PREREQS:-"HDF5 NETCDF"}
+export MOAB_VERSION=${MOAB_VERSION:-"4.1.0RC1"}
+export MOAB_INSTALL=${MOAB_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/moab-${MOAB_VERSION}"}
+export MOAB_DISTFILE=${MOAB_DISTFILE:-"moab-${MOAB_VERSION}-itaps-1.3.tar.gz"}
+#export MOAB_URL=${MOAB_URL:-"http://gnep.mcs.anl.gov:8010"}
+# I don't like this: Below variable gets defined with _INSTALL terms evaluated now and not at time
+# this variable is actually needed. So, have to have already build the _INSTALL terms instead of allowing
+# script to generate them as needed. This forces us to pre-define HDF5_INSTALL and NETCDF_INSTALL
+# even though they are entirely generatable as needed.
+export MOAB_CFGFLAGS=${MOAB_CFGFLAGS:-"--enable-imesh --with-pic --disable-tools --disable-shared --enable-static --with-hdf5=${HDF5_INSTALL} --with-netcdf=${NETCDF_INSTALL} ${MOAB_XCFGFLAGS}"}
+export MOAB_FEXTENSIONS=${MOAB_FEXTENSIONS:-"*.cub"}
+
+export LASSO_IMPLEMENTS="iRel"
+export LASSO_PREREQS=${LASSO_PREREQS:-"CGM MOAB"}
+export LASSO_VERSION=${LASSO_VERSION:-"2.5"}
+export LASSO_INSTALL=${LASSO_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/lasso-${LASSO_VERSION}"}
+export LASSO_DISTFILE=${LASSO_DISTFILE:-"lasso-${LASSO_VERSION}-itaps-1.3.tar.gz"}
+#export LASSO_URL=${LASSO_URL:-"http://gnep.mcs.anl.gov:8010"}
+# problem here: forcing lasso build against ANL products; why not use any products
+export LASSO_CFGFLAGS=${LASSO_CFGFLAGS:-"--with-pic --disable-tools --disable-shared --enable-static --with-igeom=${CGM_INSTALL} --with-imesh=${MOAB_INSTALL}"}
+
+#
+# FMDB and its prerequisites
+#
+export FMDB_VERSION=${FMDB_VERSION:-"1.3.2"}
+export SCORECUTIL_VERSION=${SCORECUTIL_VERSION:-"0.1"}
+export GMI_VERSION=${GMI_VERSION:-"1.0"}
+
+export GMI_IMPLEMENTS="iGeom"
+export GMI_DISTFILE="GMI-${GMI_VERSION}.tar.gz"
+export GMI_URL=${GMI_URL:-"http://www.scorec.rpi.edu/FMDB/source"}
+export GMI_INSTALL=${GMI_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/gmi-${GMI_VERSION}"}
+export GMI_CFGFLAGS=${GMI_CFGFLAGS:-"--with-fmdb=${PWDDIR}/fmdb-${FMDB_VERSION} --with-scorecutil=${PWDDIR}/scorecutil-${SCORECUTIL_VERSION} --with-iterators=${PWDDIR}/scutil-1.2/siter"}
+export GMI_MVSHLIBS=${GMI_MVSHLIBS:-"no"};
+
+export SCORECUTIL_DISTFILE="SCORECUtil-${SCORECUTIL_VERSION}.tar.gz"
+export SCORECUTIL_URL=${SCORECUTIL_URL:-"http://www.scorec.rpi.edu/FMDB/source"}
+export SCORECUTIL_INSTALL=${SCORECUTIL_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/scorecutil-${SCORECUTIL_VERSION}"}
+export SCORECUTIL_CFGFLAGS=${SCORECUTIL_CFGFLAGS:-"--with-gmi=${GMI_INSTALL} --with-fmdb=${PWDDIR}/fmdb-${FMDB_VERSION} --with-iterators=${PWDDIR}/scutil-1.2/siter"}
+export SCORECUTIL_MVSHLIBS=${SCORECUTIL_MVSHLIBS:-"no"};
+
+export FMDB_IMPLEMENTS="iMesh iMeshP"
+export FMDB_PREREQS=${FMDB_PREREQS:-"GMI SCORECUTIL"}
+export FMDB_INSTALL=${FMDB_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/fmdb-${FMDB_VERSION}"}
+export FMDB_DISTFILE="fmdb-${FMDB_VERSION}-itaps-1.3.tar.gz"
+export FMDB_URL=${FMDB_URL:-"http://www.scorec.rpi.edu/FMDB/source"}
+export FMDB_CFGFLAGS=${FMDB_CFGFLAGS:-"--enable-imesh --with-scorecutil=${SCORECUTIL_INSTALL} --with-gmi=${GMI_INSTALL} --with-iterators=${PWDDIR}/scutil-1.2/siter"}
+export FMDB_PREPCMD=fmdb_prep
+export FMDB_FEXTENSIONS=${FMDB_FEXTENSIONS:-"*.sms"}
+
+#
+# GRUMMP (no URL ==> DEFURL)
+#
+export GRUMMP_IMPLEMENTS="iMesh"
+export GRUMMP_PREREQS=${GRUMMP_PREREQS:-"CGM"}
+export GRUMMP_VERSION=${GRUMMP_VERSION:-"0.6.4"}
+#export GRUMMP_URL=${GRUMMP_URL:-"ftp://tetra.mech.ubc.ca/pub/GRUMMP"}
+export GRUMMP_DISTFILE=${GRUMMP_DISTFILE:-"grummp-${GRUMMP_VERSION}-itaps-1.3.tar.gz"}
+export GRUMMP_INSTALL=${GRUMMP_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/grummp-${GRUMMP_VERSION}"}
+export GRUMMP_MKCKCMD=${GRUMMP_MKCKCMD:-"env LD_LIBRARY_PATH=$(pwd)/lib/libO/linux-gnu make test"}
+export GRUMMP_CFGFLAGS=${GRUMMP_CFGFLAGS:-"--enable-imesh --with-CGM-path=${CGM_INSTALL} ${GRUMMP_XCFGFLAGS}"}
+export GRUMMP_FEXTENSIONS=${GRUMMP_FEXTENSIONS:-"*.bdry *.smesh *.vmesh"}
+
+export REFIMPL_IMPLEMENTS="iMesh"
+export REFIMPL_VERSION=${REFIMPL_VERSION:-"1.3.0"}
+export REFIMPL_DISTFILE=${REFIMPL_DISTFILE:-"refimpl-${REFIMPL_VERSION}-itaps-1.3.tar.gz"}
+export REFIMPL_INSTALL=${REFIMPL_INSTALL:-"${INSTALLROOT}/itaps-${ITAPS_VERSION}/refimpl-${REFIMPL_VERSION}"}
+export REFIMPL_CFGFLAGS=${REFIMPL_CFGFLAGS:-"--enable-imesh"}
+
+#
+# SERVICES
+#
+export HelloMesh_REQUIRES="iMesh"
+export HelloMesh_DISTFILE=${HelloMesh_DISTFILE:-"interfaces/iMesh/examples/HelloMesh"}
+export HelloMesh_MKFLAGS=${HelloMesh_MKFLAGS:-"-f Makefile.noautoconf"}
+
+export iMesh_unitTest_REQUIRES="iMesh"
+export iMesh_unitTest_DISTFILE=${iMesh_unitTest_DISTFILE:-"interfaces/iMesh/test/unit"}
+export iMesh_unitTest_MKFLAGS=${iMesh_unitTest_MKFLAGS:-"ITAPS_NOCKSPEC=1"}
+
+export eyeMesh_REQUIRES="iMesh"
+export eyeMesh_DISTFILE=${eyeMesh_DISTFILE:-"services/eyeMesh"}
+
+export Mesquite_REQUIRES="iMesh"
+export Mesquite_VERSION=${Mesquite_VERSION:-"2.1.4"}
+export Mesquite_DISTFILE=${Mesquite_DISTFILE:-"mesquite-${Mesquite_VERSION}.tar.gz"}
+
+export Swapping_REQUIRES="iMesh"
+export Swapping_DISTFILE=${Swapping_DISTFILE:-"services/Swapping/C_API"}
+export Swapping_CFGFLAGS=${Swapping_CFGFLAGS:-"MESQUITE_DIR=${INSTALLROOT}/itaps-${ITAPS_VERSION}/mesquite-${Mesquite_VERSION}"}
+
+export VISIT_BIN=${VISIT_BIN:-$(type -p visit)}
+export CMAKE_BIN=${CMAKE_BIN:-$(type -p cmake)}
+export VisItPlugin_REQUIRES="iMesh"
+export VisItPlugin_DISTFILE=${VisItPlugin_DISTFILE:-"branches/miller86/itaps-1.3/src/databases/ITAPS_C"}
+export VisItPlugin_URL=${VisItPlugin_URL:-"http://portal.nersc.gov/svn/visit"}
+VisItPlugin_BUILD_SERVICE=VisItPlugin_build_service
+
+# Problem here: PyTAPS doesn't actually *require* any particular interface
+# It needs at least one of iMesh, iGeom or iRel.
+export PYTHON_BIN=${PYTHON_BIN:-$(type -p python)}
+export PyTAPS_REQUIRES="iMesh"
+export PyTAPS_DISTFILE=${PyTAPS_DISTFILE:-"pytaps-1.3.tar.gz"}
+#export PyTAPS_URL=${PyTAPS_URL:-"http://pypi.python.org/packages/source/P/PyTAPS"}
+export PyTAPS_CFGFLAGS=${PyTAPS_CFGFLAGS:-"MESQUITE_DIR=${INSTALLROOT}/itaps-${ITAPS_VERSION}/mesquite-${Mesquite_VERSION}"}
+PyTAPS_BUILD_SERVICE=PyTAPS_build_service
+
+export ZOLTAN_VERSION=${ZOLTAN_VERSION:-"v3.3"}
+export ZOLTAN_INSTALL=${ZOLTAN_INSTALL:-"${INSTALLROOT}/3rd_party/zoltan-${ZOLTAN_VERSION}"}
+export ZOLTAN_DISTFILE=${ZOLTAN_DISTFILE:-"zoltan_distrib_${ZOLTAN_VERSION}.tar.gz"}
+export ZOLTAN_CFGFLAGS=${ZOLTAN_CFGFLAGS:-"-C --disable-mpi ${ZOLTAN_XCFGFLAGS}"}
+# problem here: Can't tell difference between unset variable and ""
+export ZOLTAN_MKCKCMD=${ZOLTAN_MKCKCMD:-" "}
+
+export iZoltan_REQUIRES="iMesh"
+export iZoltan_PREREQS="ZOLTAN"
+export iZoltan_VERSION=${iZoltan_VERSION:-"0.9"}
+export iZoltan_DISTFILE=${iZoltan_DISTFILE:-"izoltanserial-${iZoltan_VERSION}.tar.gz"}
+export iZoltan_CFGFLAGS=${iZoltan_CFGFLAGS:-"--with-zoltan-include=${ZOLTAN_INSTALL}/include --with-zoltan-lib=${ZOLTAN_INSTALL}/lib"}
+
+#
+# Product specific methods
+#
+fmdb_prep()
+{
+    local lib=FMDB
+
+    local builddir=${lib}
+    local version=$(checkvar ${lib} VERSION)
+    [[ "${version}" ]] && builddir="${lib}-${version}"
+    builddir=$(echo $builddir | tr \[A-Z\] \[a-z\])
+
+    # First, see if it is already been installed
+    local installdir=$(checkvar ${lib} INSTALL)
+    if [[ -z "installdir" ]]; then
+        installdir=${INSTALLROOT}/itaps-${ITAPS_VERSION}/${buildir}
+    fi
+    local overinstall=$(checkvar ${lib} OVERINSTALL)
+    if [[ "${overinstall}" = no ]]; then
+        if [[ -e ${installdir}/lib ]] && [[ -e ${installdir}/include ]]; then
+            info "skipping ${lib} PREP because it appears to already be installed"
+            return 0
+        fi
+    fi
+
+    # These downloads will result in the items being downloaded and untar'd
+    # Then, when FMDB is processed, the configure commands can assume presence of other pieces
+    local overdownload=$(checkvar ${lib} OVERDOWNLOAD)
+    if [[ "${overdownload}" == no ]]; then
+        if [[ -e fmdb-${FMDB_VERSION} ]]; then
+	    info "Skipping download of FMDB pieces because they appear to be available"
+	    return
+	fi
+    fi
+    download_item targz ${FMDB_DISTFILE} fmdb-${FMDB_VERSION} http://www.scorec.rpi.edu/FMDB/source
+    [[ $? -eq 0 ]] || { error "Unable to download ${FMDB_DISTFILE} for FMDB" && return 1; }
+    download_item targz ${GMI_DISTFILE} gmi-${GMI_VERSION} http://www.scorec.rpi.edu/FMDB/source
+    [[ $? -eq 0 ]] || { error "Unable to download ${GMI_DISTFILE} for FMDB" && return 1; }
+    download_item targz SCUtil.tar.gz scutil-1.2 http://www.scorec.rpi.edu/FMDB/source
+    [[ $? -eq 0 ]] || { error "Unable to download SCUtil.tar.gz for FMDB" && return 1; }
+    gunzip < scutil-1.2/${SCORECUTIL_DISTFILE} | tar xf -
+    [[ $? -eq 0 ]] || { error "Unable to untar ${SCORECUTIL_DISTFILE} for FMDB" && return 1; }
+    mv SCORECUtil-${SCORECUTIL_VERSION} scorecutil-${SCORECUTIL_VERSION}
+    pushd scutil-1.2 >/dev/null 2>&1
+    gunzip < siter.tar.gz | tar xf -
+    [[ $? -eq 0 ]] || { error "Unable to untar siter.tar.gz for FMDB" && return 1; }
+    popd >/dev/null 2>&1
+}
+
+#
+# VisItPlugin build_service method
+# Uses make command to echo values for IMESH install
+# variables so we can pass them to VisIt's cmake stuff
+VisItPlugin_make_helper()
+{
+    cat <<EOF | make -f - echo_vars IMESH_DEFS=$1
+include \$(IMESH_DEFS)
+echo_vars:
+	@echo IMESH_LIBS=@\$(IMESH_LIBS)@
+	@echo IMESH_INCLUDES=@\$(IMESH_INCLUDES)@
+EOF
+}
+
+VisItPlugin_build_service()
+{
+    # First, see paths to visit and cmake are defined
+    [[ "${VISIT_BIN}" ]] || { error "visit is not in your path and VISIT_BIN is empty" && return 1; }
+    [[ "${CMAKE_BIN}" ]] || { error "cmake is not in your path and CMAKE_BIN is empty" && return 1; }
+
+    # If they gave us path to a dir, resolve it to the executable
+    if [[ ! -x ${VISIT_BIN} ]]; then
+        if [[ -d ${VISIT_BIN} ]]; then
+            if [[ -d ${VISIT_BIN}/bin ]] && [[ -x ${VISIT_BIN}/bin/visit ]]; then
+                VISIT_BIN=${VISIT_BIN}/bin/visit
+            elif [[ -x ${VISIT_BIN}/visit ]]; then
+                VISIT_BIN=${VISIT_BIN}/visit
+	    else
+	        error "Neither ${VISIT_BIN}/visit or ${VISIT_BIN}/bin/visit exist" && return 1
+	    fi
+	else
+	    error "${VISIT_BIN} specifies neither a dir nor an executable" && return 1
+        fi
+    fi
+    if [[ ! -x ${CMAKE_BIN} ]]; then
+        if [[ -d ${CMAKE_BIN} ]]; then
+            if [[ -d ${CMAKE_BIN}/bin ]] && [[ -x ${CMAKE_BIN}/bin/cmake ]]; then
+                CMAKE_BIN=${CMAKE_BIN}/bin/cmake
+            elif [[ -x ${CMAKE_BIN}/cmake ]]; then
+                CMAKE_BIN=${CMAKE_BIN}/cmake
+	    else
+	        error "Neither ${CMAKE_BIN}/cmake or ${CMAKE_BIN}/bin/cmake exist" && return 1
+	    fi
+	else
+	    error "${CMAKE_BIN} specifies neither a dir nor an executable" && return 1
+        fi
+    fi
+    local visit_dir=$(dirname ${VISIT_BIN})
+
+    local serv=$1
+    local impl=$2
+
+    local builddir=${serv}
+    local version=$(checkvar ${serv} VERSION)
+    [[ "${version}" ]] && builddir="${serv}-${version}"
+    builddir=$(echo $builddir | tr \[A-Z\] \[a-z\])
+
+    local implbuilddir=${impl}
+    local implversion=$(checkvar ${impl} VERSION)
+    [[ "${implversion}" ]] && implbuilddir="${impl}-${implversion}"
+    implbuilddir=$(echo $implbuilddir | tr \[A-Z\] \[a-z\])
+
+    # First, see if this service has already been installed for this implementation
+    local implinstalldir=$(checkvar ${impl} INSTALL)
+    if [[ -z "implinstalldir" ]]; then
+        implinstalldir=${INSTALLROOT}/itaps-${ITAPS_VERSION}/${implbuildir}
+    fi
+    local overinstall=$(checkvar ${serv} OVERINSTALL)
+    if [[ "${overinstall}" = no ]]; then
+        # Using find here, we don't have to actually know the service's installed name
+        local servfiles=$(find -L ${implinstalldir}/lib -name "lib[EMI]ITAPS_*Database*.so" 2>/dev/null)
+        if [[ -n "${servfiles}" ]]; then
+            info "skipping ${serv} for impl ${impl} because it appears to already be installed"
+            return 0
+        fi
+    fi
+
+    #
+    # Get IMESH_LIBS/IMESH_INCLUDES values from the iMesh-Defs.inc file
+    #
+    if [[ ! -e ${implinstalldir}/lib/iMesh-Defs.inc ]]; then
+        error "Cannot find iMesh-Defs.inc file for $impl" && return 1
+    fi
+    local imesh_vars=$(VisItPlugin_make_helper ${implinstalldir}/lib/iMesh-Defs.inc)
+    local imesh_libs=$(echo ${imesh_vars} | cut -d'@' -f2)
+    local imesh_incs=$(echo ${imesh_vars} | cut -d'@' -f4)
+
+    # Download the product and copy to impl-specific dir
+    download $serv
+    [[ $? -eq 0 ]] || { error "Unable to download $serv" && return 1; }
+    if [[ "${DOWNLOAD_ONLY}" == yes ]]; then
+        return 0
+    fi 
+    cp -R ${builddir} ${builddir}-${impl}
+    cd ${builddir}-${impl}
+
+    info "Configuring ${serv} for ${impl}"
+
+    # Change all the filenames and file contents
+    for f in *ITAPS_C*; do
+        newf=`echo $f | sed -e "s/ITAPS_C/ITAPS_${impl}/"`
+        mv $f $newf
+    done
+    sed -i -e "s/ITAPS_C/ITAPS_${impl}/g" *
+
+    #
+    # Fix contents of the .xml file. Note that if the ITAPS_C.xml file
+    # ever gets re-generated, then it probably WILL NOT get formatted
+    # exactly how the following sed commands want it with, for example,
+    # <CXXFLAGS> and </CXXFLAGS> on the same line.
+    #
+    sed -i -e "s%<FilePatterns>\(.*\)</FilePatterns>%<FilePatterns> ${impl_exts} </FilePatterns>%" ITAPS_${impl}.xml
+    sed -i -e "s%<CXXFLAGS>\(.*\)</CXXFLAGS>%<CXXFLAGS> -DITAPS_${impl} ${imesh_incs} </CXXFLAGS>%" ITAPS_${impl}.xml
+    sed -i -e "s%<LIBS>\(.*\)</LIBS>%<LIBS> ${imesh_libs} </LIBS>%" ITAPS_${impl}.xml
+
+    #
+    # Fix the extensions in the PluginInfo.C file
+    #
+    local impl_exts=$(checkvar ${impl} FEXTENSIONS)
+    sed -i -e "/defaultExtensions.push_back/d" ITAPS_${impl}PluginInfo.C
+    for ext in $impl_exts; do
+        sed -i -e "/return defaultExtensions;/i \ \ \ \ defaultExtensions.push_back(\"${ext}\");" ITAPS_${impl}PluginInfo.C
+    done
+
+    #
+    # Execute xml2cmake
+    #
+    ${visit_dir}/xml2cmake -clobber ITAPS_${impl}.xml >>${LOG_FILE} 2>&1
+    [[ $? -eq 0 ]] || { error "xml2cmake failed" && return 1; }
+
+    #
+    # Execute cmake
+    #
+    ${CMAKE_BIN} . >>${LOG_FILE} 2>&1
+    [[ $? -eq 0 ]] || { error "cmake failed" && return 1; }
+
+    #
+    # Make it (for VisIt, making it also 'installs' it to ~/.visit/<arch>/plugins
+    #
+    info "Making ${serv} for ${impl}"
+    local mkflags=$(checkvar ${serv} MKFLAGS)
+    make ${mkflags} >>${LOG_FILE} 2>&1
+    [[ $? -eq 0 ]] || { error "Failed to make $serv. See ${BLOG_FILE}" && return 1; }
+
+    #
+    # Copy also to impl install point
+    #
+    info "Installing ${serv} for ${impl}"
+    find . -type f -name "lib[EMI]ITAPS_*Database*.so" -exec cp {} ${implinstalldir}/lib.so \; 2>/dev/null
+
+    cd ..
+}
+
+PyTAPS_check_numpy_helper()
+{
+    cat <<EOF | $1 -
+try:
+    import numpy
+    print "succeeded"
+except:
+    print "failed"
+EOF
+}
+
+PyTAPS_build_service()
+{
+    [[ "${PYTHON_BIN}" ]] || { error "python is not in your path and PYTHON_BIN is empty" && return 1; }
+
+    # If they gave us path to a dir, resolve it to the executable
+    if [[ ! -x ${PYTHON_BIN} ]]; then
+        if [[ -d ${PYTHON_BIN} ]]; then
+            if [[ -d ${PYTHON_BIN}/bin ]] && [[ -x ${PYTHON_BIN}/bin/python ]]; then
+                PYTHON_BIN=${PYTHON_BIN}/bin/python
+            elif [[ -x ${PYTHON_BIN}/python ]]; then
+                PYTHON_BIN=${PYTHON_BIN}/python
+	    else
+	        error "Neither ${PYTHON_BIN}/python or ${PYTHON_BIN}/bin/python exist" && return 1
+	    fi
+	else
+	    error "${PYTHON_BIN} specifies neither a dir nor an executable" && return 1
+        fi
+    fi
+
+    # Check that python has numpy support
+    local has_numpy=$(PyTAPS_check_numpy_helper ${PYTHON_BIN})
+    [[ "${has_numpy}" == succeeded ]] || { error "import numpy for ${PYTHON_BIN} failed" && return 1; }
+
+    local serv=$1
+    local impl=$2
+
+    local builddir=${serv}
+    local version=$(checkvar ${serv} VERSION)
+    [[ "${version}" ]] && builddir="${serv}-${version}"
+    builddir=$(echo $builddir | tr \[A-Z\] \[a-z\])
+
+    local implbuilddir=${impl}
+    local implversion=$(checkvar ${impl} VERSION)
+    [[ "${implversion}" ]] && implbuilddir="${impl}-${implversion}"
+    implbuilddir=$(echo $implbuilddir | tr \[A-Z\] \[a-z\])
+
+    # First, see if this service has already been installed for this implementation
+    local implinstalldir=$(checkvar ${impl} INSTALL)
+    if [[ -z "implinstalldir" ]]; then
+        implinstalldir=${INSTALLROOT}/itaps-${ITAPS_VERSION}/${implbuildir}
+    fi
+    local overinstall=$(checkvar ${serv} OVERINSTALL)
+    if [[ "${overinstall}" = no ]]; then
+        # Using find here, we don't have to actually know the service's installed name
+        local servfiles=$(find -L ${implinstalldir}/lib -name "iMesh.so" 2>/dev/null)
+        if [[ -n "${servfiles}" ]]; then
+            info "skipping ${serv} for impl ${impl} because it appears to already be installed"
+            return 0
+        fi
+    fi
+
+    # Download the product and copy to impl-specific dir
+    download $serv
+    [[ $? -eq 0 ]] || { error "Unable to download $serv" && return 1; }
+    if [[ "${DOWNLOAD_ONLY}" == yes ]]; then
+        return 0
+    fi 
+    cp -R ${builddir} ${builddir}-${impl}
+    cd ${builddir}-${impl}
+
+    info "Building ${serv} for ${impl}"
+    ${PYTHON_BIN} setup.py --without-iRel --without-iGeom --with-iMesh --iMesh-path=${implinstalldir} build
+    find build -iname "*.so" -exec cp {} ${implinstalldir}/lib.so \;
+}
+
+#
+# Script Utilities
+#
+
+error()
+{
+    [[ -n "$@" ]] || return 0
+    echo "###ERROR###"
+    echo -e "$@"
+    if [[ "${IGNORE_ERRORS}" ]]; then
+        echo "Continuing past this error"
+	return 0
+    fi
+    exit 1
+}
+
+info()
+{
+    [[ -n "$@" ]] || return 0
+    echo -e "$@"
+}
+
+ts=0
+timestamp()
+{
+    touch timestamp_$ts
+    # Ensures any subsequent operations occur long enough after in time
+    # that they will be resolved in time.
+    sleep 1
+    echo timestamp_$ts
+    ts=$(expr $ts + 1)
+}
+
+clear_timestamp()
+{
+    if [[ -e $1 ]]; then
+        rm -f $1
+    fi
+}
+
+file_type_and_target()
+{
+    local type=""
+    local target=""
+    local tartype=""
+    if [[ $(echo $1 | egrep "\.tar$") != "" ]] ; then
+        type="tar"
+	target=$(basename $1 .tar)
+    elif [[ $(echo $1 | egrep "\.tar.gz$") != "" ]] ; then
+        type="tar"
+        tartype="gzip"
+	target=$(basename $1 .tar.gz)
+    elif [[ $(echo $1 | egrep "\.tar.bz2$") != "" ]] ; then
+        type="tar"
+        tartype="bzip"
+	target=$(basename $1 .tar.bz2)
+    elif [[ $(echo $1 | egrep "\.tgz$") != "" ]] ; then
+        type="tar"
+        tartype="targzip"
+	target=$(basename $1 .tgz)
+    elif [[ $(echo $1 | egrep "^https?://.*/.*svn.*") != "" ]]; then
+        type="svn"
+	target=$(basename $1)
+    elif [[ $(echo $1 | egrep "^svn\+ssh?://.*/.*svn.*") != "" ]]; then
+        type="svn"
+	target=$(basename $1)
+    else
+        type="plainfile"
+	target=$(basename $1)
+    fi
+    echo $type $target $tartype
+}
+
+uncompress_untar()
+{
+    [[ "$1" ]] || { error "uncompress_untar input file not specified." && return 1; }
+    [[ "$2" ]] || { error "uncompress_untar target not specified." && return 1; }
+
+    # Determine type of tar
+    local tt=$(file_type_and_target $1)
+    local type=$(echo $tt | cut -d' ' -f1)
+    local tartype=$(echo $tt | cut -d' ' -f3)
+
+    if [[ ${type} != tar ]]; then
+	return 0
+    fi
+
+    tmpdir="untar_tmp_$1_$$"
+    rm -rf $tmpdir
+    mkdir $tmpdir
+    cd $tmpdir
+
+    # Use either tar's -z option or pipe via unzip method
+    # Use tar's -m flag to ensure modification times are now
+    local untarts=$(timestamp)
+    local tarversion=$(tar --version >/dev/null 2>&1)
+    if [[ $? == 0 ]] ; then
+        case $tartype in
+            tar)
+	        tar xf ../$1
+		;;
+            gzip|targzip)
+	        tar zxf ../$1
+		;;
+            bzip)
+	        tar jxf ../$1
+		;;
+        esac
+    else
+        case $tartype in
+            tar)
+	        tar xf ../$1
+		;;
+            gzip|targzip)
+	        gunzip < ../$1 | tar xf -
+		;;
+            bzip)
+	        bunzip2 < ../$1 | tar xf -
+		;;
+        esac
+    fi
+    [[ $? -eq 0 ]] || { error "Problem uncompressing/untaring ../$1" && return 1; }
+
+    # If above succeeded, figure out what dir it just created.
+    newdir=$(ls -1atdF * | grep '/$' | sed -n 1p)
+    [[ $? -eq 0 ]] || { error "Unable to detect directory created by uncompress_untar" && return 1; }
+    [[ "${newdir}" ]] || { error "Unable to detect directory created by uncompress_untar" && return 1; }
+    if [[ "$newdir" == "NOT SET NOT SET" || "$newdir" == "." \
+          || "$newdir" == ".." ]]; then
+        error "Unable to detect directory created by uncompress_untar"
+    fi
+
+    clear_timestamp $untarts
+    rm -rf ../$2
+    mv $newdir ../$2
+    cd ..
+    rm -rf $tmpdir
+
+    return 0
+}
+
+download_item()
+{
+    local type=$1
+    local dfile=$2
+    local dir=$3
+    local url=$4
+
+    info "Downloading $dfile from $url"
+
+    # Ensure downloads dir is setup and make a timestamp
+    if [[ ! -d downloads ]]; then
+        mkdir downloads
+    fi
+    pushd downloads >/dev/null 2>&1
+
+    if [[ ${type} == svn ]]; then
+        [[ ${SVN} != "" ]] || { error "No svn client to handle checkouts." && return 1; }
+        rm -rf $dir
+        ${SVN} co ${SVN_OPTS} $url/$dfile $dir >>${LOG_FILE} 2>&1
+        [[ $? -eq 0 ]] || { error "SVN Checkout of \"$dfile\" failed." && return 1; }
+        find $dir -depth -type d -name .svn -exec rm -rf {} \;
+    else
+        if [[ "$OPSYS" == "Darwin" ]]; then
+            /usr/bin/curl -ksfLO $url/$dfile
+        else
+            [[ ${WGET} != "" ]] || { error "No wget to handle downloads." && return 1; }
+            ${WGET} $WGET_OPTS -o /dev/null $url/$dfile
+        fi
+        [[ $? -eq 0 ]] || { error "Download of \"$dfile\" failed." && return 1; }
+        if [[ ${type} != plainfile ]]; then
+            uncompress_untar $dfile $dir
+        fi
+    fi
+
+    cp -pR $dir ../.
+    popd >/dev/null 2>&1
+}
+
+#
+# Download a product
+#    - determines product's distribution file type and target
+#    - checks if its already downloaded
+#    - downloads over existing download if so requested
+#    - uncompress/untar if needed
+#    - echos the resultant file|dir in the filesystem
+#    - returns 0 on success otherwise errors fatally
+#
+download()
+{
+    local product=$1
+    [[ "${product}" ]] || { error "No product name specified" && return 1; }
+
+    # Get this product's distribution file name, type and target
+    local dfile=$(checkvar ${product} DISTFILE)
+    [[ "${dfile}" ]] || { error "don't know DISTFILE for ${product}" && return 1; }
+
+    local version=$(checkvar ${product} VERSION)
+    local productdir=${product}
+    if [[ "${version}" ]]; then
+        productdir="${product}-${version}"
+    fi
+    productdir=$(echo $productdir | tr \[A-Z\] \[a-z\])
+
+    local urls=$(checkvar ${product} URL)
+    local tnt=$(file_type_and_target ${urls}/${dfile})
+    local type=$(echo ${tnt} | cut -d' ' -f1)
+    local target=$(echo ${tnt} | cut -d' ' -f2)
+
+    # If we already have the target and we don't overdownload, we're done
+    if [[ -e ${productdir} ]] ; then
+        local overdownload=$(checkvar ${product} OVERDOWNLOAD)
+        if [[ "${overdownload}" == no ]]; then
+            info "${product} has been previously downloaded. Using that..."
+	    return 0
+	fi
+    fi
+
+    # Get this product's URL(s), use default URL if none given
+    if [[ -z "${urls}" ]]; then
+        if [[ ${type} == plainfile ]]; then
+	    urls=${DEFURL}
+	    type=svn
+	else
+	    urls=${DEFURL}/release_distros
+	fi
+    fi
+
+    # Use various download methods based on type and system
+    for url in $urls; do
+        download_item $type $dfile $productdir $url
+        [[ $? -eq 0 ]] && break
+    done
+    [[ -e ${productdir} ]] || { error "Problem downloading ${product}." && return 1; }
+}
+
+checkvar()
+{
+    local impl_var=${1}_${2}
+    local ckvar=""
+    eval ckvar=\$$impl_var
+    if [[ -n "${ckvar}" ]]; then
+        echo ${ckvar}
+    fi
+}
+
+# Iterates over all product vars and defines default values for any
+# that are not already defined.
+setupvars()
+{
+    local prod=$1
+    local varname=""
+    for pvar in ${PROD_VARS}; do
+        local pvarck=$(checkvar ${prod} ${pvar})
+        if [[ -z "${pvarck}" ]]; then
+            local pvarname=${prod}_${pvar}
+            eval export ${pvarname}=\$\{${pvarname}:-\${${pvar}}}
+        fi
+    done
+}
+
+#
+# Compare an implementation's IMPLEMENTS variable and a services
+# REQUIRED variable to determine which implementations meet the
+# service's requirements.
+#
+get_list_of_compatible_impls()
+{
+    local serv=$1
+    local requires=$(checkvar ${serv} REQUIRES)
+    local impls=""
+    for impl in ${ITAPS_IMPLS_INSTALLED}; do
+        local implements=$(checkvar ${impl} IMPLEMENTS)
+        local have_all_required=1
+        for req in ${requires}; do
+	    if [[ -z "$(echo $implements | grep $req)" ]]; then
+	        have_all_required=0
+	        break
+	    fi
+        done
+	if [[ $have_all_required -eq 1 ]]; then
+	    impls="$impls $impl"
+	fi
+    done
+    echo $impls
+}
+
+#
+# Main function to build and install a product. Its recursive on a 
+# product's prerequisites.
+#
+build_lib()
+{
+    local lib=$1
+    local isprereq=$2
+
+    local builddir=${lib}
+    local version=$(checkvar ${lib} VERSION)
+    [[ "${version}" ]] && builddir="${lib}-${version}"
+    builddir=$(echo $builddir | tr \[A-Z\] \[a-z\])
+
+    # First, see if it is already been installed
+    local installdir=$(checkvar ${lib} INSTALL)
+    if [[ -z "installdir" ]]; then
+        if [[ "$isprereq" ]]; then
+            installdir=${INSTALLROOT}/3rd_party/${buildir}
+        else
+            installdir=${INSTALLROOT}/itaps-${ITAPS_VERSION}/${buildir}
+        fi
+    fi
+    local overinstall=$(checkvar ${lib} OVERINSTALL)
+    if [[ "${overinstall}" = no ]]; then
+        if [[ -e ${installdir}/lib ]] && [[ -e ${installdir}/include ]]; then
+            info "skipping ${lib} because it appears to already be installed"
+            return 0
+        fi
+    fi
+
+    # Next, handle any prerequesits
+    local prereqs=$(checkvar ${lib} PREREQS)
+    if [[ "${prereqs}" ]]; then
+        for p in ${prereqs}; do
+            info "Building prerequisite $p for $lib"
+            setupvars $p
+            build_lib $p isPrereq
+            [[ $? -eq 0 ]] || { error "Unable to build prerequesite $p for $lib" && return 1; }
+        done
+    fi  
+
+    # Download this product
+    download ${lib}
+    [[ $? -eq 0 ]] || { error "Unable to download $lib" && return 1; }
+    if [[ "${DOWNLOAD_ONLY}" == yes ]]; then
+        return 0
+    fi 
+    cd ${builddir}
+
+    info "Configuring ${lib}..."
+    # Ok, go to that dir and configure it
+    local cppflags=$(checkvar ${lib} CPPFLAGS)
+    local cc=$(checkvar ${lib} CC)
+    local cflags=$(checkvar ${lib} CFLAGS)
+    local cxx=$(checkvar ${lib} CXX)
+    local cxxflags=$(checkvar ${lib} CXXFLAGS)
+    local fc=$(checkvar ${lib} FC)
+    local fcflags=$(checkvar ${lib} FCFLAGS)
+    local cfgflags=$(checkvar ${lib} CFGFLAGS)
+    ./configure \
+        CPPFLAGS="${cppflags}" \
+        CC="${cc}" \
+        CFLAGS="${cflags}" \
+        CXX="${cxx}" \
+        CXXFLAGS="${cxxflags}" \
+        FC="${fc}" \
+        FCFLAGS="${fcflags}" \
+        ${cfgflags} \
+        --prefix=${installdir} >>${LOG_FILE} 2>&1
+    [[ $? -eq 0 ]] || { error "Failed to configure $lib. See ${BLOG_FILE}" || return 1; }
+
+    # Make it
+    info "Making ${lib}..."
+    local mkflags=$(checkvar ${lib} MKFLAGS)
+    make ${mkflags} >>${LOG_FILE} 2>&1
+    [[ $? -eq 0 ]] || { error "Failed to make $lib. See ${BLOG_FILE}" && return 1; }
+
+    # If a check routine is defined and checking is enabled, check it
+    local mkckcmd=$(checkvar ${lib} MKCKCMD)
+    if [[ "${mkckcmd}" ]]; then
+        info "Checking ${lib}..."
+        ${mkckcmd} >>${LOG_FILE} 2>&1
+        [[ $? -eq 0 ]] || info "$lib failed its own checks. See ${BLOG_FILE}. Installing anyways..."
+    fi
+
+    # Ok, install it now.
+    info "Installing ${lib}..."
+    local mkinstcmd=$(checkvar ${lib} MKINSTCMD)
+    if [[ "${mkinstcmd}" ]]; then
+        ${mkinstcmd} >>${LOG_FILE} 2>&1
+        status=$?
+        [[ $status -eq 0 ]] || { error "$lib failed to install. See ${BLOG_FILE}" && return 1; }
+
+	# Stuff some information about this configuration into
+	# a text file in the installed lib dir
+	[[ -e config.log ]] && cat config.log > ${installdir}/lib/${lib}_config_info.txt
+	[[ -e config.status ]] && cat config.status >> ${installdir}/lib/${lib}_config_info.txt
+
+        # Move installed shared libs away from static libs
+	# unless otherwise instructed. Having both in same dir is
+	# a pain for novice users.
+        local mvshlibs=$(checkvar ${lib} MVSHLIBS)
+        if [[ "${mvshlibs}" == yes ]]; then
+	    cp -R ${installdir}/lib ${installdir}/lib.so
+	    mv ${installdir}/lib ${installdir}/lib.a
+	    rm -f ${installdir}/lib.a/lib*.so* 2>/dev/null
+	    rm -f ${installdir}/lib.so/lib*.a 2>/dev/null
+            local useshlibs=$(checkvar ${lib} USESHLIBS)
+            pushd ${installdir} >/dev/null 2>&1
+	    if [[ "${useshlibs}" == no ]]; then
+	        ln -s lib.a lib
+	    else
+	        ln -s lib.so lib
+            fi
+            popd >/dev/null 2>&1
+        fi
+    else
+        { error "No command to install $lib" && return 1; }
+    fi
+
+    cd ..
+
+    # Hack to patchup fortran headers for this impl
+    # Never done on prerequisites.
+    if [[ -z "$isprereq" ]]; then
+        download_item plainfile iMesh_f.h iMesh_f.h ${DEFURL}/interfaces/iMesh/spec
+        mv iMesh_f.h ${installdir}/include/.
+        download_item plainfile iBase_f.h iBase_f.h ${DEFURL}/interfaces/iBase/spec
+        mv iBase_f.h ${installdir}/include/.
+    fi
+
+    return $status
+}
+
+build_service()
+{
+    local serv=$1
+    local impl=$2
+
+    local builddir=${serv}
+    local version=$(checkvar ${serv} VERSION)
+    [[ "${version}" ]] && builddir="${serv}-${version}"
+    builddir=$(echo $builddir | tr \[A-Z\] \[a-z\])
+
+    local implbuilddir=${impl}
+    local implversion=$(checkvar ${impl} VERSION)
+    [[ "${implversion}" ]] && implbuilddir="${impl}-${implversion}"
+    implbuilddir=$(echo $implbuilddir | tr \[A-Z\] \[a-z\])
+
+    # First, see if this service has already been installed for this implementation
+    local implinstalldir=$(checkvar ${impl} INSTALL)
+    if [[ -z "implinstalldir" ]]; then
+        implinstalldir=${INSTALLROOT}/itaps-${ITAPS_VERSION}/${implbuildir}
+    fi
+    local overinstall=$(checkvar ${serv} OVERINSTALL)
+    if [[ "${overinstall}" = no ]]; then
+        # Using find here, we don't have to actually know the service's installed name
+        local servfiles=$(find -L ${implinstalldir}/lib -iname "lib*${serv}*.*" 2>/dev/null)
+        if [[ -n "${servfiles}" ]]; then
+            info "skipping ${serv} for impl ${impl} because it appears to already be installed"
+            return 0
+        fi
+        local servfiles=$(find ${implinstalldir}/bin -iname "*${serv}*" 2>/dev/null)
+        if [[ -n "${servfiles}" ]]; then
+            info "skipping ${serv} for impl ${impl} because it appears to already be installed"
+            return 0
+        fi
+    fi
+
+    # Next, handle any prerequesits
+    local prereqs=$(checkvar ${serv} PREREQS)
+    if [[ "${prereqs}" ]]; then
+        for p in ${prereqs}; do
+            info "Building prerequisite $p for $serv"
+            setupvars $p
+            build_service $p $impl
+            [[ $? -eq 0 ]] || { error "Unable to build prerequesite $p for $serv" && return 1; }
+        done
+    fi  
+
+    # Download the product
+    download $serv
+    [[ $? -eq 0 ]] || { error "Unable to download $serv" && return 1; }
+    if [[ "${DOWNLOAD_ONLY}" == yes ]]; then
+        return 0
+    fi 
+    cd ${builddir}
+
+    # configure it
+    info "Configuring ${serv} for ${impl}"
+    if [[ -e configure ]]; then
+        local cfgflags=$(checkvar ${serv} CFGFLAGS)
+        ./configure IMESH_DEFS=${implinstalldir}/lib/iMesh-Defs.inc ${cfgflags} \
+            --prefix=${implinstalldir} >>${LOG_FILE} 2>&1
+        [[ $? -eq 0 ]] || { error "Failed to configure $serv. See ${BLOG_FILE}" && return 1; }
+    fi
+
+    # Make it
+    info "Making ${serv} for ${impl}"
+    local mkflags=$(checkvar ${serv} MKFLAGS)
+    make ${mkflags} IMESH_DIR=${implinstalldir} clean >>${LOG_FILE} 2>&1
+    make ${mkflags} IMESH_DIR=${implinstalldir} >>${LOG_FILE} 2>&1
+    [[ $? -eq 0 ]] || { error "Failed to make $serv. See ${BLOG_FILE}" && return 1; }
+
+    # If a check routine is defined and checking is enabled, check it
+    local mkckcmd=$(checkvar ${serv} MKCKCMD)
+    if [[ "${mkckcmd}" ]]; then
+        info "Checking ${serv} for ${impl}"
+        ${mkckcmd} >>${LOG_FILE} 2>&1
+        [[ $? -eq 0 ]] || info "$serv failed its own checks. See ${BLOG_FILE}. Installing anyways..."
+    fi
+
+    # Ok, install it now.
+    info "Installing ${serv} for ${impl}"
+    local mkinstcmd=$(checkvar ${serv} MKINSTCMD)
+    if [[ "${mkinstcmd}" ]]; then
+        ${mkinstcmd} >>${LOG_FILE} 2>&1
+        status=$?
+        [[ $status -eq 0 ]] || { error "$serv failed to install. See ${BLOG_FILE}" && return 1; }
+    else
+        { error "No command to install $serv" && return 1; }
+    fi
+
+    cd ..
+}
+
+info "############################################"
+info "############################################"
+info "New log started $(date)"
+info "Invoked with following env settings..."
+# This bit of code is to attempt to suck out all the vars
+# defined in this script and then search for ONLY those
+# in the enviornment.
+vars=$(cat $0 | grep -v '^ *#' | tr ' /=:.{}-' '\n' | \
+      grep "[A-Z]\{3,\}" | tr -d '"|${}();.-' | sort | \
+      uniq | sed 's|^\(.*\)|\0=|')
+env | grep -F "$vars" | sort | sed 's|^\(.\)|    \0|' >>${LOG_FILE} 2>&1
+info "############################################"
+info "############################################"
+
+if [[ ! -d ${INSTALLROOT} ]]; then
+    mkdir -p ${INSTALLROOT}
+fi
+
+#
+# Main installation loop over implementations
+#
+ITAPS_IMPLS_INSTALLED=""
+for impl in ${ITAPS_IMPLS}; do
+    info "building implementation: ${impl}"
+
+    # Ensure we've copied all default and product overrides
+    setupvars ${impl}
+
+    cd $PWDDIR
+
+    prepcmd=$(checkvar ${impl} PREPCMD)
+    if [[ "${prepcmd}" ]]; then
+        ${prepcmd}
+        status=$?
+        [[ $status -eq 0 ]] || { error "${prepcmd} failed for ${lib}" && continue; }
+    fi
+    build_lib ${impl}
+    if [[ $? -eq 0 ]]; then
+        ITAPS_IMPLS_INSTALLED="${ITAPS_IMPLS_INSTALLED} ${impl}"
+    fi
+done
+
+#
+# Main installation loop over services
+#
+for serv in ${ITAPS_SERVICES}; do
+    # Ensure we've copied all default and product overrides
+    setupvars ${serv}
+
+    cd $PWDDIR
+
+    impls=$(get_list_of_compatible_impls $serv)
+    if [[ "${impls}" ]]; then
+        for impl in ${impls}; do
+            cd $PWDDIR
+            bscmd=$(checkvar ${serv} BUILD_SERVICE)
+	    [[ "${bscmd}" ]] || bscmd=build_service
+	    $bscmd ${serv} ${impl}
+            [[ $? -eq 0 ]] || { error "${bscmd} failed for ${serv}" && continue; }
+        done
+    else
+        info "Found no compatible implementation for $serv. Skipping it."
+    fi
+done
+
+if [[ "$GRPNAME" ]]; then
+    chgrp -R ${GRPNAME} ${INSTALLROOT}
+fi
+chmod -R g+rwX,o+rX ${INSTALLROOT}
+
+# ensure output from this script as well as all sub-processes is captured 
+# to the log file
+# ]
+) | tee -a ${LOG_FILE}

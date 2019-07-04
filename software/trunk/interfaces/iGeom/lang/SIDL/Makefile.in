@@ -1,0 +1,4 @@
+FACE = Geom
+IMPL_SIDL = $(srcdir)/iGeomSIDL.sidl
+IBASE_REPO = -R../iBase/xml
+include @top_srcdir@/subdir.make

@@ -1,0 +1,231 @@
+Notes:
+
+o No testing is done for cases where an array hasn't been allocated, but
+the allocated size variable happens to have some large garbage value,
+leading to an attempt to fill an array with a bogus address.  While this
+is certainly possible, it's (a) easy to debug bad application/service
+code that makes this mistake and (b) not likely to happen randomly after
+that initial debugging.
+
+========================================================================
+
+These functions can't really have their results checked in any way I can
+think of.
+
+xC iMesh_areEHValid
+xC iMesh_dtor
+xC iMesh_save
+
+These functions have to do something, and it's relatively easy to tell
+by implication whether their actions are consistent.
+
+xI iMesh_getRootSet
+xI iMesh_load
+xI iMesh_newMesh
+
+These functions can be called without prerequisites, but it's wise to
+use the information from them in performing other tests subsequently.
+
+xO iMesh_getAdjTable 
+xO iMesh_getDfltStorage
+
+These functions can be tested in isolation:  once known mesh data is
+read, the answers to these calls are known.
+
+Mesh-level queries:
+
+xS iMesh_getGeometricDimension
+xS iMesh_getNumOfTopo
+xS iMesh_getNumOfType
+
+All-mesh retrieval:
+
+To be able to really test adjacency stuff, there's going to have to be a
+separate internal rep of the mesh.  Otherwise, any re-ordering of data
+by an implementation will make testing completely impossible.
+
+With some serious scut work, it should be possible to create (based on
+coordinates (getAllVtxCoords, getVtxCoords, getVtxArrCoords)) a map from
+the iMesh instance's vert handles to some internal mesh rep's handles.
+Then, using edge/face/region -> vert adjacency (including maybe chains;
+iterators to get ents, getAdjEntities, getEntAdj, getEntArrAdj), it
+should be possible to build a similar map for those entities.  Once
+that's done, then adjacency and entity retrieval tests are feasible.
+Only adjacencies that are needed (and possible, according to
+getAdjTable) should be tested, obviously...
+
+xS iMesh_getAllVtxCoords 
+S iMesh_getEntities
+S iMesh_getAdjEntities 
+S iMesh_getVtxCoordIndex 
+
+Per-entity retrieval (require some way to get entities; some may require
+The Mapping) 
+
+S iMesh_getEntAdj
+S iMesh_getEntTopo
+S iMesh_getEntType
+S iMesh_getVtxCoord
+
+Array retrieval:
+
+S iMesh_getEntArrAdj
+S iMesh_getEntArrTopo
+S iMesh_getEntArrType
+S iMesh_getVtxArrCoords
+
+Error description:
+
+S iMesh_getDescription
+
+Groups:
+
+Iterator functions must be tested as a group, and they must be tested
+-after- something like getEntities or getEntAdj, so that it's possible
+to check the answers.  Otherwise, all one can do, even with known data,
+is just check that the right number of things have been retrieved.
+
+With The Mapping, it should be possible to 
+
+EntIter:
+
+I iMesh_initEntIter
+P iMesh_getNextEntIter
+P iMesh_resetEntIter
+C iMesh_endEntIter
+
+EntArrIter:
+
+I iMesh_initEntArrIter
+P iMesh_getNextEntArrIter
+P iMesh_resetEntArrIter
+C iMesh_endEntArrIter
+
+Modification:
+
+These functions must be tested after the corresponding retrieval
+functions, or again it's a very weak test.
+
+P iMesh_setVtxArrCoords
+P iMesh_setVtxCoords
+P iMesh_createVtx
+P iMesh_createVtxArr
+P iMesh_createEnt
+P iMesh_createEntArr
+P iMesh_deleteEnt
+P iMesh_deleteEntArr
+
+Sets:
+
+Creation:  Surely will be tested in conjunction with subsequent stuff.
+It's possible that a service won't specify this, but an application may
+have to have it explicitly (certainly must have the equivalent
+internally). 
+
+? iMesh_createEntSet
+
+SetType: Depends only on creation.
+
+P iMesh_isList
+
+Entity members: These functions are testable once some sort of entity
+retrieval function passes, because the data from those retrievals is
+used.
+
+P iMesh_addEntToSet
+P iMesh_addEntArrToSet
+P iMesh_isEntContained
+P iMesh_rmvEntArrFromSet
+P iMesh_rmvEntFromSet
+
+Set members:  These functions require only that createEntSet works.
+
+P iMesh_addEntSet
+P iMesh_isEntSetContained
+P iMesh_getNumEntSets
+P iMesh_getEntSets
+P iMesh_rmvEntSet
+
+Parent/child:  These functions require only that createEntSet works.
+
+P iMesh_addPrntChld
+P iMesh_isChildOf
+P iMesh_getNumChld
+P iMesh_getChldn
+S iMesh_getNumPrnt
+P iMesh_getPrnts
+P iMesh_rmvPrntChld
+
+Set boolean:  These require that both entity and set members work.
+
+P iMesh_intersect
+P iMesh_subtract
+P iMesh_unite
+
+Set destroy: Can only be tested if creation works, and only to be sure
+it exits safely.
+
+C iMesh_destroyEntSet
+
+Tags:
+
+? iMesh_createTag
+
+Tag basics: Depend only on creation.
+
+P iMesh_getTagHandle
+P iMesh_getTagName
+P iMesh_getTagSizeBytes
+P iMesh_getTagSizeValues
+P iMesh_getTagType
+
+Tag retrieval: Require successful tag setting.
+
+P iMesh_getAllTags
+P iMesh_getAllEntSetTags
+
+Entity set/get: Require tag creation and entity retrieval
+
+P iMesh_setData
+P iMesh_setDblData
+P iMesh_setEHData
+P iMesh_setIntData
+P iMesh_getData
+P iMesh_getDblData
+P iMesh_getEHData
+P iMesh_getIntData
+
+Array set/get: Require tag creation and entity retrieval
+
+P iMesh_setArrData
+P iMesh_setDblArrData
+P iMesh_setEHArrData
+P iMesh_setIntArrData
+P iMesh_getArrData
+P iMesh_getDblArrData
+P iMesh_getEHArrData
+P iMesh_getIntArrData
+
+Entity set set/get: Require tag creation, entity set creation, and (for
+EH data) entity retrieval
+
+P iMesh_setEntSetData
+P iMesh_setEntSetDblData
+P iMesh_setEntSetEHData
+P iMesh_setEntSetIntData
+P iMesh_getEntSetData
+P iMesh_getEntSetDblData
+P iMesh_getEntSetEHData
+P iMesh_getEntSetIntData
+
+Tag removal: Require tag creation.  Entity retrieval, entity set
+creation, tag setting for some tests.
+
+P iMesh_rmvTag
+P iMesh_rmvArrTag
+P iMesh_rmvEntSetTag
+
+Tag destruction:  Require tag creation.  Tag setting for some tests.
+
+P iMesh_destroyTag
+

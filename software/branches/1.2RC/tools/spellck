@@ -1,0 +1,248 @@
+#!/bin/sh
+
+##
+## Useful tool to help find spelling errors in english language comments
+## in various ITAPS Interface header files.
+## 
+## Usage:
+##     spellck iBase.h
+##     spellck iMesh.h
+##
+## It will print out a list of unrecognized words. Its not perfect. So,
+## this script also has an explicit list of acceptable words which you
+## are welcome to add to as needed.
+##
+
+if [[ -z "$1" ]]; then
+    echo "Must specify one of the ITAPS interface header files as \$1"
+    exit
+fi
+h=$(basename $1)
+if [[ "$h" != iBase.h && "$h" != iMesh.h && "$h" != iMeshP.h &&
+      "$h" != iGeom.h && "$h" != iRel.h && "$h" != iField.h &&
+      "$h" != iField_dfk.h ]]; then
+    echo "Must specify one of the ITAPS interface header files as \$1"
+    exit 1
+fi
+
+# decide upon a temporary directory for the ignore_words file
+tmpDir=$TMPDIR
+if test -z "$tmpDir"; then
+    if test -d /usr/tmp; then
+       tmpDir=/usr/tmp
+    elif test -d /tmp; then
+       tmpDir=/tmp
+    else
+       tmpDir=.
+    fi
+fi
+
+# build an initial list of words to ignore
+rm -f $tmpDir/ignore_words
+cat $1 | tr ' ' '\n' | grep 'iBase_\|IBASE_\|iMesh_\|IMESH_\|iMeshP_\|IMESHP_\|iRel_\|IREL_\|iGeom_\|IGEOM_\|iField_\|IFIELD_' | cut -d'(' -f1 | tr -d '*,;"][' | tr '_' '\n' | sort | uniq | grep . > $tmpDir/ignore_words
+
+# Add some specific words we know are ok
+cat >> $tmpDir/ignore_words <<- EOF
+AdjacencyCost
+ADJACENCYCOST
+API
+CREATIONSTATUS
+ENTITYSET
+ENTITYTYPE
+ERRORACTIONS
+ERRORTYPE
+ErrorActions
+FMDB
+GRUMMP
+INsensitive
+ITAPS
+LOGN
+STRUCT
+TagValueType
+TOPO
+TYPEDEF'S
+TWOPHASEIO
+TwoPhaseIO
+areHandlesInvariant
+arg
+const
+coords
+cplusplus
+doReset
+endif
+entArr
+enum
+fmdb
+getEnt
+getEntArr
+grummp
+hdf
+hexahedra
+hexahedral
+ifdef
+ifndef
+inout
+ith
+len
+mainpage
+moab
+null
+num
+param
+pre
+protos
+silant
+strlen
+struct
+topo
+tradeoffs
+twophaseio
+undef
+vertices
+verts
+vfd
+xy
+xyz
+yyy
+zzz
+ArgOrder
+IfaceType
+RelationType
+descr
+discretize
+endcode
+ent
+entiter
+entset
+iGeom
+iMesh
+ierr
+ies
+iface
+cvtr
+dir
+drvt
+dvrt
+dvtr
+getArr
+ndAdj
+ndDrvt
+nrml
+stDrvt
+tgnt
+uu
+uv
+vv
+BOOTCAMP
+CMM
+CreateEnt
+Ent
+EntArr
+FETI
+IMeshP
+KDD
+MPI
+Onkar's
+PRT
+PTN
+SVN
+Xiaolin
+createEnt
+dest
+getAllVtxCoord
+getNext
+getNumX
+getTag
+getX
+mpi
+nbor
+nbors
+setVtxCoords
+svn
+typedef'ed
+DFK
+DOF
+DOFs
+DTYPE
+Galerkin
+InOut
+Jacobians
+TensorField
+TensorFields
+XYZ
+YYY
+YZX
+ZYX
+aaa
+abc
+alg
+alloc
+bbb
+bool
+bunits
+candela
+cartesian
+ccc
+cgs
+coord
+createDomain
+datatype
+deriveable
+discretizations
+getDOFAssoc
+getDOFs
+getDof
+getName
+getParamCoords
+getVtx
+hessian
+hessians
+html
+ie
+iff
+iGeom
+illuminance
+impl
+ipcomman
+irel
+kernal
+kludgy
+Lagrange
+logbase
+logcoef
+NIST
+pSET
+pSETs
+primetime
+quant
+ssl
+subsubsection
+taghandle
+towards
+value'd
+vec
+vert
+wwwwww
+xml
+GPU
+IMPL
+INVALD
+Ok
+VisIt
+dfunc
+dlopen
+dofs
+evalDFunc
+evalGrad
+evalHessian
+func
+getContinuous
+getDegree
+lagrange
+multiplexor
+namespaces
+ness
+STL
+EOF
+spell $1 | grep -v -f $tmpDir/ignore_words
+rm -f $tmpDir/ignore_words

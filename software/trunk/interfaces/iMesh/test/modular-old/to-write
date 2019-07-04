@@ -1,0 +1,5 @@
+TEST macro (including statistics, output of stringified arg, etc)
+
+Functions to get actual data.  So far:
+  actualNumOfType, actualNumOfTopo, actualCoords
+

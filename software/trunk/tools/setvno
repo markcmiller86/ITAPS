@@ -1,0 +1,72 @@
+#!/bin/sh -x
+
+#
+# Tool to handle updating iMesh version number in all the right places.
+# Yes, it can be done manually but this script ensures all relevant
+# places are updated. It does a sed replacement in place on iMesh.h.
+#
+# Examples...
+#
+# 'setvno -maj++' incriments the major version number and resets minor, patch 
+# 'setvno -min++' incriments the minor version number and resets patch 
+# 'setvno -pat++' incriments the patch version number
+# 'setvno a.b.c'  sets version number to a.b.c
+
+#
+# Scan current version number from file
+#
+majno=$(grep '#define IMESH_MAJOR_VERSION' iMesh.h | tr -s ' ' | cut -d ' ' -f3)
+minno=$(grep '#define IMESH_MINOR_VERSION' iMesh.h | tr -s ' ' | cut -d ' ' -f3)
+patno=$(grep '#define IMESH_PATCH_VERSION' iMesh.h | tr -s ' ' | cut -d ' ' -f3)
+
+#
+# Set new version number.
+#
+for options
+do
+   case $1 in
+      "") # handle empty argument
+         ;;
+      -maj++) # incriment major number
+         newmajno=$(expr $majno + 1)
+         newminno=0
+         newpatno=0
+         ;;
+      -min++) # incriment minor number
+         newmajno=$majno
+         newminno=$(expr $minno + 1)
+         newpatno=0
+         ;;
+      -pat++) # incriment patch number
+         newmajno=$majno
+         newminno=$minno
+         newpatno=$(expr $patno + 1)
+         ;;
+      *) # set it to specific value
+         newmajno=$(echo $1 | cut -d '.' -f1)
+         newminno=$(echo $1 | cut -d '.' -f2)
+         newpatno=$(echo $1 | cut -d '.' -f3)
+         if test $newmajno -lt $majno -o \
+             \( $newmajno -eq $majno -a $newminno -lt $minno \) -o \
+             \( $newmajno -eq $majno -a $newminno -eq $minno -a $newpatno -lt $patno \); then
+             echo "*****************************************"
+             echo "*****************************************"
+             echo "Warning. Setting version number backwards"
+             echo "*****************************************"
+             echo "*****************************************"
+         fi
+         ;;
+   esac
+done
+
+echo "Current version number is... $majno.$minno.$patno"
+echo "Update to new version number $newmajno.$newminno.$newpatno?"
+echo "(type 'yes' to continue)"
+read ans
+if test "$ans" = "yes"; then
+    sed -i -e "s|IMESH_MAJOR_VERSION $majno|IMESH_MAJOR_VERSION $newmajno|" \
+        -e "s|IMESH_MINOR_VERSION $minno|IMESH_MINOR_VERSION $newminno|" \
+        -e "s|IMESH_PATCH_VERSION $patno|IMESH_PATCH_VERSION $newpatno|" \
+        -e "s|iMesh_Version_${majno}_${minno}_${patno}|iMesh_Version_${newmajno}_${newminno}_${newpatno}|" \
+        -e "s|\"iMesh Version ${majno}.${minno}.${patno}\"|\"iMesh Version ${newmajno}.${newminno}.${newpatno}\"|" \
+fi

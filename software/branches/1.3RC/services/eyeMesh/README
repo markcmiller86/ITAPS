@@ -1,0 +1,32 @@
+Dependencies:
+    The eyeMesh browser requires Qt version 4 or newer. Newer systems
+    have Qt4 by default. Older systems may have had Qt4 installed on
+    them after their initial deployment. Otherwise, you can obtain
+    Qt4 here, http://qt.nokia.com/downloads/embedded-linux-cpp
+
+Building:
+    If your system has Qt version 4 by default, usually the following
+    commands are sufficient to build the eyeMesh browser...
+
+        ./configure IMESH_DEFS=<path-to-iMesh-Defs.inc-file>
+        make
+
+    where <path-to-iMesh-Defs.inc-file> is a path to the iMesh-Defs.inc
+    file for the iMesh implementation you are using can be found.
+
+    Note, eyeMesh can be linked with only one iMesh implementation at
+    any one time. The same eyeMesh executable is not capable of reading
+    files from multiple different iMesh implementations.
+
+    If your system's default Qt is NOT Qt version 4 but it is available
+    and/or you have downloaded and installed Qt version 4, then you can
+    tell configure where to find it using the --with-qt-dir configure
+    option as in...
+
+        ./configure --with-qt-dir=<path-to-qt4>
+
+    The command
+
+        ./configure --help
+
+    displays all the options for configuring and building eyeMesh.

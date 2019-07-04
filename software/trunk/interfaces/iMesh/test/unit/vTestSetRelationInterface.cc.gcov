@@ -1,0 +1,328 @@
+        -:    0:Source:vTestSetRelationInterface.cc
+        -:    0:Programs:15
+        -:    1:#include "iMesh_unitTest.hh"
+        -:    2:
+        1:    3:void vTestSetRelationInterface(iMesh_Instance& instance)
+        -:    4:{
+        -:    5:  int err;
+        -:    6:  //     addPrntChld, rmvPrntChld, isChildOf, getNumChld, getNumPrnt,
+        -:    7:  //     getChldn, getPrnts
+        1:    8:  cout << "Testing relations and parent/child queries...             ";
+        -:    9:  iBase_EntitySetHandle apvSets[10];
+        -:   10:  iBase_EntitySetHandle *aSets =
+        1:   11:    (iBase_EntitySetHandle*) calloc(10, sizeof(iBase_EntitySetHandle));
+        1:   12:  int i, iNumSets, iSetsAlloc = 10;
+        -:   13:  int iIsChild;
+        -:   14:
+        -:   15:  // Create ten sets; the even ones are lists
+       11:   16:  for ( i=0; i<10; i++ ) {
+       10:   17:    iMesh_createEntSet(instance, (i%2==0), &apvSets[i], &err);
+       10:   18:    CHECK_ERR(err);
+        -:   19:  }
+        -:   20:
+        -:   21:  // Create a hierarchy of sets where                     [0]
+        -:   22:  //     set 0 is the parent of sets 1-3,           _______|_______
+        -:   23:  //     set 1 is the parent of sets 4-5,           [1],  [2],  [3]
+        -:   24:  //     set 3 is the parent of sets 6-7,         ___|___     ___|___
+        -:   25:  // and set 6 is the parent of sets 8-9          [4],[5]     [6],[7]
+        -:   26:  //                                                        ___|___
+        -:   27:  //                                                        [8],[9]
+        -:   28:  // Also test the isChildOf query
+        1:   29:  iIsChild = true;
+        1:   30:  bool qOK = true;
+        4:   31:  for ( i=1; i<=3; i++ ) {
+        3:   32:    iMesh_addPrntChld(instance, apvSets[0], apvSets[i], &err);
+        3:   33:    CHECK_ERR(err);
+        3:   34:    iMesh_isChildOf(instance, apvSets[0], apvSets[i], &iIsChild, &err);
+        3:   35:    CHECK_ERR(err);
+        3:   36:    qOK = qOK && iIsChild;
+        -:   37:  }
+        -:   38:
+        3:   39:  for ( int j=4; j<=5; j++ ) {
+        2:   40:    iMesh_addPrntChld(instance, apvSets[1], apvSets[j], &err);
+        2:   41:    CHECK_ERR(err);
+        2:   42:    iMesh_isChildOf(instance, apvSets[1], apvSets[j], &iIsChild, &err);
+        2:   43:    CHECK_ERR(err);
+        2:   44:    qOK = qOK && iIsChild;
+        -:   45:  }
+        -:   46:
+        3:   47:  for ( int j=6; j<=7; j++ ) {
+        2:   48:    iMesh_addPrntChld(instance, apvSets[3], apvSets[j], &err);
+        2:   49:    CHECK_ERR(err);
+        2:   50:    iMesh_isChildOf(instance, apvSets[3], apvSets[j], &iIsChild, &err);
+        2:   51:    CHECK_ERR(err);
+        2:   52:    qOK = qOK && iIsChild;
+        -:   53:  }
+        -:   54:
+        3:   55:  for ( int j=8; j<=9; j++ ) {
+        2:   56:    iMesh_addPrntChld(instance, apvSets[6], apvSets[j], &err);
+        2:   57:    CHECK_ERR(err);
+        2:   58:    iMesh_isChildOf(instance, apvSets[6], apvSets[j], &iIsChild, &err);
+        2:   59:    CHECK_ERR(err);
+        2:   60:    qOK = qOK && iIsChild;
+        -:   61:  }
+        1:   62:  TEST (qOK);
+        1:   63:  cout << "DONE\n";
+        -:   64:
+        1:   65:  vDoSaveLoad(&instance, &pvRootSet);
+        1:   66:  if (qSaveLoad) {
+        1:   67:    vRecoverSetsParentChild(instance, pvRootSet, apvSets);
+        -:   68:  }
+        -:   69:
+        1:   70:  cout << "Testing ability to get children/parents...                ";
+        1:   71:  int aiTotalChld[] =    {9, 2, 0, 4, 0, 0, 2, 0, 0, 0};
+        1:   72:  int aiDirectChld[] =   {3, 2, 0, 2, 0, 0, 2, 0, 0, 0};
+        1:   73:  int aiTwoLayerChld[] = {7, 2, 0, 4, 0, 0, 2, 0, 0, 0};
+        1:   74:  int aiTotalPrnt[] =    {0, 1, 1, 1, 2, 2, 2, 2, 3, 3};
+        1:   75:  int aiDirectPrnt[] =   {0, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+        1:   76:  int aiTwoLayerPrnt[] = {0, 1, 1, 1, 2, 2, 2, 2, 2, 2};
+        -:   77:
+        -:   78:  iBase_EntitySetHandle a2hTotalChld[][9] =
+        5:   79:    {{apvSets[1], apvSets[2], apvSets[3], apvSets[4], apvSets[5],
+        4:   80:      apvSets[6], apvSets[7], apvSets[8], apvSets[9]},
+        2:   81:     {apvSets[4], apvSets[5], NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        -:   82:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        4:   83:     {apvSets[6], apvSets[7], apvSets[8], apvSets[9], NULL, NULL, NULL,
+        -:   84:      NULL, NULL},
+        -:   85:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        -:   86:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        2:   87:     {apvSets[8], apvSets[9], NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        -:   88:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        -:   89:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+       18:   90:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
+        -:   91:  iBase_EntitySetHandle a2hDirectChld[][3] =
+        3:   92:    {{apvSets[1], apvSets[2], apvSets[3]},
+        2:   93:     {apvSets[4], apvSets[5], NULL},
+        -:   94:     {NULL, NULL, NULL},
+        2:   95:     {apvSets[6], apvSets[7], NULL},
+        -:   96:     {NULL, NULL, NULL},
+        -:   97:     {NULL, NULL, NULL},
+        2:   98:     {apvSets[8], apvSets[9], NULL},
+        -:   99:     {NULL, NULL, NULL},
+        -:  100:     {NULL, NULL, NULL},
+       10:  101:     {NULL, NULL, NULL}};
+        -:  102:  iBase_EntitySetHandle a2hTwoLayerChld[][7] =
+        5:  103:    {{apvSets[1], apvSets[2], apvSets[3], apvSets[4], apvSets[5],
+        2:  104:      apvSets[6], apvSets[7]},
+        2:  105:     {apvSets[4], apvSets[5], NULL, NULL, NULL, NULL, NULL},
+        -:  106:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        4:  107:     {apvSets[6], apvSets[7], apvSets[8], apvSets[9], NULL, NULL, NULL},
+        -:  108:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        -:  109:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        2:  110:     {apvSets[8], apvSets[9], NULL, NULL, NULL, NULL, NULL},
+        -:  111:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+        -:  112:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+       16:  113:     {NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
+        -:  114:
+        -:  115:  iBase_EntitySetHandle a2hTotalPrnt[][3] =
+        -:  116:    {{NULL, NULL, NULL},
+        1:  117:     {apvSets[0], NULL, NULL},
+        1:  118:     {apvSets[0], NULL, NULL},
+        1:  119:     {apvSets[0], NULL, NULL},
+        2:  120:     {apvSets[0], apvSets[1], NULL},
+        2:  121:     {apvSets[0], apvSets[1], NULL},
+        2:  122:     {apvSets[0], apvSets[3], NULL},
+        2:  123:     {apvSets[0], apvSets[3], NULL},
+        3:  124:     {apvSets[0], apvSets[3], apvSets[6]},
+       15:  125:     {apvSets[0], apvSets[3], apvSets[6]}};
+        -:  126:  iBase_EntitySetHandle a2hDirectPrnt[][1] =
+        -:  127:    {{NULL},
+        1:  128:     {apvSets[0]},
+        1:  129:     {apvSets[0]},
+        1:  130:     {apvSets[0]},
+        1:  131:     {apvSets[1]},
+        1:  132:     {apvSets[1]},
+        1:  133:     {apvSets[3]},
+        1:  134:     {apvSets[3]},
+        1:  135:     {apvSets[6]},
+        9:  136:     {apvSets[6]}};
+        -:  137:  iBase_EntitySetHandle a2hTwoLayerPrnt[][2] =
+        -:  138:    {{NULL, NULL},
+        1:  139:     {apvSets[0], NULL},
+        1:  140:     {apvSets[0], NULL},
+        1:  141:     {apvSets[0], NULL},
+        2:  142:     {apvSets[0], apvSets[1]},
+        2:  143:     {apvSets[0], apvSets[1]},
+        2:  144:     {apvSets[0], apvSets[3]},
+        2:  145:     {apvSets[0], apvSets[3]},
+        2:  146:     {apvSets[3], apvSets[6]},
+       14:  147:     {apvSets[3], apvSets[6]}};
+        -:  148:
+        -:  149:
+        1:  150:  bool qNumsOK = true;
+       11:  151:  for (int i = 0; i < 10; i++) {
+        -:  152:    int iTotalChld, iDirectChld, iTwoLayerChld;
+        -:  153:    int iTotalPrnt, iDirectPrnt, iTwoLayerPrnt;
+        -:  154:
+       10:  155:    iMesh_getNumChld(instance, apvSets[i], -1, &iTotalChld, &err);
+       10:  156:    CHECK_ERR(err);
+       10:  157:    iMesh_getNumChld(instance, apvSets[i],  0, &iDirectChld, &err);
+       10:  158:    CHECK_ERR(err);
+       10:  159:    iMesh_getNumChld(instance, apvSets[i],  1, &iTwoLayerChld, &err);
+       10:  160:    CHECK_ERR(err);
+        -:  161:
+       10:  162:    iMesh_getNumPrnt(instance, apvSets[i], -1, &iTotalPrnt, &err);
+       10:  163:    CHECK_ERR(err);
+       10:  164:    iMesh_getNumPrnt(instance, apvSets[i],  0, &iDirectPrnt, &err);
+       10:  165:    CHECK_ERR(err);
+       10:  166:    iMesh_getNumPrnt(instance, apvSets[i],  1, &iTwoLayerPrnt, &err);
+       10:  167:    CHECK_ERR(err);
+        -:  168:
+       10:  169:    qNumsOK = ((iTotalChld == aiTotalChld[i]) &&
+       10:  170:	       (iDirectChld == aiDirectChld[i]) &&
+       10:  171:	       (iTwoLayerChld == aiTwoLayerChld[i]) &&
+       10:  172:	       (iTotalPrnt == aiTotalPrnt[i]) &&
+       10:  173:	       (iDirectPrnt == aiDirectPrnt[i]) &&
+       50:  174:	       (iTwoLayerPrnt == aiTwoLayerPrnt[i]));
+       10:  175:    TEST ( qNumsOK );
+        -:  176:
+        -:  177:    // Check that the sets can return the parents and children
+        -:  178:    // counted above
+        -:  179:    ///
+        -:  180:    // Total children
+       10:  181:    iMesh_getChldn(instance, apvSets[i], -1, &aSets, &iSetsAlloc, &iNumSets, &err);
+       10:  182:    CHECK_ERR(err);
+       10:  183:    bool qGotAllSets = false;
+       10:  184:    GOT_ALL_ITEMS (a2hTotalChld[i], aSets, iNumSets, qGotAllSets );
+       10:  185:    TEST ( qGotAllSets && iNumSets == aiTotalChld[i] );
+        -:  186:
+        -:  187:    // Direct children
+       10:  188:    iMesh_getChldn(instance, apvSets[i], 0, &aSets, &iSetsAlloc, &iNumSets, &err);
+       10:  189:    CHECK_ERR(err);
+       10:  190:    qGotAllSets = false;
+       10:  191:    GOT_ALL_ITEMS (a2hDirectChld[i], aSets, iNumSets, qGotAllSets );
+       10:  192:    TEST ( qGotAllSets && iNumSets == aiDirectChld[i] );
+        -:  193:
+        -:  194:    // TwoLayer children
+       10:  195:    iMesh_getChldn(instance, apvSets[i], 1, &aSets, &iSetsAlloc, &iNumSets, &err);
+       10:  196:    CHECK_ERR(err);
+       10:  197:    qGotAllSets = false;
+       10:  198:    GOT_ALL_ITEMS (a2hTwoLayerChld[i], aSets, iNumSets, qGotAllSets );
+       10:  199:    TEST ( qGotAllSets && iNumSets == aiTwoLayerChld[i] );
+        -:  200:
+        -:  201:    // Total parents
+       10:  202:    iMesh_getPrnts(instance, apvSets[i], -1, &aSets, &iSetsAlloc, &iNumSets, &err);
+       10:  203:    CHECK_ERR(err);
+       10:  204:    qGotAllSets = false;
+       10:  205:    GOT_ALL_ITEMS (a2hTotalPrnt[i], aSets, iNumSets, qGotAllSets );
+       10:  206:    TEST ( qGotAllSets && iNumSets == aiTotalPrnt[i] );
+        -:  207:
+        -:  208:    // Direct parents
+       10:  209:    iMesh_getPrnts(instance, apvSets[i], 0, &aSets, &iSetsAlloc, &iNumSets, &err);
+       10:  210:    CHECK_ERR(err);
+       10:  211:    qGotAllSets = false;
+       10:  212:    GOT_ALL_ITEMS (a2hDirectPrnt[i], aSets, iNumSets, qGotAllSets );
+       10:  213:    TEST ( qGotAllSets && iNumSets == aiDirectPrnt[i] );
+        -:  214:
+        -:  215:    // TwoLayer parents
+       10:  216:    iMesh_getPrnts(instance, apvSets[i], 1, &aSets, &iSetsAlloc, &iNumSets, &err);
+       10:  217:    CHECK_ERR(err);
+       10:  218:    qGotAllSets = false;
+       10:  219:    GOT_ALL_ITEMS (a2hTwoLayerPrnt[i], aSets, iNumSets, qGotAllSets );
+       10:  220:    TEST ( qGotAllSets && iNumSets == aiTwoLayerPrnt[i] );
+        -:  221:  }
+        1:  222:  cout << "DONE\n";
+        -:  223:
+        -:  224:  double dData;
+        1:  225:  void* pvData = &dData;
+        1:  226:  if ( qErrTests ) {
+        1:  227:    cout << "Testing error throwing...                                 ";
+        -:  228:    // Error throwing tests simply try to create a situation where the interface
+        -:  229:    // should, according to the spec, throw an error, and verify that:
+        -:  230:    // (a) an error is thrown, and (b) the error is the one expected.
+        -:  231:    // If an error is not thrown, the reversal of the action is attempted, if
+        -:  232:    // it would interfere with further tests.
+        -:  233:
+        -:  234:    // Invalid entity/entity set/tag handle tests usually involve passing in an
+        -:  235:    // entity as an entity set or vice versa, etc., but sometimes try more
+        -:  236:    // difficult tests such as passing in a pointer to character data as an
+        -:  237:    // entity handle.
+        -:  238:
+        -:  239:    // Root set as parent
+        1:  240:    iMesh_addPrntChld(instance, pvRootSet, apvSets[0], &err);
+        1:  241:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  242:
+        -:  243:    // Root set as child
+        1:  244:    iMesh_addPrntChld(instance, apvSets[0], pvRootSet, &err);
+        1:  245:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  246:
+        -:  247:    // Removing root as parent
+        1:  248:    iMesh_rmvPrntChld(instance, pvRootSet, apvSets[0], &err);
+        1:  249:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  250:
+        -:  251:    // Removing root as child
+        1:  252:    iMesh_rmvPrntChld(instance, apvSets[0], pvRootSet, &err);
+        1:  253:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  254:
+        -:  255:    // Checking for root as parent
+        1:  256:    iMesh_isChildOf(instance, pvRootSet, apvSets[0], &iIsChild, &err);
+        1:  257:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  258:
+        -:  259:    // Checking for root as child
+        1:  260:    iMesh_isChildOf(instance, apvSets[0], pvRootSet, &iIsChild, &err);
+        1:  261:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  262:
+        -:  263:    // Getting child count for root set
+        1:  264:    iMesh_getNumChld(instance, pvRootSet, -1, &iNumSets, &err);
+        1:  265:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  266:
+        -:  267:    // Getting parent count for root set
+        1:  268:    iMesh_getNumPrnt(instance, pvRootSet, -1, &iNumSets, &err);
+        1:  269:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  270:
+        -:  271:    // Getting children for root set
+        -:  272:    iMesh_getChldn(instance, pvRootSet, -1, &aSets, &iSetsAlloc,
+        1:  273:		   &iNumSets, &err);
+        1:  274:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  275:
+        -:  276:    // Getting parents for root set
+        -:  277:    iMesh_getPrnts(instance, pvRootSet, -1, &aSets, &iSetsAlloc,
+        1:  278:		   &iNumSets, &err);
+        1:  279:    CHECK_ERR2(err, iBase_INVALID_ENTITYSET_HANDLE );
+        -:  280:
+        1:  281:    cout << "DONE\n";
+        -:  282:  }
+        -:  283:
+        1:  284:  cout << "Testing relation removal...                               ";
+        -:  285:
+        -:  286:  // Ensure that the parent-child relations can be removed without throwing
+        -:  287:  // an error an that the query reflects this removal
+        1:  288:  qOK = true;
+        4:  289:  for ( i=1; i<=3; i++ ) {
+        3:  290:    iMesh_rmvPrntChld(instance, apvSets[0], apvSets[i], &err);
+        3:  291:    CHECK_ERR(err);
+        3:  292:    iMesh_isChildOf(instance, apvSets[0], apvSets[i], &iIsChild, &err);
+        3:  293:    CHECK_ERR(err);
+        3:  294:    qOK = qOK && (!iIsChild);
+        -:  295:  }
+        3:  296:  for ( i=4; i<=5; i++ ) {
+        2:  297:    iMesh_rmvPrntChld(instance, apvSets[1], apvSets[i], &err);
+        2:  298:    CHECK_ERR(err);
+        2:  299:    iMesh_isChildOf(instance, apvSets[1], apvSets[i], &iIsChild, &err);
+        2:  300:    CHECK_ERR(err);
+        2:  301:    qOK = qOK && (!iIsChild);
+        -:  302:  }
+        3:  303:  for ( i=6; i<=7; i++ ) {
+        2:  304:    iMesh_rmvPrntChld(instance, apvSets[3], apvSets[i], &err);
+        2:  305:    CHECK_ERR(err);
+        2:  306:    iMesh_isChildOf(instance, apvSets[3], apvSets[i], &iIsChild, &err);
+        2:  307:    CHECK_ERR(err);
+        2:  308:    qOK = qOK && (!iIsChild);
+        -:  309:  }
+        3:  310:  for ( i=8; i<=9; i++ ) {
+        2:  311:    iMesh_rmvPrntChld(instance, apvSets[6], apvSets[i], &err);
+        2:  312:    CHECK_ERR(err);
+        2:  313:    iMesh_isChildOf(instance, apvSets[6], apvSets[i], &iIsChild, &err);
+        2:  314:    CHECK_ERR(err);
+        2:  315:    qOK = qOK && (!iIsChild);
+        -:  316:  }
+        -:  317:
+        -:  318:  // Clean up the sets
+       11:  319:  for ( i=0; i<10; i++ ) {
+       10:  320:    iMesh_destroyEntSet(instance, apvSets[i], &err);
+       10:  321:    CHECK_ERR(err);
+        -:  322:  }
+        1:  323:  UT_FREE(aSets);
+        1:  324:  vDoSaveLoad(&instance, &pvRootSet);
+        1:  325:  cout << "DONE\n";
+        3:  326:}

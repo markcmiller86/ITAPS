@@ -1,0 +1,10 @@
+./iMeshZoltanTest 2 test_meshes/brick.vtk REGION tmp.vtk
+./iMeshZoltanTest 2 test_meshes/brick.vtk FACE tmp.vtk
+./iMeshZoltanTest 2 test_meshes/brick.vtk EDGE tmp.vtk
+./iMeshZoltanTest 2 test_meshes/brick.vtk VERTEX tmp.vtk
+./iMeshZoltanTest 2 test_meshes/brick.vtk REGION tmp.vtk Graph
+./iMeshZoltanTest 2 test_meshes/brick.vtk FACE tmp.vtk Graph
+./iMeshZoltanTest 2 test_meshes/brick.vtk EDGE tmp.vtk Graph
+./iMeshZoltanTest 2 test_meshes/brick.vtk VERTEX tmp.vtk Graph
+./iMeshZoltanTest 2 test_meshes/brick.vtk REGION tmp.vtk Hypergraph
+./iMeshZoltanTest 2 test_meshes/brick.vtk FACE tmp.vtk Hypergraph

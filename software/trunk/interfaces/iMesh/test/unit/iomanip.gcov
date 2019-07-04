@@ -1,0 +1,298 @@
+        -:    0:Source:/usr/include/c++/4.4/iomanip
+        -:    0:Programs:15
+        -:    1:// Standard stream manipulators -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+        -:    4:// 2006, 2007, 2009
+        -:    5:// Free Software Foundation, Inc.
+        -:    6://
+        -:    7:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    8:// software; you can redistribute it and/or modify it under the
+        -:    9:// terms of the GNU General Public License as published by the
+        -:   10:// Free Software Foundation; either version 3, or (at your option)
+        -:   11:// any later version.
+        -:   12:
+        -:   13:// This library is distributed in the hope that it will be useful,
+        -:   14:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   15:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   16:// GNU General Public License for more details.
+        -:   17:
+        -:   18:// Under Section 7 of GPL version 3, you are granted additional
+        -:   19:// permissions described in the GCC Runtime Library Exception, version
+        -:   20:// 3.1, as published by the Free Software Foundation.
+        -:   21:
+        -:   22:// You should have received a copy of the GNU General Public License and
+        -:   23:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   24:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   25:// <http://www.gnu.org/licenses/>.
+        -:   26:
+        -:   27:/** @file iomanip
+        -:   28: *  This is a Standard C++ Library header.
+        -:   29: */
+        -:   30:
+        -:   31://
+        -:   32:// ISO C++ 14882: 27.6.3  Standard manipulators
+        -:   33://
+        -:   34:
+        -:   35:#ifndef _GLIBCXX_IOMANIP
+        -:   36:#define _GLIBCXX_IOMANIP 1
+        -:   37:
+        -:   38:#pragma GCC system_header
+        -:   39:
+        -:   40:#include <bits/c++config.h>
+        -:   41:#include <iosfwd>
+        -:   42:#include <bits/ios_base.h>
+        -:   43:
+        -:   44:_GLIBCXX_BEGIN_NAMESPACE(std)
+        -:   45:
+        -:   46:  // [27.6.3] standard manipulators
+        -:   47:  // Also see DR 183.
+        -:   48:
+        -:   49:  struct _Resetiosflags { ios_base::fmtflags _M_mask; };
+        -:   50:
+        -:   51:  /**
+        -:   52:   *  @brief  Manipulator for @c setf.
+        -:   53:   *  @param  mask  A format flags mask.
+        -:   54:   *
+        -:   55:   *  Sent to a stream object, this manipulator resets the specified flags,
+        -:   56:   *  via @e stream.setf(0,mask).
+        -:   57:  */
+        -:   58:  inline _Resetiosflags 
+        -:   59:  resetiosflags(ios_base::fmtflags __mask)
+        -:   60:  { 
+        -:   61:    _Resetiosflags __x; 
+        -:   62:    __x._M_mask = __mask; 
+        -:   63:    return __x; 
+        -:   64:  }
+        -:   65:
+        -:   66:  template<typename _CharT, typename _Traits>
+        -:   67:    inline basic_istream<_CharT, _Traits>& 
+        -:   68:    operator>>(basic_istream<_CharT, _Traits>& __is, _Resetiosflags __f)
+        -:   69:    { 
+        -:   70:      __is.setf(ios_base::fmtflags(0), __f._M_mask); 
+        -:   71:      return __is; 
+        -:   72:    }
+        -:   73:
+        -:   74:  template<typename _CharT, typename _Traits>
+        -:   75:    inline basic_ostream<_CharT, _Traits>& 
+        -:   76:    operator<<(basic_ostream<_CharT, _Traits>& __os, _Resetiosflags __f)
+        -:   77:    { 
+        -:   78:      __os.setf(ios_base::fmtflags(0), __f._M_mask); 
+        -:   79:      return __os; 
+        -:   80:    }
+        -:   81:
+        -:   82:
+        -:   83:  struct _Setiosflags { ios_base::fmtflags _M_mask; };
+        -:   84:
+        -:   85:  /**
+        -:   86:   *  @brief  Manipulator for @c setf.
+        -:   87:   *  @param  mask  A format flags mask.
+        -:   88:   *
+        -:   89:   *  Sent to a stream object, this manipulator sets the format flags
+        -:   90:   *  to @a mask.
+        -:   91:  */
+        -:   92:  inline _Setiosflags 
+        -:   93:  setiosflags(ios_base::fmtflags __mask)
+        -:   94:  { 
+        -:   95:    _Setiosflags __x; 
+        -:   96:    __x._M_mask = __mask; 
+        -:   97:    return __x; 
+        -:   98:  }
+        -:   99:
+        -:  100:  template<typename _CharT, typename _Traits>
+        -:  101:    inline basic_istream<_CharT, _Traits>& 
+        -:  102:    operator>>(basic_istream<_CharT, _Traits>& __is, _Setiosflags __f)
+        -:  103:    { 
+        -:  104:      __is.setf(__f._M_mask); 
+        -:  105:      return __is; 
+        -:  106:    }
+        -:  107:
+        -:  108:  template<typename _CharT, typename _Traits>
+        -:  109:    inline basic_ostream<_CharT, _Traits>& 
+        -:  110:    operator<<(basic_ostream<_CharT, _Traits>& __os, _Setiosflags __f)
+        -:  111:    { 
+        -:  112:      __os.setf(__f._M_mask); 
+        -:  113:      return __os; 
+        -:  114:    }
+        -:  115:
+        -:  116:
+        -:  117:  struct _Setbase { int _M_base; };
+        -:  118:
+        -:  119:  /**
+        -:  120:   *  @brief  Manipulator for @c setf.
+        -:  121:   *  @param  base  A numeric base.
+        -:  122:   *
+        -:  123:   *  Sent to a stream object, this manipulator changes the
+        -:  124:   *  @c ios_base::basefield flags to @c oct, @c dec, or @c hex when @a base
+        -:  125:   *  is 8, 10, or 16, accordingly, and to 0 if @a base is any other value.
+        -:  126:  */
+        -:  127:  inline _Setbase 
+        -:  128:  setbase(int __base)
+        -:  129:  { 
+        -:  130:    _Setbase __x; 
+        -:  131:    __x._M_base = __base; 
+        -:  132:    return __x; 
+        -:  133:  }
+        -:  134:
+        -:  135:  template<typename _CharT, typename _Traits>
+        -:  136:    inline basic_istream<_CharT, _Traits>& 
+        -:  137:    operator>>(basic_istream<_CharT, _Traits>& __is, _Setbase __f)
+        -:  138:    {
+        -:  139:      __is.setf(__f._M_base ==  8 ? ios_base::oct : 
+        -:  140:		__f._M_base == 10 ? ios_base::dec : 
+        -:  141:		__f._M_base == 16 ? ios_base::hex : 
+        -:  142:		ios_base::fmtflags(0), ios_base::basefield);
+        -:  143:      return __is; 
+        -:  144:    }
+        -:  145:  
+        -:  146:  template<typename _CharT, typename _Traits>
+        -:  147:    inline basic_ostream<_CharT, _Traits>& 
+        -:  148:    operator<<(basic_ostream<_CharT, _Traits>& __os, _Setbase __f)
+        -:  149:    {
+        -:  150:      __os.setf(__f._M_base ==  8 ? ios_base::oct : 
+        -:  151:		__f._M_base == 10 ? ios_base::dec : 
+        -:  152:		__f._M_base == 16 ? ios_base::hex : 
+        -:  153:		ios_base::fmtflags(0), ios_base::basefield);
+        -:  154:      return __os; 
+        -:  155:    }
+        -:  156:  
+        -:  157:
+        -:  158:  template<typename _CharT> 
+        -:  159:    struct _Setfill { _CharT _M_c; };
+        -:  160:
+        -:  161:  /**
+        -:  162:   *  @brief  Manipulator for @c fill.
+        -:  163:   *  @param  c  The new fill character.
+        -:  164:   *
+        -:  165:   *  Sent to a stream object, this manipulator calls @c fill(c) for that
+        -:  166:   *  object.
+        -:  167:  */
+        -:  168:  template<typename _CharT> 
+        -:  169:    inline _Setfill<_CharT> 
+        -:  170:    setfill(_CharT __c)
+        -:  171:    { 
+        -:  172:      _Setfill<_CharT> __x; 
+        -:  173:      __x._M_c = __c; 
+        -:  174:      return __x; 
+        -:  175:    }
+        -:  176:
+        -:  177:  template<typename _CharT, typename _Traits>
+        -:  178:    inline basic_istream<_CharT, _Traits>& 
+        -:  179:    operator>>(basic_istream<_CharT, _Traits>& __is, _Setfill<_CharT> __f)
+        -:  180:    { 
+        -:  181:      __is.fill(__f._M_c); 
+        -:  182:      return __is; 
+        -:  183:    }
+        -:  184:
+        -:  185:  template<typename _CharT, typename _Traits>
+        -:  186:    inline basic_ostream<_CharT, _Traits>& 
+        -:  187:    operator<<(basic_ostream<_CharT, _Traits>& __os, _Setfill<_CharT> __f)
+        -:  188:    { 
+        -:  189:      __os.fill(__f._M_c); 
+        -:  190:      return __os; 
+        -:  191:    }
+        -:  192:
+        -:  193:
+        -:  194:  struct _Setprecision { int _M_n; };
+        -:  195:
+        -:  196:  /**
+        -:  197:   *  @brief  Manipulator for @c precision.
+        -:  198:   *  @param  n  The new precision.
+        -:  199:   *
+        -:  200:   *  Sent to a stream object, this manipulator calls @c precision(n) for
+        -:  201:   *  that object.
+        -:  202:  */
+        -:  203:  inline _Setprecision 
+        -:  204:  setprecision(int __n)
+        -:  205:  { 
+        -:  206:    _Setprecision __x; 
+        -:  207:    __x._M_n = __n; 
+        -:  208:    return __x; 
+        -:  209:  }
+        -:  210:
+        -:  211:  template<typename _CharT, typename _Traits>
+        -:  212:    inline basic_istream<_CharT, _Traits>& 
+        -:  213:    operator>>(basic_istream<_CharT, _Traits>& __is, _Setprecision __f)
+        -:  214:    { 
+        -:  215:      __is.precision(__f._M_n); 
+        -:  216:      return __is; 
+        -:  217:    }
+        -:  218:
+        -:  219:  template<typename _CharT, typename _Traits>
+        -:  220:    inline basic_ostream<_CharT, _Traits>& 
+        -:  221:    operator<<(basic_ostream<_CharT, _Traits>& __os, _Setprecision __f)
+        -:  222:    { 
+        -:  223:      __os.precision(__f._M_n); 
+        -:  224:      return __os; 
+        -:  225:    }
+        -:  226:
+        -:  227:
+        -:  228:  struct _Setw { int _M_n; };
+        -:  229:
+        -:  230:  /**
+        -:  231:   *  @brief  Manipulator for @c width.
+        -:  232:   *  @param  n  The new width.
+        -:  233:   *
+        -:  234:   *  Sent to a stream object, this manipulator calls @c width(n) for
+        -:  235:   *  that object.
+        -:  236:  */
+        -:  237:  inline _Setw 
+        -:  238:  setw(int __n)
+        -:  239:  { 
+        -:  240:    _Setw __x; 
+        6:  241:    __x._M_n = __n; 
+        6:  242:    return __x; 
+        -:  243:  }
+        -:  244:
+        -:  245:  template<typename _CharT, typename _Traits>
+        -:  246:    inline basic_istream<_CharT, _Traits>& 
+        -:  247:    operator>>(basic_istream<_CharT, _Traits>& __is, _Setw __f)
+        -:  248:    { 
+        -:  249:      __is.width(__f._M_n); 
+        -:  250:      return __is; 
+        -:  251:    }
+        -:  252:
+        -:  253:  template<typename _CharT, typename _Traits>
+        -:  254:    inline basic_ostream<_CharT, _Traits>& 
+        -:  255:    operator<<(basic_ostream<_CharT, _Traits>& __os, _Setw __f)
+        -:  256:    { 
+        6:  257:      __os.width(__f._M_n); 
+        6:  258:      return __os; 
+        -:  259:    }
+        -:  260:
+        -:  261:  // Inhibit implicit instantiations for required instantiations,
+        -:  262:  // which are defined via explicit instantiations elsewhere.  
+        -:  263:  // NB:  This syntax is a GNU extension.
+        -:  264:#if _GLIBCXX_EXTERN_TEMPLATE
+        -:  265:  extern template ostream& operator<<(ostream&, _Setfill<char>);
+        -:  266:  extern template ostream& operator<<(ostream&, _Setiosflags);
+        -:  267:  extern template ostream& operator<<(ostream&, _Resetiosflags);
+        -:  268:  extern template ostream& operator<<(ostream&, _Setbase);
+        -:  269:  extern template ostream& operator<<(ostream&, _Setprecision);
+        -:  270:  extern template ostream& operator<<(ostream&, _Setw);
+        -:  271:  extern template istream& operator>>(istream&, _Setfill<char>);
+        -:  272:  extern template istream& operator>>(istream&, _Setiosflags);
+        -:  273:  extern template istream& operator>>(istream&, _Resetiosflags);
+        -:  274:  extern template istream& operator>>(istream&, _Setbase);
+        -:  275:  extern template istream& operator>>(istream&, _Setprecision);
+        -:  276:  extern template istream& operator>>(istream&, _Setw);
+        -:  277:
+        -:  278:#ifdef _GLIBCXX_USE_WCHAR_T
+        -:  279:  extern template wostream& operator<<(wostream&, _Setfill<wchar_t>);
+        -:  280:  extern template wostream& operator<<(wostream&, _Setiosflags);
+        -:  281:  extern template wostream& operator<<(wostream&, _Resetiosflags);
+        -:  282:  extern template wostream& operator<<(wostream&, _Setbase);
+        -:  283:  extern template wostream& operator<<(wostream&, _Setprecision);
+        -:  284:  extern template wostream& operator<<(wostream&, _Setw);
+        -:  285:  extern template wistream& operator>>(wistream&, _Setfill<wchar_t>);
+        -:  286:  extern template wistream& operator>>(wistream&, _Setiosflags);
+        -:  287:  extern template wistream& operator>>(wistream&, _Resetiosflags);
+        -:  288:  extern template wistream& operator>>(wistream&, _Setbase);
+        -:  289:  extern template wistream& operator>>(wistream&, _Setprecision);
+        -:  290:  extern template wistream& operator>>(wistream&, _Setw);
+        -:  291:#endif
+        -:  292:#endif
+        -:  293:
+        -:  294:_GLIBCXX_END_NAMESPACE
+        -:  295:
+        -:  296:#endif /* _GLIBCXX_IOMANIP */

@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"><!-- InstanceBegin template="/Templates/2col-LeftNav_services.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>ITAPS</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<meta name="Description" content="Your description goes here." />
+<meta name="Keywords" content="your,keywords,goes,here" />
+<meta name="author" content="name and perhaps email" />
+<link rel="stylesheet" href="../../itaps.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="../../assets/viewer/lightbox.css" type="text/css" media="screen" />
+<script type="text/javascript" src="../../assets/viewer/lightbox.js"></script>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<!-- InstanceParam name="bodyID" type="text" value="default" -->
+<!-- InstanceParam name="bodyClass" type="text" value="pageTools pageToolsServices pageSearch" -->
+</head>
+
+<body class="pageTools pageToolsServices pageSearch">
+<div id="container">
+
+<div id="sitename">
+<h1>ITAPS</h1>
+</div>
+
+<div id="mainmenu">
+<!--#include virtual="../../assets/inc/mainmenu.html" -->
+</div>
+ 
+<div id="wrap">
+
+<div id="leftside">
+<h1>Interoperable Tools</h1>
+<p>
+
+<a class="nav" href="../interfaces/index.html">Interfaces</a><span class="hide"> | </span>
+
+
+
+<a class="nav active" href="index.html" id="linkIndex">Services</a><span class="hide"> | </span>
+
+<a class="nav sub" href="meshgeom.html" id="linkMeshgeom">Mesh Geometry</a><span class="hide"> | </span>
+<a class="nav sub" href="curve.html" id="linkCurve">Mesh Curving</a><span class="hide"> | </span>
+<a class="nav sub" href="mesquite.html" id="linkMesquite">Mesh Smoothing</a><span class="hide"> | </span>
+<a class="nav sub" href="swapping.html" id="linkSwapping">Mesh Swapping</a><span class="hide"> | </span>
+<a class="nav sub" href="adaptive-loops.html" id="linkAdaptive-loops">Adaptive Loops</a><span class="hide"> | </span>
+<a class="nav sub" href="frontier.html" id="linkFrontier">Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="dynamic.html" id="linkDynamic">Dynamic Services</a><span class="hide"> | </span>
+<a class="nav sub" href="search.html" id="linkSearch">Search and Sort</a><span class="hide"> | </span>
+<a class="nav sub" href="visit_plugin.html" id="linkVisit_plugin">Visit Plugins</a><span class="hide"> | </span>
+<a class="nav sub" href="imeshio.html" id="linkImeshio">iMeshIO</a><span class="hide"> | </span>
+<a class="nav sub" href="IPComMan.html" id="linkIPComMan">IPComMan</a><span class="hide"> | </span>
+
+<a class="nav sub" href="adaptServ.html" id="linkAdaptServ">Mesh Adapt Service</a><span class="hide"> | </span>
+<a class="nav sub" href="petascale_meshing.html" id="linkPetascale_meshing">Petascale Meshing</a><span class="hide"> | </span>
+<a class="nav sub" href="shape_opt.html" id="linkShape_opt">Shape Optimization</a><span class="hide"> | </span>
+<a class="nav sub" href="amr_front_tracking.html" id="linkAmr_front_tracking">AMR Front Tracking</a><span class="hide"> | </span>
+<a class="nav sub" href="solution_transfer.html" id="linkSolution_transfer">Solution Transfer</a>
+
+
+</p>
+
+</div>
+
+
+
+
+<div id="contentaltL2" ><!-- InstanceBeginEditable name="Content" -->
+  <h1>Point/Element Search Service</h1>
+
+  
+<div class="imgContainer fLeft" style="width: 275px;">
+	<img src="../../assets/images/linesearch.jpg" alt="line search algorithm" name="Line search algorithm" width="275" height="192" border="0" align="middle" id="Graphic1" />
+    <p>Figure 1: An example of the line search algorithm for a 2D mesh.</p>
+</div>
+
+  <p>It is a common procedure to search a given mesh to determine the mesh entities that contain a set of points.  Examples of this include synthetic diagnostics and field transfer during mesh adaptation.  This can become a computationally expensive operation if the search procedure is not organized.  The best search procedure depends on the organization and number of search points.  Two point/element search algorithms have been developed. </p>
+        <p>The first is a line-search algorithm.  It assumes that there are a   &#8220;small&#8221; number of points being searched, that the points are ordered such that consecutive points are &#8220;close&#8221; to each other, and that, other that maybe a very small number, all of the points are in the domain of the mesh.  The algorithm requires no setup beyond loading the mesh.  The algorithm is initiated by starting from the mesh region returned from the last successful mesh search (or a random mesh region if no previous successful searches have been performed).  The algorithm proceeds by determining if the given point is in the domain of the mesh region and if it is, it returns the mesh region.  If the point is outside the domain of the mesh region, the algorithm marks the mesh region as being searched and moves on to an adjacent mesh region that is closest to the search point and continues the search. If all adjacent mesh regions are marked then the search is continued with a random unmarked mesh region.  The figure below shows an example of the line search algorithm in 2 dimensions.</p>
+
+<div class="imgContainer fRight" style="width: 275px;">
+	<img src="../../assets/images/octreesearch.jpg" alt="" name="Octree division" width="275" height="191" border="0" align="CENTER" id="An octree division of the bounding box of a 2D mesh" />
+    <p>Figure 2: An octree division of the bounding box of a 2D mesh.</p>
+</div>
+
+        <p>The second search algorithm is an octree-based search algorithm.   This algorithm recursively divides the domain of a mesh's bounding box into octants.  The domain is subdivided locally such that the number of mesh regions associated with a leaf octant (an octant without any sub-octants) is bounded and balanced.  A mesh region is considered to be associated with a leaf-octant if it is not determined that they do not intersect.  Exact intersection between a mesh region's domain and a leaf octant is expensive to compute so approximate intersection is computed using a projection method to quickly eliminate candidates. </p>
+        <p>After all of the mesh regions are associated with the proper leaf octants, the setup is complete.  Searching the mesh for a given point then involves determining which leaf octant the point is contained in and then searching the mesh regions associated with that leaf octant to determine if any of them contain the point in their domain.  Figure 2 shows an octree division of the bounding box of a mesh.</p>
+        <p>Deciding which of these two algorithms to use depends on a variety of factors.  Some of these factors include how many search points there are, the ordering of the search points, how many search points may be outside the domain of the mesh, the size of the mesh, etc.  Both algorithms were tested with 2 meshes with M1 having 38,400 mesh regions and M2 having 557,568 mesh regions (both meshes are manifold and have all prismatic mesh regions).  The setup time in seconds for each mesh and algorithm is shown in Table 1.  Note that the mesh is created from nodal coordinates and element connectivity information. </p>
+        <p> For search efficiency, the two algorithms were compared for doing line searches.  The results are given in Table 2.</p>
+
+<div class="imgContainer center" style="width: 576px;">
+	<table cellpadding="0" cellspacing="0" width="576">
+          <col width="310" />
+          <col width="122" />
+          <col width="119" />
+          <thead>
+            <tr valign="top">
+              <td width="310"><p><br />
+              </p></td>
+              <td width="122"><p align="center">M1</p></td>
+              <td width="119"><p align="center">M2</p></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr valign="top">
+              <td width="310"><p>Line Search Mesh Creation</p></td>
+              <td width="122"><p align="center">1.59 (s)</p></td>
+              <td width="119"><p align="center">22.7 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="310"><p>Octree-Based Search Mesh 				Creation</p></td>
+              <td width="122"><p align="center">0.34 (s)</p></td>
+              <td width="119"><p align="center">4.64 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="310"><p>Octree-Based Search 				Structure Creation</p></td>
+              <td width="122"><p align="center">3.66 (s)</p></td>
+              <td width="119"><p align="center">53.9 (s)</p></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Table 1: Computation time in seconds for creating objects.</p>
+</div>
+
+
+<div class="imgContainer center" style="width: 576px;">
+	<table border="1" bordercolor="#000000" cellpadding="4" cellspacing="0" width="576">
+          <col width="330" />
+          <col width="84" />
+          <col width="137" />
+          <thead>
+            <tr valign="top">
+              <td width="330"><p><br />
+              </p></td>
+              <td width="84"><p> Line Search</p></td>
+              <td width="137"><p> Octree-Based Search</p></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr valign="top">
+              <td width="330"><p>M1 with 96 				interior points out of 100</p></td>
+              <td width="84"><p align="center">4.17 (s)</p></td>
+              <td width="137"><p align="center">0.0025 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M1 with 9,618 				interior points out of 10,000</p></td>
+              <td width="84"><p align="center">398 (s)</p></td>
+              <td width="137"><p align="center">0.929 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M1 with 100 				interior points</p></td>
+              <td width="84"><p align="center">0.0163 (s)</p></td>
+              <td width="137"><p align="center">0.00645 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M1 with 10,000 				interior points</p></td>
+              <td width="84"><p align="center">0.411 (s)</p></td>
+              <td width="137"><p align="center">0.0968 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M2 with 92 				interior points out of 100</p></td>
+              <td width="84"><p align="center">125 (s)</p></td>
+              <td width="137"><p align="center">0.00227 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M2 with 9,332 				interior points out of 10,000</p></td>
+              <td width="84"><p align="center">10.989 (s)</p></td>
+              <td width="137"><p align="center">0.0866 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M2 with 100 				interior points</p></td>
+              <td width="84"><p align="center">0.0223 (s)</p></td>
+              <td width="137"><p align="center">0.00765 (s)</p></td>
+            </tr>
+            <tr valign="top">
+              <td width="330"><p>M2 with 10,000 				interior points</p></td>
+              <td width="84"><p align="center">0.412 (s)</p></td>
+              <td width="137"><p align="center">0.103 (s)</p></td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Table 2: Compute times for line searches.</p>
+</div>
+      <p class="clear">As can be seen from Table 2, the line search algorithm is only slightly slower than the octree-based search algorithm when all of the search points are in the domain of the mesh. Since the line search has very small set-up time, it is superior when points are ordered and no points are exterior. When any points are outside the domain, the line search quickly becomes expensive since in that case it ends-up checking all elements for such points. When there are large numbers of more random points to be searched, the octree method is faster. </p>
+      <p>Other search algorithms such as the popular ADT (or a pseudo ADT  for adapting meshes) can be implemented fairly quickly building on the ITAPS infrastructure. </p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+<!-- InstanceEndEditable -->
+<div class="clearingdiv"></div>
+</div>
+
+<div class="clearingdiv">&nbsp;</div>
+</div>
+</div>
+<div id="footer">
+  <!--#include virtual="/assets/inc/footer.html" -->
+</div>
+</body>
+<!-- InstanceEnd --></html>

@@ -1,0 +1,113 @@
+% This is section for entitygroup. 
+
+The definition of mesh entity group is derived from the defintion of
+part mesh entity, which is from part entity. 
+
+
+\textbf{Definition: Part Mesh Entity}
+
+In finite element space, part mesh entity is a mesh entity that does not
+bound any higher order mesh entities.In a 3D manifold
+mesh, this includes all mesh regions. In a 3D non-manifold mesh, this
+includes all mesh regions, the mesh faces that do not bound any mesh
+regions; the mesh edges that do not bound any mesh faces, and mesh
+vertices that do not bound any mesh edges. The $i^{th}$ part mesh entity of
+dimension d is denoted as $M^d_{P\_i}$.
+
+
+\subsection{Definition of Entity Group}
+
+\textbf{Entity group:} a group of part mesh entities that
+need to stay together. It is defined by the application program
+according to rules listed below. 
+
+\begin{itemize}
+\item Entity group only includes part mesh entities that need to stay
+  on the same part. These part mesh entities stay together as a group
+  during the life time of entity group.
+
+\item A part mesh entity only associates with a single entity group, and is defined once in the entity group.
+
+\item Entity group information is maintained consistently before and
+  after migration on the part it exists.
+
+\item Entity group is dynamic in nature during the execution, i.e.,
+  the application program can create and destroy an entity group, or
+  add/remove  part mesh entities in an entity group. 
+\end{itemize}
+
+\subsection{operations on entity group} 
+Once an entity group is defined, the application program has a
+handle/pointer to access the entity group and can perform basic
+operations on the entity group. The possible operations on entity group are listed below. 
+
+\textbf{Mesh level operation for entity group}
+
+\begin{itemize}
+\item Iteration over entity groups in a mesh  
+
+      Loop through all entity groups in a mesh, for example, to get a
+      certain part mesh entity. 
+\end{itemize}
+
+\textbf{Group level operation for entity group}
+
+\begin{itemize}
+
+\item Create/Delete
+
+To create an entity group, the application program needs to give FMDB
+a list of part mesh entities. The application program can delete an
+entity group if it is not needed.
+
+\item getBdryEntity 
+
+Get a set of mesh entities that bound the part mesh entities on the boundary of the entity
+group. 
+
+\item Clear
+
+Clear the list of part mesh entities in an entity group to get an empty entity group. 
+
+\item Size
+
+Get the number of part mesh entities in an entity group.
+
+\item isEmpty
+
+Check whether or not an entity group is empty, i.e., without any part mesh entities.
+
+\item Union/Subtract
+
+Union: merge the second entity group into the first entity group, and delete the second entity group.
+
+Subtract: retrieve some part mesh entities from an entity group to
+build a new entity group, and remove/erase these part mesh entities in the old entity group.
+
+\item Iteration over part mesh entities in an entity group
+
+Loop through part mesh entities of an entity group, for example, to get a
+certain part mesh entity.
+
+\item Add/Remove
+
+Append or remove a part mesh entity in an entity group.
+
+\end{itemize}
+
+\textbf{Entity level operation for entity group}
+\begin{itemize}
+\item GetEntityGroup
+
+Given a part mesh entity, find the entity group it belongs to. If it does not belong to any entity group, the operation returns zero. 
+\end{itemize}
+
+In FMDB implementation, this functionality is achieved by attaching
+group information (local memory location of the entity group on the
+process) to a part mesh entity when the entity is added to entity
+group, or to all part mesh entities in the group when an entity group
+is created with part mesh entities. When a part mesh entity is removed
+from the entity group, or an entity group is removed from the mesh,
+the attached group information for the part mesh entity in the group is deleted. 
+
+

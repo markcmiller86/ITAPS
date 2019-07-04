@@ -1,0 +1,44 @@
+# Note: to generate a ../configure file, do:  autoconf -I ../conf
+
+AC_INIT(./configure.in)
+AC_CONFIG_AUX_DIR(../conf)
+
+# Default languages
+TSTT_CLIENT_C=yes
+TSTT_CLIENT_CXX=yes
+TSTT_CLIENT_F77=yes
+TSTT_CLIENT_F90=yes
+TSTT_CLIENT_JAVA=no
+TSTT_CLIENT_PYTHON=no
+
+TSTT_PROG_CHECKS
+TSTT_CLIENT_INIT
+TSTT_PATH_TSTTB
+TSTT_PATH_TSTTM 
+
+echo "CLIENT_LANGS = $CLIENT_LANGS"
+
+for dir in *; do  
+  if test -d $dir; then
+    for tmp_lang in $CLIENT_LANGS; do
+      if test "$tmp_lang" = "CXX"; then
+        lang='C++'
+      else
+        lang="$tmp_lang"
+      fi
+      mydir="$dir/$lang"
+      if test -f $mydir/Makefile.in; then
+	SUBDIRS="$SUBDIRS $mydir"
+	filelist="$filelist $mydir/Makefile"
+      elif test -f $mydir/Makefile; then
+	SUBDIRS="$SUBDIRS $mydir"
+      fi
+    done
+  fi
+done
+
+AC_SUBST(SUBDIRS)
+AC_OUTPUT( $filelist Makefile )
+#AC_OUTPUT( $filelist )
+
+		 
